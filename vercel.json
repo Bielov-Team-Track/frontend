@@ -9,12 +9,6 @@
       "runtime": "nodejs20.x"
     }
   },
-  "env": {
-    "NEXT_PUBLIC_API_URL": "@api_url",
-    "NEXT_PUBLIC_AUTH_API_URL": "@auth_api_url",
-    "NEXT_PUBLIC_EVENTS_API_URL": "@events_api_url",
-    "NEXT_PUBLIC_WEBSOCKET_URL": "@websocket_url"
-  },
   "headers": [
     {
       "source": "/api/(.*)",
