@@ -64,9 +64,11 @@ function PositionWithUser({
       />
       <div className="collapse-title p-4 h-14 rounded-md bg-primary w-full flex justify-between">
         <div className="flex items-center gap-2">
-          <Avatar profile={position.userProfile} />
+          <Avatar profile={position.userProfile!} />
           <div className="flex flex-col">
-            <span>{position.userProfile?.name} {position.userProfile?.surname}</span>
+            <span>
+              {position.userProfile?.name} {position.userProfile?.surname}
+            </span>
             <span className="text-neutral/60 text-xs">{position.name}</span>
           </div>
         </div>
@@ -93,7 +95,7 @@ function PositionWithUser({
                 {waitlist && waitlist.length > 0 ? (
                   waitlist.map((user) => (
                     <div
-                      key={`waitlist-${position.id}-${user.id}`}
+                      key={`waitlist-${position.id}-${user.userId}`}
                       className="flex w-full items-center justify-between gap-2"
                     >
                       <div className="flex gap-2 items-center">

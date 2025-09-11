@@ -160,9 +160,19 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
     return await createEvent(eventData);
   });
 
-  window.onpopstate = () => {
-    setStep(step - 1);
-  };
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const handlePopState = () => {
+        setStep((prevStep) => Math.max(1, prevStep - 1));
+      };
+      
+      window.addEventListener('popstate', handlePopState);
+      
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }
+  }, []);
 
   const saveEvent = async (data: any) => {
     const payload: CreateEvent = {
@@ -257,10 +267,10 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
             </span>
           </div>
         )}
-        {values.locationId && step > 3 && (
+        {values.location && step > 3 && (
           <div className="flex items-center gap-2">
             <span>🗺️</span>
-            <span>Location: {getLocationName(values.locationId)}</span>
+            <span>Location: {values.location}</span>
           </div>
         )}
       </div>
@@ -295,7 +305,7 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
           <div className="bg-error/10 border border-error/20 text-error p-4 rounded-lg mb-6">
             <p className="font-medium">Something went wrong</p>
             <p className="text-sm opacity-80">
-              We're working on it. Please try again.
+              We&apos;re working on it. Please try again.
             </p>
           </div>
         )}
@@ -309,7 +319,7 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
                 Event Details
               </h2>
               <p className="text-base-content/60">
-                Let's start with the basic information about your event
+                Let&apos;s start with the basic information about your event
               </p>
             </div>
 
@@ -628,9 +638,8 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
                 <Controller
                   name="payToEnter"
                   control={control}
-                  render={({ field }) => (
+                  render={() => (
                     <Checkbox
-                      {...field}
                       label="Pay to enter event"
                       error={errors.payToEnter?.message}
                       helperText="Check if participants need to pay to join this event"

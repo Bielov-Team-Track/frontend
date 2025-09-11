@@ -9,7 +9,13 @@ export interface CheckboxProps
   label?: string;
   error?: string;
   helperText?: string;
-  variant?: "primary" | "secondary" | "accent" | "success" | "warning" | "error";
+  variant?:
+    | "primary"
+    | "secondary"
+    | "accent"
+    | "success"
+    | "warning"
+    | "error";
   checkboxSize?: "sm" | "md" | "lg";
   fullWidth?: boolean;
 }
@@ -90,7 +96,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             <span
               className={`label-text ${
                 error ? "text-red-600" : "text-base-content"
-              } ${disabled ? "opacity-60" : ""} ${responsiveClasses.text.base}`}
+              } ${disabled ? "opacity-60" : ""}`}
             >
               {label}
               {props.required && <span className="text-red-500 ml-1">*</span>}

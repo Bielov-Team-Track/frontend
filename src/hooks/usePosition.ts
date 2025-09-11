@@ -8,7 +8,7 @@ import {
 } from "@/lib/requests/positions";
 import { usePositionStore } from "@/lib/realtime/positionStore";
 import signalr from "@/lib/realtime/signalrClient";
-import { UserProfile, User } from "@/lib/models/User";
+import { UserProfile } from "@/lib/models/User";
 
 export function usePosition(
   defaultPosition: Position,
@@ -125,8 +125,8 @@ export function usePosition(
   }, [position.id, profile, connectionStatus]);
 
   const assignPosition = useCallback(
-    async (targetUser: User) => {
-      if (!targetUser.id || !profile?.userId) {
+    async (targetUser: UserProfile) => {
+      if (!targetUser.userId || !profile?.userId) {
         setError("Invalid user data");
         return;
       }
@@ -137,7 +137,7 @@ export function usePosition(
       try {
         const newPosition = await takePositionWithUser(
           position.id,
-          targetUser.id
+          targetUser.userId
         );
         setPosition(newPosition);
       } catch (error: any) {

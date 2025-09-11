@@ -98,10 +98,6 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         // If empty string (placeholder selected), pass undefined
         onChange(newValue === "" ? undefined : newValue);
       }
-      // Also call the original onChange if provided in props
-      if (props.onChange) {
-        props.onChange(e);
-      }
     };
 
     // Determine the display value

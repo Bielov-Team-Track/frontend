@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import Avatar from "@/components/ui/avatar";
-import { User } from "@/lib/models/User";
+import { UserProfile } from "@/lib/models/User";
 import { search as searchUsers } from "@/lib/requests/user";
 
 type UserSearchProps = {
-  onUserSelect: (user: User) => void;
+  onUserSelect: (userProfile: UserProfile) => void;
 };
 
 const UserSearch = ({ onUserSelect }: UserSearchProps) => {
   const [query, setQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -31,12 +31,14 @@ const UserSearch = ({ onUserSelect }: UserSearchProps) => {
         {searchResults.length > 0 &&
           searchResults.map((user) => (
             <div
-              key={user.id}
+              key={user.userId}
               onClick={() => onUserSelect && onUserSelect(user)}
               className="flex gap-2"
             >
               <Avatar profile={user} />
-              <span>{user.name}</span>
+              <span>
+                {user.name} {user.surname}
+              </span>
             </div>
           ))}
       </div>

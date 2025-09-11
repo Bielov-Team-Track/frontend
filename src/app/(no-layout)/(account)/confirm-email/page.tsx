@@ -4,9 +4,9 @@ import Loader from '@/components/ui/loader';
 import { confirmEmail as confirmEmailRequest } from '@/lib/requests/auth';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, Suspense } from 'react'
 
-function ConfirmEmailPage() {
+function ConfirmEmailContent() {
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
@@ -73,6 +73,14 @@ function ConfirmEmailPage() {
     </div>
   ) : (
     <div>{error}</div>
+  );
+}
+
+function ConfirmEmailPage() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <ConfirmEmailContent />
+    </Suspense>
   );
 }
 

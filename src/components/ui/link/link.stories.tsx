@@ -39,10 +39,6 @@ const meta: Meta<typeof Link> = {
         defaultValue: { summary: "false" },
       },
     },
-    disabled: {
-      control: { type: "boolean" },
-      description: "Whether the Link is disabled",
-    },
     children: {
       control: { type: "text" },
       description: "The content of the Link",
@@ -131,13 +127,6 @@ export const ExtraLarge: Story = {
 };
 
 // State stories
-export const Disabled: Story = {
-  args: {
-    children: "Disabled Link",
-    disabled: true,
-  },
-};
-
 export const FullWidth: Story = {
   args: {
     children: "Full Width Link",
@@ -400,7 +389,6 @@ export const Playground: Story = {
     children: "Playground Link",
     variant: "primary",
     size: "md",
-    disabled: false,
     fullWidth: false,
   },
   parameters: {
@@ -420,7 +408,6 @@ export const InteractionExamples: Story = {
         <h3 className="text-lg font-semibold mb-4">Link States</h3>
         <div className="flex flex-wrap gap-4">
           <Link>Normal</Link>
-          <Link disabled>Disabled</Link>
           <Link>Loading</Link>
         </div>
       </div>

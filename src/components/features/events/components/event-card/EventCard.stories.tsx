@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import EventCard from "./index";
-import { Event } from "@/lib/models/Event";
+import { Event, EventType, PlayingSurface } from "@/lib/models/Event";
 
 const meta: Meta<typeof EventCard> = {
   title: "Events/EventCard",
@@ -25,19 +25,20 @@ const mockEvent: Event = {
     name: "Downtown Sports Complex",
     address: "123 Main Street",
   },
-  cost: 25.0,
-  type: 0, // Assuming EventType enum
-  surface: 0, // Assuming PlayingSurface enum
+  costToEnter: 25.0,
+  type: EventType.CasualPlay, // Assuming EventType enum
+  surface: PlayingSurface.Indoor, // Assuming PlayingSurface enum
   isPrivate: false,
   teamsNumber: 4,
   description:
     "Join us for a fun-filled day of volleyball with teams from all over the city. Prizes for the winners!",
   admins: [
     {
-      id: "usr_admin1",
+      userId: "usr_admin1",
+      surname: "Smith",
+      imageUrl: "https://example.com/avatar1.jpg",
       name: "John Doe",
       email: "john@example.com",
-      role: "ADMIN",
     },
   ],
 };

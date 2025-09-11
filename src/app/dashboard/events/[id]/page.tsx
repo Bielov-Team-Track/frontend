@@ -22,6 +22,7 @@ import {
   FaUsers as PeopleIcon,
   FaVolleyballBall as VolleyballIcon,
 } from "react-icons/fa";
+import { UserProfile } from "@/lib/models/User";
 
 type EventPageParams = {
   params: {
@@ -34,7 +35,7 @@ async function EventPage({ params }: EventPageParams) {
     notFound();
   }
 
-  const user = await getUserProfile();
+  const user: UserProfile = await getUserProfile();
 
   if (!user) {
     redirect("/login");
@@ -47,16 +48,16 @@ async function EventPage({ params }: EventPageParams) {
     notFound();
   }
 
-  const isAdmin = !!event.admins!.find((a) => a.id == user.id);
+  const isAdmin = !!event.admins!.find((a) => a.userId == user.userId);
 
   if ((event as any).approveGuests && !isAdmin) {
-    const userApproval = await checkUserApproval(event.id!, user?.id!);
+    const userApproval = await checkUserApproval(event.id!, user?.userId!);
 
     if (!userApproval || !userApproval.approved) {
       return (
         <ApprovalSection
           defaultApproval={userApproval}
-          userId={user?.id!}
+          userId={user?.userId!}
           eventId={event.id!}
         />
       );

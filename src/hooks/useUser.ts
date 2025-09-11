@@ -1,22 +1,16 @@
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getCurrentUserProfile } from "@/lib/requests/auth";
-
-interface User {
-  id: string;
-  email: string;
-  name?: string;
-  // Add other user properties as needed
-}
+import { UserProfile } from "@/lib/models/User";
 
 interface UseUserReturn {
-  user: User | null;
+  userProfile: UserProfile | null;
   loading: boolean;
   error: string | null;
 }
 
 const useUser = (): UseUserReturn => {
-  const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -26,19 +20,19 @@ const useUser = (): UseUserReturn => {
       try {
         setLoading(true);
         setError(null);
-        
+
         const userData = await getCurrentUserProfile();
-        setUser(userData);
+        setUserProfile(userData);
       } catch (err: any) {
-        console.error('Error fetching user:', err);
-        setError(err.message || 'Failed to fetch user');
-        
+        console.error("Error fetching user:", err);
+        setError(err.message || "Failed to fetch user");
+
         // If authentication failed, redirect to login
         if (err.response?.status === 401 || err.response?.status === 403) {
-          router.push('/login');
+          router.push("/login");
         }
-        
-        setUser(null);
+
+        setUserProfile(null);
       } finally {
         setLoading(false);
       }
@@ -47,7 +41,7 @@ const useUser = (): UseUserReturn => {
     fetchUser();
   }, [router]);
 
-  return { user, loading, error };
+  return { userProfile: userProfile ?? null, loading, error };
 };
 
 export default useUser;

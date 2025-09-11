@@ -1,6 +1,6 @@
-import { User } from "next-auth";
+import { UserProfile } from "./User";
 
 export interface Approval {
-  user: User
+  user: UserProfile;
   approved?: boolean;
 }

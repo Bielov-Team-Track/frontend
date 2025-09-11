@@ -15,11 +15,6 @@ const MockHeader = () => (
   </header>
 )
 
-// Mock the components/layout module
-jest.mock('@/components/layout', () => ({
-  Header: MockHeader,
-}))
-
 const meta: Meta<typeof Drawer> = {
   title: 'UI/Drawer',
   component: Drawer,

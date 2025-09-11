@@ -7,20 +7,22 @@ import { FaEllipsisH as MenuIcon } from "react-icons/fa";
 import { Modal } from "@/components/ui";
 import { UserSearch } from "@/components/features/users";
 import { assignCaptain as assignCaptainRequest } from "@/lib/requests/teams";
-
-type MinimalUser = { id: string; name: string };
+import useUser from "@/hooks/useUser";
+import { UserProfile } from "@/lib/models/User";
 
 type TeamMenuProps = {
   team: Team;
-  onCaptainAssigned: (user?: MinimalUser) => void;
+  onCaptainAssigned: (user?: UserProfile) => void;
 };
 
 function TeamMenu({ team, onCaptainAssigned }: TeamMenuProps) {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  const { user } = useAuth();
+  const { userProfile } = useUser();
 
-  const isAdmin = !!team.event.admins.find((a) => a.id == user?.id);
+  const isAdmin = !!team.event.admins?.find(
+    (a) => a.userId == userProfile?.userId
+  );
 
   if (!isAdmin) {
     return null;
@@ -30,9 +32,9 @@ function TeamMenu({ team, onCaptainAssigned }: TeamMenuProps) {
     return null;
   }
 
-  const assignCaptain = (selectedUser?: MinimalUser) => {
+  const assignCaptain = (selectedUser?: UserProfile) => {
     setIsLoading(true);
-    assignCaptainRequest(team.id!, selectedUser?.id!)
+    assignCaptainRequest(team.id!, selectedUser?.userId!)
       .then(() => {
         setIsLoading(false);
         setIsModalOpen(false);

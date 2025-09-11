@@ -1,4 +1,5 @@
 import {
+  HttpTransportType,
   HubConnection,
   HubConnectionBuilder,
   HubConnectionState,
@@ -43,7 +44,10 @@ class SignalRClient {
 
     const options: IHttpConnectionOptions = {
       accessTokenFactory: token ? () => token : undefined,
-      transport: 7, // All transports: WebSockets | ServerSentEvents | LongPolling
+      transport:
+        HttpTransportType.LongPolling |
+        HttpTransportType.WebSockets |
+        HttpTransportType.ServerSentEvents, // All transports: WebSockets | ServerSentEvents | LongPolling
       withCredentials: true, // For CORS support
     };
 
@@ -88,7 +92,7 @@ class SignalRClient {
         console.log("Attempting to restart connection...");
         try {
           await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds
-          await this.start(token);
+          await this.start(hub, token);
         } catch (restartError) {
           console.error("Failed to restart connection:", restartError);
         }

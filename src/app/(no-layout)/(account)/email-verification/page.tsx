@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import { sendVerification } from '@/lib/requests/auth'
 import Loader from '@/components/ui/loader'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-function EmailVerificationPage() {
+function EmailVerificationContent() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
   const [resendSuccess, setResendSuccess] = useState<boolean>(false)
@@ -91,6 +91,14 @@ function EmailVerificationPage() {
       </div>
     </div>
   )
+}
+
+function EmailVerificationPage() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <EmailVerificationContent />
+    </Suspense>
+  );
 }
 
 export default EmailVerificationPage

@@ -1,9 +1,11 @@
 import axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from "axios";
 import { handleDates } from "./utils/date";
+import { API_BASE_URL } from "./constants";
 
 const client = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: API_BASE_URL,
   withCredentials: false,
+  timeout: 10000,
 });
 
 // Token management utilities
@@ -72,10 +74,11 @@ client.interceptors.request.use(
 
       // If we still don't have a token, try cookie fallback
       if (!token) {
-        token = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("token="))
-          ?.split("=")[1];
+        token =
+          document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("token="))
+            ?.split("=")[1] ?? null;
       }
 
       if (token) {

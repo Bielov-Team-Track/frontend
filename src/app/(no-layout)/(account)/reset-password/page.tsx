@@ -1,11 +1,12 @@
 'use client';
 
-import ResetPasswordForm from '@/components/Forms/Auth/ResetPasswordForm';
+import { ResetPasswordForm } from '@/components';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import React from 'react'
+import React, { Suspense } from 'react'
+import Loader from '@/components/ui/loader';
 
-function ResetPasswordPage() {
+function ResetPasswordContent() {
   const params = useSearchParams();
   const [passwordReset, setPasswordReset] = React.useState(false);
   const [email, token] = [params.get('email'), params.get('token')];
@@ -28,6 +29,14 @@ function ResetPasswordPage() {
       }
     </div>
   )
+}
+
+function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <ResetPasswordContent />
+    </Suspense>
+  );
 }
 
 export default ResetPasswordPage

@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useState, Suspense } from "react";
 import { FcGoogle as GoogleIcon } from "react-icons/fc";
 import { FaEnvelope, FaLock } from "react-icons/fa6";
 import { Loader, Input, Button } from "@/components/ui";
 import { useAuth } from "@/lib/auth/authContext";
 import { sendVerification } from "@/lib/requests/auth";
 
-function LoginPage() {
+function LoginContent() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
@@ -169,6 +169,14 @@ function getProviderLogo(id: string) {
     default:
       return <></>;
   }
+}
+
+function LoginPage() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <LoginContent />
+    </Suspense>
+  );
 }
 
 export default LoginPage;

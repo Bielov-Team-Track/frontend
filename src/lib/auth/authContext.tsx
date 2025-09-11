@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       saveTokens(user);
 
       const userProfile = await getCurrentUserProfile();
-      setUserProfile(userProfile);
+      setUserProfile(userProfile ?? null);
 
       console.log("Login process completed, user set:", userProfile);
     } catch (error) {
@@ -123,8 +123,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const authResponse = await apiRefreshToken(refreshTokenValue);
 
       saveTokens(authResponse);
-      const user = await getCurrentUserProfile();
-      setUserProfile(user);
+      const userProfile = await getCurrentUserProfile();
+      setUserProfile(userProfile ?? null);
     } catch (error) {
       console.error("Token refresh failed:", error);
       clearTokens();
@@ -157,7 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Token is valid, get current user
           try {
             const currentUserProfile = await getCurrentUserProfile();
-            setUserProfile(currentUserProfile);
+            setUserProfile(currentUserProfile ?? null);
           } catch (error) {
             // If getting user fails, try refresh
             await refreshAuth();

@@ -1,15 +1,15 @@
-import React, { ComponentType, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth/authContext';
+import React, { ComponentType, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth/authContext";
 
 const withAuth = <P extends object>(WrappedComponent: ComponentType<P>) => {
   const ComponentWithAuth = (props: P) => {
-    const { user, isLoading, isAuthenticated } = useAuth();
+    const { userProfile, isLoading, isAuthenticated } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
       if (!isLoading && !isAuthenticated) {
-        router.replace('/login');
+        router.replace("/login");
       }
     }, [isLoading, isAuthenticated, router]);
 
@@ -23,16 +23,18 @@ const withAuth = <P extends object>(WrappedComponent: ComponentType<P>) => {
     }
 
     // If not authenticated or no user, don't render the component
-    if (!isAuthenticated || !user) {
+    if (!isAuthenticated || !userProfile) {
       return null;
     }
 
     // User is authenticated, render the wrapped component with user data
-    return <WrappedComponent {...props} user={user} />;
+    return <WrappedComponent {...props} user={userProfile} />;
   };
 
   // Set display name for debugging
-  ComponentWithAuth.displayName = `withAuth(${WrappedComponent.displayName || WrappedComponent.name})`;
+  ComponentWithAuth.displayName = `withAuth(${
+    WrappedComponent.displayName || WrappedComponent.name
+  })`;
 
   return ComponentWithAuth;
 };

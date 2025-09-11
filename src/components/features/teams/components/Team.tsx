@@ -9,6 +9,7 @@ import TeamMenu from "./TeamMenu";
 import { usePositionStore } from "@/lib/realtime/positionStore";
 import { useRealtimePositions } from "@/hooks/useRealtimePositions";
 import signalr from "@/lib/realtime/signalrClient";
+import { UserProfile } from "@/lib/models/User";
 
 function Team({ team: defaultTeam }: { team: TeamModel }) {
   const [team, setTeam] = useState(defaultTeam);
@@ -60,8 +61,8 @@ function Team({ team: defaultTeam }: { team: TeamModel }) {
     });
   }, [positionStore]);
 
-  const handleCaptainAssigned = (newCaptain?: { id: string; name: string }) => {
-    setTeam({ ...team, captain: newCaptain as any });
+  const handleCaptainAssigned = (newCaptain?: UserProfile) => {
+    setTeam({ ...team, captain: newCaptain });
   };
 
   const isAdmin =

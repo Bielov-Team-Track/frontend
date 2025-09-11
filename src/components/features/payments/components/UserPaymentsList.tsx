@@ -22,7 +22,7 @@ function UserPaymentsList({ payments }: UserPaymentsListProps) {
                   {payment.event.name}
                 </Link>
                 <span className="text-sm">
-                  {getFormattedDate(payment.event.date)}
+                  {getFormattedDate(payment.event.startTime)}
                 </span>
               </div>
             </div>

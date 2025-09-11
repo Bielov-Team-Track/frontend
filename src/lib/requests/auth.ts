@@ -7,13 +7,16 @@ export interface AuthResponse {
   expiresAt: string;
 }
 
+const AUTH_PREFIX = "/auth"
+const EVENTS_PREFIX = "/events"
+
 export async function login(
   email: string,
   password: string
 ): Promise<AuthResponse> {
   const endpoint = "/v1/auth/login";
 
-  return (await client.post<AuthResponse>(endpoint, { email, password })).data;
+  return (await client.post<AuthResponse>(AUTH_PREFIX + endpoint, { email, password })).data;
 }
 
 export async function refreshToken(
@@ -21,13 +24,13 @@ export async function refreshToken(
 ): Promise<AuthResponse> {
   const endpoint = "/v1/auth/refresh";
 
-  return (await client.post<AuthResponse>(endpoint, refreshTokenValue)).data;
+  return (await client.post<AuthResponse>(AUTH_PREFIX + endpoint, refreshTokenValue)).data;
 }
 
 export async function logout(refreshTokenValue: string): Promise<void> {
   // Note: Current backend doesn't implement logout, so we'll just clear local storage
   // const endpoint = "/v1/auth/logout"
-  // await client.post(endpoint, { refreshToken: refreshTokenValue })
+  // await client.post(PREFIX + endpoint, { refreshToken: refreshTokenValue })
 
   // Clear local storage
   if (typeof window !== "undefined") {
@@ -41,7 +44,7 @@ export async function logout(refreshTokenValue: string): Promise<void> {
 export async function verifyToken(): Promise<{ isValid: boolean }> {
   const endpoint = "/v1/auth/validate";
 
-  return (await client.post(endpoint)).data;
+  return (await client.post(AUTH_PREFIX + endpoint)).data;
 }
 
 // Note: The following functions are not yet implemented in the current backend
@@ -78,7 +81,7 @@ export async function getCurrentUserProfile(): Promise<
 > {
   const endpoint = `/v1/profiles/me`;
 
-  const request = client.get<UserProfile>(endpoint);
+  const request = client.get<UserProfile>(EVENTS_PREFIX + endpoint);
 
   return await request
     .catch((error) => {
@@ -102,7 +105,7 @@ export async function register(
   const endpoint = "/v1/auth/register";
 
   return (
-    await client.post<AuthResponse>(endpoint, {
+    await client.post<AuthResponse>(AUTH_PREFIX + endpoint, {
       email,
       password,
       firstName,

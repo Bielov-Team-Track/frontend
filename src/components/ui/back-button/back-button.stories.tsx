@@ -11,11 +11,6 @@ const mockRouter = {
   prefetch: (href: string) => console.log('Router prefetch:', href),
 }
 
-// Mock Next.js router
-jest.mock('next/navigation', () => ({
-  useRouter: () => mockRouter,
-}))
-
 const meta: Meta<typeof BackButton> = {
   title: 'UI/BackButton',
   component: BackButton,
