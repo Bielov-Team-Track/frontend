@@ -11,7 +11,7 @@ const VerifyEmailPage = () => {
   const [countdown, setCountdown] = React.useState(5);
   const router = useRouter();
   const params = useSearchParams();
-  const token = params.get("token") || "";
+  const token = params.get("token");
 
   const verifiedRef = React.useRef(false);
 
