@@ -159,7 +159,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {helperText && !error && (
           <div className="mt-1">
             <span
-              className={`${responsiveClasses.text.caption} text-base-content/70`}
+              className={`${responsiveClasses.text.caption} text-primary-content/40 text-sm`}
             >
               {helperText}
             </span>

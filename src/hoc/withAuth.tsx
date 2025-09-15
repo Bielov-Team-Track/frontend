@@ -1,13 +1,16 @@
+"use client";
+
 import React, { ComponentType, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/authContext";
 
 const withAuth = <P extends object>(WrappedComponent: ComponentType<P>) => {
   const ComponentWithAuth = (props: P) => {
+    console.log("withAuth - isLoading:");
     const { userProfile, isLoading, isAuthenticated } = useAuth();
     const router = useRouter();
-
     useEffect(() => {
+
       if (!isLoading && !isAuthenticated) {
         router.replace("/login");
       }

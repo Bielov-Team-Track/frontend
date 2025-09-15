@@ -2,6 +2,9 @@
 
 import React, { MouseEvent, useEffect, useState } from "react";
 import Cropper, { Area } from "react-easy-crop";
+import Button from "../button";
+import { set } from "react-hook-form";
+import Loader from "../loader";
 
 export const readFile = (file: any): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -87,6 +90,7 @@ const ImageCropper = ({
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area>();
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!imageFile) {
@@ -100,11 +104,14 @@ const ImageCropper = ({
 
   const saveImage = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    setIsSaving(true);
     try {
       const croppedImage = await getCroppedImg(image!, croppedAreaPixels!);
       onImageSave(croppedImage);
+      setIsSaving(false);
     } catch (e) {
       console.error(e);
+      setIsSaving(false);
     }
   };
 
@@ -127,13 +134,13 @@ const ImageCropper = ({
               onCropComplete={onCropComplete}
             />
           )}
+          {isSaving && (
+            <Loader className="bg-black/30 absolute inset-0 z-1000"></Loader>
+          )}
         </div>
-        <button
-          onClick={saveImage}
-          className="btn w-full text-neutral-100 btn-success"
-        >
-          Save
-        </button>
+        <Button onClick={saveImage} disabled={isSaving}>
+          {isSaving ? "Saving..." : "Save"}
+        </Button>
       </div>
     </div>
   );

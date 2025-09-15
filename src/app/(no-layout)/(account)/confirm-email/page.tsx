@@ -1,7 +1,7 @@
 'use client'
 
 import Loader from '@/components/ui/loader';
-import { confirmEmail as confirmEmailRequest } from '@/lib/requests/auth';
+import { verifyEmail as confirmEmailRequest } from '@/lib/requests/auth';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState, Suspense } from 'react'

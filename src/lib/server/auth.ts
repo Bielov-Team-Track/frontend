@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { EVENTS_API_URL } from "../constants";
+import { EVENTS_API_URL, EVENTS_API_V1 } from "../constants";
 
 export const getUserProfile = async () => {
   const cookieStore = cookies();
@@ -18,7 +18,7 @@ export const getUserProfile = async () => {
     return null;
   }
 
-  const backendUrl = `${EVENTS_API_URL}profiles/me`;
+  const backendUrl = `${EVENTS_API_V1}/profiles/me`;
 
   const fetchOptions: RequestInit = {
     method: "GET",

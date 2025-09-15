@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { API_BASE_URL, EVENTS_API_V1 } from "./lib/constants";
 
 // Public routes that don't require authentication
 const publicRoutes = [
@@ -9,6 +10,7 @@ const publicRoutes = [
   "/reset-password",
   "/confirm-email",
   "/email-verification",
+  "/verify-email",
   "/privacy-policy",
   "/terms-of-service",
   "/_next",
@@ -16,6 +18,9 @@ const publicRoutes = [
   "/favicon.ico",
   "/events",
 ];
+
+// Routes that require authentication but not complete profile
+const profileSetupRoute = "/complete-profile-setup";
 
 export default async function authMiddleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -31,64 +36,107 @@ export default async function authMiddleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Check if it's a profile setup route
+  const isProfileSetupRoute = pathname.startsWith(profileSetupRoute);
+
   // Check for authentication token in cookies
   const cookieStore = cookies();
   const token = cookieStore.get("token")?.value;
-  console.log(
-    "Middleware - token found:",
-    !!token,
-    token ? token.substring(0, 20) + "..." : "none"
-  );
 
   if (!token) {
-    // No token found, redirect to login
     console.log("Middleware - no token, redirecting to login");
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  console.log("Middleware - token found, validating");
+
   // Verify token using the new auth endpoint
   try {
-    console.log("Middleware - verifying token with backend");
-    const response = await fetch(`${process.env.API_BASE_URL}auth/validate`, {
+    //TODO: change to request from lib/client.ts
+    const response = await fetch(`${API_BASE_URL}auth/v1/auth/validate`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
-
-    console.log("Middleware - verify token response status:", response.status);
-
     if (!response.ok) {
-      // Token is invalid, redirect to login
+      const loginUrl = new URL("/login", request.url);
+      const redirectResponse = NextResponse.redirect(loginUrl);
+
+      redirectResponse.cookies.delete("token");
+      return redirectResponse;
+    }
+    const result = await response.json();
+
+    if (!result.isValid) {
       console.log("Middleware - token invalid, redirecting to login");
       const loginUrl = new URL("/login", request.url);
       const redirectResponse = NextResponse.redirect(loginUrl);
 
-      // Clear invalid token
       redirectResponse.cookies.delete("token");
       return redirectResponse;
     }
 
-    const result = await response.json();
-    console.log("Middleware - verify token result:", result);
+    console.log(
+      "Middleware - token valid, email verified:",
+      result.isEmailVerified
+    );
 
-    if (!result.isValid) {
-      // Token is not valid, redirect to login
-      console.log("Middleware - token not valid, redirecting to login");
-      const loginUrl = new URL("/login", request.url);
-      const redirectResponse = NextResponse.redirect(loginUrl);
-
-      // Clear invalid token
-      redirectResponse.cookies.delete("token");
-      return redirectResponse;
+    if (!result.isEmailVerified && pathname !== "/verify-email") {
+      console.log(
+        "Middleware - email not verified, redirecting to verification-sent"
+      );
+      const emailVerificationUrl = new URL("/email-verification", request.url);
+      return NextResponse.redirect(emailVerificationUrl);
     }
 
-    // User is authenticated, continue
-    console.log("Middleware - token valid, allowing access");
+    // Check profile completeness for non-setup routes
+    if (!isProfileSetupRoute) {
+      console.log("Middleware - checking profile completeness");
+      try {
+        const profileResponse = await fetch(`${EVENTS_API_V1}/profiles/me`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (profileResponse.ok) {
+          const profile = await profileResponse.json();
+          console.log("Middleware - profile data:", profile);
+
+          // Check if profile is complete (has name and surname)
+          const isProfileComplete = profile.name && profile.surname;
+
+          if (!isProfileComplete) {
+            console.log(
+              "Middleware - profile incomplete, redirecting to profile setup"
+            );
+            const profileSetupUrl = new URL(profileSetupRoute, request.url);
+            console.log("Redirecting to:", profileSetupUrl.toString());
+            return NextResponse.redirect(profileSetupUrl);
+          }
+        } else {
+          console.log(
+            "Middleware - failed to fetch profile, status:", profileResponse.status
+          );
+          const profileSetupUrl = new URL(profileSetupRoute, request.url);
+          return NextResponse.redirect(profileSetupUrl);
+        }
+      } catch (profileError) {
+        console.log("Middleware - profile check error:", profileError);
+        const profileSetupUrl = new URL(profileSetupRoute, request.url);
+        return NextResponse.redirect(profileSetupUrl);
+      }
+    }
+
+    // User is authenticated, email verified, and profile complete (or on setup route)
+    console.log("Middleware - all checks passed, allowing access");
     return NextResponse.next();
   } catch (error) {
-    console.error("Auth middleware error:", error);
+    console.log("Auth middleware error:", error);
     // On error, redirect to login and clear token
     const loginUrl = new URL("/login", request.url);
     const redirectResponse = NextResponse.redirect(loginUrl);

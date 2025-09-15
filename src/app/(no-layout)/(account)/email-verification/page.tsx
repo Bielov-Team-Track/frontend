@@ -1,96 +1,67 @@
-'use client'
+"use client";
 
-import React, { useState, Suspense } from 'react'
-import { sendVerification } from '@/lib/requests/auth'
-import Loader from '@/components/ui/loader'
-import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+import React, { useState, Suspense } from "react";
+import { sendVerification } from "@/lib/requests/auth";
+import Loader from "@/components/ui/loader";
+import { Button } from "@/components";
+import { FaEnvelope } from "react-icons/fa6";
+import Link from "next/link";
 
 function EmailVerificationContent() {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string>('')
-  const [resendSuccess, setResendSuccess] = useState<boolean>(false)
-  const [email, setEmail] = useState<string>('')
-  const searchParams = useSearchParams()
-  
-  // Try to get email from URL params (if redirected from registration)
-  const emailFromParams = searchParams.get('email')
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [resendSuccess, setResendSuccess] = useState<boolean>(false);
 
   const handleResendEmail = async () => {
-    const emailToUse = email || emailFromParams
-    
-    if (!emailToUse) {
-      setError('Please enter your email address')
-      return
-    }
-    
-    setIsLoading(true)
-    setError('')
-    setResendSuccess(false)
-    
+    setIsLoading(true);
+    setError("");
+    setResendSuccess(false);
+
     try {
-      await sendVerification(emailToUse)
-      setResendSuccess(true)
+      await sendVerification();
+      setResendSuccess(true);
     } catch (error: any) {
-      setError('Failed to send verification email. Please try again.')
-      console.error('Resend email error:', error)
+      setError("Failed to send verification email. Please try again.");
+      console.error("Resend email error:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="flex flex-col items-center gap-6 max-w-md mx-auto">
-      {isLoading && <Loader />}
-      
-      <div className="text-center">
-        <h1 className="text-2xl font-bold mb-2">Check Your Email</h1>
-        <p className="text-gray-600">
-          We sent a verification email to {emailFromParams || 'your email address'}. 
-          Please check your inbox and click the verification link.
-        </p>
-      </div>
-
-      {error && <div className="text-red-500 text-center">{error}</div>}
-      {resendSuccess && (
-        <div className="text-green-500 text-center">
-          Verification email sent! Please check your inbox.
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-md relative bg-stone-900 p-6 sm:p-8 rounded-lg shadow-lg flex flex-col gap-6">
+        <div className="flex flex-col gap-4 justify-center items-center text-center">
+          <div className="flex gap-2 items-center">
+            <FaEnvelope size={"24px"} />
+            <h1 className="text-2xl font-bold">Verification email sent</h1>
+          </div>
+          <p className="text-primary-content/70">
+            We sent a verification email to your email address. Please check
+            your inbox and click the verification link.
+          </p>
+          <Link href="/login" className="btn btn-link">Go back to login</Link>
         </div>
-      )}
 
-      <div className="w-full">
-        {!emailFromParams && (
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium mb-2">
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input input-bordered w-full"
-              placeholder="Enter your email address"
-            />
+        <Button onClick={handleResendEmail} disabled={isLoading}>
+          {isLoading ? (
+            <span className="flex items-center gap-2">
+              <Loader />
+              Sending...
+            </span>
+          ) : (
+            "Resend Verification Email"
+          )}
+        </Button>
+        {error && <div className="text-red-500 text-center">{error}</div>}
+        {resendSuccess && (
+          <div className="text-green-500 text-center">
+            Verification email sent! Please check your inbox.
           </div>
         )}
-        
-        <button
-          onClick={handleResendEmail}
-          disabled={isLoading}
-          className="btn btn-outline w-full mb-4"
-        >
-          {isLoading ? 'Sending...' : 'Resend Verification Email'}
-        </button>
-        
-        <div className="text-center">
-          <Link href="/login" className="link">
-            Back to Login
-          </Link>
-        </div>
       </div>
     </div>
-  )
+  );
 }
 
 function EmailVerificationPage() {
@@ -101,4 +72,4 @@ function EmailVerificationPage() {
   );
 }
 
-export default EmailVerificationPage
+export default EmailVerificationPage;

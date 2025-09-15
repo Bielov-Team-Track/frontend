@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Forward request to the API
-    const apiResponse = await axios.get(`${process.env.API_BASE_URL}/api/v1/profiles/me`, {
+    const apiResponse = await axios.get(`${process.env.API_BASE_URL}/v1/profiles/me`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'

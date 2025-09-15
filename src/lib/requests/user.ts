@@ -9,8 +9,7 @@ import { PositionPayment } from "../models/Position";
 import { AuthData } from "../models/Auth";
 import { AuthResponse } from "./auth";
 
-const PREFIX = "/events"
-
+const PREFIX = "/events";
 
 export async function getUserProfile(userId: string) {
   const endpoint = `/users/${userId}`;
@@ -64,13 +63,30 @@ export async function saveGoogleUser(user: GoogleUserCreate) {
   return (await client.put<AuthResponse>(PREFIX + endpoint, user)).data;
 }
 
-export async function updateProfileImage(image: Blob, userId: string) {
-  const endpoint = `/profile/${userId}/image`;
+export async function updateProfileImage(image: Blob): Promise<string> {
+  // Step 1: Get presigned URL from backend
+  const fileType = image.type; // e.g., "image/jpeg", "image/png"
+  const getUploadUrlEndpoint = `/v1/profiles/me/profile-image-upload-url?fileType=${encodeURIComponent(fileType)}`;
 
-  const formData = new FormData();
-  formData.append("image", image);
+  const response = await client.get(PREFIX + getUploadUrlEndpoint);
+  const presignedUrl = response.data;
 
-  return await client.post(PREFIX + endpoint, formData);
+  // Step 2: Upload directly to S3 using presigned URL
+  const uploadResponse = await fetch(presignedUrl, {
+    method: "PUT",
+    body: image,
+    headers: {
+      "Content-Type": fileType,
+    },
+  });
+
+  if (!uploadResponse.ok) {
+    throw new Error("Failed to upload image");
+  }
+
+  // Step 3: Extract the public URL (remove query parameters from presigned URL)
+  const imageUrl = presignedUrl.split('?')[0];
+  return imageUrl;
 }
 
 export async function followUser(userId: string) {

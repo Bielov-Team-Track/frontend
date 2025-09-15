@@ -15,6 +15,7 @@ import {
   getCurrentUserProfile,
 } from "../requests/auth";
 import { UserProfile } from "../models/User";
+import { redirect } from "next/navigation";
 
 interface AuthContextType {
   userProfile: UserProfile | null;
@@ -81,15 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      console.log("Starting login process...");
       const user = await apiLogin(email, password);
 
       saveTokens(user);
-
-      const userProfile = await getCurrentUserProfile();
-      setUserProfile(userProfile ?? null);
-
-      console.log("Login process completed, user set:", userProfile);
     } catch (error) {
       console.error("Login failed:", error);
       clearTokens();

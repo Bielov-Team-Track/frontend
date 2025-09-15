@@ -31,19 +31,14 @@ function LoginContent() {
     const password = formData.get("password") as string;
 
     try {
-      console.log("About to call login...");
       await login(email, password);
-      console.log("Login completed, about to redirect...");
 
-      // Small delay to ensure cookie is set before redirect
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       setIsLoading(false);
 
       const targetRoute = callback || "/dashboard/events/my";
-      console.log("Redirecting to:", targetRoute);
 
-      // Use window.location for a hard redirect to ensure it works
       router.push(targetRoute);
     } catch (error: any) {
       setIsLoading(false);
@@ -52,13 +47,6 @@ function LoginContent() {
         error.response?.data?.error ||
         "Login failed";
       setError(message);
-
-      // Check if the error is about email not being confirmed
-      if (message === "Email not confirmed") {
-        setUnconfirmedEmail(email);
-      } else {
-        setUnconfirmedEmail(null);
-      }
 
       console.error("Login error:", error);
     }

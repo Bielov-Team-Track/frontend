@@ -4,7 +4,6 @@ import React, { ChangeEvent, useRef, useState } from "react";
 import { FaEnvelope, FaLock, FaUser } from "react-icons/fa6";
 import { register as registerUser } from "@/lib/requests/auth";
 import { AxiosError } from "axios";
-import { redirect } from "next/navigation";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -15,8 +14,7 @@ import Link from "next/link";
 interface SignUpFormInputs {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  confirmPassword: string;
 }
 
 const schema = yup.object().shape({
@@ -25,8 +23,10 @@ const schema = yup.object().shape({
     .string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
-  firstName: yup.string().required("First name is required"),
-  lastName: yup.string().required("Last name is required"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "Passwords must match")
+    .required("Please confirm your password"),
 });
 
 function SignUpPage() {
@@ -34,7 +34,6 @@ function SignUpPage() {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const {
-    register,
     handleSubmit,
     control,
     formState: { errors },
@@ -47,15 +46,9 @@ function SignUpPage() {
     setError("");
 
     try {
-      const response = await registerUser(
-        data.email,
-        data.password,
-        data.firstName,
-        data.lastName
-      );
+      await registerUser(data.email, data.password);
 
-      // Registration returns tokens; redirect to login
-      router.push("/login");
+      router.push("/email-verification");
     } catch (error) {
       console.error(error);
       const axiosError = error as AxiosError;
@@ -127,7 +120,6 @@ function SignUpPage() {
                 leftIcon={<FaLock />}
                 showPasswordToggle
                 error={errors.password?.message}
-                helperText="Must be at least 6 characters"
                 required
                 onChange={(e) => {
                   field.onChange(e);
@@ -137,47 +129,26 @@ function SignUpPage() {
             )}
           />
 
-          <div className="flex flex-col gap-4">
-            <Controller
-              name="firstName"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text"
-                  label="First Name"
-                  placeholder="Enter your first name"
-                  leftIcon={<FaUser />}
-                  error={errors.firstName?.message}
-                  required
-                  onChange={(e) => {
-                    field.onChange(e);
-                    setError("");
-                  }}
-                />
-              )}
-            />
-
-            <Controller
-              name="lastName"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="text"
-                  label="Last Name"
-                  placeholder="Enter your last name"
-                  leftIcon={<FaUser />}
-                  error={errors.lastName?.message}
-                  required
-                  onChange={(e) => {
-                    field.onChange(e);
-                    setError("");
-                  }}
-                />
-              )}
-            />
-          </div>
+          <Controller
+            name="confirmPassword"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="password"
+                label="Confirm Password"
+                placeholder="Confirm your password"
+                leftIcon={<FaLock />}
+                showPasswordToggle
+                error={errors.confirmPassword?.message}
+                required
+                onChange={(e) => {
+                  field.onChange(e);
+                  setError("");
+                }}
+              />
+            )}
+          />
 
           <button className="btn bg-primary text-primary-content" type="submit">
             Create Account

@@ -79,7 +79,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         "active:scale-[0.98]",
       ].join(" "),
       link: [
-        "bg-transparent hover:bg-base-100 focus:bg-base-100",
+        "bg-transparent p-0",
         "text-primary hover:text-primary/80 focus:text-primary/80",
         "underline decoration-2 underline-offset-2",
         "active:scale-[0.98]",
