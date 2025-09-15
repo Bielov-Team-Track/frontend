@@ -1,5 +1,5 @@
 /**
- * Responsive utility classes and breakpoints for the Bielov Team Track app
+ * Responsive utility classes and breakpoints for the Bielov Volleyer app
  * Mobile-first responsive design patterns
  * 
  * FONT SIZE STRATEGY:

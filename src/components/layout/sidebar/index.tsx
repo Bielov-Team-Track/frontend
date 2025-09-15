@@ -28,7 +28,7 @@ const Sidebar = () => {
     <aside className="w-80 h-full bg-background text-white z-30 rounded-lg">
       <div className="py-8 px-6">
         <h1 className="font-bold w-full text-5xl text-center text-accent mb-4">
-          Team Track
+          Volleyer
         </h1>
 
         <nav className="space-y-1">

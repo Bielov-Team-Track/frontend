@@ -78,7 +78,7 @@ function SignUpPage() {
         )}
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <h1 className="text-5xl font-bold text-accent self-center mb-4">
-            Team Track
+            Volleyer
           </h1>
           <div>
             Already have an account?{" "}

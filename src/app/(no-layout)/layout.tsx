@@ -8,7 +8,7 @@ import { AuthProvider } from "@/lib/auth/authContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Team Track",
+  title: "Volleyer",
   description: "",
 };
 

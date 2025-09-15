@@ -59,7 +59,7 @@ function LoginContent() {
         )}
         <form onSubmit={credentialsSignIn} className="flex flex-col gap-4">
           <h1 className="text-4xl sm:text-5xl font-bold text-accent text-center mb-4">
-            Team Track
+            Volleyer
           </h1>
           <div className="text-center text-sm sm:text-base">
             Do not have an account?{" "}
