@@ -3,10 +3,10 @@
 import { Button, Loader } from "@/components";
 import { verifyEmail } from "@/lib/requests/auth";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { FaCheck } from "react-icons/fa6";
 
-const VerifyEmailPage = () => {
+const VerifyEmailPageContent = () => {
   const [error, setError] = React.useState<string | null>(null);
   const [countdown, setCountdown] = React.useState(5);
   const router = useRouter();
@@ -94,6 +94,14 @@ const VerifyEmailPage = () => {
         )}
       </div>
     </div>
+  );
+};
+
+const VerifyEmailPage = () => {
+  return (
+    <Suspense fallback={<Loader />}>
+      <VerifyEmailPageContent />
+    </Suspense>
   );
 };
 
