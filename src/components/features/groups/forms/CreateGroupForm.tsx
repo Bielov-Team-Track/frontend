@@ -5,7 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "next/navigation";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 // import { useSession } from 'next-auth/react';
 // import { User } from 'next-auth';
 import { createGroup } from "@/lib/requests/groups"; // Assuming you have a createGroup function
@@ -35,11 +35,13 @@ function CreateGroupForm() {
   const router = useRouter();
   const {
     mutate: submitGroup,
-    isLoading,
+    isPending,
     isError,
     error,
-  } = useMutation(async (groupData: any) => {
-    return await createGroup(groupData);
+  } = useMutation({
+    mutationFn: async (groupData: any) => {
+      return await createGroup(groupData);
+    },
   });
 
   const saveGroup = async (data: any) => {
@@ -57,7 +59,7 @@ function CreateGroupForm() {
 
   return (
     <form className="form relative" onSubmit={handleSubmit(saveGroup)}>
-      {isLoading && <Loader className="absolute inset-0 bg-black/55" />}
+      {isPending && <Loader className="absolute inset-0 bg-black/55" />}
       <div className="flex gap-2">
         <h1 className="text-2xl font-bold">Create Group</h1>
       </div>

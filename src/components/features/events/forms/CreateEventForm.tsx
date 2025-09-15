@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { Event } from "@/lib/models/Event";
 import "react-datepicker/dist/react-datepicker.css";
 import { getDuration, getFormattedDate } from "@/lib/utils/date";
-import { useMutation } from "react-query";
+import { useMutation } from '@tanstack/react-query';
 import {
   Button,
   Loader,
@@ -154,10 +154,12 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
   const router = useRouter();
   const {
     mutate: submitEvent,
-    isLoading,
+    isPending,
     isError,
-  } = useMutation(async (eventData: CreateEvent) => {
-    return await createEvent(eventData);
+  } = useMutation({
+    mutationFn: async (eventData: CreateEvent) => {
+      return await createEvent(eventData);
+    }
   });
 
   React.useEffect(() => {
@@ -297,7 +299,7 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
       </div>
 
       <form className="relative p-6" onSubmit={handleSubmit(saveEvent)}>
-        {isLoading && (
+        {isPending && (
           <Loader className="absolute inset-0 bg-black/55 rounded-xl z-50" />
         )}
 
@@ -705,11 +707,11 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
                   type="submit"
                   variant="accent"
                   size="lg"
-                  disabled={isLoading}
-                  loading={isLoading}
+                  disabled={isPending}
+                  loading={isPending}
                   rightIcon={<FaVolleyballBall className="w-4 h-4" />}
                 >
-                  {isLoading ? "Creating..." : "Create Event"}
+                  {isPending ? "Creating..." : "Create Event"}
                 </Button>
               )}
             </div>
