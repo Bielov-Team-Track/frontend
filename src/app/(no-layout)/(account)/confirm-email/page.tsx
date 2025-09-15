@@ -40,7 +40,7 @@ function ConfirmEmailContent() {
       console.error('Token is missing');
       return;
     }
-    confirmEmailRequest(email, token)
+    confirmEmailRequest(email)
       .then(() => {
         setIsLoading(false);
         setIsEmailVerified(true);

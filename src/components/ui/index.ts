@@ -13,7 +13,6 @@ export { default as BlockOverlay } from "./block-overlay";
 export { default as Drawer } from "./drawer";
 export { default as ImageCropper } from "./image-cropper";
 export { default as DelayWrapper } from "./delay-wrapper";
-export { default as Map } from "./map";
 
 // Re-export types
 export type { ButtonProps } from "./button";

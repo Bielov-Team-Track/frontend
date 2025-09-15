@@ -12,7 +12,6 @@ import { sendVerification } from "@/lib/requests/auth";
 function LoginContent() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
   const [resendSuccess, setResendSuccess] = useState<boolean>(false);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -52,24 +51,6 @@ function LoginContent() {
     }
   };
 
-  const handleResendEmail = async () => {
-    if (!unconfirmedEmail) return;
-
-    setIsLoading(true);
-    setError(null);
-    setResendSuccess(false);
-
-    try {
-      await sendVerification(unconfirmedEmail);
-      setResendSuccess(true);
-    } catch (error: any) {
-      setError("Failed to send verification email. Please try again.");
-      console.error("Resend email error:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md relative bg-stone-900 p-6 sm:p-8 rounded-lg shadow-lg flex flex-col gap-6">
@@ -92,22 +73,6 @@ function LoginContent() {
               Verification email sent! Please check your inbox.
             </div>
           )}
-          {unconfirmedEmail && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-              <p className="text-yellow-800 text-sm mb-2">
-                Your email address is not confirmed. Please check your inbox for
-                a verification email.
-              </p>
-              <button
-                type="button"
-                onClick={handleResendEmail}
-                className="text-blue-600 hover:text-blue-800 underline text-sm"
-                disabled={isLoading}
-              >
-                Resend verification email
-              </button>
-            </div>
-          )}
           <Input
             name="email"
             type="email"
@@ -117,7 +82,6 @@ function LoginContent() {
             required
             onChange={() => {
               setError("");
-              setUnconfirmedEmail(null);
               setResendSuccess(false);
             }}
           />
@@ -131,7 +95,6 @@ function LoginContent() {
             required
             onChange={() => {
               setError("");
-              setUnconfirmedEmail(null);
               setResendSuccess(false);
             }}
           />
