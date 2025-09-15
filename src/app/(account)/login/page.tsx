@@ -52,63 +52,61 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md relative bg-stone-900 p-6 sm:p-8 rounded-lg shadow-lg flex flex-col gap-6">
-        {isLoading && (
-          <Loader className="bg-black/55 absolute inset-0 rounded-md" />
-        )}
-        <form onSubmit={credentialsSignIn} className="flex flex-col gap-4">
-          <h1 className="text-4xl sm:text-5xl font-bold text-accent text-center mb-4">
-            Volleyer
-          </h1>
-          <div className="text-center text-sm sm:text-base">
-            Do not have an account?{" "}
-            <Link href={"/sign-up"} className="link">
-              Register
-            </Link>
-          </div>
-          {error && <div className="text-red-500 text-sm">{error}</div>}
-          {resendSuccess && (
-            <div className="text-green-500 text-sm">
-              Verification email sent! Please check your inbox.
-            </div>
-          )}
-          <Input
-            name="email"
-            type="email"
-            label="Email"
-            placeholder="Enter your email"
-            leftIcon={<FaEnvelope />}
-            required
-            onChange={() => {
-              setError("");
-              setResendSuccess(false);
-            }}
-          />
-          <Input
-            name="password"
-            type="password"
-            label="Password"
-            placeholder="Enter your password"
-            leftIcon={<FaLock />}
-            showPasswordToggle
-            required
-            onChange={() => {
-              setError("");
-              setResendSuccess(false);
-            }}
-          />
-          <Link href={"/forgot-password"} className="link text-sm">
-            Forgot your password?
+    <>
+      {isLoading && (
+        <Loader className="bg-black/55 absolute inset-0 rounded-md" />
+      )}
+      <form onSubmit={credentialsSignIn} className="flex flex-col gap-4">
+        <h1 className="text-4xl sm:text-5xl font-bold text-accent text-center mb-4">
+          Volleyer
+        </h1>
+        <div className="text-center text-sm sm:text-base">
+          Do not have an account?{" "}
+          <Link href={"/sign-up"} className="link">
+            Register
           </Link>
-          <Button>Login</Button>
-        </form>
-        <div className="divider">OR</div>
-        <div className="flex flex-col gap-4">
-          {/* Future OAuth buttons can go here */}
         </div>
-      </div>
-    </div>
+        {error && <div className="text-red-500 text-sm">{error}</div>}
+        {resendSuccess && (
+          <div className="text-green-500 text-sm">
+            Verification email sent! Please check your inbox.
+          </div>
+        )}
+        <Input
+          name="email"
+          type="email"
+          label="Email"
+          placeholder="Enter your email"
+          leftIcon={<FaEnvelope />}
+          required
+          onChange={() => {
+            setError("");
+            setResendSuccess(false);
+          }}
+        />
+        <Input
+          name="password"
+          type="password"
+          label="Password"
+          placeholder="Enter your password"
+          leftIcon={<FaLock />}
+          showPasswordToggle
+          required
+          onChange={() => {
+            setError("");
+            setResendSuccess(false);
+          }}
+        />
+        <Link href={"/forgot-password"} className="link text-sm">
+          Forgot your password?
+        </Link>
+        <Button>Login</Button>
+      </form>
+      {/* <div className="divider">OR</div>
+        <div className="flex flex-col gap-4">
+          Future OAuth buttons can go here 
+        </div> */}
+    </>
   );
 }
 

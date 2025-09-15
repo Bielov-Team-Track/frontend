@@ -58,7 +58,6 @@ function ForgotPasswordForm({ onEmailSent }: ForgotPasswordFormProps) {
         render={({ field }) => (
           <Input
             {...field}
-            className="input input-bordered w-full text-neutral-content"
             type="email"
           />
         )}

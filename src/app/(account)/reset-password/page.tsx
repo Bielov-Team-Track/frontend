@@ -17,29 +17,28 @@ function ResetPasswordContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md relative bg-stone-900 p-6 sm:p-8 rounded-lg shadow-lg flex flex-col gap-6">
-        {passwordReset ? (
-          <div>
-            Password reset successfully.{" "}
-            <Link href={"/login"} className="link">
-              Click here to login
-            </Link>
-          </div>
-        ) : (
-          <>
-            {token ? (
-              <ResetPasswordForm
-                onPasswordReset={onPasswordReset}
-                token={token}
-              />
-            ) : (
-              <div>Invalid reset URL</div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+    <>
+      {" "}
+      {passwordReset ? (
+        <div>
+          Password reset successfully.{" "}
+          <Link href={"/login"} className="link">
+            Click here to login
+          </Link>
+        </div>
+      ) : (
+        <>
+          {token ? (
+            <ResetPasswordForm
+              onPasswordReset={onPasswordReset}
+              token={token}
+            />
+          ) : (
+            <div>Invalid reset URL</div>
+          )}
+        </>
+      )}
+    </>
   );
 }
 

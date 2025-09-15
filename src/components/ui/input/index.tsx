@@ -99,7 +99,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           </label>
         )}
 
-        <div className="relative">
+        <div className={`relative isolate bg-base-100 rounded-md transition-colors ${
+          error
+            ? "border-red-500"
+            : isFocused
+              ? "border-primary ring-2 ring-primary/20"
+              : "border-base-content/20"
+        }`}>
           {/* Left Icon */}
           {leftIcon && (
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -126,7 +132,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
           {/* Right Icon or Password Toggle */}
           {(rightIcon || (type === "password" && showPasswordToggle)) && (
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center z-10">
               {type === "password" && showPasswordToggle ? (
                 <button
                   type="button"
