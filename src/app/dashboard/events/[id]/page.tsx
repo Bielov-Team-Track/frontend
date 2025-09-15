@@ -25,13 +25,14 @@ import {
 import { UserProfile } from "@/lib/models/User";
 
 type EventPageParams = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 async function EventPage({ params }: EventPageParams) {
-  if (!params || !params.id) {
+  const parameters = await params;
+  if (!parameters || !parameters.id) {
     notFound();
   }
 
@@ -42,7 +43,7 @@ async function EventPage({ params }: EventPageParams) {
   }
 
   // TODO: Too many requests
-  const event = await loadEvent(params.id);
+  const event = await loadEvent(parameters.id);
 
   if (!event) {
     notFound();
@@ -64,7 +65,7 @@ async function EventPage({ params }: EventPageParams) {
     }
   }
 
-  const teams = await loadTeams(params.id);
+  const teams = await loadTeams(parameters.id);
 
   teams.forEach((team) => {
     team.event = event;

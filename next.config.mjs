@@ -9,9 +9,7 @@ const nextConfig = {
     ],
     unoptimized: process.env.NODE_ENV === "production",
   },
-  experimental: {
-    serverComponentsExternalPackages: ["@microsoft/signalr"],
-  },
+  serverExternalPackages: ["@microsoft/signalr"],
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
   },

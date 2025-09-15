@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import Avatar from "@/components/ui/avatar";
 import { followUser, getUserProfile } from "@/lib/requests/user";
 import { redirect } from "next/navigation";
@@ -10,10 +10,10 @@ import { loadEventsByUser } from "@/lib/requests/events";
 import { UserProfile } from "@/lib/models/User";
 import { useAuth } from "@/lib/auth/authContext";
 
-function ProfilePage({ params }: { params: { id: string } }) {
+function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const [profile, setProfile] = useState<UserProfile>();
   const [events, setEvents] = useState<Event[]>();
-  const { id } = params;
+  const { id } = use(params);
   const { userProfile } = useAuth();
 
   useEffect(() => {

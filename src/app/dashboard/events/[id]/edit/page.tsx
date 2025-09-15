@@ -2,15 +2,15 @@ import { loadEvent, loadEvents } from "@/lib/requests/events";
 import moment from "moment";
 import { notFound } from "next/navigation";
 import { loadLocations } from "@/lib/requests/locations";
-// import { EventEditForm } from "@/components";
 import TeamsEditSection from "@/components/features/teams/components/TeamEditSection";
 
 async function EventEditPage({ params }: Params) {
-  if (!params || !params.id) {
+  const parameters = await params;
+  if (!parameters || !parameters.id) {
     notFound();
   }
 
-  const event = await loadEvent(params.id);
+  const event = await loadEvent(parameters.id);
 
   if (!event) {
     notFound();
@@ -36,9 +36,9 @@ async function EventEditPage({ params }: Params) {
 }
 
 type Params = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export async function generateStaticParams() {

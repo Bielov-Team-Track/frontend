@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import client from "../client";
 import { User, UserProfile } from "../models/User";
 
@@ -93,12 +94,16 @@ export async function resetPassword(token: string, newPassword: string) {
   });
 }
 
-export async function getCurrentUserProfile(): Promise<
-  UserProfile | undefined
-> {
+export async function getCurrentUserProfile(): Promise<UserProfile | null> {
   const endpoint = `/v1/profiles/me`;
-
-  return (await client.get<UserProfile>(EVENTS_PREFIX + endpoint)).data;
+  try {
+    return (await client.get<UserProfile>(EVENTS_PREFIX + endpoint)).data;
+  } catch (error: any) {
+    if (error instanceof AxiosError && error.response?.status === 401) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function register(

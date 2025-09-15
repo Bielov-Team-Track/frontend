@@ -1,16 +1,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { EVENTS_API_URL, EVENTS_API_V1 } from "../constants";
+import { EVENTS_API_V1 } from "../constants";
 
 export const getUserProfile = async () => {
   const cookieStore = cookies();
-  const token = cookieStore.get("token")?.value;
-
-  console.log(
-    "getUserProfile - token found:",
-    !!token,
-    token ? token.substring(0, 20) + "..." : "none"
-  );
+  const token = (await cookieStore).get("token")?.value;
 
   // If no token, return null to indicate unauthenticated
   if (!token) {

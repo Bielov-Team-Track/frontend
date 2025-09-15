@@ -163,7 +163,7 @@ function UserMenu({ user }: UserMenuProps) {
 }
 
 type UserMenuProps = {
-  user: UserProfile | undefined;
+  user: UserProfile | null;
 };
 
 export default UserMenu;

@@ -2,11 +2,8 @@ import { useEffect, useRef } from "react";
 
 type Timer = ReturnType<typeof setTimeout>;
 
-export function useDebounce(
-  func: Function,
-  delay = 500
-) {
-  const timer = useRef<Timer>();
+export function useDebounce(func: Function, delay = 500) {
+  const timer = useRef<Timer | undefined>(undefined);
 
   useEffect(() => {
     return () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { loadEvent, loadParticipants } from "@/lib/requests/events";
 import { notFound } from "next/navigation";
 import { useRealtimePayments } from "@/hooks/useRealtimePayments";
@@ -13,9 +13,9 @@ import AuditParticipantList from "@/components/features/audit/components/AuditPa
 import { Loader } from "@/components/ui";
 
 type AuditPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 function AuditPage({ params }: AuditPageProps) {
@@ -23,21 +23,22 @@ function AuditPage({ params }: AuditPageProps) {
   const [participants, setParticipants] = useState<EventParticipant[]>([]);
   const [loading, setLoading] = useState(true);
   const token = useAccessToken();
+  const parameters = use(params);
 
   useRealtimePayments();
   const paymentsStore = usePaymentsStore((s) => s.participants);
   const setPaymentsStore = usePaymentsStore((s) => s.setParticipants);
 
   useEffect(() => {
-    if (!params?.id) {
+    if (!parameters?.id) {
       notFound();
     }
 
     const loadData = async () => {
       try {
         const [eventData, participantsData] = await Promise.all([
-          loadEvent(params.id),
-          loadParticipants(params.id),
+          loadEvent(parameters.id),
+          loadParticipants(parameters.id),
         ]);
 
         if (!eventData) {
@@ -53,7 +54,7 @@ function AuditPage({ params }: AuditPageProps) {
         if (token) {
           try {
             const connection = await signalr.start("payments", token);
-            await connection.invoke("JoinEventGroup", params.id);
+            await connection.invoke("JoinEventGroup", parameters.id);
           } catch (error) {
             console.error("Failed to join event group:", error);
           }
@@ -65,7 +66,7 @@ function AuditPage({ params }: AuditPageProps) {
     };
 
     loadData();
-  }, [params.id, token, setPaymentsStore]);
+  }, [parameters.id, token, setPaymentsStore]);
 
   if (loading) {
     return <Loader className="absolute inset-0" />;

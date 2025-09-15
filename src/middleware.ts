@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { API_BASE_URL, EVENTS_API_V1 } from "./lib/constants";
+import { AUTH_API_V1, EVENTS_API_V1 } from "./lib/constants";
 
 // Public routes that don't require authentication
 const publicRoutes = [
@@ -41,7 +41,7 @@ export default async function authMiddleware(request: NextRequest) {
 
   // Check for authentication token in cookies
   const cookieStore = cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = (await cookieStore).get("token")?.value;
 
   if (!token) {
     console.log("Middleware - no token, redirecting to login");
@@ -53,7 +53,7 @@ export default async function authMiddleware(request: NextRequest) {
   // Verify token using the new auth endpoint
   try {
     //TODO: change to request from lib/client.ts
-    const response = await fetch(`${API_BASE_URL}auth/v1/auth/validate`, {
+    const response = await fetch(`${AUTH_API_V1}/auth/validate`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -120,7 +120,8 @@ export default async function authMiddleware(request: NextRequest) {
           }
         } else {
           console.log(
-            "Middleware - failed to fetch profile, status:", profileResponse.status
+            "Middleware - failed to fetch profile, status:",
+            profileResponse.status
           );
           const profileSetupUrl = new URL(profileSetupRoute, request.url);
           return NextResponse.redirect(profileSetupUrl);
