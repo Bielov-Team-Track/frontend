@@ -19,7 +19,6 @@ const mockEvent: Event = {
   name: "Weekend Volleyball Tournament",
   startTime: new Date("2024-01-20T10:00:00"),
   endTime: new Date("2024-01-20T14:00:00"),
-  locationId: "loc_xyz789",
   location: {
     id: "loc_xyz789",
     name: "Downtown Sports Complex",

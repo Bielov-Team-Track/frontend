@@ -11,7 +11,7 @@ function LocationForm() {
   const [address, setAddress] = useState<string>();
   const [mapAddress, setMapAddress] = useState<string>();
   const [mapError, setMapError] = useState<string>();
-  const [location, setLocation] = useState<google.maps.LatLng>();
+  const [location, setLocation] = useState<{ lat: number; lng: number }>();
   const setMapAddressDebounced = useDebounce(setMapAddress, 1000);
 
   const updateAddress = (address: string) => {
@@ -26,7 +26,8 @@ function LocationForm() {
     await createLocationRequest({
       address: formData.get("address")?.toString()!,
       name: formData.get("name")?.toString()!,
-      latLng: formData.get("location")?.toString()!,
+      latitude: location?.lat,
+      longitude: location?.lng,
     });
     setIsLoading(false);
     router.back();
@@ -58,7 +59,7 @@ function LocationForm() {
       <Map
         onError={setMapError}
         onAddressSelected={setAddress}
-        onLocationCalculated={setLocation}
+        onLocationCalculated={(lat, lng) => setLocation({ lat, lng })}
         defaultAddress={mapAddress}
       ></Map>
       <button
