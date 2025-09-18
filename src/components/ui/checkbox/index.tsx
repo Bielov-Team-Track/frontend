@@ -39,7 +39,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
     // Build CSS classes
     const baseClasses =
-      "checkbox transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary";
+      "checkbox transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary border bg-base-100 input-bordered";
 
     const variantClasses = {
       primary: "checkbox-primary",

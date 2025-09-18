@@ -76,7 +76,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
       error ? stateClasses.error : "",
       disabled ? stateClasses.disabled : "",
       !fullWidth ? "w-auto" : "",
-      leftIcon ? "pl-10" : "",
+      leftIcon ? "!pl-10" : "",
       className,
     ]
       .filter(Boolean)
@@ -144,11 +144,6 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
               </option>
             ))}
           </select>
-
-          {/* Dropdown Arrow */}
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <FaChevronDown className="text-base-content/60" size={12} />
-          </div>
         </div>
 
         {/* Error Message */}

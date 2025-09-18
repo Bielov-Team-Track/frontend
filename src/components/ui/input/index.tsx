@@ -82,7 +82,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       .join(" ");
 
     const labelClasses = [
-      "block font-medium mb-2",
+      "block font-medium",
       responsiveClasses.text.label,
       error ? "text-red-600" : "text-base-content",
       disabled ? "opacity-60" : "",
@@ -99,16 +99,29 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           </label>
         )}
 
-        <div className={`relative isolate bg-base-100 rounded-md transition-colors ${
-          error
-            ? "border-red-500"
-            : isFocused
+        {/* Helper Text */}
+        {helperText && !error && (
+          <div className="mb-1">
+            <span
+              className={`${responsiveClasses.text.caption} text-primary-content/40 text-sm`}
+            >
+              {helperText}
+            </span>
+          </div>
+        )}
+
+        <div
+          className={`relative isolate bg-base-100 rounded-md transition-colors ${
+            error
+              ? "border-red-500"
+              : isFocused
               ? "border-primary ring-2 ring-primary/20"
               : "border-base-content/20"
-        }`}>
+          }`}
+        >
           {/* Left Icon */}
           {leftIcon && (
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-50">
               <span className="text-base-content/60">{leftIcon}</span>
             </div>
           )}
@@ -158,17 +171,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <div className="flex items-center gap-1 mt-1 text-red-600">
             <FaExclamationCircle size={12} />
             <span className={responsiveClasses.text.caption}>{error}</span>
-          </div>
-        )}
-
-        {/* Helper Text */}
-        {helperText && !error && (
-          <div className="mt-1">
-            <span
-              className={`${responsiveClasses.text.caption} text-primary-content/40 text-sm`}
-            >
-              {helperText}
-            </span>
           </div>
         )}
       </div>

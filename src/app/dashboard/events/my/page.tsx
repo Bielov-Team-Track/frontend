@@ -4,6 +4,11 @@ import { EventsList } from "@/components/features/events";
 import { getUserProfile } from "@/lib/server/auth";
 import { UserProfile } from "@/lib/models/User";
 import Link from "@/components/ui/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "My Events - Dashboard | Volleyer",
+};
 
 async function EventsPage() {
   const user: UserProfile = await getUserProfile();

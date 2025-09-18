@@ -111,7 +111,7 @@ async function EventPage({ params }: EventPageParams) {
               <Link
                 target="_blank"
                 href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-                  event.location.address
+                  event.location.address!
                 )}`}
                 className="btn w-full bg-primary text-primary-content"
               >

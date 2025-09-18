@@ -3,7 +3,7 @@ import { Position } from "../models/Position"
 import { PositionType } from "../models/PositionType"
 
 
-const PREFIX = "/events"
+const PREFIX = "/events/v1"
 
 
 export async function loadPositionTypes() {
@@ -13,7 +13,7 @@ export async function loadPositionTypes() {
 }
 
 export async function getPosition(positionId: string) {
-  const endpoint = `/v1/teams/positions/${positionId}`
+  const endpoint = `/positions/${positionId}`
 
   return (await client.get<Position>(PREFIX + endpoint)).data
 }
@@ -49,17 +49,17 @@ export async function addPosition(teamId: string, positionTypeId: string) {
 }
 
 export async function takePositionWithUser(positionId: string, userId: string) {
-  const endpoint = `/v1/teams/positions/${positionId}/assign/${userId}`
+  const endpoint = `/positions/${positionId}/assign/${userId}`
   return (await client.post(PREFIX + endpoint)).data
 }
 
 export async function claimPosition(positionId: string) {
-  const endpoint = `/v1/teams/positions/${positionId}/claim`
+  const endpoint = `/positions/${positionId}/claim`
   return (await client.post(PREFIX + endpoint)).data
 }
 
 export async function releasePosition(positionId: string) {
-  const endpoint = `/v1/teams/positions/${positionId}/release`
+  const endpoint = `/positions/${positionId}/release`
   return (await client.post(PREFIX + endpoint)).data
 }
 

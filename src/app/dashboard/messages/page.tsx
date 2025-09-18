@@ -1,3 +1,9 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Messages | Volleyer",
+};
+
 const MessagesPage = () => {
   return (
     <div className="flex flex-col items-center justify-center h-full">

@@ -148,8 +148,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       sizeClasses[size],
       fullWidth ? "w-full" : "",
       loading ? "cursor-wait" : "",
-      className,
       baseClasses,
+      className,
     ]
       .filter(Boolean)
       .join(" ");

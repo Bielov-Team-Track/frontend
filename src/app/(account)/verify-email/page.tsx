@@ -2,6 +2,7 @@
 
 import { Button, Loader } from "@/components";
 import { verifyEmail } from "@/lib/requests/auth";
+import { useAuth } from "@/lib/auth/authContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect } from "react";
 import { FaCheck } from "react-icons/fa6";
@@ -12,6 +13,7 @@ const VerifyEmailPageContent = () => {
   const router = useRouter();
   const params = useSearchParams();
   const token = params.get("token");
+  const { loginFromTokens } = useAuth();
 
   const verifiedRef = React.useRef(false);
 
@@ -24,9 +26,33 @@ const VerifyEmailPageContent = () => {
     }
 
     verifyEmail(token)
-      .then(() => {
+      .then(async (result) => {
+        if (!result.success) {
+          // Handle verification failure
+          if (result.errorType === "TokenNotFound") {
+            setError("This verification link is invalid or not found");
+          } else if (result.errorType === "TokenExpired") {
+            setError("This verification link has expired");
+          } else {
+            setError(result.errorMessage || "An error occurred while verifying your email");
+          }
+          return;
+        }
+
+        // Verification successful
         verifiedRef.current = true;
         setError(null);
+
+        // If auth tokens are provided, log in the user automatically
+        if (result.auth) {
+          try {
+            await loginFromTokens(result.auth);
+            console.log("User automatically logged in after email verification");
+          } catch (loginError) {
+            console.error("Failed to log in user after verification:", loginError);
+            // Continue with redirect even if login fails
+          }
+        }
 
         const timer = setInterval(() => {
           setCountdown((prev) => {
@@ -40,22 +66,12 @@ const VerifyEmailPageContent = () => {
         }, 1000);
       })
       .catch((errorResponse) => {
-        const data: ErrorResponse = errorResponse.response?.data;
-        if (!data) {
-          setError("An error occurred while verifying your email");
-          return;
-        }
-
-        if (data.errors[0].errorCode == "InvalidVerificationToken") {
-          setError("This verification link is invalid or expired");
-        } else {
-          setError("An error occurred while verifying your email");
-        }
         console.error("Email verification error:", errorResponse);
+        setError("An error occurred while verifying your email");
       });
 
     setError(null);
-  }, [router, token, verifiedRef]);
+  }, [router, token, loginFromTokens]);
 
   // Countdown timer effect
 

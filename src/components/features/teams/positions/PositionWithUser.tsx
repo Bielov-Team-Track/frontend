@@ -62,30 +62,30 @@ function PositionWithUser({
         type="checkbox"
         name={team?.id!}
       />
-      <div className="collapse-title p-4 h-14 rounded-md bg-primary w-full flex justify-between">
+      <div className="collapse-title p-4 h-14 rounded-md bg-primary w-full flex justify-between isolate">
         <div className="flex items-center gap-2">
           <Avatar profile={position.userProfile!} />
           <div className="flex flex-col">
-            <span>
-              {position.userProfile?.name} {position.userProfile?.surname}
-            </span>
+            <div className="flex gap-2 items-center z-50">
+              <span className="whitespace-nowrap font-bold w-full">
+                {position.userProfile?.name} {position.userProfile?.surname}
+              </span>
+
+              <Button
+                size={"sm"}
+                variant={"icon"}
+                className="text-error p-0 px-0 py-0"
+                onClick={handleLeavePosition}
+              >
+                Leave
+              </Button>
+            </div>
             <span className="text-neutral/60 text-xs">{position.name}</span>
           </div>
         </div>
         <span className="place-self-center self-center font-bold mr-6"></span>
       </div>
       <div className="collapse-content relative">
-        <div className="flex justify-between items-center p-4">
-          <Button
-            size={"sm"}
-            variant={"icon"}
-            className="text-error"
-            leftIcon={<LeaveIcon></LeaveIcon>}
-            onClick={handleLeavePosition}
-          >
-            Leave
-          </Button>
-        </div>
         {isLoading && <Loader className="absolute inset-0 bg-black/55 z-50" />}
         {waitlist && (
           <>

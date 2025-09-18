@@ -15,8 +15,8 @@ import { createEvent } from "@/lib/requests/events";
 import { useRouter } from "next/navigation";
 import { Event } from "@/lib/models/Event";
 import "react-datepicker/dist/react-datepicker.css";
-import { getDuration, getFormattedDate } from "@/lib/utils/date";
-import { useMutation } from '@tanstack/react-query';
+import { getDuration } from "@/lib/utils/date";
+import { useMutation } from "@tanstack/react-query";
 import {
   Button,
   Loader,
@@ -34,6 +34,9 @@ import {
   FaUsers,
   FaDollarSign,
 } from "react-icons/fa";
+import { Map } from "@/components";
+import AddressAutocomplete from "@/components/ui/address-autocomplete";
+import { APIProvider } from "@vis.gl/react-google-maps";
 
 const eventTypeOptions = [
   { value: EventType.CasualPlay, label: "Casual" },
@@ -74,7 +77,18 @@ const schema = yup.object().shape({
         return end > start;
       }
     ),
-  location: yup.string().required("Location is required"),
+  location: yup
+    .object()
+    .shape({
+      name: yup.string().required("Location name is required"),
+      address: yup.string().optional(),
+      city: yup.string().optional(),
+      country: yup.string().optional(),
+      postalCode: yup.string().optional(),
+      latitude: yup.number().optional(),
+      longitude: yup.number().optional(),
+    })
+    .required("Location is required"),
   name: yup.string().required("Name is required"),
   approveGuests: yup.boolean(),
   teamsNumber: yup.number().when("eventFormat", {
@@ -125,6 +139,7 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
     watch,
     formState: { errors },
     trigger,
+    setValue,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -132,7 +147,15 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
       endTime:
         event?.endTime ||
         new Date(Date.now() + 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000), // Default to tomorrow + 2 hours
-      location: "",
+      location: {
+        name: "",
+        address: "",
+        city: "",
+        country: "",
+        postalCode: "",
+        latitude: undefined,
+        longitude: undefined,
+      },
       name: event?.name ?? "",
       approveGuests: false,
       teamsNumber: 3,
@@ -149,6 +172,59 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
 
   const values = watch();
 
+  const [coordinates, setCoordinates] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+
+  const parseAddressComponents = (place: google.maps.places.PlaceResult) => {
+    const components = place.address_components || [];
+    const locationData: Partial<Location> = {
+      name: place.name || "",
+    };
+
+    components.forEach((component) => {
+      const types = component.types;
+      const longName = component.long_name;
+      const shortName = component.short_name;
+
+      if (types.includes("street_number")) {
+        locationData.address =
+          longName + (locationData.address ? " " + locationData.address : "");
+      } else if (types.includes("route")) {
+        locationData.address =
+          (locationData.address ? locationData.address + " " : "") + longName;
+      } else if (types.includes("locality")) {
+        locationData.city = longName;
+      } else if (types.includes("country")) {
+        locationData.country = longName;
+      } else if (types.includes("postal_code")) {
+        locationData.postalCode = longName;
+      }
+    });
+
+    // Set coordinates if available
+    if (place.geometry?.location) {
+      locationData.latitude = place.geometry.location.lat();
+      locationData.longitude = place.geometry.location.lng();
+    }
+
+    return locationData;
+  };
+
+  const handleAddressSelected = (address: string) => {
+    // This is kept for backward compatibility with simple address string
+    setValue("location.name", address.split(",")[0]);
+    setValue("location.address", address);
+  };
+
+  const handleMapPositionChanged = (lat: number, lng: number) => {
+    setCoordinates({ lat, lng });
+    setValue("location.latitude", lat);
+    setValue("location.longitude", lng);
+    console.log("Map position changed:", lat, lng);
+  };
+
   // Creator will be auto-added as admin by backend
 
   const router = useRouter();
@@ -159,19 +235,19 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
   } = useMutation({
     mutationFn: async (eventData: CreateEvent) => {
       return await createEvent(eventData);
-    }
+    },
   });
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const handlePopState = () => {
         setStep((prevStep) => Math.max(1, prevStep - 1));
       };
-      
-      window.addEventListener('popstate', handlePopState);
-      
+
+      window.addEventListener("popstate", handlePopState);
+
       return () => {
-        window.removeEventListener('popstate', handlePopState);
+        window.removeEventListener("popstate", handlePopState);
       };
     }
   }, []);
@@ -180,14 +256,22 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
     const payload: CreateEvent = {
       startTime: new Date(data.startTime),
       endTime: new Date(data.endTime),
-      location: data.location,
+      location: {
+        name: data.location.name,
+        address: data.location.address,
+        city: data.location.city,
+        country: data.location.country,
+        postalCode: data.location.postalCode,
+        latitude: data.location.latitude,
+        longitude: data.location.longitude,
+      },
       name: data.name,
       approveGuests: !!data.approveGuests,
       teamsNumber:
         data.eventFormat === EventFormat.Open ? 0 : Number(data.teamsNumber),
       eventFormat: data.eventFormat,
       courtsNumber: Number(data.courtsNumber),
-      cost: Number(data.cost),
+      cost: Number(data.costToEnter),
       type: data.type,
       surface: data.surface,
       isPrivate: !!data.isPrivate,
@@ -269,10 +353,12 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
             </span>
           </div>
         )}
-        {values.location && step > 3 && (
+        {values.location?.address && step > 3 && (
           <div className="flex items-center gap-2">
             <span>🗺️</span>
-            <span>Location: {values.location}</span>
+            <span>
+              Location: {values.location.name || values.location.address}
+            </span>
           </div>
         )}
       </div>
@@ -481,19 +567,19 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
               {values.startTime && values.endTime && (
                 <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg">
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-primary">
+                    <div className="flex items-center gap-2 text-primary-content">
                       <FaCalendar className="w-5 h-5" />
                       <span className="font-semibold">
                         Start: {new Date(values.startTime).toLocaleString()}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-primary">
+                    <div className="flex items-center gap-2 text-primary-content">
                       <FaClock className="w-5 h-5" />
                       <span className="font-semibold">
                         End: {new Date(values.endTime).toLocaleString()}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-primary">
+                    <div className="flex items-center gap-2 text-primary-content">
                       <FaClock className="w-5 h-5" />
                       <span className="font-semibold">
                         Duration:{" "}
@@ -568,22 +654,63 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
             </div>
 
             {step === 3 && (
-              <div className="grid gap-6">
-                <Controller
-                  name="location"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      label="Address"
-                      placeholder="e.g., 12 Taylors Court, London"
-                      leftIcon={<FaVolleyballBall />}
-                      error={errors.location?.message}
-                      required
-                    />
-                  )}
-                />
-              </div>
+              <>
+                <div className="grid gap-6">
+                  <Controller
+                    name="location"
+                    control={control}
+                    render={({ field }) => (
+                      <APIProvider
+                        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
+                      >
+                        <AddressAutocomplete
+                          value={field.value?.address || ""}
+                          onChange={(address) => {
+                            handleAddressSelected(address);
+                          }}
+                          onPlaceSelected={(place) => {
+                            const locationData = parseAddressComponents(place);
+
+                            // Set all location fields from parsed data
+                            Object.entries(locationData).forEach(
+                              ([key, value]) => {
+                                if (value !== undefined) {
+                                  setValue(`location.${key}` as any, value);
+                                }
+                              }
+                            );
+
+                            // Update map position if place has geometry
+                            if (place.geometry?.location) {
+                              const lat = place.geometry.location.lat();
+                              const lng = place.geometry.location.lng();
+                              handleMapPositionChanged(lat, lng);
+                              console.log(
+                                "Selected place with parsed data:",
+                                locationData
+                              );
+                            }
+                          }}
+                          label="Address"
+                          placeholder="e.g., 12 Taylors Court, London"
+                          error={errors.location?.address?.message}
+                          required
+                        />
+                      </APIProvider>
+                    )}
+                  />
+                </div>
+                <div>
+                  <span className="text-sm text-primary-content/60">
+                    You can select the exact location by clicking on the map
+                  </span>
+                  <Map
+                    defaultAddress={values.location?.address}
+                    onAddressSelected={handleAddressSelected}
+                    onPositionChanged={handleMapPositionChanged}
+                  />
+                </div>
+              </>
             )}
 
             {step === 4 && (
@@ -659,6 +786,90 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
                   </h3>
                   {renderValues()}
                 </div>
+
+                {/* Event Timeline */}
+                <div className="bg-base-50 rounded-lg p-6">
+                  <h3 className="font-semibold text-lg text-base-content mb-4">
+                    Event Timeline
+                  </h3>
+                  <div className="bg-white rounded-lg p-4 border border-base-300">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <FaCalendar className="text-primary" />
+                        <span className="font-medium">
+                          {values.startTime.toLocaleDateString("en-GB", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-base-content/70">
+                      <div className="flex items-center gap-1">
+                        <FaClock className="text-primary" />
+                        <span>
+                          {values.startTime.toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}{" "}
+                          -{" "}
+                          {values.endTime.toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                      <span>
+                        Duration:{" "}
+                        {getDuration(values.startTime, values.endTime)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location Map */}
+                {values.location?.address && (
+                  <div className="bg-base-50 rounded-lg p-6">
+                    <h3 className="font-semibold text-lg text-base-content mb-4">
+                      Event Location
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="bg-white rounded-lg p-4 border border-base-300">
+                        <div className="flex items-start gap-3">
+                          <FaMapMarkerAlt className="text-primary mt-1" />
+                          <div>
+                            <h4 className="font-medium text-base-content">
+                              {values.location.name}
+                            </h4>
+                            <p className="text-sm text-base-content/70">
+                              {values.location.address}
+                            </p>
+                            <p className="text-sm text-base-content/70">
+                              {[
+                                values.location.city,
+                                values.location.postalCode,
+                              ]
+                                .filter(Boolean)
+                                .join(", ")}
+                            </p>
+                            {values.location.country && (
+                              <p className="text-sm text-base-content/70">
+                                {values.location.country}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <Map
+                        defaultAddress={values.location.address}
+                        readonly={true}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div className="bg-warning/10 border border-warning/20 p-4 rounded-lg">
                   <p className="text-warning-content text-sm">
                     <strong>Please review:</strong> Make sure all information is

@@ -6,6 +6,7 @@ import {
   IHttpConnectionOptions,
   LogLevel,
 } from "@microsoft/signalr";
+import { EVENTS_API_URL } from "../constants";
 
 class SignalRClient {
   private static instance: SignalRClient;
@@ -38,8 +39,7 @@ class SignalRClient {
       return this.connection;
     }
 
-    const apiBase =
-      process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5160";
+    const apiBase = EVENTS_API_URL;
     const hubUrl = `${apiBase}/hubs/${hub}`;
 
     const options: IHttpConnectionOptions = {

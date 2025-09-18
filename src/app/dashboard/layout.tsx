@@ -38,13 +38,13 @@ export default async function RootLayout({
       >
         <AuthProvider>
           <ReactQueryProvider>
-            <div className="min-h-screen-safe grid">
-              <div className="fixed left-8 top-8 bottom-8">
+            <div className="min-h-screen-safe flex gap-4 sm:p-8">
+              <div className="hidden sm:flex">
                 <Sidebar />
               </div>
-              <div className="fixed right-8 left-96 top-8 bottom-8 flex flex-col gap-8">
+              <div className="flex flex-col gap-4 flex-1">
                 <DashboardHeader />
-                <main className="flex-1 relative w-full rounded-lg h-full bg-background overflow-scroll">
+                <main className="flex-1 relative w-full rounded-lg bg-background overflow-auto">
                   {children}
                 </main>
               </div>

@@ -22,6 +22,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginFromTokens: (authResponse: AuthResponse) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<void>;
 }
@@ -87,6 +88,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       saveTokens(user);
     } catch (error) {
       console.error("Login failed:", error);
+      clearTokens();
+      setUserProfile(null);
+      throw error;
+    }
+  };
+
+  const loginFromTokens = async (authResponse: AuthResponse): Promise<void> => {
+    try {
+      saveTokens(authResponse);
+      const userProfile = await getCurrentUserProfile();
+      setUserProfile(userProfile ?? null);
+    } catch (error) {
+      console.error("Login from tokens failed:", error);
       clearTokens();
       setUserProfile(null);
       throw error;
@@ -175,6 +189,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
     isAuthenticated,
     login,
+    loginFromTokens,
     logout,
     refreshAuth,
   };

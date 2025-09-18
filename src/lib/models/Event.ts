@@ -35,7 +35,7 @@ export interface Event {
   name: string;
   startTime: Date;
   endTime: Date;
-  locationId?: string;
+  locationId?: Location;
   location?: Location;
   description?: string;
   costToEnter: number;
@@ -61,8 +61,7 @@ export interface CreateEvent {
   name: string;
   startTime: Date;
   endTime: Date;
-  // Send location as string to be mapped to address in backend
-  location: string;
+  location: Location;
   approveGuests: boolean;
   teamsNumber: number;
   eventFormat: EventFormat;
@@ -78,6 +77,10 @@ export interface CreateEvent {
 export interface Location {
   id?: string | undefined;
   name: string;
-  latLng?: string;
-  address: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
 }
