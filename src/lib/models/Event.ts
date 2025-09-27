@@ -1,36 +1,39 @@
 import { Team } from "./Team";
 import { UserProfile } from "./User";
+import { EventBudget, Unit } from "./EventBudget";
 
 export enum EventType {
   CasualPlay = "CasualPlay",
   Tournament = "Tournament",
+  TrainingSession = "TrainingSession",
 }
 
 export const EventTypeOptions = [
   { value: EventType.CasualPlay, label: "Casual" },
   { value: EventType.Tournament, label: "Tournament" },
+  { value: EventType.TrainingSession, label: "Training Session" },
 ];
 
 export enum EventFormat {
-  Open = 0, // No teams, everyone joins individually (masterclass, social events)
-  OpenTeams = 1, // Teams with generic "Player" positions
-  TeamsWithPositions = 2, // Teams with specific volleyball positions
+  Open = "Open", // No teams, everyone joins individually (masterclass, social events)
+  OpenTeams = "OpenTeams", // Teams with generic "Player" positions
+  TeamsWithPositions = "TeamsWithPositions", // Teams with specific volleyball positions
 }
 
 export enum PlayingSurface {
-  Grass = "Grass",
-  Indoor = "Indoor",
-  Beach = "Beach",
+  Grass = 0,
+  Indoor = 1,
+  Beach = 2,
 }
 
 export const SurfaceOptions = [
-  { value: PlayingSurface.Indoor.toString(), label: "Indoor" },
-  { value: PlayingSurface.Grass.toString(), label: "Grass" },
-  { value: PlayingSurface.Beach.toString(), label: "Beach" },
+  { value: PlayingSurface.Indoor, label: "Indoor" },
+  { value: PlayingSurface.Grass, label: "Grass" },
+  { value: PlayingSurface.Beach, label: "Beach" },
 ];
 
 export interface Event {
-  id?: string | undefined;
+  id: string;
   image?: string | undefined; // Optional for some UIs
   name: string;
   startTime: Date;
@@ -38,16 +41,28 @@ export interface Event {
   locationId?: Location;
   location?: Location;
   description?: string;
-  costToEnter: number;
+  canceled?: boolean;
+
+  // Registration and pricing
+  registrationUnit: Unit; // How people register for this event
+  budget?: EventBudget; // Budget configuration (new approach)
+  budgetId?: string; // Reference to budget if using separate budget entity
+
+  // Legacy pricing fields (for backward compatibility)
+  costToEnter: number; // @deprecated - use budget instead
+
   // Extended fields to match backend model
   type: EventType;
   surface: PlayingSurface;
   isPrivate: boolean;
   teamsNumber: number;
+
   // Optional for some UIs
   admins?: UserProfile[];
   teams?: Team[]; // Array of team IDs
 }
+
+export interface EventAdmin {}
 
 export interface GetEventsRequest {
   type?: EventType; // Optional filter by event type
@@ -65,13 +80,15 @@ export interface CreateEvent {
   approveGuests: boolean;
   teamsNumber: number;
   eventFormat: EventFormat;
-  cost: number;
+
+  // Registration and pricing
+  registrationUnit: Unit;
+  budget?: EventBudget; // Inline budget configuration
+  budgetId?: string; // Or reference to existing budget template
+
   type: EventType;
   surface: PlayingSurface;
   isPrivate: boolean;
-  capacity?: number | null; // Changed from maxParticipants to match backend
-  courtsNumber: number;
-  payToEnter?: boolean; // Indicates if participants need to pay to join this event
 }
 
 export interface Location {

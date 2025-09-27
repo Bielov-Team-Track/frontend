@@ -58,7 +58,6 @@ const InteractiveTemplate = (args: any) => {
       <ConfirmationModal
         ref={modalRef}
         confirm={() => {
-          console.log("Confirmed!");
           modalRef.current?.close();
         }}
         {...args}

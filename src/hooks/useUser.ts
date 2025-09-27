@@ -27,11 +27,6 @@ const useUser = (): UseUserReturn => {
         console.error("Error fetching user:", err);
         setError(err.message || "Failed to fetch user");
 
-        // If authentication failed, redirect to login
-        if (err.response?.status === 401 || err.response?.status === 403) {
-          router.push("/login");
-        }
-
         setUserProfile(null);
       } finally {
         setLoading(false);

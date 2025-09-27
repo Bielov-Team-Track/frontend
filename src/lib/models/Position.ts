@@ -1,3 +1,4 @@
+import { Team } from "./Team";
 import { UserProfile } from "./User";
 
 export interface Position {
@@ -6,6 +7,8 @@ export interface Position {
   paid: boolean;
   userId?: string;
   userProfile?: UserProfile;
+  teamId?: string;
+  team?: Team;
 }
 
 export interface PositionPayment {
@@ -13,4 +16,11 @@ export interface PositionPayment {
   paid: boolean;
   eventId: string;
   position: string;
+}
+
+export interface WaitlistEntry {
+  userId: string;
+  user: UserProfile;
+  positionId: string;
+  position: Position;
 }

@@ -7,11 +7,9 @@ import React, { Suspense } from "react";
 import Loader from "@/components/ui/loader";
 
 function ResetPasswordContent() {
-  console.log("Render ResetPasswordContent");
   const params = useSearchParams();
   const [passwordReset, setPasswordReset] = React.useState(false);
   const token = params.get("token");
-  console.log(params);
   const onPasswordReset = () => {
     setPasswordReset(true);
   };

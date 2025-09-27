@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader } from "@/components/ui";
 import {
   APIProvider,
   AdvancedMarker,
@@ -25,6 +26,7 @@ function MapComponent({
   onError,
   readonly = false,
 }: MapProps) {
+  const [isLoading, setIsLoading] = useState(true);
   const [position, setPosition] = useState<google.maps.LatLngLiteral>();
   const [center, setCenter] = useState<google.maps.LatLngLiteral>({
     lat: 54.9783,
@@ -66,7 +68,11 @@ function MapComponent({
       onAddressSelected &&
         address &&
         onAddressSelected(address.formatted_address);
-      onLocationCalculated && onLocationCalculated(clickEvent.detail.latLng?.lat!, clickEvent.detail.latLng?.lng!);
+      onLocationCalculated &&
+        onLocationCalculated(
+          clickEvent.detail.latLng?.lat!,
+          clickEvent.detail.latLng?.lng!
+        );
     },
     [geocoder, readonly]
   );
@@ -79,6 +85,9 @@ function MapComponent({
 
   return (
     <div className="w-full h-56 resize-y overflow-hidden border border-base-300 rounded-lg min-h-32 max-h-96 relative">
+      {isLoading && (
+        <Loader className="bg-black/25 absolute inset-0 rounded-md" />
+      )}
       <GoogleMap
         mapId={"31199ddcdd9ac2de"}
         defaultZoom={12}
@@ -87,6 +96,7 @@ function MapComponent({
         onClick={handleClick}
         gestureHandling="auto"
         disableDefaultUI={readonly}
+        onTilesLoaded={() => setIsLoading(false)}
       >
         {position && <AdvancedMarker position={position} />}
       </GoogleMap>

@@ -36,7 +36,7 @@ function LoginContent() {
 
       setIsLoading(false);
 
-      const targetRoute = callback || "/dashboard/events/my";
+      const targetRoute = callback || "/dashboard/";
 
       router.push(targetRoute);
     } catch (error: any) {

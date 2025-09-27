@@ -6,16 +6,24 @@ import React from "react";
 import { FaEllipsisH as MenuIcon } from "react-icons/fa";
 import { Modal } from "@/components/ui";
 import { UserSearch } from "@/components/features/users";
-import { assignCaptain as assignCaptainRequest } from "@/lib/requests/teams";
+import {
+  assignCaptain as assignCaptainRequest,
+  removeCaptain as removeCaptainRequest,
+} from "@/lib/requests/teams";
 import useUser from "@/hooks/useUser";
 import { UserProfile } from "@/lib/models/User";
 
 type TeamMenuProps = {
   team: Team;
-  onCaptainAssigned: (user?: UserProfile) => void;
+  onCaptainAssigned: (user: UserProfile) => void;
+  onCaptainRemoved: () => void;
 };
 
-function TeamMenu({ team, onCaptainAssigned }: TeamMenuProps) {
+function TeamMenu({
+  team,
+  onCaptainAssigned,
+  onCaptainRemoved,
+}: TeamMenuProps) {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const { userProfile } = useUser();
@@ -32,7 +40,7 @@ function TeamMenu({ team, onCaptainAssigned }: TeamMenuProps) {
     return null;
   }
 
-  const assignCaptain = (selectedUser?: UserProfile) => {
+  const assignCaptain = (selectedUser: UserProfile) => {
     setIsLoading(true);
     assignCaptainRequest(team.id!, selectedUser?.userId!)
       .then(() => {
@@ -45,8 +53,20 @@ function TeamMenu({ team, onCaptainAssigned }: TeamMenuProps) {
       });
   };
 
+  const removeCaptain = () => {
+    setIsLoading(true);
+    removeCaptainRequest(team.id!)
+      .then(() => {
+        setIsLoading(false);
+        onCaptainRemoved && onCaptainRemoved();
+      })
+      .catch(() => {
+        setIsLoading(false);
+      });
+  };
+
   return (
-    <div className="dropdown dropdown-start z-50">
+    <div className="dropdown dropdown-end z-50">
       <MenuIcon tabIndex={0} role="button" className="m-1" />
       <ul
         tabIndex={0}
@@ -57,10 +77,7 @@ function TeamMenu({ team, onCaptainAssigned }: TeamMenuProps) {
         </li>
         {team.captain && (
           <li>
-            {" "}
-            <button onClick={() => assignCaptain(undefined)}>
-              Remove the captain
-            </button>
+            <button onClick={() => removeCaptain()}>Remove the captain</button>
           </li>
         )}
       </ul>
@@ -69,7 +86,9 @@ function TeamMenu({ team, onCaptainAssigned }: TeamMenuProps) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
-        <UserSearch onUserSelect={assignCaptain} />
+        <div className="p-12">
+          <UserSearch onUserSelect={assignCaptain} />
+        </div>
       </Modal>
     </div>
   );

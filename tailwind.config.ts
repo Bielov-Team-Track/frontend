@@ -1,3 +1,4 @@
+import { error } from "console";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -32,11 +33,17 @@ const config: Config = {
         neutral: "#ffffff",
         "neutral-content": "#38686b",
         primary: "#38686B",
-        "primary-content": "#ebebeb",
+        "primary-content": "#ffffff",
         secondary: "#be3f23",
         "secondary-content": "#ffffff",
         accent: "#ff7d00",
         "accent-content": "#000000",
+        error: "#ff4d6d",
+        "error-content": "#ffffff",
+        success: "#00c851",
+        "success-content": "#ffffff",
+        warning: "#ffbb33",
+        "warning-content": "#000000",
       },
       fontSize: {
         xs: [

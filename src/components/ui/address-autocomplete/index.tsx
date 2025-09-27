@@ -120,7 +120,6 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
   const handleSuggestionClick = (suggestion: AddressSuggestion) => {
     setInputValue(suggestion.description);
-    console.log(suggestion)
     onChange?.(suggestion.description);
     setSuggestions([]);
     setIsOpen(false);
@@ -231,7 +230,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
       {/* Suggestions dropdown */}
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg max-h-60 overflow-auto" style={{ zIndex: 999999 }}>
+        <div className="absolute top-full left-0 right-0 mt-1 bg-[141414] border border-base-300 rounded-lg shadow-lg max-h-60 overflow-auto" style={{ zIndex: 999999 }}>
           {suggestions.map((suggestion) => (
             <button
               key={suggestion.placeId}

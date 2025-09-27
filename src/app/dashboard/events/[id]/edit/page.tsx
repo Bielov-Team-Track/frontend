@@ -15,7 +15,6 @@ async function EventEditPage({ params }: Params) {
   if (!event) {
     notFound();
   }
-  const locations = await loadLocations();
 
   return (
     <div className="flex flex-col w-full gap-4">

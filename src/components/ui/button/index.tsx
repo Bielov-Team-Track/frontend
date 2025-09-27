@@ -4,26 +4,21 @@ import React, { forwardRef } from "react";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?:
-    | "primary"
-    | "secondary"
-    | "accent"
-    | "ghost"
-    | "outline"
-    | "link"
-    | "icon";
+  variant?: "solid" | "outline" | "ghost" | "link" | "icon";
+  color?: "primary" | "secondary" | "accent" | "neutral" | "success" | "warning" | "error";
   size?: "sm" | "md" | "lg" | "xl";
   fullWidth?: boolean;
   loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
-      variant = "primary",
+      variant = "solid",
+      color = "primary",
       size = "md",
       fullWidth = false,
       loading = false,
@@ -40,56 +35,90 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const baseClasses =
       "inline-flex items-center min-w-max max-h-min justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed";
 
-    // Variant classes
+    // Color scheme classes
+    const colorClasses = {
+      primary: {
+        base: "primary",
+        content: "primary-content",
+        hover: "primary/90",
+        focus: "primary/50",
+      },
+      secondary: {
+        base: "secondary",
+        content: "secondary-content",
+        hover: "secondary/90",
+        focus: "secondary/50",
+      },
+      accent: {
+        base: "accent",
+        content: "accent-content",
+        hover: "accent/90",
+        focus: "accent/50",
+      },
+      neutral: {
+        base: "neutral",
+        content: "neutral-content",
+        hover: "neutral/90",
+        focus: "neutral/50",
+      },
+      success: {
+        base: "success",
+        content: "success-content",
+        hover: "success/90",
+        focus: "success/50",
+      },
+      warning: {
+        base: "warning",
+        content: "warning-content",
+        hover: "warning/90",
+        focus: "warning/50",
+      },
+      error: {
+        base: "error",
+        content: "error-content",
+        hover: "error/90",
+        focus: "error/50",
+      },
+    };
+
+    const currentColor = colorClasses[color];
+
+    // Variant classes (structural)
     const variantClasses = {
-      primary: [
-        "bg-primary hover:bg-primary/90 focus:bg-primary/90",
-        "text-primary-content",
+      solid: [
+        `bg-${currentColor.base} hover:bg-${currentColor.hover} focus:bg-${currentColor.hover}`,
+        `text-${currentColor.content}`,
         "shadow-md hover:shadow-lg",
-        "focus:ring-primary/50",
-        "active:scale-[0.98]",
-      ].join(" "),
-      secondary: [
-        "bg-secondary hover:bg-secondary/90 focus:bg-secondary/90",
-        "text-secondary-content",
-        "shadow-md hover:shadow-lg",
-        "focus:ring-secondary/50",
-        "active:scale-[0.98]",
-      ].join(" "),
-      accent: [
-        "bg-accent hover:bg-accent/90 focus:bg-accent/90",
-        "text-accent-content",
-        "shadow-md hover:shadow-lg",
-        "focus:ring-accent/50",
-        "active:scale-[0.98]",
-      ].join(" "),
-      ghost: [
-        "bg-transparent hover:bg-base-200 focus:bg-base-200",
-        "text-base-content",
-        "hover:shadow-sm",
-        "focus:ring-base-300",
+        `focus:ring-${currentColor.focus}`,
         "active:scale-[0.98]",
       ].join(" "),
       outline: [
-        "bg-transparent hover:bg-base-100 focus:bg-base-100",
-        "text-base-content",
-        "border-2 border-base-300 hover:border-base-400",
+        `bg-transparent hover:bg-${currentColor.base}/10 focus:bg-${currentColor.base}/10`,
+        `text-${currentColor.content} hover:text-${currentColor.base}`,
+        `border-2 border-${currentColor.base}`,
         "hover:shadow-sm",
-        "focus:ring-base-300",
+        `focus:ring-${currentColor.focus}`,
+        "active:scale-[0.98]",
+      ].join(" "),
+      ghost: [
+        `bg-transparent hover:bg-${currentColor.base}/10 focus:bg-${currentColor.base}/10`,
+        `text-${currentColor.base}`,
+        "hover:shadow-sm",
+        `focus:ring-${currentColor.focus}`,
         "active:scale-[0.98]",
       ].join(" "),
       link: [
         "bg-transparent p-0",
-        "text-primary hover:text-primary/80 focus:text-primary/80",
+        `text-${currentColor.base} hover:text-${currentColor.hover} focus:text-${currentColor.hover}`,
         "underline decoration-2 underline-offset-2",
         "active:scale-[0.98]",
       ].join(" "),
       icon: [
-        "bg-transparent hover:bg-base-200 focus:bg-base-200",
-        "text-base-content",
+        `bg-transparent hover:bg-${currentColor.base}/10 focus:bg-${currentColor.base}/10`,
+        `text-${currentColor.base}`,
         "p-2 rounded-full",
         "hover:shadow-sm",
-        "focus:ring-base-300",
+        `focus:ring-${currentColor.focus}`,
         "active:scale-[0.98]",
       ].join(" "),
     };

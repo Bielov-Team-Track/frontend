@@ -35,7 +35,7 @@ export default async function RootLayout({
           <ReactQueryProvider>
             <div className="min-h-screen-safe bg-background">
               <Header />
-              <main className="relative w-full ">{children}</main>
+              <main className="relative max-w-4xl mx-auto">{children}</main>
             </div>
           </ReactQueryProvider>
         </AuthProvider>

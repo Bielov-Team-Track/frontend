@@ -37,34 +37,24 @@ export function useRealtimePayments() {
         connection.on(
           "PaymentReceived",
           (payload: { participantId: string }) => {
-            console.log("Position taken:", payload);
             applyPaymentReceived(payload.participantId);
           }
         );
 
         connection.on("Connected", (payload: { connectionId: string }) => {
-          console.log("SignalR connected:", payload.connectionId);
           setConnectionStatus("connected");
         });
 
         // Connection state handlers
         connection.onreconnecting(() => {
-          console.log("SignalR reconnecting...");
           setConnectionStatus("reconnecting");
         });
 
         connection.onreconnected(() => {
-          console.log("SignalR reconnected");
           setConnectionStatus("connected");
-          // Position sync will be handled by signalr client callback
         });
 
-        // Set up position sync callback
-        signalr.setSyncCallback(async () => {
-          console.log("Syncing payments after reconnection");
-          // This could trigger a refresh of all positions for the current page
-          // For now, we'll let the components handle their own refresh
-        });
+        signalr.setSyncCallback(async () => {});
 
         connection.onclose(handleConnectionError);
       } catch (error) {

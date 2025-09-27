@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { EVENTS_API_V1 } from "../constants";
 
 export const getUserProfile = async () => {
   const cookieStore = cookies();
+  console.log("cookieStore:", cookieStore);
   const token = (await cookieStore).get("token")?.value;
 
   // If no token, return null to indicate unauthenticated
@@ -49,9 +49,9 @@ export const getUserProfile = async () => {
 export const requireAuth = async () => {
   const user = await getUserProfile();
 
-  if (!user) {
-    redirect("/login");
-  }
+  // if (!user) {
+  //   redirect("/login");
+  // }
 
   return user;
 };

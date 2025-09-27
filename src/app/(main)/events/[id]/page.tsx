@@ -16,13 +16,10 @@ import {
   getFormattedTime,
 } from "@/lib/utils/date";
 
-import {
-  FaClock as ClockIcon,
-  FaMapPin as PinIcon,
-  FaUsers as PeopleIcon,
-  FaVolleyballBall as VolleyballIcon,
-} from "react-icons/fa";
 import { UserProfile } from "@/lib/models/User";
+import CommentsSection from "@/components/features/comments/components/CommentsSection";
+import EventPageButtons from "./components/EventPageButtons";
+import PaymentsSection from "./components/PaymentsSection";
 
 type EventPageParams = {
   params: Promise<{
@@ -38,10 +35,6 @@ async function EventPage({ params }: EventPageParams) {
 
   const user: UserProfile = await getUserProfile();
 
-  if (!user) {
-    redirect("/login");
-  }
-
   // TODO: Too many requests
   const event = await loadEvent(parameters.id);
 
@@ -49,7 +42,8 @@ async function EventPage({ params }: EventPageParams) {
     notFound();
   }
 
-  const isAdmin = !!event.admins!.find((a) => a.userId == user.userId);
+  const isAdmin = !!event.admins!.find((a) => a.userId == user?.userId);
+  console.log("EventPage render", { event, user, isAdmin });
 
   if ((event as any).approveGuests && !isAdmin) {
     const userApproval = await checkUserApproval(event.id!, user?.userId!);
@@ -74,22 +68,26 @@ async function EventPage({ params }: EventPageParams) {
   return (
     <div className="flex flex-col w-full gap-4 p-8">
       <PositionsRealtimeClient />
+      {event.canceled && (
+        <div className="alert alert-error">
+          <div>
+            <span>This event has been canceled.</span>
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between">
-        <h1 className="text-4xl font-bold">{event.name}</h1>
-        {!event.teams && <Button>Join</Button>}
+        <h1 className="md:text-6xl text-5xl font-bold">{event.name}</h1>
+        {isAdmin && <EventPageButtons event={event} />}
       </div>
       <div>{event.description}</div>
       <div>
         <div className="flex items-center gap-2">
-          <ClockIcon />
-          <span className="text-neutral/60">Date and time</span>
+          <span className="text-3xl font-bold">Date and time</span>
         </div>
         <div className="flex gap-12 py-4">
-          <div className="text-2xl">
-            {getFormattedDateWithDay(event.startTime)}
-          </div>
+          <div className="">{getFormattedDateWithDay(event.startTime)}</div>
           <div className="flex flex-col">
-            <div className="text-2xl font-bold">
+            <div className="font-bold">
               {getFormattedTime(event.startTime)} -{" "}
               {getFormattedTime(event.endTime)}
             </div>
@@ -101,13 +99,17 @@ async function EventPage({ params }: EventPageParams) {
       </div>
       <div>
         <div className="flex items-center gap-2">
-          <PinIcon />
-          <span className="text-neutral/60">Location</span>
+          <span className="text-3xl font-bold">Location</span>
         </div>
         <div className="flex flex-col gap-2 py-4">
           {event.location ? (
             <>
-              <Map defaultAddress={event.location.address} />
+              <div className="flex flex-col gap-2">
+                <span>
+                  <b>Address:</b> {event.location.address}
+                </span>
+              </div>
+              <Map defaultAddress={event.location.address} readonly={true} />
               <Link
                 target="_blank"
                 href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
@@ -117,14 +119,6 @@ async function EventPage({ params }: EventPageParams) {
               >
                 Get Directions
               </Link>
-              <div className="flex flex-col gap-2">
-                <span>
-                  <b>Name:</b> {event.location.name}
-                </span>
-                <span>
-                  <b>Address:</b> {event.location.address}
-                </span>
-              </div>
             </>
           ) : (
             <span className="font-2xl font-bold">TBD</span>
@@ -132,31 +126,49 @@ async function EventPage({ params }: EventPageParams) {
         </div>
       </div>
 
-      {teams && teams.length > 0 && (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2">
-            <VolleyballIcon />
-            <span className="text-neutral/60">Teams</span>
-          </div>
-          <TeamsList teams={teams} />
-        </div>
-      )}
       {event.admins && event.admins.length > 0 && (
         <div>
           <span className="flex items-center gap-2">
-            <PeopleIcon />
-            <span className="text-neutral/60">Admins</span>
+            <span className="text-3xl font-bold">Admins</span>
           </span>
           <div className="flex flex-col gap-2 p-4 rounded-lg bg-primary/5">
             {event.admins.map((admin) => (
-              <div key={admin.userId} className="flex items-center gap-2">
+              <Link
+                href={"/profiles/" + admin.userId}
+                key={admin.userId}
+                className="flex items-center gap-2"
+              >
                 <Avatar profile={admin} />
-                <span>{(admin as any).name || admin.email}</span>
-              </div>
+                <span>
+                  {admin.name} {admin.surname}
+                </span>
+              </Link>
             ))}
           </div>
         </div>
       )}
+      <PaymentsSection event={event} teams={teams} userProfile={user} />
+      {teams && teams.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-3xl font-bold">Teams</span>
+          </div>
+          {teams && teams.length > 0 && (
+            <TeamsList
+              teams={teams}
+              userId={user?.userId}
+              isAdmin={isAdmin}
+              registrationType={event.registrationUnit}
+            />
+          )}
+        </div>
+      )}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-3xl font-bold">Comments</span>
+        </div>
+        <CommentsSection eventId={event.id}></CommentsSection>
+      </div>
     </div>
   );
 }

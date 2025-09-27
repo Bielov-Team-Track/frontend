@@ -5,6 +5,7 @@ import { responsiveClasses } from "@/lib/utils/responsive";
 export interface SelectOption {
   value: string | number;
   label: string;
+  icon?: React.ReactNode;
   disabled?: boolean;
 }
 
@@ -50,7 +51,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ) => {
     // Build CSS classes
     const baseClasses =
-      "select w-full transition-colors duration-200 appearance-none";
+      "select w-full transition-colors duration-200 appearance-none bg-[#141414]";
 
     const variantClasses = {
       default: "select-ghost",
@@ -91,6 +92,12 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
       .filter(Boolean)
       .join(" ");
 
+    const iconClasses = [
+      disabled ? "opacity-60" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     // Handle change event
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const newValue = e.target.value;
@@ -116,7 +123,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           {/* Left Icon */}
           {leftIcon && (
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-              <span className="text-base-content/60">{leftIcon}</span>
+              <span className={`text-base-content/60 ${iconClasses}`}>{leftIcon}</span>
             </div>
           )}
 

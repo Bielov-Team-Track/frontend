@@ -8,11 +8,12 @@ import {
   FaUserCircle as UserIcon,
   FaCog as SettingsIcon,
 } from "react-icons/fa";
-import { Avatar, Button } from "@/components/ui";
+import { Avatar, Button, Loader } from "@/components/ui";
 import { useAuth } from "@/lib/auth/authContext";
 import { useRouter } from "next/navigation";
+import { MdOutlineSpaceDashboard } from "react-icons/md";
 
-function UserMenu({ user }: UserMenuProps) {
+function UserMenu({ user, isLoading }: UserMenuProps) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { logout } = useAuth();
@@ -26,6 +27,7 @@ function UserMenu({ user }: UserMenuProps) {
   };
 
   const links = [
+    { href: "/dashboard/", label: "Dashboard", icon: MdOutlineSpaceDashboard },
     { href: "/profile/" + user?.userId, label: "Profile", icon: UserIcon },
     { href: "/profile/settings", label: "Settings", icon: SettingsIcon },
   ];
@@ -55,7 +57,17 @@ function UserMenu({ user }: UserMenuProps) {
 
   return (
     <div className="relative" ref={menuRef}>
-      {user ? (
+      {isLoading ? (
+        <div className="flex items-center gap-2">
+          {/* User Info Skeleton - Hidden on very small screens */}
+          <div className="hidden sm:flex flex-col items-end text-right gap-1">
+            <div className="skeleton h-5 w-24"></div>
+          </div>
+
+          {/* Avatar Skeleton */}
+          <div className="skeleton h-8 w-8 avatar rounded"></div>
+        </div>
+      ) : user ? (
         <div className="flex items-center gap-2">
           {/* User Info - Hidden on very small screens */}
           <div className="hidden sm:flex flex-col items-end text-right">
@@ -101,9 +113,10 @@ function UserMenu({ user }: UserMenuProps) {
 
               <Button
                 variant="ghost"
+                color="secondary"
                 leftIcon={<LogoutIcon size={16} />}
                 onClick={handleLogout}
-                className="w-full text-error"
+                className="w-full"
               >
                 Sign Out
               </Button>
@@ -122,6 +135,7 @@ function UserMenu({ user }: UserMenuProps) {
 
 type UserMenuProps = {
   user: UserProfile | null;
+  isLoading?: boolean;
 };
 
 export default UserMenu;

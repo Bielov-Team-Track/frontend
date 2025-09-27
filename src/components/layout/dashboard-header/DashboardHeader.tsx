@@ -5,12 +5,12 @@ import UserMenu from "./UserMenu";
 import { useAuth } from "@/lib/auth/authContext";
 
 function DashboardHeader() {
-  const { userProfile } = useAuth();
+  const { userProfile, isLoading } = useAuth();
 
   return (
     <header className="flex justify-between items-center w-full h-14 p-4 bg-background text-base-content rounded-md">
       <Breadcrumbs />
-      <UserMenu user={userProfile!} />
+      <UserMenu user={userProfile!} isLoading={isLoading} />
     </header>
   );
 }

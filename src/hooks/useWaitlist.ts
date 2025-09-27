@@ -1,33 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   joinWaitlist as joinWaitlistRequest,
   leaveWaitlist as leaveWaitlistRequest,
   loadWaitlist as loadWaitlistRequest,
 } from "@/lib/requests/waitlist";
-import { UserProfile } from "@/lib/models/User";
+import { WaitlistEntry } from "@/lib/models/Position";
 
-export function useWaitlist(positionId: string, userId: string) {
-  const [waitlist, setWaitlist] = useState<UserProfile[] | undefined>(
+export function useWaitlist(positionId: string, shouldLoad: boolean = true) {
+  const [waitlist, setWaitlist] = useState<WaitlistEntry[] | undefined>(
     undefined
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const loadWaitlist = async () => {
-    setIsLoading(true);
+  const loadWaitlist = useCallback(async () => {
+    await new Promise(resolve => setTimeout(resolve, 300));
     try {
-      const users = await loadWaitlistRequest(positionId);
-      setWaitlist(users);
+      const waitlistEntries = await loadWaitlistRequest(positionId);
+      setWaitlist(waitlistEntries);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [positionId]);
 
   const joinWaitlist = async () => {
     setIsLoading(true);
     try {
-      await joinWaitlistRequest(positionId, userId);
+      await joinWaitlistRequest(positionId);
       await loadWaitlist();
     } finally {
       setIsLoading(false);
@@ -37,7 +37,7 @@ export function useWaitlist(positionId: string, userId: string) {
   const leaveWaitlist = async () => {
     setIsLoading(true);
     try {
-      await leaveWaitlistRequest(positionId, userId);
+      await leaveWaitlistRequest(positionId);
       await loadWaitlist();
     } finally {
       setIsLoading(false);
@@ -45,8 +45,10 @@ export function useWaitlist(positionId: string, userId: string) {
   };
 
   useEffect(() => {
-    loadWaitlist();
-  }, [positionId]);
+    if (shouldLoad) {
+      loadWaitlist();
+    }
+  }, [loadWaitlist, shouldLoad]);
 
   return {
     waitlist,

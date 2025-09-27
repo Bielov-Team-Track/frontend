@@ -8,8 +8,8 @@ export const getDuration = (
 
   if (typeof startTime === "string" && typeof endTime === "string") {
     // Legacy support for time strings (e.g., "14:30")
-    startDate = new Date(`01/01/2000 ${startTime}`);
-    endDate = new Date(`01/01/2000 ${endTime}`);
+    startDate = new Date(startTime);
+    endDate = new Date(endTime);
   } else {
     // Handle Date objects
     startDate = new Date(startTime);
@@ -34,15 +34,15 @@ export const getDuration = (
   const parts: string[] = [];
 
   if (days > 0) {
-    parts.push(`${days}d`);
+    parts.push(`${days} days`);
   }
 
   if (hours > 0) {
-    parts.push(`${hours}h`);
+    parts.push(`${hours} hours`);
   }
 
   if (minutes > 0) {
-    parts.push(`${minutes}m`);
+    parts.push(`${minutes} minutes`);
   }
 
   // Handle edge case where duration is 0
@@ -81,15 +81,32 @@ export const getFormattedDate = (date: Date | string) => {
   });
 };
 
-export const getFormattedDateWithDay = (date: Date | string) => {
+export const getFormattedDateWithDay = (
+  date: Date | string,
+  variant: "short" | "long" = "long"
+) => {
   if (typeof date === "string") date = new Date(date);
 
-  return date.toLocaleDateString("en-UK", {
-    weekday: "short",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const dayOfWeek = date.toLocaleDateString("en-UK", { weekday: "long" });
+  const day = date.getDate();
+  const month = date.toLocaleDateString("en-UK", { month: "long" });
+  const monthNum = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+  const ordinal = (n: number) => {
+    if (n > 3 && n < 21) return "th";
+    switch (n % 10) {
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
+    }
+  };
+
+  if (variant === "long") {
+    return `${dayOfWeek}, ${day}${ordinal(day)} of ${month}, ${year}`;
+  } else {
+    return `${dayOfWeek}, ${day.toString().padStart(2, "0")}/${monthNum}/${year}`;
+  }
 };
 
 export const getFormattedTime = (date: Date | string) => {

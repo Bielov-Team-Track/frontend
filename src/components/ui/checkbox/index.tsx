@@ -39,7 +39,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
     // Build CSS classes
     const baseClasses =
-      "checkbox transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary border bg-base-100 input-bordered";
+      "checkbox transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary border bg-[#141414] input-bordered";
 
     const variantClasses = {
       primary: "checkbox-primary",
@@ -76,7 +76,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
     return (
       <div className={`form-control ${fullWidth ? "w-full" : "w-auto"}`}>
-        <label className="label cursor-pointer justify-start gap-3">
+        <label className="label cursor-pointer justify-start gap-2">
           <input
             ref={ref}
             type="checkbox"
@@ -114,9 +114,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
         {/* Helper Text */}
         {helperText && !error && (
-          <div className="mt-1">
+          <div>
             <span
-              className={`${responsiveClasses.text.caption} text-base-content/70`}
+              className={`${responsiveClasses.text.caption} text-neutral/60 text-sm`}
             >
               {helperText}
             </span>

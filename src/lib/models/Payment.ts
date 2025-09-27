@@ -1,14 +1,11 @@
-import { Position } from "./Position"
-import { Event } from "./Event"
+import { EventParticipant } from "./EventParticipant";
+import { UserProfile } from "./User";
 
 export interface Payment {
-  date: Date
-  location: string
-  positions: Position[]
-  eventId: string
-}
-
-export interface UserPayment {
-  event: Event
-  amount: number
+  id: string;
+  userId: string;
+  eventParticipant?: EventParticipant;
+  amount: number;
+  paidAt?: Date;
+  status: string;
 }

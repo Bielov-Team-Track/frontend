@@ -89,7 +89,6 @@ const InteractiveTemplate = () => {
     setCroppedImage(croppedImageBlob);
     const url = URL.createObjectURL(croppedImageBlob);
     setCroppedImageUrl(url);
-    console.log("Cropped image saved:", croppedImageBlob);
   };
 
   const loadSampleImage = () => {

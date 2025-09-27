@@ -64,16 +64,11 @@ class SignalRClient {
           return delay + jitter;
         },
       })
-      .configureLogging(
-        process.env.NODE_ENV === "development"
-          ? LogLevel.Information
-          : LogLevel.Error
-      )
+      .configureLogging(LogLevel.Error)
       .build();
 
     // Enhanced connection event handlers
     this.connection.onreconnected(async () => {
-      console.log("SignalR reconnected - syncing positions");
       if (this.onSyncNeeded) {
         try {
           await this.onSyncNeeded();
@@ -84,12 +79,10 @@ class SignalRClient {
     });
 
     this.connection.onclose(async (error) => {
-      console.log("SignalR connection closed:", error);
       this.started = false;
 
       // Attempt to restart connection if it was unexpected
       if (error && !this.connection) {
-        console.log("Attempting to restart connection...");
         try {
           await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds
           await this.start(hub, token);
@@ -102,7 +95,6 @@ class SignalRClient {
     if (!this.started) {
       await this.connection.start();
       this.started = true;
-      console.log("SignalR connection established");
     }
 
     return this.connection;

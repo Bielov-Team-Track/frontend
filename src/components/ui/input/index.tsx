@@ -15,6 +15,7 @@ export interface InputProps
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   showPasswordToggle?: boolean;
+  optional?: boolean;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -32,6 +33,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       type = "text",
       className = "",
       disabled,
+      optional,
       ...props
     },
     ref
@@ -46,7 +48,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     const baseClasses =
       "input w-full transition-colors duration-200 focus:outline-none" +
       "focus:ring-2 focus:ring-offset-2 focus:ring-primary rounded-md outline-1 outline-base-content/20 " +
-      "bg-base-100 text-base-content placeholder:text-base-content/60 focus:placeholder:text";
+      "bg-[#141414] text-neutral placeholder:text-base-content/60 focus:placeholder:text";
 
     const variantClasses = {
       default: "input-ghost",
@@ -65,7 +67,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       focused: "ring-2 ring-primary ring-opacity-20",
       disabled: "input-disabled opacity-60 cursor-not-allowed",
     };
-
+    
     const inputClasses = [
       baseClasses,
       variantClasses[variant],
@@ -80,6 +82,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     ]
       .filter(Boolean)
       .join(" ");
+
+      const iconClasses = [
+        disabled ? "opacity-60" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
 
     const labelClasses = [
       "block font-medium",
@@ -96,6 +104,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <label className={labelClasses}>
             {label}
             {props.required && <span className="text-red-500 ml-1">*</span>}
+            {optional && !props.required && (
+              <span className="text-neutral/40 ml-1 font-normal text-sm">
+                optional
+              </span>
+            )}
           </label>
         )}
 
@@ -122,7 +135,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           {/* Left Icon */}
           {leftIcon && (
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-50">
-              <span className="text-base-content/60">{leftIcon}</span>
+              <span className={`text-base-content/60 ${iconClasses}`}>{leftIcon}</span>
             </div>
           )}
 

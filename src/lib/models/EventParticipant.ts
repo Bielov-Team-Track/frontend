@@ -5,7 +5,7 @@ export interface EventParticipant {
   eventId: string;
   userId: string;
   hasPaid: boolean;
-  profile: UserProfile;
+  userProfile: UserProfile;
   createdAt: Date;
   updatedAt: Date;
 }

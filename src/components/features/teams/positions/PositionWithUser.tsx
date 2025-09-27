@@ -1,19 +1,25 @@
-import React from "react";
-import { FiX as CancelIcon } from "react-icons/fi";
+"use client";
+
 import Avatar from "@/components/ui/avatar";
-import Loader from "@/components/ui/loader";
-import { useWaitlist } from "@/hooks/useWaitlist";
 import { Position as PositionModel } from "@/lib/models/Position";
 import { Team } from "@/lib/models/Team";
-import { useAuth } from "@/lib/auth/authContext";
 import { Button } from "@/components/ui";
-import { FaSignOutAlt as LeaveIcon } from "react-icons/fa";
+import {
+  FaSignOutAlt as LeaveIcon,
+  FaUserAlt as PersonIcon,
+} from "react-icons/fa";
+import Link from "next/link";
+import { loadWaitlist } from "@/lib/requests/waitlist";
+import { useState } from "react";
+import PositionWaitlist from "./PositionWaitlist";
 
 type PositionWithUserProps = {
   position: PositionModel;
   userId: string;
   team: Team;
-  onPositionLeave: (positionId: string) => void;
+  onPositionLeave?: (positionId: string) => void;
+  open?: boolean;
+  editable?: boolean;
 };
 
 function PositionWithUser({
@@ -21,17 +27,19 @@ function PositionWithUser({
   userId,
   team,
   onPositionLeave,
+  open = false,
+  editable = false,
 }: PositionWithUserProps) {
-  const { waitlist, isLoading, loadWaitlist, joinWaitlist, leaveWaitlist } =
-    useWaitlist(position.id, userId);
-
-  const { userProfile } = useAuth();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleLeavePosition = () => {
-    onPositionLeave(position.id);
+    if (onPositionLeave) {
+      onPositionLeave(position.id);
+      loadWaitlist(position.id);
+    }
   };
 
-  const hideOtherWaitlists = (positionId: string) => {
+  const collapseOtherPositions = (positionId: string) => {
     const checkboxes = document.querySelectorAll(
       `input[type="checkbox"][name="${team.id}"]`
     );
@@ -40,93 +48,86 @@ function PositionWithUser({
         (checkbox as HTMLInputElement).checked = false;
       }
     });
-    if (!waitlist) {
-      loadWaitlist();
-    }
   };
 
-  const isCaptain = team.captain?.userId === userProfile?.userId;
-  const isAdmin = !!team.event.admins?.find(
-    (a) => a.userId === userProfile?.userId
-  );
+  const collapsable =
+    open || editable || position.userProfile?.userId === userId;
+
+  if (!collapsable) {
+    return (
+      <div className="p-4 h-14 rounded-md bg-primary w-full flex justify-between items-center">
+        <Link
+          href={`/profiles/${position.userProfile!.userId}`}
+          className="flex gap-2 items-center z-50"
+        >
+          <Avatar profile={position.userProfile!} />
+          <div className="flex flex-col">
+            <span className="whitespace-nowrap font-bold text-sm  hover:underline">
+              {position.userProfile?.name} {position.userProfile?.surname}
+            </span>
+            <span className="text-neutral/60 text-xs">{position.name}</span>
+          </div>
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div
-      tabIndex={0}
-      className="collapse collapse-arrow bg-primary/90 text-primary-content rounded-md"
-      onFocus={() => hideOtherWaitlists(position.id)}
-    >
+    <div className="collapse collapse-arrow bg-primary/30 text-primary-content rounded-md">
       <input
-        className="peer"
         id={position.id}
         type="checkbox"
         name={team?.id!}
+        checked={isExpanded}
+        onChange={(e) => {
+          setIsExpanded(e.target.checked);
+          collapseOtherPositions(position.id);
+        }}
       />
-      <div className="collapse-title p-4 h-14 rounded-md bg-primary w-full flex justify-between isolate">
-        <div className="flex items-center gap-2">
+      <div className="collapse-title p-4 h-14 rounded-md bg-primary w-full flex justify-between items-center">
+        <Link
+          href={`/profiles/${position.userProfile!.userId}`}
+          className="flex gap-2 items-center z-50"
+        >
           <Avatar profile={position.userProfile!} />
           <div className="flex flex-col">
-            <div className="flex gap-2 items-center z-50">
-              <span className="whitespace-nowrap font-bold w-full">
+            <div className="flex items-center gap-1">
+              <span className="whitespace-nowrap font-bold text-sm hover:underline">
                 {position.userProfile?.name} {position.userProfile?.surname}
               </span>
-
-              <Button
-                size={"sm"}
-                variant={"icon"}
-                className="text-error p-0 px-0 py-0"
-                onClick={handleLeavePosition}
-              >
-                Leave
-              </Button>
+              {team.captain?.userId === position.userProfile?.userId && (
+                <span className="text-sm pb-1"> 👑</span>
+              )}
             </div>
             <span className="text-neutral/60 text-xs">{position.name}</span>
           </div>
-        </div>
-        <span className="place-self-center self-center font-bold mr-6"></span>
+        </Link>
       </div>
       <div className="collapse-content relative">
-        {isLoading && <Loader className="absolute inset-0 bg-black/55 z-50" />}
-        {waitlist && (
-          <>
-            <div className="py-2 w-full text-lg">Waitlist</div>
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-full items-center flex flex-col gap-2">
-                {waitlist && waitlist.length > 0 ? (
-                  waitlist.map((user) => (
-                    <div
-                      key={`waitlist-${position.id}-${user.userId}`}
-                      className="flex w-full items-center justify-between gap-2"
-                    >
-                      <div className="flex gap-2 items-center">
-                        <Avatar profile={user} />
-                        <span>{user.name}</span>
-                      </div>
-                      {userId === user.userId && (
-                        <button
-                          className="link text-error"
-                          onClick={leaveWaitlist}
-                        >
-                          <CancelIcon />
-                        </button>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <span className="text-sm">Waitlist is empty</span>
-                )}
-              </div>
-              {position.userProfile?.userId !== userId &&
-                (!waitlist || !waitlist.find((u) => u.userId === userId)) && (
-                  <button
-                    className="btn btn-sm text-primary-content bg-primary border-none"
-                    onClick={joinWaitlist}
-                  >
-                    Join waitlist
-                  </button>
-                )}
-            </div>
-          </>
+        {(position.userProfile?.userId === userId || editable) && (
+          <div className="flex justify-end pt-4">
+            <Button
+              fullWidth={true}
+              variant="solid"
+              color="secondary"
+              leftIcon={<LeaveIcon />}
+              className="text-error !min-h-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleLeavePosition();
+              }}
+            >
+              Free position
+            </Button>
+          </div>
+        )}
+        {open && (
+          <PositionWaitlist
+            position={position}
+            team={team}
+            userId={userId}
+            shouldLoad={isExpanded}
+          />
         )}
       </div>
     </div>

@@ -1,8 +1,9 @@
 "use client";
 
-import { Loader } from '@/components/ui';
+import { Loader } from "@/components/ui";
 import React, { PropsWithChildren, useEffect } from "react";
 import ReactDOM from "react-dom";
+import { FaTimes } from "react-icons/fa";
 
 type ModalProps = {
   isOpen: boolean;
@@ -26,11 +27,11 @@ const Modal = ({ isOpen, onClose, children, isLoading }: ModalProps) => {
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-40 flex">
-      <div className="relative p-4 bg-black rounded max-w-sm m-auto flex-col flex">
+      <div className="relative p-4 bg-background max-w-sm m-auto flex-col flex rounded-3xl">
         {isLoading && <Loader className="absolute inset-0 bg-black/55" />}
         {/* Modal Close Button */}
-        <button onClick={onClose} className="absolute top-0 right-0 mt-2 mr-2">
-          &times;
+        <button onClick={onClose} className="absolute top-0 right-0 mt-6 mr-6">
+          <FaTimes className="text-white hover:text-gray-300" />
         </button>
         {/* Modal Content */}
         {children}

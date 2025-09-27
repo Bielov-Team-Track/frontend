@@ -7,6 +7,6 @@ export interface Team {
   name: string;
   event: Event;
   positions?: Position[];
-  captainUserId?: string;
+  captainId?: string;
   captain?: UserProfile;
 }

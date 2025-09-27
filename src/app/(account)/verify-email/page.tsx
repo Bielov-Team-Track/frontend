@@ -47,7 +47,6 @@ const VerifyEmailPageContent = () => {
         if (result.auth) {
           try {
             await loginFromTokens(result.auth);
-            console.log("User automatically logged in after email verification");
           } catch (loginError) {
             console.error("Failed to log in user after verification:", loginError);
             // Continue with redirect even if login fails

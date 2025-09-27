@@ -23,7 +23,7 @@ export async function loadEventsByUser(userId: string): Promise<Event[]> {
 
 export async function loadEventsByAdmin(userId: string): Promise<Event[]> {
   const endpoint = "/v1/admins/" + userId + "/events";
-  console.log(PREFIX + endpoint);
+
   return (await client.get<Event[]>(PREFIX + endpoint)).data;
 }
 

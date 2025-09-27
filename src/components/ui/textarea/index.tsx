@@ -44,7 +44,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     const characterCount = typeof value === "string" ? value.length : 0;
 
     // Build CSS classes
-    const baseClasses = "textarea resize-y transition-colors duration-200";
+    const baseClasses = "textarea resize-y transition-colors duration-200 bg-[#141414]";
 
     const variantClasses = {
       default: "textarea-ghost",
@@ -135,7 +135,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           {(showCharCount || maxLength) && (
             <div className="absolute bottom-2 right-2 pointer-events-none">
               <span
-                className={`${responsiveClasses.text.caption} text-base-content/50 bg-base-100 px-1 rounded`}
+                className={`${responsiveClasses.text.caption} text-base-content/50 bg-[#141414] px-1 rounded`}
               >
                 {characterCount}
                 {maxLength && `/${maxLength}`}

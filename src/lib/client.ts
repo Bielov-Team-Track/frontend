@@ -66,8 +66,6 @@ client.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     if (typeof window !== "undefined") {
       let token = getAccessToken();
-      console.log("Current token:", token?.substring(0, 20) + "...");
-      // Check if token is expired and refresh if needed
       if (token && isTokenExpired()) {
         token = await refreshAccessToken();
       }
@@ -171,6 +169,8 @@ client.interceptors.response.use(
         isRefreshing = false;
       }
     }
+
+    console.error(error.response || error.message);
 
     return Promise.reject(error);
   }

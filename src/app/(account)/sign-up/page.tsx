@@ -149,7 +149,7 @@ function SignUpPage() {
             />
           )}
         />
-
+        <span className="text-sm text-neutral/60">By continuing you agree to our <Link className="link" href={"/terms-of-service"}>Terms of service</Link> and <Link className="link" href={"/privacy-policy"}>Privacy policy</Link></span>
         <Button type="submit">
           Create Account
         </Button>

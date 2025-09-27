@@ -1,3 +1,5 @@
+"use client";
+
 import { Button, Input } from "@/components/ui";
 import Loader from "@/components/ui/loader";
 import { resetPassword } from "@/lib/requests/auth";

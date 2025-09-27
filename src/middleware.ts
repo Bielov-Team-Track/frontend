@@ -17,6 +17,7 @@ const publicRoutes = [
   "/api",
   "/favicon.ico",
   "/events",
+  "/.well-known"
 ];
 
 // Routes that require authentication but not complete profile

@@ -74,10 +74,16 @@ export async function sendVerification() {
   return await client.post(AUTH_PREFIX + endpoint);
 }
 
-export async function verifyEmail(token: string): Promise<EmailVerificationResult> {
+export async function verifyEmail(
+  token: string
+): Promise<EmailVerificationResult> {
   const endpoint = `/v1/auth/verify-email`;
 
-  return (await client.post<EmailVerificationResult>(AUTH_PREFIX + endpoint, { token })).data;
+  return (
+    await client.post<EmailVerificationResult>(AUTH_PREFIX + endpoint, {
+      token,
+    })
+  ).data;
 }
 
 export async function isEmailVerified(email: string) {

@@ -9,7 +9,7 @@ import { PositionPayment } from "../models/Position";
 import { AuthData } from "../models/Auth";
 import { AuthResponse } from "./auth";
 
-const PREFIX = "/events";
+const PREFIX = "/events/v1";
 
 export async function getUserProfile(userId: string) {
   const endpoint = `/users/${userId}`;
@@ -66,7 +66,9 @@ export async function saveGoogleUser(user: GoogleUserCreate) {
 export async function updateProfileImage(image: Blob): Promise<string> {
   // Step 1: Get presigned URL from backend
   const fileType = image.type; // e.g., "image/jpeg", "image/png"
-  const getUploadUrlEndpoint = `/v1/profiles/me/profile-image-upload-url?fileType=${encodeURIComponent(fileType)}`;
+  const getUploadUrlEndpoint = `/v1/profiles/me/profile-image-upload-url?fileType=${encodeURIComponent(
+    fileType
+  )}`;
 
   const response = await client.get(PREFIX + getUploadUrlEndpoint);
   const presignedUrl = response.data;
@@ -85,7 +87,7 @@ export async function updateProfileImage(image: Blob): Promise<string> {
   }
 
   // Step 3: Extract the public URL (remove query parameters from presigned URL)
-  const imageUrl = presignedUrl.split('?')[0];
+  const imageUrl = presignedUrl.split("?")[0];
   return imageUrl;
 }
 
@@ -101,8 +103,10 @@ export async function unfollowUser(userId: string) {
   return await client.post(PREFIX + endpoint);
 }
 
-export async function search(query: string) {
-  const endpoint = `/users/search?query=${query}`;
+export async function search(query: string): Promise<UserProfile[]> {
+  const processedQuery = encodeURIComponent(query.trim());
+
+  const endpoint = `/profiles?query=${processedQuery}`;
 
   return (await client.get<UserProfile[]>(PREFIX + endpoint)).data;
 }

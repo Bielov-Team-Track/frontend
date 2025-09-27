@@ -1,23 +1,26 @@
 import client from "../client";
-import { UserProfile } from "../models/User";
+import { WaitlistEntry } from "../models/Position";
 
-const PREFIX = "/events"
+const PREFIX = "/events/v1";
 
+export async function loadWaitlist(
+  positionId: string
+): Promise<WaitlistEntry[]> {
+  const endpoint = `/positions/${positionId}/waitlist`;
 
-export async function loadWaitlist(positionId: string): Promise<UserProfile[]> {
-  const endpoint = `/waitlist/${positionId}`;
-
-  return (await client.get<UserProfile[]>(PREFIX + endpoint)).data;
+  return (await client.get<WaitlistEntry[]>(PREFIX + endpoint)).data;
 }
 
-export async function joinWaitlist(positionId: string, userId: string) {
-  const endpoint = `/waitlist/${positionId}/${userId}`;
+export async function joinWaitlist(positionId: string) {
+  const endpoint = `/positions/${positionId}/waitlist/`;
 
   await client.post(PREFIX + endpoint);
 }
 
-export async function leaveWaitlist(positionId: string, userId: string) {
-  const endpoint = `/waitlist/${positionId}/${userId}`;
+export async function leaveWaitlist(positionId: string) {
+  const endpoint = `/positions/${positionId}/waitlist`;
 
-  await client.delete(PREFIX + endpoint);
+  await (
+    await client.delete(PREFIX + endpoint)
+  ).data;
 }

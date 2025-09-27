@@ -7,7 +7,7 @@ const PREFIX = "events";
 
 export async function loadTeams(eventId: string): Promise<Team[]> {
   const endpoint = `/v1/events/${eventId}/teams`;
-
+  
   return (await client.get<Team[]>(PREFIX + endpoint)).data;
 }
 
@@ -38,5 +38,11 @@ export async function deleteTeamPosition(teamId: string, positionId: string) {
 export async function assignCaptain(teamId: string, userId: string) {
   const endpoint = `/v1/teams/${teamId}/captain`;
 
-  return await client.put(PREFIX + endpoint, { userId });
+  return await client.post(PREFIX + endpoint, { userId: userId });
+}
+
+export async function removeCaptain(teamId: string) {
+  const endpoint = `/v1/teams/${teamId}/captain`;
+
+  return await client.delete(PREFIX + endpoint);
 }

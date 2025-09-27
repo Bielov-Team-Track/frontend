@@ -5,10 +5,12 @@ import signalr from "@/lib/realtime/signalrClient";
 import { usePositionStore } from "@/lib/realtime/positionStore";
 import { HubConnection, HubConnectionState } from "@microsoft/signalr";
 import { useAccessToken } from "@/lib/auth/authContext";
+import { Position } from "@/lib/models/Position";
 
 export function useRealtimePositions() {
   const applyTaken = usePositionStore((s) => s.applyTaken);
   const applyReleased = usePositionStore((s) => s.applyReleased);
+  const applyMultipleUpdated = usePositionStore((s) => s.applyMultipleUpdated);
   const setConnectionStatus = usePositionStore((s) => s.setConnectionStatus);
   const token = useAccessToken(); // Get token at hook level
 
@@ -32,47 +34,32 @@ export function useRealtimePositions() {
     const start = async () => {
       try {
         setConnectionStatus("connecting");
-        connection = await signalr.start(token, "positions");
+        connection = await signalr.start("position", token);
 
         // Set up event handlers
-        connection.on(
-          "PositionTaken",
-          (payload: { positionId: string; userId: string }) => {
-            console.log("Position taken:", payload);
-            applyTaken(payload.positionId, payload.userId);
-          }
-        );
+        connection.on("PositionTaken", (payload: Position) => {
+          applyTaken(payload);
+        });
 
-        connection.on(
-          "PositionReleased",
-          (payload: { positionId: string; userId: string }) => {
-            console.log("Position released:", payload);
-            applyReleased(payload.positionId);
-          }
-        );
+        connection.on("PositionReleased", (payload: Position) => {
+          applyReleased(payload);
+        });
+
+        connection.on("PositionsUpdated", (payload: Position[]) => {
+          applyMultipleUpdated(payload);
+        });
 
         connection.on("Connected", (payload: { connectionId: string }) => {
-          console.log("SignalR connected:", payload.connectionId);
           setConnectionStatus("connected");
         });
 
         // Connection state handlers
         connection.onreconnecting(() => {
-          console.log("SignalR reconnecting...");
           setConnectionStatus("reconnecting");
         });
 
         connection.onreconnected(() => {
-          console.log("SignalR reconnected");
           setConnectionStatus("connected");
-          // Position sync will be handled by signalr client callback
-        });
-
-        // Set up position sync callback
-        signalr.setSyncCallback(async () => {
-          console.log("Syncing positions after reconnection");
-          // This could trigger a refresh of all positions for the current page
-          // For now, we'll let the components handle their own refresh
         });
 
         connection.onclose(handleConnectionError);
@@ -93,6 +80,7 @@ export function useRealtimePositions() {
     token,
     applyTaken,
     applyReleased,
+    applyMultipleUpdated,
     setConnectionStatus,
     handleConnectionError,
   ]);

@@ -12,8 +12,9 @@ type PositionState = {
   setConnectionStatus: (
     status: "disconnected" | "connecting" | "connected" | "reconnecting"
   ) => void;
-  applyTaken: (positionId: string, userId: string) => void;
-  applyReleased: (positionId: string) => void;
+  applyTaken: (position: Position) => void;
+  applyReleased: (position: Position) => void;
+  applyMultipleUpdated: (positions: Position[]) => void;
   applyTakenWithRollback: (positionId: string, userId: string) => () => void;
   upsert: (position: Position) => void;
   reset: () => void;
@@ -32,33 +33,40 @@ export const usePositionStore = create<PositionState>((set, get) => ({
   setConnectionStatus: (status) => set(() => ({ connectionStatus: status })),
   upsert: (position) =>
     set((s) => ({ positions: { ...s.positions, [position.id]: position } })),
-  applyTaken: (positionId, userId) =>
+  applyTaken: (position) =>
     set((s) => {
-      const p = s.positions[positionId];
-      if (!p) return {};
+      if (!s.positions[position.id]) {
+        return {};
+      }
       return {
         positions: {
           ...s.positions,
-          [positionId]: {
-            ...p,
-            userProfile: {
-              ...(p.userProfile || ({} as any)),
-              id: userId,
-            } as any,
-          },
+          [position.id]: position,
         },
       };
     }),
-  applyReleased: (positionId) =>
+  applyReleased: (position) =>
     set((s) => {
-      const p = s.positions[positionId];
-      if (!p) return {};
+      if (!s.positions[position.id]) return {};
+
       return {
         positions: {
           ...s.positions,
-          [positionId]: { ...p, userProfile: undefined },
+          [position.id]: position,
         },
       };
+    }),
+  applyMultipleUpdated: (positions) =>
+    set((s) => {
+      const updatedPositions = { ...s.positions };
+
+      positions.forEach((position) => {
+        if (s.positions[position.id]) {
+          updatedPositions[position.id] = position;
+        }
+      });
+
+      return { positions: updatedPositions };
     }),
   applyTakenWithRollback: (positionId, userId) => {
     const previousState = get().positions[positionId];
@@ -72,10 +80,14 @@ export const usePositionStore = create<PositionState>((set, get) => ({
           ...s.positions,
           [positionId]: {
             ...p,
+            userId: userId,
             userProfile: {
-              ...(p.userProfile || ({} as any)),
-              id: userId,
-            } as any,
+              userId: userId,
+              name: "Loading...",
+              surname: "",
+              email: "",
+              imageUrl: "",
+            },
           },
         },
       };
