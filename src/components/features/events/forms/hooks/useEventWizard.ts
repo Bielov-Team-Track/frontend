@@ -35,19 +35,19 @@ export function useEventWizard({ trigger, watch }: UseEventWizardProps) {
       ];
 
     // Add dynamic validation for step 4
-    if (currentStep === 4 && Number(values.eventFormat) !== EventFormat.Open) {
-      fieldsToValidate = [...fieldsToValidate, "teamsNumber"];
+    if (currentStep === 4 && values.eventFormat !== EventFormat.Open) {
+      fieldsToValidate = [...fieldsToValidate, "teamsNumber"] as any;
     }
-    
+
     // Add dynamic validation for step 5 (budget)
     if (currentStep === 5) {
-      if (!values.ignoreBudget) {
-        // If budget is not ignored, validate budget fields
-        fieldsToValidate = [...fieldsToValidate, "budget.applicableUnit", "budget.pricingModel", "budget.cost"];
+      if (values.useBudget) {
+        // If budget is enabled, validate budget fields
+        fieldsToValidate = [...fieldsToValidate, "budget.pricingModel", "budget.cost"] as any;
       }
     }
 
-    const isValid = await trigger(fieldsToValidate);
+    const isValid = await trigger(fieldsToValidate as any);
 
     if (isValid && currentStep < TOTAL_STEPS) {
       const newStep = currentStep + 1;

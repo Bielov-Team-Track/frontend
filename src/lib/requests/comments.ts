@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import client from "../client";
-import { Comment } from "../models/comment";
+import { Comment } from "../models/Comment";
 
 const PREFIX = "/events/v1";
 

@@ -1,20 +1,20 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import Section from './index';
-import { FaUser, FaCreditCard, FaBell } from 'react-icons/fa';
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import Section from "./index";
+import { FaCreditCard, FaBell } from "react-icons/fa";
 
 const meta: Meta<typeof Section> = {
-  title: 'UI/Section',
+  title: "UI/Section",
   component: Section,
   parameters: {
-    layout: 'padded',
+    layout: "padded",
   },
   argTypes: {
     variant: {
-      control: { type: 'select' },
-      options: ['info', 'warning', 'error', 'success', 'neutral'],
+      control: { type: "select" },
+      options: ["info", "warning", "error", "success", "neutral"],
     },
     showIcon: {
-      control: { type: 'boolean' },
+      control: { type: "boolean" },
     },
   },
 };
@@ -24,17 +24,17 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    title: 'Default Section',
-    description: 'This is a neutral section with default styling.',
+    title: "Default Section",
+    description: "This is a neutral section with default styling.",
     children: <p>Additional content can go here.</p>,
   },
 };
 
 export const Info: Story = {
   args: {
-    variant: 'info',
-    title: 'Information',
-    description: 'This section provides helpful information to the user.',
+    variant: "info",
+    title: "Information",
+    description: "This section provides helpful information to the user.",
     children: (
       <ul className="list-disc list-inside space-y-1 text-sm">
         <li>Feature is available in your plan</li>
@@ -46,23 +46,19 @@ export const Info: Story = {
 
 export const Warning: Story = {
   args: {
-    variant: 'warning',
-    title: 'Setup Required',
-    description: 'Action needed before you can proceed.',
+    variant: "warning",
+    title: "Setup Required",
+    description: "Action needed before you can proceed.",
     children: <p>Please complete your profile setup to continue.</p>,
-    actions: (
-      <button className="btn btn-warning btn-sm">
-        Complete Setup
-      </button>
-    ),
+    actions: <button className="btn btn-warning btn-sm">Complete Setup</button>,
   },
 };
 
 export const Error: Story = {
   args: {
-    variant: 'error',
-    title: 'Account Verification Failed',
-    description: 'There was an issue verifying your account.',
+    variant: "error",
+    title: "Account Verification Failed",
+    description: "There was an issue verifying your account.",
     children: (
       <div className="space-y-2">
         <p>Please check the following:</p>
@@ -72,69 +68,64 @@ export const Error: Story = {
         </ul>
       </div>
     ),
-    actions: (
-      <button className="btn btn-error btn-sm">
-        Contact Support
-      </button>
-    ),
+    actions: <button className="btn btn-error btn-sm">Contact Support</button>,
   },
 };
 
 export const Success: Story = {
   args: {
-    variant: 'success',
-    title: 'Account Verified',
-    description: 'Your payment account is now active and ready to use.',
+    variant: "success",
+    title: "Account Verified",
+    description: "Your payment account is now active and ready to use.",
     children: <p>You can now accept card payments for your events.</p>,
   },
 };
 
 export const CustomIcon: Story = {
   args: {
-    variant: 'info',
-    title: 'Payment Account',
-    description: 'Manage your payment settings and account information.',
+    variant: "info",
+    title: "Payment Account",
+    description: "Manage your payment settings and account information.",
     icon: <FaCreditCard className="text-primary text-xl" />,
     children: (
       <div className="space-y-2">
-        <p>Account Status: <span className="badge badge-success">Active</span></p>
+        <p>
+          Account Status: <span className="badge badge-success">Active</span>
+        </p>
         <p>Last Updated: Today</p>
       </div>
     ),
-    actions: (
-      <button className="btn btn-primary btn-sm">
-        Manage Account
-      </button>
-    ),
+    actions: <button className="btn btn-primary btn-sm">Manage Account</button>,
   },
 };
 
 export const WithoutIcon: Story = {
   args: {
-    title: 'Profile Settings',
-    description: 'Update your personal information and preferences.',
+    title: "Profile Settings",
+    description: "Update your personal information and preferences.",
     showIcon: false,
     children: (
       <div className="form-control">
         <label className="label">
           <span className="label-text">Display Name</span>
         </label>
-        <input type="text" className="input input-bordered input-sm" defaultValue="John Doe" />
+        <input
+          type="text"
+          className="input input-bordered input-sm"
+          defaultValue="John Doe"
+        />
       </div>
     ),
-    actions: (
-      <button className="btn btn-primary btn-sm">
-        Save Changes
-      </button>
-    ),
+    actions: <button className="btn btn-primary btn-sm">Save Changes</button>,
   },
 };
 
 export const PaymentSetup: Story = {
   args: {
-    variant: 'warning',
-    title: 'Payment Account Setup Required',
-    description: 'To accept card payments for your events, you need to set up a payment account.',
+    variant: "warning",
+    title: "Payment Account Setup Required",
+    description:
+      "To accept card payments for your events, you need to set up a payment account.",
     icon: <FaCreditCard className="text-warning text-xl" />,
     children: (
       <div className="space-y-3">
@@ -148,12 +139,8 @@ export const PaymentSetup: Story = {
     ),
     actions: (
       <div className="flex space-x-2">
-        <button className="btn btn-warning btn-sm">
-          Set up Account
-        </button>
-        <button className="btn btn-outline btn-sm">
-          Learn More
-        </button>
+        <button className="btn btn-warning btn-sm">Set up Account</button>
+        <button className="btn btn-outline btn-sm">Learn More</button>
       </div>
     ),
   },
@@ -161,9 +148,9 @@ export const PaymentSetup: Story = {
 
 export const MultipleActions: Story = {
   args: {
-    variant: 'neutral',
-    title: 'Event Management',
-    description: 'Manage your volleyball events and settings.',
+    variant: "neutral",
+    title: "Event Management",
+    description: "Manage your volleyball events and settings.",
     icon: <FaBell className="text-primary text-xl" />,
     children: (
       <div className="stats stats-horizontal shadow-sm bg-base-100">
@@ -182,10 +169,19 @@ export const MultipleActions: Story = {
         <div tabIndex={0} role="button" className="btn btn-sm btn-ghost">
           Options
         </div>
-        <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-          <li><a>View All Events</a></li>
-          <li><a>Create New Event</a></li>
-          <li><a>Event Settings</a></li>
+        <ul
+          tabIndex={0}
+          className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+        >
+          <li>
+            <a>View All Events</a>
+          </li>
+          <li>
+            <a>Create New Event</a>
+          </li>
+          <li>
+            <a>Event Settings</a>
+          </li>
         </ul>
       </div>
     ),

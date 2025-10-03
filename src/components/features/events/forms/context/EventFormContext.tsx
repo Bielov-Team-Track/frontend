@@ -35,7 +35,7 @@ interface EventFormProviderProps {
 export function EventFormProvider({ children, event, locations }: EventFormProviderProps) {
   const form = useEventForm(event);
   const wizard = useEventWizard({
-    trigger: form.trigger,
+    trigger: form.trigger as any,
     watch: form.watch,
   });
 

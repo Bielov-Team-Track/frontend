@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 async function EventsPage() {
   const user: UserProfile = await getUserProfile();
 
-  const events = await loadEventsByFilter(user.userId!);
+  const events = await loadEventsByFilter({ organizerId: user.userId! });
 
   return (
     <div className="absolte inset-0 p-4">

@@ -33,7 +33,8 @@ const meta: Meta<typeof Button> = {
     },
     fullWidth: {
       control: { type: "boolean" },
-      description: "Whether the button should take the full width of its container",
+      description:
+        "Whether the button should take the full width of its container",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -66,7 +67,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     children: "Button",
-    variant: "primary",
+    variant: "solid",
     size: "md",
   },
 };
@@ -75,21 +76,21 @@ export const Default: Story = {
 export const Primary: Story = {
   args: {
     children: "Primary Button",
-    variant: "primary",
+    variant: "solid",
   },
 };
 
 export const Secondary: Story = {
   args: {
     children: "Secondary Button",
-    variant: "secondary",
+    variant: "solid",
   },
 };
 
 export const Accent: Story = {
   args: {
     children: "Accent Button",
-    variant: "accent",
+    variant: "solid",
   },
 };
 
@@ -154,10 +155,10 @@ export const Loading: Story = {
 export const LoadingWithVariants: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4">
-      <Button variant="primary" loading>
+      <Button variant="solid" loading>
         Saving...
       </Button>
-      <Button variant="secondary" loading>
+      <Button variant="solid" loading>
         Processing...
       </Button>
       <Button variant="outline" loading>
@@ -188,9 +189,9 @@ export const FullWidth: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4">
-      <Button variant="primary">Primary</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="accent">Accent</Button>
+      <Button variant="solid">Primary</Button>
+      <Button variant="solid">Secondary</Button>
+      <Button variant="solid">Accent</Button>
       <Button variant="ghost">Ghost</Button>
       <Button variant="outline">Outline</Button>
     </div>
@@ -272,7 +273,7 @@ export const WithRightIcon: Story = {
 export const WithBothIcons: Story = {
   args: {
     children: "Download",
-    variant: "secondary",
+    variant: "solid",
     leftIcon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -333,7 +334,7 @@ export const IconExamples: Story = {
         >
           Create New
         </Button>
-        
+
         <Button
           variant="outline"
           rightIcon={
@@ -355,9 +356,9 @@ export const IconExamples: Story = {
         >
           Save
         </Button>
-        
+
         <Button
-          variant="secondary"
+          variant="solid"
           leftIcon={
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -383,7 +384,8 @@ export const IconExamples: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Examples of buttons with icons using the leftIcon and rightIcon props.",
+        story:
+          "Examples of buttons with icons using the leftIcon and rightIcon props.",
       },
     },
   },
@@ -404,13 +406,17 @@ export const ResponsiveShowcase: Story = {
           </div>
         </div>
       </div>
-      
+
       <div>
         <h3 className="text-lg font-semibold mb-4">Full Width Examples</h3>
         <div className="space-y-2 max-w-md">
           <Button fullWidth>Full Width Primary</Button>
-          <Button fullWidth variant="outline">Full Width Outline</Button>
-          <Button fullWidth variant="ghost">Full Width Ghost</Button>
+          <Button fullWidth variant="outline">
+            Full Width Outline
+          </Button>
+          <Button fullWidth variant="ghost">
+            Full Width Ghost
+          </Button>
         </div>
       </div>
     </div>
@@ -418,7 +424,8 @@ export const ResponsiveShowcase: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Demonstrates responsive typography and full-width button options.",
+        story:
+          "Demonstrates responsive typography and full-width button options.",
       },
     },
   },
@@ -428,7 +435,7 @@ export const ResponsiveShowcase: Story = {
 export const Playground: Story = {
   args: {
     children: "Playground Button",
-    variant: "primary",
+    variant: "solid",
     size: "md",
     disabled: false,
     loading: false,
@@ -455,37 +462,67 @@ export const InteractionExamples: Story = {
           <Button loading>Loading</Button>
         </div>
       </div>
-      
+
       <div>
         <h3 className="text-lg font-semibold mb-4">Action Buttons</h3>
         <div className="flex flex-wrap gap-4">
           <Button
-            variant="primary"
+            variant="solid"
             leftIcon={
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
               </svg>
             }
           >
             Create Event
           </Button>
-          
+
           <Button
-            variant="secondary"
+            variant="solid"
             leftIcon={
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
               </svg>
             }
           >
             Edit Profile
           </Button>
-          
+
           <Button
             variant="outline"
             rightIcon={
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
               </svg>
             }
           >
@@ -498,7 +535,8 @@ export const InteractionExamples: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Real-world examples showing common button use cases with icons and various states.",
+        story:
+          "Real-world examples showing common button use cases with icons and various states.",
       },
     },
   },

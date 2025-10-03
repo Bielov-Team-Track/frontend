@@ -1,7 +1,11 @@
 import { Controller } from "react-hook-form";
 import { useEventFormContext } from "../context/EventFormContext";
 import { FaCoins, FaDoorOpen } from "react-icons/fa6";
-import { PricingModel, PricingModelOptions, PaymentMethod } from "@/lib/models/EventBudget";
+import {
+  PricingModel,
+  PricingModelOptions,
+  PaymentMethod,
+} from "@/lib/models/EventBudget";
 import { Checkbox, Select, Input } from "@/components/ui";
 import { useState } from "react";
 import PaymentMethodsSelector from "../components/PaymentMethodsSelector";
@@ -27,18 +31,20 @@ const EventBudgetStep = () => {
         </h2>
         <p className="text-base-content/60">
           Configure the budget and payment settings for your event. Without
-          budget you can't get payments and audit event afterwards.
+          budget you can&apos;t get payments and audit event afterwards.
         </p>
       </div>
 
       <Controller
         name="useBudget"
         control={control}
-        render={({ field }) => (
+        render={({ field: { value, onChange, ...field } }) => (
           <Checkbox
             {...field}
+            checked={value}
             label="Use budget"
             onChange={(e) => {
+              onChange(e);
               e.target.checked ? setIgnoreBudget(true) : setIgnoreBudget(false);
             }}
           />
@@ -89,13 +95,15 @@ const EventBudgetStep = () => {
         )}
       />
 
-      {values.budget?.pricingModel === PricingModel.Fixed && (
+      {values.budget?.pricingModel === PricingModel.Individual && (
         <Controller
           name="budget.payToJoin"
           control={control}
-          render={({ field }) => (
+          render={({ field: { value, onChange, ...field } }) => (
             <Checkbox
               {...field}
+              checked={value}
+              onChange={onChange}
               variant="secondary"
               disabled={!useBudget}
               label="Require payment to join event"

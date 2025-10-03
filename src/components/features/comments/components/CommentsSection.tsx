@@ -2,7 +2,7 @@
 
 import { loadComments, createComment } from "@/lib/requests/comments";
 import { useState, useEffect } from "react";
-import { Comment } from "@/lib/models/comment";
+import { Comment } from "@/lib/models/Comment";
 import CommentItem from "./CommentItem";
 import { TextArea, Button } from "@/components/ui";
 import { useAuth } from "@/lib/auth/authContext";

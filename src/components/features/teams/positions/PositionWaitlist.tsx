@@ -27,7 +27,7 @@ const PositionWaitlist = ({
       <div className="py-4 w-full flex items-center justify-between border-b h-16 border-neutral/20 mb-4">
         <span className="text-lg">Waitlist</span>
 
-        {position.userProfile?.userId !== userId &&
+        {position.eventParticipant?.userProfile?.userId !== userId &&
           (!waitlist || !waitlist.find((u) => u.userId === userId)) && (
             <Button size="sm" onClick={joinWaitlist}>
               Join waitlist

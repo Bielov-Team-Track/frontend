@@ -1,7 +1,6 @@
 "use client";
 
 import { Loader } from "@/components";
-import { OnboardingLink } from "@/lib/models/Payment";
 import { getOnboardingLink } from "@/lib/requests/payments";
 import { use, useEffect, useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
@@ -14,8 +13,8 @@ const StripeRefreshPage = () => {
   useEffect(() => {
     // Redirect to the backend endpoint to refresh the Stripe session
     getOnboardingLink()
-      .then((onboardingLink: OnboardingLink) => {
-        window.location.href = onboardingLink.url;
+      .then((onboardingLink: string) => {
+        window.location.href = onboardingLink;
       })
       .catch((err) => {
         console.error("Failed to get onboarding link:", err);

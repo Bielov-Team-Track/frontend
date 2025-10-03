@@ -95,7 +95,7 @@ export function ReviewStep() {
             <div className="flex items-center gap-2">
               <span>
                 🪙 Payments:{" "}
-                {values.ignoreBudget ? "self-managed" : getBudgetSummary()}
+                {!values.useBudget ? "self-managed" : getBudgetSummary()}
               </span>
             </div>
           </div>

@@ -70,6 +70,7 @@ function Position({
           position={position}
           team={team}
           editable={editable}
+          open={open}
           takePosition={takePosition}
           handlePayment={handlePayment}
           assignPosition={assignPosition}
@@ -84,6 +85,7 @@ type PositionMenuProps = {
   position: any;
   team: any;
   editable: boolean;
+  open: boolean;
   takePosition: () => void;
   handlePayment: () => void;
   assignPosition: (user: any) => void;
@@ -94,6 +96,7 @@ const AvailablePosition = ({
   position,
   team,
   editable,
+  open,
   takePosition,
   handlePayment,
   assignPosition,
@@ -128,7 +131,9 @@ const AvailablePosition = ({
           className="p-4 h-14 rounded-md bg-black/20 w-full flex justify-between items-center cursor-pointer hover:bg-black/30 transition-colors"
         >
           <span className="text-neutral/40 text-sm">{position.name}</span>
-          <span className="text-neutral/60 text-xs">Available</span>
+          {(open || editable) && (
+            <span className="text-neutral/60 text-xs">Available</span>
+          )}
         </div>
 
         <ul

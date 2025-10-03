@@ -1,5 +1,6 @@
 import { EventParticipant } from "./EventParticipant";
 import { UserProfile } from "./User";
+import { Event } from "./Event";
 
 export interface Payment {
   id: string;
@@ -8,6 +9,10 @@ export interface Payment {
   amount: number;
   paidAt?: Date;
   status: string;
+}
+
+export interface UserPayment extends Payment {
+  event: Event;
 }
 
 export enum PaymentAccountStatus {

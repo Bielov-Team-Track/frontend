@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import EventCard from "./index";
-import { Event, EventType, PlayingSurface } from "@/lib/models/Event";
+import {
+  Event,
+  EventFormat,
+  EventType,
+  PlayingSurface,
+} from "@/lib/models/Event";
+import { Unit } from "@/lib/models/EventBudget";
 
 const meta: Meta<typeof EventCard> = {
   title: "Events/EventCard",
@@ -24,6 +30,8 @@ const mockEvent: Event = {
     name: "Downtown Sports Complex",
     address: "123 Main Street",
   },
+  registrationUnit: Unit.Team,
+  eventFormat: EventFormat.TeamsWithPositions,
   costToEnter: 25.0,
   type: EventType.CasualPlay, // Assuming EventType enum
   surface: PlayingSurface.Indoor, // Assuming PlayingSurface enum
@@ -45,12 +53,12 @@ const mockEvent: Event = {
 export const Preview: Story = {
   args: {
     event: mockEvent,
-    style: "card",
+    variant: "horizontal",
   },
   render: (args) => (
     <div className="flex flex-row gap-4">
-      <EventCard event={args.event} style={"card"}></EventCard>
-      <EventCard event={args.event} style={"inline"}></EventCard>
+      <EventCard event={args.event} variant={"horizontal"}></EventCard>
+      <EventCard event={args.event} variant={"vertical"}></EventCard>
     </div>
   ),
 };
@@ -58,11 +66,11 @@ export const Preview: Story = {
 export const Card: Story = {
   args: {
     event: mockEvent,
-    style: "card",
+    variant: "vertical",
   },
   render: (args) => (
     <div className="grid place-content-center h-96">
-      <EventCard event={args.event} style={"card"}></EventCard>
+      <EventCard event={args.event} variant={"vertical"}></EventCard>
     </div>
   ),
 };
@@ -70,11 +78,11 @@ export const Card: Story = {
 export const Inline: Story = {
   args: {
     event: mockEvent,
-    style: "inline",
+    variant: "horizontal",
   },
   render: (args) => (
     <div>
-      <EventCard event={args.event} style={"inline"}></EventCard>
+      <EventCard event={args.event} variant={"horizontal"}></EventCard>
     </div>
   ),
 };

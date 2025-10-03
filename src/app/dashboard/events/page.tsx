@@ -1,5 +1,5 @@
 import React from "react";
-import { loadEventsByUser } from "@/lib/requests/events";
+import { loadEventsByFilter } from "@/lib/requests/events";
 import { EventsList } from "@/components/features/events";
 import { redirect } from "next/navigation";
 import { getUserProfile } from "@/lib/server/auth";
@@ -9,7 +9,7 @@ async function EventsPage() {
   if (!userProfile) {
     redirect("/login");
   }
-  const events = await loadEventsByUser(userProfile.userId!);
+  const events = await loadEventsByFilter({ organizerId: userProfile.userId! });
 
   return (
     <div className="absolte inset-0 grid place-items-center p-4">

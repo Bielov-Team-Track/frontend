@@ -1,5 +1,5 @@
 import { Avatar, Button } from "@/components/ui";
-import { Comment } from "@/lib/models/comment";
+import { Comment } from "@/lib/models/Comment";
 import { getFormattedDate } from "@/lib/utils/date";
 import {
   FaTrash as DeleteIcon,

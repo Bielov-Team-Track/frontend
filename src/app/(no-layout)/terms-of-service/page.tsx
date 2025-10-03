@@ -26,7 +26,7 @@ export default function TermsOfServicePage() {
                 Agreement to Our Legal Terms
               </h2>
               <p className="text-lg mb-4">
-                We are <strong>Volleyer</strong> ("Company," "we," "us," "our").
+                We are <strong>Volleyer</strong> (&quot;Company,&quot; &quot;we,&quot; &quot;us,&quot; &quot;our&quot;).
                 We operate the Volleyer volleyball community platform at{" "}
                 <a
                   href="https://www.volleyer.app"
@@ -37,8 +37,8 @@ export default function TermsOfServicePage() {
                   www.volleyer.app
                 </a>
                 , as well as any other related products and services that refer
-                or link to these legal terms (the "Legal Terms") (collectively,
-                the "Services").
+                or link to these legal terms (the &quot;Legal Terms&quot;) (collectively,
+                the &quot;Services&quot;).
               </p>
               <p className="mb-4">
                 You can contact us by email at{" "}
@@ -180,8 +180,8 @@ export default function TermsOfServicePage() {
                 rights in our Services, including all source code, databases,
                 functionality, software, website designs, audio, video, text,
                 photographs, and graphics in the Services (collectively, the
-                "Content"), as well as the trademarks, service marks, and logos
-                contained therein (the "Marks").
+               &quot;Content&quot;), as well as the trademarks, service marks, and logos
+                contained therein (the &quot;Marks&quot;).
               </p>
 
               <div className="bg-info/20 p-4 rounded-lg mb-4">
@@ -345,7 +345,7 @@ export default function TermsOfServicePage() {
                 including but not limited to text, writings, video, audio,
                 photographs, graphics, comments, suggestions, or personal
                 information or other material related to volleyball events,
-                teams, and community activities (collectively, "Contributions").
+                teams, and community activities (collectively, &quot;Contributions&quot;).
               </p>
               <div className="alert alert-info">
                 <svg
@@ -481,14 +481,14 @@ export default function TermsOfServicePage() {
               <h2 className="text-2xl font-semibold  mb-4">13. Disclaimer</h2>
               <div className="card bg-warning/20 p-4">
                 <p className="font-semibold mb-2">
-                  THE SERVICES ARE PROVIDED ON AN "AS-IS" AND "AS-AVAILABLE"
+                  THE SERVICES ARE PROVIDED ON AN &quot;AS-IS&quot; AND &quot;AS-AVAILABLE&quot;
                   BASIS.
                 </p>
                 <p className="text-sm">
                   TO THE FULLEST EXTENT PERMITTED BY LAW, WE DISCLAIM ALL
                   WARRANTIES, EXPRESS OR IMPLIED, IN CONNECTION WITH THE
                   SERVICES AND YOUR USE THEREOF. We make no warranties about the
-                  accuracy or completeness of the Services' content and assume
+                  accuracy or completeness of the Services&apos; content and assume
                   no liability for:
                 </p>
                 <ul className="list-disc pl-6 text-sm mt-2 space-y-1">

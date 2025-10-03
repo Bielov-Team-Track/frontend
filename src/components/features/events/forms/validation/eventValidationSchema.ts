@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { EventFormat, EventType, PlayingSurface } from "@/lib/models/Event";
-import { PricingModel, Unit } from "@/lib/models/EventBudget";
+import { EventBudget, PaymentMethod, PricingModel, Unit } from "@/lib/models/EventBudget";
 
 export const eventValidationSchema = yup.object().shape({
   startTime: yup
@@ -74,50 +74,47 @@ export const eventValidationSchema = yup.object().shape({
     .min(1, "Must be at least 1")
     .optional(),
   useBudget: yup.boolean().default(false),
-  budget: yup.object().when("useBudget", {
-    is: true,
-    then: (schema) =>
-      schema.shape({
-        pricingModel: yup
-          .mixed<PricingModel>()
-          .oneOf(Object.values(PricingModel) as PricingModel[])
-          .required("Pricing model is required"),
-        cost: yup
-          .number()
-          .min(0, "Cost cannot be negative")
-          .required("Cost is required"),
-        payToJoin: yup.boolean().optional().default(false),
-        minUnitsForBudget: yup
-          .number()
-          .min(1, "Must be at least 1")
-          .optional()
-          .transform((v, o) => (o === "" ? null : v)),
-        dropoutDeadlineHours: yup
-          .number()
-          .min(0, "Cannot be negative")
-          .optional()
-          .transform((v, o) => (o === "" ? null : v)),
-      }),
-    otherwise: (schema) =>
-      schema.shape({
-        pricingModel: yup
-          .mixed<PricingModel>()
-          .oneOf(Object.values(PricingModel) as PricingModel[])
-          .optional(),
-        cost: yup.number().min(0, "Cost cannot be negative").optional(),
-        payToJoin: yup.boolean().optional().default(false),
-        minUnitsForBudget: yup
-          .number()
-          .min(1, "Must be at least 1")
-          .optional()
-          .transform((v, o) => (o === "" ? null : v)),
-        dropoutDeadlineHours: yup
-          .number()
-          .min(0, "Cannot be negative")
-          .optional()
-          .transform((v, o) => (o === "" ? null : v)),
-      }),
-  }),
+  budget: yup
+    .object()
+    .shape({
+      paymentMethods: yup
+        .array()
+        .of(
+          yup
+            .mixed<PaymentMethod>()
+            .oneOf(Object.values(PaymentMethod) as PaymentMethod[])
+            .required()
+        )
+        .optional(),
+      pricingModel: yup
+        .mixed<PricingModel>()
+        .oneOf(Object.values(PricingModel) as PricingModel[])
+        .when("$useBudget", {
+          is: true,
+          then: (schema) => schema.required("Pricing model is required"),
+          otherwise: (schema) => schema.optional(),
+        }),
+      cost: yup
+        .number()
+        .min(0, "Cost cannot be negative")
+        .when("$useBudget", {
+          is: true,
+          then: (schema) => schema.required("Cost is required"),
+          otherwise: (schema) => schema.optional(),
+        }),
+      payToJoin: yup.boolean().optional().default(false),
+      minUnitsForBudget: yup
+        .number()
+        .min(1, "Must be at least 1")
+        .optional()
+        .transform((v, o) => (o === "" ? null : v)),
+      dropoutDeadlineHours: yup
+        .number()
+        .min(0, "Cannot be negative")
+        .optional()
+        .transform((v, o) => (o === "" ? null : v)),
+    })
+    .default(undefined),
   description: yup.string().optional(),
   payToEnter: yup.boolean().required("Pay to enter is required").default(false),
 });

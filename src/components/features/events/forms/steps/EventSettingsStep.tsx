@@ -60,7 +60,7 @@ export function EventSettingsStep() {
             )}
           />
 
-          {Number(values.eventFormat) !== EventFormat.Open && (
+          {values.eventFormat !== EventFormat.Open && (
             <Controller
               name="teamsNumber"
               control={control}
@@ -77,13 +77,14 @@ export function EventSettingsStep() {
             />
           )}
 
-          {Number(values.eventFormat) === EventFormat.Open && (
+          {values.eventFormat === EventFormat.Open && (
             <Controller
               name="capacity"
               control={control}
-              render={({ field }) => (
+              render={({ field: { value, ...field } }) => (
                 <Input
                   {...field}
+                  value={value ?? ""}
                   type="number"
                   label="Maximum Participants (Optional)"
                   leftIcon={<FaUsers />}
@@ -98,9 +99,11 @@ export function EventSettingsStep() {
           <Controller
             name="isPrivate"
             control={control}
-            render={({ field }) => (
+            render={({ field: { value, onChange, ...field } }) => (
               <Checkbox
                 {...field}
+                checked={value}
+                onChange={onChange}
                 label="Private Event"
                 helperText="Private events are only visible to invited participants"
               />
@@ -110,9 +113,11 @@ export function EventSettingsStep() {
           <Controller
             name="approveGuests"
             control={control}
-            render={({ field }) => (
+            render={({ field: { value, onChange, ...field } }) => (
               <Checkbox
                 {...field}
+                checked={value}
+                onChange={onChange}
                 label="Require approval for new participants"
                 helperText="You'll need to approve each participant before they can join"
               />

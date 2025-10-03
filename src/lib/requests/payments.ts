@@ -1,6 +1,11 @@
 import client from "../client";
-import { API_BASE_URL } from "../constants";
-import { Payment, PaymentAccount, AccountBalance, AccountPayoutInfo } from "../models/Payment";
+import {
+  Payment,
+  UserPayment,
+  PaymentAccount,
+  AccountBalance,
+  AccountPayoutInfo,
+} from "../models/Payment";
 
 const PREFIX = "events/v1";
 
@@ -23,6 +28,12 @@ export async function loadTeamPayments(teamId: string): Promise<Payment[]> {
   const endpoint = `/teams/${teamId}/payments`;
 
   return (await client.get<Payment[]>(PREFIX + endpoint)).data;
+}
+
+export async function getUserPayments(userId: string): Promise<UserPayment[]> {
+  const endpoint = `/payments?userId=${userId}`;
+
+  return (await client.get<UserPayment[]>(PREFIX + endpoint)).data;
 }
 
 export async function getPaymentAccount(): Promise<PaymentAccount> {
@@ -49,7 +60,9 @@ export async function getDashboardLink(): Promise<string> {
   return response.data.url;
 }
 
-export async function createCheckoutSession(participantId: string): Promise<string> {
+export async function createCheckoutSession(
+  participantId: string
+): Promise<string> {
   const endpoint = `/participants/${participantId}/checkout`;
   const response = await client.post<{ url: string }>(PREFIX + endpoint);
   return response.data.url;

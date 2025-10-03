@@ -29,16 +29,17 @@ const getCachedUserProfile = cache(
   }
 );
 
-const ProfilePage = async ({ params }: { params: { id: string } }) => {
-  const userProfile = await getCachedUserProfile(params.id);
+const ProfilePage = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const { id } = await params;
+  const userProfile = await getCachedUserProfile(id);
 
-  const events = await loadEventsByFilter(params.id);
+  const events = await loadEventsByFilter({ organizerId: id });
 
   if (!userProfile) {
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold">User not found</h1>
-        <p>The profile you're looking for doesn't exist.</p>
+        <p>The profile you&apos;re looking for doesn&apos;t exist.</p>
       </div>
     );
   }
@@ -65,9 +66,10 @@ export default ProfilePage;
 export const generateMetadata = async ({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) => {
-  const userProfile = await getCachedUserProfile(params.id);
+  const { id } = await params;
+  const userProfile = await getCachedUserProfile(id);
 
   if (userProfile) {
     return {

@@ -17,6 +17,13 @@ import { getFormatedCurrency } from "@/lib/utils/currency";
 import Link from "@/components/ui/link";
 import classNames from "classnames";
 
+declare module "@tanstack/react-table" {
+  interface ColumnMeta<TData, TValue> {
+    headerClassName?: string;
+    cellClassName?: string;
+  }
+}
+
 type AuditEventsListProps = {
   events: Event[];
 };

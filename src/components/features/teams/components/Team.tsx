@@ -155,7 +155,7 @@ function Team({
       <div>
         <div className="flex flex-col gap-2 relative">
           {filteredPositions && filteredPositions.length != 0 ? (
-            filteredPositions.map((p) => (
+            positions?.map((p) => (
               <PositionComponent
                 open={open}
                 audit={audit}

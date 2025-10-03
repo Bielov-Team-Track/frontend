@@ -6,7 +6,7 @@ import { followUser, getUserProfile } from "@/lib/requests/user";
 import { redirect } from "next/navigation";
 import Loader from "@/components/ui/loader";
 import { Event } from "@/lib/models/Event";
-import { loadEventsByUser } from "@/lib/requests/events";
+import { loadEventsByFilter } from "@/lib/requests/events";
 import { UserProfile } from "@/lib/models/User";
 import { useAuth } from "@/lib/auth/authContext";
 
@@ -27,7 +27,7 @@ function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
   }, [id]);
 
   useEffect(() => {
-    loadEventsByUser(id as string).then((events) => {
+    loadEventsByFilter({ organizerId: id as string }).then((events) => {
       setEvents(events);
     });
   }, [id]);

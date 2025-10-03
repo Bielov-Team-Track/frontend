@@ -18,7 +18,7 @@ const AuditEventItem = async ({ event }: AuditEventItemProps) => {
 
   const participants = await loadParticipants(event.id);
 
-  const isClosed = participants.filter((p) => !p.hasPaid).length == 0;
+  const isClosed = participants.filter((p) => p.payment?.status !== "completed").length == 0;
 
   return (
     <div className="p-4 bg-foreground/60 text-primary-content rounded-md flex gap-4 items-center justify-between">
