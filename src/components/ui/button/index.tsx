@@ -5,7 +5,14 @@ import React, { forwardRef } from "react";
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "solid" | "outline" | "ghost" | "link" | "icon";
-  color?: "primary" | "secondary" | "accent" | "neutral" | "success" | "warning" | "error";
+  color?:
+    | "primary"
+    | "secondary"
+    | "accent"
+    | "neutral"
+    | "success"
+    | "warning"
+    | "error";
   size?: "sm" | "md" | "lg" | "xl";
   fullWidth?: boolean;
   loading?: boolean;
@@ -194,7 +201,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {!loading && leftIcon && (
           <span className="flex-shrink-0">{leftIcon}</span>
         )}
-        <span className={loading ? "opacity-75" : ""}>{children}</span>
+        {children && (
+          <span className={loading ? "opacity-75" : ""}>{children}</span>
+        )}
         {!loading && rightIcon && (
           <span className="flex-shrink-0">{rightIcon}</span>
         )}

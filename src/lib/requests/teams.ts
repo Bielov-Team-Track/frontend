@@ -5,8 +5,8 @@ import { API_BASE_URL } from "../constants";
 
 const PREFIX = "events";
 
-export async function loadTeams(eventId: string): Promise<Team[]> {
-  const endpoint = `/v1/events/${eventId}/teams`;
+export async function loadTeams(eventId: string, includePayments: boolean = false): Promise<Team[]> {
+  const endpoint = `/v1/events/${eventId}/teams?includePayments=${includePayments}`;
   
   return (await client.get<Team[]>(PREFIX + endpoint)).data;
 }

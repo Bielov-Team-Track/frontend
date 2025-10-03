@@ -16,6 +16,7 @@ import { Modal } from "@/components/ui";
 import { UserSearch } from "@/components/features/users";
 import { deletePosition } from "@/lib/requests/positions";
 import { Unit } from "@/lib/models/EventBudget";
+import AuditPosition from "../../audit/components/AuditPosition";
 
 type PositionProps = {
   position: PositionModel;
@@ -23,6 +24,7 @@ type PositionProps = {
   payToJoin?: boolean;
   open?: boolean;
   editable?: boolean;
+  audit?: boolean;
   onPositionRemoved?: (positionId: string) => void;
 };
 
@@ -31,6 +33,7 @@ function Position({
   team,
   open = false,
   editable = false,
+  audit = false,
   onPositionRemoved,
 }: PositionProps) {
   const { userProfile } = useAuth();
@@ -49,15 +52,19 @@ function Position({
       {isLoading && (
         <Loader className="absolute inset-0 bg-black/55 rounded-md z-50" />
       )}
-      {position.userProfile ? (
-        <PositionWithUser
-          onPositionLeave={leavePosition}
-          position={position}
-          userId={userProfile?.userId!}
-          editable={editable}
-          open={open}
-          team={team}
-        />
+      {position.eventParticipant?.userProfile ? (
+        audit ? (
+          <AuditPosition position={position} team={team} />
+        ) : (
+          <PositionWithUser
+            onPositionLeave={leavePosition}
+            position={position}
+            userId={userProfile?.userId!}
+            editable={editable}
+            open={open}
+            team={team}
+          />
+        )
       ) : (
         <AvailablePosition
           position={position}

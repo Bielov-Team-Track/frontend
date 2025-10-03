@@ -16,10 +16,12 @@ import {
 } from "react-icons/fa";
 import { addPosition } from "@/lib/requests/positions";
 import { Position } from "@/lib/models/Position";
+import Link from "next/link";
 
 type TeamProps = {
   open?: boolean;
   editable?: boolean;
+  audit?: boolean;
   team: TeamModel;
 };
 
@@ -27,6 +29,7 @@ function Team({
   team: defaultTeam,
   open = false,
   editable = false,
+  audit = false,
 }: TeamProps) {
   const [team, setTeam] = useState(defaultTeam);
   const [positions, setLocalPositions] = useState(team.positions);
@@ -34,7 +37,9 @@ function Team({
   useRealtimePositions();
 
   const filteredPositions = useMemo(() => {
-    return positions?.filter((p) => p.userProfile || open || editable);
+    return positions?.filter(
+      (p) => p.eventParticipant?.userProfile || open || editable
+    );
   }, [positions, open, editable]);
 
   const positionStore = usePositionStore((s) => s.positions);
@@ -104,10 +109,10 @@ function Team({
     setTeam((prevTeam) => ({ ...prevTeam, captain: undefined }));
   };
 
-  const isTeamFull = !positions?.find((p) => !p.userProfile);
+  const isTeamFull = !positions?.find((p) => !p.eventParticipant?.userProfile);
 
   return (
-    <div className="bg-stone-900 relative max-w-96 flex-1 flex flex-col p-4 gap-4 rounded-lg w-80">
+    <div className="bg-stone-900 relative max-w-96 flex flex-col p-4 gap-4 rounded-lg w-80">
       <div>
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between w-full">
@@ -115,7 +120,21 @@ function Team({
               <span className="text-lg font-bold">{team.name}</span>
               {/* TODO: team menu is not visible when tam is collapsed */}
               <div className="flex items-center gap-2">
+                {captain && (
+                  <div className="flex gap-1 items-center">
+                    <span className="-translate-y-[2px]">👑</span>
+                    <Link
+                      href={"/pofiles/" + captain.userId}
+                      className="flex items-center gap-1 hover:underline"
+                    >
+                      <span className="text-sm font-bold">
+                        {captain.name} {captain.surname}
+                      </span>
+                    </Link>
+                  </div>
+                )}
                 {open &&
+                  !captain &&
                   positions &&
                   positions.length > 0 &&
                   (isTeamFull ? (
@@ -131,16 +150,6 @@ function Team({
               </div>
             </div>
           </div>
-          {captain && (
-            <div className="flex gap-2 items-center">
-              <span className="text-sm">Captain:</span>
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-bold">
-                  {captain.name} {captain.surname}
-                </span>
-              </div>
-            </div>
-          )}
         </div>
       </div>
       <div>
@@ -149,6 +158,7 @@ function Team({
             filteredPositions.map((p) => (
               <PositionComponent
                 open={open}
+                audit={audit}
                 editable={editable}
                 payToJoin={team.event.budget?.payToJoin}
                 team={team}
@@ -158,7 +168,7 @@ function Team({
                     prev ? prev.filter((pos) => pos.id !== id) : prev
                   );
                 }}
-                key={p.id + p.userProfile?.userId}
+                key={p.id + p.eventParticipant?.userProfile?.userId}
               />
             ))
           ) : (

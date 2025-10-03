@@ -1,9 +1,9 @@
 import React from 'react'
-import UserSettings from '../_components/UserSettings'
+import PaymentSettings from '../components/PaymentSettings'
 import { redirect } from 'next/navigation'
 import { getUserProfile } from '@/lib/server/auth'
 
-async function ProfileSettingsPage() {
+async function PaymentSettingsPage() {
   const user = await getUserProfile()
 
   if (!user) {
@@ -12,9 +12,9 @@ async function ProfileSettingsPage() {
 
   return (
     <div>
-      <UserSettings user={user}></UserSettings>
+      <PaymentSettings user={user} />
     </div>
   )
 }
 
-export default ProfileSettingsPage
+export default PaymentSettingsPage

@@ -17,7 +17,8 @@ const publicRoutes = [
   "/api",
   "/favicon.ico",
   "/events",
-  "/.well-known"
+  "/.well-known",
+  "/error",
 ];
 
 // Routes that require authentication but not complete profile
@@ -124,8 +125,8 @@ export default async function authMiddleware(request: NextRequest) {
             "Middleware - failed to fetch profile, status:",
             profileResponse.status
           );
-          const profileSetupUrl = new URL(profileSetupRoute, request.url);
-          return NextResponse.redirect(profileSetupUrl);
+          const errorUrl = new URL("/error", request.url);
+          return NextResponse.redirect(errorUrl);
         }
       } catch (profileError) {
         console.log("Middleware - profile check error:", profileError);

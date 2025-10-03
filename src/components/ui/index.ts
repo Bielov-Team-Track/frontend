@@ -13,6 +13,7 @@ export { default as BlockOverlay } from "./block-overlay";
 export { default as Drawer } from "./drawer";
 export { default as ImageCropper } from "./image-cropper";
 export { default as DelayWrapper } from "./delay-wrapper";
+export { default as Section } from "./section";
 
 // Re-export types
 export type { ButtonProps } from "./button";
@@ -20,3 +21,4 @@ export type { InputProps } from "./input";
 export type { CheckboxProps } from "./checkbox";
 export type { SelectProps, SelectOption } from "./select";
 export type { TextAreaProps } from "./textarea";
+export type { SectionVariant } from "./section";

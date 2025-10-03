@@ -1,30 +1,28 @@
 import client from "../client";
-import { CreateEvent, Event, GetEventsRequest } from "../models/Event";
+import { CreateEvent, Event, EventFilterRequest } from "../models/Event";
 import { EventParticipant } from "../models/EventParticipant";
 import { getParamsFromObject } from "../utils/request";
 
-const PREFIX = "/events"
+const PREFIX = "/events";
 
 export async function loadEvents(
-  request: GetEventsRequest | undefined = undefined
+  filter?: EventFilterRequest
 ): Promise<Event[]> {
   const endpoint = "/v1/events";
 
-  const params = getParamsFromObject(request);
+  const params = getParamsFromObject(filter);
 
   return (await client.get<Event[]>(PREFIX + endpoint, { params })).data;
 }
 
-export async function loadEventsByUser(userId: string): Promise<Event[]> {
-  const endpoint = "/v1/users/" + userId + "/events";
+export async function loadEventsByFilter(
+  filter?: EventFilterRequest
+): Promise<Event[]> {
+  const endpoint = "/v1/events";
 
-  return (await client.get<Event[]>(PREFIX + endpoint)).data;
-}
+  const params = getParamsFromObject(filter);
 
-export async function loadEventsByAdmin(userId: string): Promise<Event[]> {
-  const endpoint = "/v1/admins/" + userId + "/events";
-
-  return (await client.get<Event[]>(PREFIX + endpoint)).data;
+  return (await client.get<Event[]>(PREFIX + endpoint, { params })).data;
 }
 
 export async function loadEvent(eventId: string): Promise<Event> {
@@ -64,14 +62,13 @@ export async function removeParticipant(eventId: string, userId: string) {
   await client.delete(PREFIX + endpoint);
 }
 
-export async function markParticipantPaid(eventId: string, userId: string) {
-  const endpoint = `/v1/events/${eventId}/participants/${userId}/paid`;
-  await client.post(PREFIX + endpoint);
-}
+export async function updateParticipantPaymentStatus(
+  participantId: string,
+  status: "pending" | "completed"
+): Promise<EventParticipant> {
+  const endpoint = `/v1/participants/${participantId}/payments`;
 
-export async function markParticipantAsPaid(participantId: string) {
-  const endpoint = `/v1/payments?participantId=${participantId}`;
-  await client.put(PREFIX + endpoint);
+  return (await client.patch(PREFIX + endpoint, { status })).data;
 }
 
 // Join/Leave

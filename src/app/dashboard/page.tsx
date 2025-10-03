@@ -1,5 +1,5 @@
 import EventList from "@/components/features/events/components/event-list";
-import { loadEventsByAdmin, loadEventsByUser } from "@/lib/requests/events";
+import { loadEventsByFilter } from "@/lib/requests/events";
 import { getUserProfile } from "@/lib/server/auth";
 import { redirect } from "next/navigation";
 
@@ -10,8 +10,12 @@ const HomePage = async () => {
     redirect("/login");
   }
 
-  var userEvents = await loadEventsByUser(userProfile.userId!);
-  var adminEvents = await loadEventsByAdmin(userProfile.userId!);
+  var userEvents = await loadEventsByFilter({
+    participantId: userProfile.userId!,
+  });
+  var adminEvents = await loadEventsByFilter({
+    organizerId: userProfile.userId!,
+  });
 
   return (
     <div className="flex flex-col p-8 gap-5">

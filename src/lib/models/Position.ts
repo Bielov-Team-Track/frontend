@@ -1,3 +1,4 @@
+import { EventParticipant } from "./EventParticipant";
 import { Team } from "./Team";
 import { UserProfile } from "./User";
 
@@ -5,8 +6,8 @@ export interface Position {
   id: string;
   name: string;
   paid: boolean;
-  userId?: string;
-  userProfile?: UserProfile;
+  eventParticipantId?: string;
+  eventParticipant?: EventParticipant;
   teamId?: string;
   team?: Team;
 }

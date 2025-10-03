@@ -7,10 +7,11 @@ import { useRealtimePayments } from "@/hooks/useRealtimePayments";
 import { usePaymentsStore } from "@/lib/realtime/paymentStore";
 import signalr from "@/lib/realtime/signalrClient";
 import { useAccessToken } from "@/lib/auth/authContext";
-import { Event } from "@/lib/models/Event";
+import { Event, EventFormat, EventType } from "@/lib/models/Event";
 import { EventParticipant } from "@/lib/models/EventParticipant";
 import AuditParticipantList from "@/components/features/audit/components/AuditParticipantList";
 import { Loader } from "@/components/ui";
+import AuditTeamsList from "@/components/features/audit/components/AuditTeamsList";
 
 type AuditPageProps = {
   params: Promise<{
@@ -84,8 +85,22 @@ function AuditPage({ params }: AuditPageProps) {
 
   return (
     <div className="p-4 flex flex-col gap-4">
-      <div className="text-2xl font-bold">Participants</div>
-      <AuditParticipantList event={event} participants={displayParticipants} />
+      {(event.eventFormat == EventFormat.Open || !event.eventFormat) && (
+        <>
+          <div className="text-2xl font-bold">Participants</div>
+          <AuditParticipantList
+            event={event}
+            participants={displayParticipants}
+          />
+        </>
+      )}
+      {(event.eventFormat == EventFormat.OpenTeams ||
+        event.eventFormat == EventFormat.TeamsWithPositions) && (
+        <>
+          <div className="text-2xl font-bold">Participants</div>
+          <AuditTeamsList event={event} />
+        </>
+      )}
     </div>
   );
 }

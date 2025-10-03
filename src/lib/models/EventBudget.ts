@@ -1,3 +1,21 @@
+export enum PaymentMethod {
+  Cash = "cash",
+  Card = "card",
+}
+
+export const PaymentMethodOptions = [
+  {
+    value: PaymentMethod.Cash,
+    label: "Cash",
+    description: "Accept cash payments",
+  },
+  {
+    value: PaymentMethod.Card,
+    label: "Card",
+    description: "Accept card payments via Stripe",
+  },
+];
+
 export enum PricingModel {
   Individual = "Individual",
   Team = "Team",
@@ -29,6 +47,8 @@ export const RegistrationUnitOptions = [
 export interface EventBudget {
   id?: string;
   currency?: string; // Optional, default to USD or system default
+  // Payment methods
+  paymentMethods?: PaymentMethod[]; // Selected payment methods
   // Core pricing logic
   pricingModel: PricingModel;
   // Price configuration - single field for both strategies

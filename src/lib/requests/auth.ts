@@ -41,7 +41,9 @@ export async function refreshToken(
   const endpoint = "/v1/auth/refresh";
 
   return (
-    await client.post<AuthResponse>(AUTH_PREFIX + endpoint, refreshTokenValue)
+    await client.post<AuthResponse>(AUTH_PREFIX + endpoint, {
+      refreshToken: refreshTokenValue
+    })
   ).data;
 }
 

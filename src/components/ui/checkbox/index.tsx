@@ -28,7 +28,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       helperText,
       variant = "primary",
       checkboxSize = "md",
-      fullWidth = true,
+      fullWidth = false,
       className = "",
       disabled,
       ...props

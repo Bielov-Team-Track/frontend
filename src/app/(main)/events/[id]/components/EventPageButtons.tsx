@@ -5,6 +5,7 @@ import { useState } from "react";
 import { cancelEvent } from "@/lib/requests/events";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { Event } from "@/lib/models/Event";
+import { redirect } from "next/navigation";
 
 type EventPageButtonsProps = {
   event: Event;
@@ -31,6 +32,15 @@ const EventPageButtons = ({ event }: EventPageButtonsProps) => {
   return event.canceled ? null : (
     <>
       <div className="flex gap-2">
+        <Button
+          variant="outline"
+          color="secondary"
+          onClick={() => {
+            redirect("/dashboard/audit/" + event.id);
+          }}
+        >
+          Audit
+        </Button>
         <Button variant="outline" color="primary">
           Edit
         </Button>

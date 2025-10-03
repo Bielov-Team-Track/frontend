@@ -53,6 +53,7 @@ export interface Event {
 
   // Extended fields to match backend model
   type: EventType;
+  eventFormat: EventFormat;
   surface: PlayingSurface;
   isPrivate: boolean;
   teamsNumber: number;
@@ -64,11 +65,18 @@ export interface Event {
 
 export interface EventAdmin {}
 
-export interface GetEventsRequest {
+export interface EventFilterRequest {
   type?: EventType; // Optional filter by event type
   surface?: PlayingSurface; // Optional filter by playing surface
   from?: Date; // Optional filter for start time
   to?: Date; // Optional filter for end time
+  status?: "outstanding" | "completed" | "cancelled"; // Filter by payment/event status
+  organizerId?: string; // Filter by event organizer
+  participantId?: string; // Filter by participant
+  page?: number; // Page number for pagination (default: 1)
+  limit?: number; // Number of items per page (default: 20)
+  sortBy?: "startDate" | "createdAt"; // Sort field
+  sortOrder?: "asc" | "desc"; // Sort order (default: asc)
 }
 
 export interface CreateEvent {

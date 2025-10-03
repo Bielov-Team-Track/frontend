@@ -1,10 +1,20 @@
-const SettingsPage = () => {
-  return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold mb-4">Settings Page</h1>
-      <p className="text-gray-600">This is the settings page.</p>
-    </div>
-  );
-};
+import React from 'react'
+import UserSettings from './components/UserSettings'
+import { redirect } from 'next/navigation'
+import { getUserProfile } from '@/lib/server/auth'
 
-export default SettingsPage;
+async function ProfileSettingsPage() {
+  const user = await getUserProfile()
+
+  if (!user) {
+    redirect("/login")
+  }
+
+  return (
+    <div>
+      <UserSettings user={user}></UserSettings>
+    </div>
+  )
+}
+
+export default ProfileSettingsPage

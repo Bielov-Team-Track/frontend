@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
-import {  ReactQueryProvider } from "@/components/layout";
+import { ReactQueryProvider } from "@/components/layout";
 import Head from "next/head";
 import { AuthProvider } from "@/lib/auth/authContext";
 
@@ -31,13 +31,11 @@ export default async function RootLayout({
       <body
         className={`${inter.className} min-h-screen-safe flex flex-col text-mobile-base sm:text-tablet-base lg:text-desktop-base antialiased`}
       >
-        <AuthProvider>
-          <ReactQueryProvider>
-            <div className="min-h-screen-safe grid bg-background">
-              <main className="relative w-full ">{children}</main>
-            </div>
-          </ReactQueryProvider>
-        </AuthProvider>
+        <ReactQueryProvider>
+          <div className="min-h-screen-safe grid bg-background">
+            <main className="relative w-full ">{children}</main>
+          </div>
+        </ReactQueryProvider>
       </body>
     </html>
   );

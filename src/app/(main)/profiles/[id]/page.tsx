@@ -2,7 +2,7 @@ import { cache } from "react";
 import { UserProfile } from "@/lib/models/User";
 import { EVENTS_API_V1 } from "@/lib/constants";
 import { Avatar, Button, EventsList } from "@/components";
-import { loadEventsByAdmin } from "@/lib/requests/events";
+import { loadEventsByFilter } from "@/lib/requests/events";
 import { FaBell, FaEnvelope } from "react-icons/fa";
 
 // Cached function to fetch user profile - will only make one request per user ID
@@ -32,7 +32,7 @@ const getCachedUserProfile = cache(
 const ProfilePage = async ({ params }: { params: { id: string } }) => {
   const userProfile = await getCachedUserProfile(params.id);
 
-  const events = await loadEventsByAdmin(params.id);
+  const events = await loadEventsByFilter(params.id);
 
   if (!userProfile) {
     return (

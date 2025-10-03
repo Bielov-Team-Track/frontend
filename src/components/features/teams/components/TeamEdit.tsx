@@ -85,10 +85,12 @@ function TeamEdit({
             >
               <span className="text-black self-center font-bold">{p.name}</span>
               <div className="flex gap-4">
-                {p.userProfile && (
+                {p.eventParticipant?.userProfile && (
                   <div className="flex items-center gap-4">
-                    <span className="text-black">{p.userProfile.name}</span>
-                    <Avatar profile={p.userProfile} />
+                    <span className="text-black">
+                      {p.eventParticipant?.userProfile.name}
+                    </span>
+                    <Avatar profile={p.eventParticipant?.userProfile} />
                   </div>
                 )}
                 <button

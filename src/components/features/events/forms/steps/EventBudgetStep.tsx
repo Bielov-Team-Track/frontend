@@ -1,17 +1,16 @@
 import { Controller } from "react-hook-form";
 import { useEventFormContext } from "../context/EventFormContext";
-import { FaUsers, FaCoins, FaDoorOpen } from "react-icons/fa6";
-import {
-  PricingModel,
-  PricingModelOptions,
-  RegistrationUnitOptions,
-} from "@/lib/models/EventBudget";
+import { FaCoins, FaDoorOpen } from "react-icons/fa6";
+import { PricingModel, PricingModelOptions, PaymentMethod } from "@/lib/models/EventBudget";
 import { Checkbox, Select, Input } from "@/components/ui";
 import { useState } from "react";
+import PaymentMethodsSelector from "../components/PaymentMethodsSelector";
+import { usePaymentAccount } from "../hooks/usePaymentAccount";
 
 const EventBudgetStep = () => {
-  const [ignoreBudget, setIgnoreBudget] = useState(false);
+  const [useBudget, setIgnoreBudget] = useState(false);
   const { form } = useEventFormContext();
+  const { account, status, canAcceptPayments, isLoading } = usePaymentAccount();
   const {
     control,
     formState: { errors },
@@ -33,18 +32,28 @@ const EventBudgetStep = () => {
       </div>
 
       <Controller
-        name="ignoreBudget"
+        name="useBudget"
         control={control}
         render={({ field }) => (
           <Checkbox
             {...field}
-            label="Don't use budget"
+            label="Use budget"
             onChange={(e) => {
               e.target.checked ? setIgnoreBudget(true) : setIgnoreBudget(false);
             }}
           />
         )}
       />
+
+      {useBudget && (
+        <PaymentMethodsSelector
+          control={control}
+          accountStatus={status}
+          canAcceptPayments={canAcceptPayments}
+          disabled={!useBudget}
+          error={errors.budget?.paymentMethods?.message}
+        />
+      )}
 
       <Controller
         name="budget.pricingModel"
@@ -53,7 +62,7 @@ const EventBudgetStep = () => {
           <Select
             {...field}
             required
-            disabled={ignoreBudget}
+            disabled={!useBudget}
             options={PricingModelOptions}
             label="Payment type"
             leftIcon={<FaCoins />}
@@ -71,7 +80,7 @@ const EventBudgetStep = () => {
             required
             type="number"
             min={1}
-            disabled={ignoreBudget}
+            disabled={!useBudget}
             label="Cost"
             leftIcon={<FaCoins />}
             helperText="For 'Fixed' pricing: price per person/team. For 'Budget' pricing: total event budget."
@@ -88,7 +97,7 @@ const EventBudgetStep = () => {
             <Checkbox
               {...field}
               variant="secondary"
-              disabled={ignoreBudget}
+              disabled={!useBudget}
               label="Require payment to join event"
               helperText="If enabled, participants must complete payment to confirm their registration."
             />
@@ -104,7 +113,7 @@ const EventBudgetStep = () => {
             {...field}
             type="number"
             optional
-            disabled={ignoreBudget}
+            disabled={!useBudget}
             label="Dropout Deadline (hours)"
             leftIcon={<FaDoorOpen />}
             helperText="Number of hours before event start when participants can no longer drop out (for budget events)."

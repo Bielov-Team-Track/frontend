@@ -73,9 +73,9 @@ export const eventValidationSchema = yup.object().shape({
     .transform((v, o) => (o === "" ? null : v))
     .min(1, "Must be at least 1")
     .optional(),
-  ignoreBudget: yup.boolean().default(false),
-  budget: yup.object().when("ignoreBudget", {
-    is: false,
+  useBudget: yup.boolean().default(false),
+  budget: yup.object().when("useBudget", {
+    is: true,
     then: (schema) =>
       schema.shape({
         pricingModel: yup

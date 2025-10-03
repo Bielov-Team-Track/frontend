@@ -51,19 +51,22 @@ function PositionWithUser({
   };
 
   const collapsable =
-    open || editable || position.userProfile?.userId === userId;
+    open ||
+    editable ||
+    position.eventParticipant?.userProfile?.userId === userId;
 
   if (!collapsable) {
     return (
       <div className="p-4 h-14 rounded-md bg-primary w-full flex justify-between items-center">
         <Link
-          href={`/profiles/${position.userProfile!.userId}`}
+          href={`/profiles/${position.eventParticipant?.userProfile!.userId}`}
           className="flex gap-2 items-center z-50"
         >
-          <Avatar profile={position.userProfile!} />
+          <Avatar profile={position.eventParticipant?.userProfile!} />
           <div className="flex flex-col">
             <span className="whitespace-nowrap font-bold text-sm  hover:underline">
-              {position.userProfile?.name} {position.userProfile?.surname}
+              {position.eventParticipant?.userProfile?.name}{" "}
+              {position.eventParticipant?.userProfile?.surname}
             </span>
             <span className="text-neutral/60 text-xs">{position.name}</span>
           </div>
@@ -86,16 +89,18 @@ function PositionWithUser({
       />
       <div className="collapse-title p-4 h-14 rounded-md bg-primary w-full flex justify-between items-center">
         <Link
-          href={`/profiles/${position.userProfile!.userId}`}
+          href={`/profiles/${position.eventParticipant?.userProfile!.userId}`}
           className="flex gap-2 items-center z-50"
         >
-          <Avatar profile={position.userProfile!} />
+          <Avatar profile={position.eventParticipant?.userProfile!} />
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
               <span className="whitespace-nowrap font-bold text-sm hover:underline">
-                {position.userProfile?.name} {position.userProfile?.surname}
+                {position.eventParticipant?.userProfile?.name}{" "}
+                {position.eventParticipant?.userProfile?.surname}
               </span>
-              {team.captain?.userId === position.userProfile?.userId && (
+              {team.captain?.userId ===
+                position.eventParticipant?.userProfile?.userId && (
                 <span className="text-sm pb-1"> 👑</span>
               )}
             </div>
@@ -104,7 +109,8 @@ function PositionWithUser({
         </Link>
       </div>
       <div className="collapse-content relative">
-        {(position.userProfile?.userId === userId || editable) && (
+        {(position.eventParticipant?.userProfile?.userId === userId ||
+          editable) && (
           <div className="flex justify-end pt-4">
             <Button
               fullWidth={true}

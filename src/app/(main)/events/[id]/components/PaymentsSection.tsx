@@ -1,6 +1,6 @@
 import { Avatar, Button } from "@/components";
 import { Event } from "@/lib/models/Event";
-import { PricingModel } from "@/lib/models/EventBudget";
+import { PaymentMethod, PricingModel } from "@/lib/models/EventBudget";
 import { Payment } from "@/lib/models/Payment";
 import { Team } from "@/lib/models/Team";
 import { UserProfile } from "@/lib/models/User";
@@ -9,6 +9,7 @@ import {
   loadUserPaymentForEvent,
 } from "@/lib/requests/payments";
 import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
+import PaymentButton from "./PaymentButton";
 
 type PaymentsSectionProps = {
   event: Event;
@@ -52,7 +53,7 @@ const PaymentsSection = async ({
     payment?: Payment | null,
     iconOnly: boolean = false
   ) => {
-    if (payment?.paidAt) {
+    if (payment?.status === "completed") {
       return (
         <div className="text-green-500 flex gap-1 items-center">
           <FaCheckCircle />
@@ -95,11 +96,21 @@ const PaymentsSection = async ({
               <span className="font-medium">Your Payment</span>
               <span>{getPaymentStatus(userPayment)}</span>
             </div>
-            {userPayment && !userPayment.paidAt && (
-              <Button>
-                Pay {event.budget?.currency || "£"}
-                {userPayment.amount}
-              </Button>
+            {event.budget?.paymentMethods?.includes(PaymentMethod.Card) ? (
+              userPayment &&
+              !userPayment.paidAt &&
+              userPayment.eventParticipant?.id && (
+                <PaymentButton
+                  participantId={userPayment.eventParticipant.id}
+                  amount={userPayment.amount}
+                  currency={event.budget?.currency}
+                />
+              )
+            ) : (
+              <span className="text-sm text-neutral/60">
+                You can pay with cash or bank transfer to the event organizer.
+                Contact them for details.
+              </span>
             )}
           </div>
         )}
@@ -158,10 +169,13 @@ const PaymentsSection = async ({
                       );
                     })}
                   </div>
-                  <Button fullWidth={true} className="mt-4">
-                    Pay {event.budget?.currency || "£"}
-                    {remainingAmount}
-                  </Button>
+                  {event.budget?.paymentMethods?.includes(PaymentMethod.Card) &&
+                    remainingAmount > 0 && (
+                      <Button fullWidth={true} className="mt-4">
+                        Pay {event.budget?.currency || "£"}
+                        {remainingAmount}
+                      </Button>
+                    )}
                 </div>
               </div>
             );

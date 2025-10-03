@@ -75,7 +75,7 @@ async function EventPage({ params }: EventPageParams) {
           </div>
         </div>
       )}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap gap-4 items-center justify-between">
         <h1 className="md:text-6xl text-5xl font-bold">{event.name}</h1>
         {isAdmin && <EventPageButtons event={event} />}
       </div>
