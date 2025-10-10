@@ -1,22 +1,22 @@
 import client from "../client";
 import { Group, GroupCreate } from "../models/Group";
 
-const PREFIX = "/events"
+const PREFIX = "/events";
 
 export async function loadGroupsByAdmin(adminId: string): Promise<Group[]> {
-  const endpoint = `/groups/${adminId}`
+	const endpoint = `/groups/${adminId}`;
 
-  return (await client.get<Group[]>(PREFIX + endpoint)).data
+	return (await client.get<Group[]>(PREFIX + endpoint)).data;
 }
 
 export async function loadGroup(groupId: string): Promise<Group> {
-  const endpoint = "/groups/" + groupId;
+	const endpoint = "/groups/" + groupId;
 
-  return (await client.get<Group>(PREFIX + endpoint)).data
+	return (await client.get<Group>(PREFIX + endpoint)).data;
 }
 
 export async function createGroup(group: GroupCreate) {
-  const endpoint = "/groups/";
+	const endpoint = "/groups/";
 
-  await client.put(PREFIX + endpoint, group)
+	await client.put(PREFIX + endpoint, group);
 }

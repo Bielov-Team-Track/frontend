@@ -1,10 +1,12 @@
-import client from "../client"
+import client from "../client";
 
-const PREFIX = "/events"
+const PREFIX = "/events";
 
+export async function createNotificationSubscription(
+	userId: string,
+	subscription: PushSubscription,
+) {
+	const endpoint = `/subscriptions/${userId}`;
 
-export async function createNotificationSubscription(userId: string, subscription: PushSubscription) {
-  const endpoint = `/subscriptions/${userId}`
-
-  await client.post(PREFIX + endpoint, subscription)
+	await client.post(PREFIX + endpoint, subscription);
 }

@@ -1,1 +1,1 @@
-export {default as AuditEventsTable} from './components/AuditEventsTable';
+export { default as AuditEventsTable } from "./components/AuditEventsTable";

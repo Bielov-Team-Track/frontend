@@ -11,60 +11,60 @@ import { UserProfile } from "@/lib/models/User";
 import { useAuth } from "@/lib/auth/authContext";
 
 function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
-  const [profile, setProfile] = useState<UserProfile>();
-  const [events, setEvents] = useState<Event[]>();
-  const { id } = use(params);
-  const { userProfile } = useAuth();
+	const [profile, setProfile] = useState<UserProfile>();
+	const [events, setEvents] = useState<Event[]>();
+	const { id } = use(params);
+	const { userProfile } = useAuth();
 
-  useEffect(() => {
-    getUserProfile(id as string).then((profileUser) => {
-      if (!profileUser) {
-        redirect("/404");
-      }
+	useEffect(() => {
+		getUserProfile(id as string).then((profileUser) => {
+			if (!profileUser) {
+				redirect("/404");
+			}
 
-      setProfile(profileUser);
-    });
-  }, [id]);
+			setProfile(profileUser);
+		});
+	}, [id]);
 
-  useEffect(() => {
-    loadEventsByFilter({ organizerId: id as string }).then((events) => {
-      setEvents(events);
-    });
-  }, [id]);
+	useEffect(() => {
+		loadEventsByFilter({ organizerId: id as string }).then((events) => {
+			setEvents(events);
+		});
+	}, [id]);
 
-  if (!id) {
-    redirect("/404");
-  }
+	if (!id) {
+		redirect("/404");
+	}
 
-  const handleFollow = () => {
-    followUser;
-  };
+	const handleFollow = () => {
+		followUser;
+	};
 
-  const displayName = profile?.email?.split("@")[0] || "User";
+	const displayName = profile?.email?.split("@")[0] || "User";
 
-  return profile ? (
-    <div>
-      <div className="flex items-center flex-col gap-4">
-        <Avatar profile={profile} size="large" />
-        <div>{displayName}</div>
-        {profile.userId !== userProfile?.userId && (
-          <button className="btn btn-info btn-md w-32">Follow</button>
-        )}
-      </div>
-      <div>
-        <h2>Events</h2>
-        {events ? (
-          events?.map((event) => {
-            return <div key={event.id}>{event.name}</div>;
-          })
-        ) : (
-          <Loader />
-        )}
-      </div>
-    </div>
-  ) : (
-    <Loader />
-  );
+	return profile ? (
+		<div>
+			<div className="flex items-center flex-col gap-4">
+				<Avatar profile={profile} size="large" />
+				<div>{displayName}</div>
+				{profile.userId !== userProfile?.userId && (
+					<button className="btn btn-info btn-md w-32">Follow</button>
+				)}
+			</div>
+			<div>
+				<h2>Events</h2>
+				{events ? (
+					events?.map((event) => {
+						return <div key={event.id}>{event.name}</div>;
+					})
+				) : (
+					<Loader />
+				)}
+			</div>
+		</div>
+	) : (
+		<Loader />
+	);
 }
 
 export default ProfilePage;

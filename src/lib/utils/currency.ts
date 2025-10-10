@@ -1,9 +1,9 @@
 export const getFormatedCurrency = (
-  amount: number,
-  currency: string
+	amount: number,
+	currency: string,
 ): string => {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  }).format(amount);
+	return new Intl.NumberFormat("en-GB", {
+		style: "currency",
+		currency: currency.toUpperCase(),
+	}).format(amount);
 };

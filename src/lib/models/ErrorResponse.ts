@@ -1,8 +1,8 @@
 type ErrorResponse = {
-  errors: ApplicationError[]
-}
+	errors: ApplicationError[];
+};
 
 type ApplicationError = {
-  errorMessage: string
-  errorCode: string
-}
+	errorMessage: string;
+	errorCode: string;
+};

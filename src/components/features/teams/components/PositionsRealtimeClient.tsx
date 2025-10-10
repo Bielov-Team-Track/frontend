@@ -3,8 +3,8 @@
 import { useRealtimePositions } from "@/hooks/useRealtimePositions";
 
 function PositionsRealtimeClient() {
-  useRealtimePositions();
-  return null;
+	useRealtimePositions();
+	return null;
 }
 
 export default PositionsRealtimeClient;

@@ -4,29 +4,29 @@ import ForgotPasswordForm from "@/components/features/auth/forms/ForgotPasswordF
 import React from "react";
 
 function ForgotPasswordPage() {
-  const [emailSent, setEmailSent] = React.useState(false);
+	const [emailSent, setEmailSent] = React.useState(false);
 
-  const onEmailSent = () => {
-    setEmailSent(true);
-  };
+	const onEmailSent = () => {
+		setEmailSent(true);
+	};
 
-  return (
-    <>
-      {" "}
-      <h1 className="text-2xl font-bold">Forgot Password</h1>
-      {emailSent ? (
-        <div>Email with reset URL was sent to your address</div>
-      ) : (
-        <>
-          <div>
-            Enter your email address and we will send you a link to reset your
-            password
-          </div>
-          <ForgotPasswordForm onEmailSent={onEmailSent} />
-        </>
-      )}
-    </>
-  );
+	return (
+		<>
+			{" "}
+			<h1 className="text-2xl font-bold">Forgot Password</h1>
+			{emailSent ? (
+				<div>Email with reset URL was sent to your address</div>
+			) : (
+				<>
+					<div>
+						Enter your email address and we will send you a link to reset your
+						password
+					</div>
+					<ForgotPasswordForm onEmailSent={onEmailSent} />
+				</>
+			)}
+		</>
+	);
 }
 
 export default ForgotPasswordPage;

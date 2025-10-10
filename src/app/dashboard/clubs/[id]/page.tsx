@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 function GroupPage() {
-  return (
-    <div>GroupPage</div>
-  )
+	return <div>GroupPage</div>;
 }
 
-export default GroupPage
+export default GroupPage;

@@ -1,5 +1,5 @@
 export type Response = {
-  errorCode: number;
-  result: any;
-  errorMessage: string;
-}
+	errorCode: number;
+	result: any;
+	errorMessage: string;
+};

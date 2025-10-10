@@ -7,68 +7,68 @@ import { useAccessToken } from "@/lib/auth/authContext";
 import { usePaymentsStore } from "@/lib/realtime/paymentStore";
 
 export function useRealtimePayments() {
-  const applyPaymentReceived = usePaymentsStore((s) => s.applyPaymentReceived);
-  const setConnectionStatus = usePaymentsStore((s) => s.setConnectionStatus);
-  const token = useAccessToken(); // Get token at hook level
+	const applyPaymentReceived = usePaymentsStore((s) => s.applyPaymentReceived);
+	const setConnectionStatus = usePaymentsStore((s) => s.setConnectionStatus);
+	const token = useAccessToken(); // Get token at hook level
 
-  const handleConnectionError = useCallback(
-    (error?: Error) => {
-      console.error("SignalR connection error:", error);
-      setConnectionStatus("disconnected");
-    },
-    [setConnectionStatus]
-  );
+	const handleConnectionError = useCallback(
+		(error?: Error) => {
+			console.error("SignalR connection error:", error);
+			setConnectionStatus("disconnected");
+		},
+		[setConnectionStatus],
+	);
 
-  useEffect(() => {
-    if (!token) {
-      setConnectionStatus("disconnected");
-      return;
-    }
+	useEffect(() => {
+		if (!token) {
+			setConnectionStatus("disconnected");
+			return;
+		}
 
-    let connection: HubConnection;
-    let stopped = false;
+		let connection: HubConnection;
+		let stopped = false;
 
-    const start = async () => {
-      try {
-        setConnectionStatus("connecting");
-        connection = await signalr.start("payments", token);
+		const start = async () => {
+			try {
+				setConnectionStatus("connecting");
+				connection = await signalr.start("payments", token);
 
-        // Set up event handlers
-        connection.on(
-          "PaymentReceived",
-          (payload: { participantId: string }) => {
-            applyPaymentReceived(payload.participantId);
-          }
-        );
+				// Set up event handlers
+				connection.on(
+					"PaymentReceived",
+					(payload: { participantId: string }) => {
+						applyPaymentReceived(payload.participantId);
+					},
+				);
 
-        connection.on("Connected", (payload: { connectionId: string }) => {
-          setConnectionStatus("connected");
-        });
+				connection.on("Connected", (payload: { connectionId: string }) => {
+					setConnectionStatus("connected");
+				});
 
-        // Connection state handlers
-        connection.onreconnecting(() => {
-          setConnectionStatus("reconnecting");
-        });
+				// Connection state handlers
+				connection.onreconnecting(() => {
+					setConnectionStatus("reconnecting");
+				});
 
-        connection.onreconnected(() => {
-          setConnectionStatus("connected");
-        });
+				connection.onreconnected(() => {
+					setConnectionStatus("connected");
+				});
 
-        signalr.setSyncCallback(async () => {});
+				signalr.setSyncCallback(async () => {});
 
-        connection.onclose(handleConnectionError);
-      } catch (error) {
-        handleConnectionError(error as Error);
-      }
-    };
+				connection.onclose(handleConnectionError);
+			} catch (error) {
+				handleConnectionError(error as Error);
+			}
+		};
 
-    start();
+		start();
 
-    return () => {
-      if (!stopped && connection?.state !== HubConnectionState.Disconnected) {
-        signalr.stop();
-        stopped = true;
-      }
-    };
-  }, [token, applyPaymentReceived, setConnectionStatus, handleConnectionError]);
+		return () => {
+			if (!stopped && connection?.state !== HubConnectionState.Disconnected) {
+				signalr.stop();
+				stopped = true;
+			}
+		};
+	}, [token, applyPaymentReceived, setConnectionStatus, handleConnectionError]);
 }
