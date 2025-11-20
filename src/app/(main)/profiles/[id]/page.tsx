@@ -1,17 +1,21 @@
-import { cache } from "react";
-import { UserProfile } from "@/lib/models/User";
-import { EVENTS_API_V1 } from "@/lib/constants";
 import { Avatar, Button, EventsList } from "@/components";
+import { PROFILES_API_V1 } from "@/lib/constants";
+import { UserProfile } from "@/lib/models/User";
 import { loadEventsByFilter } from "@/lib/requests/events";
+import { redirect } from "next/navigation";
+import { cache } from "react";
 import { FaBell, FaEnvelope } from "react-icons/fa";
 
 // Cached function to fetch user profile - will only make one request per user ID
 const getCachedUserProfile = cache(
 	async (userId: string): Promise<UserProfile | null> => {
 		try {
-			const response = await fetch(`${EVENTS_API_V1}/profiles/${userId}`, {
-				cache: "force-cache",
-			});
+			const response = await fetch(
+				`${PROFILES_API_V1}/profiles/${userId}`,
+				{
+					cache: "force-cache",
+				}
+			);
 
 			if (response.ok) {
 				return await response.json();
@@ -26,7 +30,7 @@ const getCachedUserProfile = cache(
 			console.error("Error fetching user profile:", error);
 			return null;
 		}
-	},
+	}
 );
 
 const ProfilePage = async ({ params }: { params: Promise<{ id: string }> }) => {
@@ -51,7 +55,7 @@ const ProfilePage = async ({ params }: { params: Promise<{ id: string }> }) => {
 				<h1 className="text-3xl font-bold mb-4">
 					{userProfile.name} {userProfile.surname}
 				</h1>
-				<Button leftIcon={<FaEnvelope></FaEnvelope>}>Message</Button>
+				<Button leftIcon={<FaEnvelope></FaEnvelope>} onClick={() => redirect("/dashboard/messages/")}>Message</Button>
 				<Button leftIcon={<FaBell></FaBell>}>Subscribe</Button>
 			</div>
 			<div className="flex-1 p-6 flex-justify-start flex-col">

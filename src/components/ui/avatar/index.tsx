@@ -1,7 +1,9 @@
-import React from "react";
-import Image from "next/image";
+"use client";
+
+import { UserProfile } from "@/lib/models/User";
 import { stringToColor } from "@/lib/utils/color";
-import { UserProfile, User } from "@/lib/models/User";
+import Image from "next/image";
+import { useState } from "react";
 
 type AvatarProps = {
 	profile: Partial<UserProfile>;
@@ -9,6 +11,8 @@ type AvatarProps = {
 };
 
 const Avatar = ({ profile, size = "small" }: AvatarProps) => {
+	const [imageError, setImageError] = useState(false);
+
 	if (!profile) {
 		return null;
 	}
@@ -19,19 +23,22 @@ const Avatar = ({ profile, size = "small" }: AvatarProps) => {
 
 	const backgroundColor = stringToColor(profile?.email!);
 
-	return profile.imageUrl ? (
+	// Show initials fallback if no imageUrl or if image failed to load
+	const shouldShowFallback = !profile.imageUrl || imageError;
+
+	return !shouldShowFallback ? (
 		<Image
-			alt={profile?.name!}
+			alt={profile.name ?? "User Avatar"}
 			className="avatar rounded"
-			src={profile?.imageUrl}
+			src={profile.imageUrl as string}
 			width={width}
 			height={height}
+			onError={() => setImageError(true)}
 		/>
 	) : (
 		<div
 			style={{ backgroundColor, width, height, fontSize }}
-			className="w-8 h-8 rounded-md font-bold flex items-center justify-center text-black"
-		>
+			className="rounded-md font-bold flex items-center justify-center text-black">
 			{profile.name
 				?.split(" ")
 				.map((w) => w[0])

@@ -1,21 +1,24 @@
 "use client";
 
+import { responsiveClasses } from "@/lib/utils/responsive";
 import React, { forwardRef, useState } from "react";
 import { FaExclamationCircle } from "react-icons/fa";
-import { responsiveClasses } from "@/lib/utils/responsive";
 
 export interface CheckboxProps
 	extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "type"> {
 	label?: string;
 	error?: string;
 	helperText?: string;
-	variant?:
+	variant?: "default" | "bordered";
+	color?:
 		| "primary"
 		| "secondary"
 		| "accent"
+		| "neutral"
 		| "success"
 		| "warning"
-		| "error";
+		| "error"
+		| "info";
 	checkboxSize?: "sm" | "md" | "lg";
 	fullWidth?: boolean;
 }
@@ -26,28 +29,36 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 			label,
 			error,
 			helperText,
-			variant = "primary",
+			variant = "bordered",
+			color = "primary",
 			checkboxSize = "md",
 			fullWidth = false,
 			className = "",
 			disabled,
 			...props
 		},
-		ref,
+		ref
 	) => {
 		const [isFocused, setIsFocused] = useState(false);
 
 		// Build CSS classes
 		const baseClasses =
-			"checkbox transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary border bg-[#141414] input-bordered";
+			"checkbox transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary bg-[#141414]";
 
 		const variantClasses = {
+			default: "",
+			bordered: "input-bordered border",
+		};
+
+		const colorClasses = {
 			primary: "checkbox-primary",
 			secondary: "checkbox-secondary",
 			accent: "checkbox-accent",
+			neutral: "checkbox-neutral",
 			success: "checkbox-success",
 			warning: "checkbox-warning",
 			error: "checkbox-error",
+			info: "checkbox-info",
 		};
 
 		const sizeClasses = {
@@ -65,6 +76,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 		const checkboxClasses = [
 			baseClasses,
 			variantClasses[variant],
+			colorClasses[color],
 			sizeClasses[checkboxSize],
 			error ? stateClasses.error : "",
 			isFocused && !error ? stateClasses.focused : "",
@@ -96,10 +108,11 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 						<span
 							className={`label-text ${
 								error ? "text-red-600" : ""
-							} ${disabled ? "opacity-60" : ""}`}
-						>
+							} ${disabled ? "opacity-60" : ""}`}>
 							{label}
-							{props.required && <span className="text-red-500 ml-1">*</span>}
+							{props.required && (
+								<span className="text-red-500 ml-1">*</span>
+							)}
 						</span>
 					)}
 				</label>
@@ -108,7 +121,9 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 				{error && (
 					<div className="flex items-center gap-1 mt-1 text-red-600">
 						<FaExclamationCircle size={12} />
-						<span className={responsiveClasses.text.caption}>{error}</span>
+						<span className={responsiveClasses.text.caption}>
+							{error}
+						</span>
 					</div>
 				)}
 
@@ -116,15 +131,14 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 				{helperText && !error && (
 					<div>
 						<span
-							className={`${responsiveClasses.text.caption} text-muted text-sm`}
-						>
+							className={`${responsiveClasses.text.caption} text-muted text-sm`}>
 							{helperText}
 						</span>
 					</div>
 				)}
 			</div>
 		);
-	},
+	}
 );
 
 Checkbox.displayName = "Checkbox";

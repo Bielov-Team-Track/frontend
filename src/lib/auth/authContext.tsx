@@ -1,21 +1,21 @@
 "use client";
 
-import React, {
+import {
+	ReactNode,
 	createContext,
+	useCallback,
 	useContext,
 	useEffect,
 	useState,
-	ReactNode,
 } from "react";
+import { UserProfile } from "../models/User";
 import {
 	AuthResponse,
 	login as apiLogin,
-	refreshToken as apiRefreshToken,
 	logout as apiLogout,
+	refreshToken as apiRefreshToken,
 	getCurrentUserProfile,
 } from "../requests/auth";
-import { UserProfile } from "../models/User";
-import { redirect } from "next/navigation";
 
 interface AuthContextType {
 	userProfile: UserProfile | null;
@@ -46,7 +46,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			expiry: authResponse.expiresAt,
 		});
 		localStorage.setItem(TOKEN_STORAGE_KEY, authResponse.token);
-		localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, authResponse.refreshToken);
+		localStorage.setItem(
+			REFRESH_TOKEN_STORAGE_KEY,
+			authResponse.refreshToken
+		);
 		localStorage.setItem(TOKEN_EXPIRY_STORAGE_KEY, authResponse.expiresAt);
 
 		// Also set in cookie for SSR
@@ -63,7 +66,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		localStorage.removeItem(TOKEN_EXPIRY_STORAGE_KEY);
 
 		// Clear cookie
-		document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+		document.cookie =
+			"token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 	};
 
 	const getStoredAccessToken = (): string | null => {
@@ -94,7 +98,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		}
 	};
 
-	const loginFromTokens = async (authResponse: AuthResponse): Promise<void> => {
+	const loginFromTokens = async (
+		authResponse: AuthResponse
+	): Promise<void> => {
 		try {
 			saveTokens(authResponse);
 			const userProfile = await getCurrentUserProfile();
@@ -121,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		}
 	};
 
-	const refreshAuth = async (): Promise<void> => {
+	const refreshAuth = useCallback(async (): Promise<void> => {
 		try {
 			const refreshTokenValue = getStoredRefreshToken();
 
@@ -144,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				window.location.href = "/login";
 			}
 		}
-	};
+	}, []);
 
 	// Initialize authentication state
 	useEffect(() => {
@@ -165,7 +171,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				} else {
 					// Token is valid, get current user
 					try {
-						const currentUserProfile = await getCurrentUserProfile();
+						const currentUserProfile =
+							await getCurrentUserProfile();
 						setUserProfile(currentUserProfile ?? null);
 					} catch (error) {
 						// If getting user fails, try refresh
@@ -182,7 +189,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		};
 
 		initializeAuth();
-	}, []);
+	}, [refreshAuth]);
 
 	const value: AuthContextType = {
 		userProfile,
@@ -194,7 +201,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		refreshAuth,
 	};
 
-	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+	return (
+		<AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+	);
 }
 
 export function useAuth(): AuthContextType {

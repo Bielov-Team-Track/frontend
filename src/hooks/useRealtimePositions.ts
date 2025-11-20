@@ -6,6 +6,7 @@ import { usePositionStore } from "@/lib/realtime/positionStore";
 import { HubConnection, HubConnectionState } from "@microsoft/signalr";
 import { useAccessToken } from "@/lib/auth/authContext";
 import { Position } from "@/lib/models/Position";
+import { EVENTS_API_URL } from "@/lib/constants";
 
 export function useRealtimePositions() {
 	const applyTaken = usePositionStore((s) => s.applyTaken);
@@ -34,7 +35,19 @@ export function useRealtimePositions() {
 		const start = async () => {
 			try {
 				setConnectionStatus("connecting");
-				connection = await signalr.start("position", token);
+				connection = await signalr.start(
+					{
+						baseUrl: EVENTS_API_URL,
+						hub: "position",
+						token,
+					},
+					{
+						onReconnected: () => {
+							setConnectionStatus("connected");
+						},
+						onClose: handleConnectionError,
+					}
+				);
 
 				// Set up event handlers
 				connection.on("PositionTaken", (payload: Position) => {
@@ -57,12 +70,6 @@ export function useRealtimePositions() {
 				connection.onreconnecting(() => {
 					setConnectionStatus("reconnecting");
 				});
-
-				connection.onreconnected(() => {
-					setConnectionStatus("connected");
-				});
-
-				connection.onclose(handleConnectionError);
 			} catch (error) {
 				handleConnectionError(error as Error);
 			}
@@ -72,7 +79,7 @@ export function useRealtimePositions() {
 
 		return () => {
 			if (!stopped && connection?.state !== HubConnectionState.Disconnected) {
-				signalr.stop();
+				signalr.stop(EVENTS_API_URL, "position");
 				stopped = true;
 			}
 		};

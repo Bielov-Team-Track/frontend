@@ -10,6 +10,7 @@ import { usePositionStore } from "@/lib/realtime/positionStore";
 import signalr from "@/lib/realtime/signalrClient";
 import { UserProfile } from "@/lib/models/User";
 import { redirect } from "next/navigation";
+import { EVENTS_API_URL } from "@/lib/constants";
 
 export function usePosition(
 	defaultPosition: Position,
@@ -56,7 +57,7 @@ export function usePosition(
 		const rollback = applyTakenWithRollback(position.id, profile.userId);
 		try {
 			// Try SignalR first for real-time updates
-			const connection = signalr.getConnection();
+			const connection = signalr.getConnection(EVENTS_API_URL, "position");
 			if (connection && connectionStatus === "connected") {
 				await connection.invoke("TakePosition", position.id);
 				// SignalR will handle the real-time update - no need to refresh
@@ -103,7 +104,7 @@ export function usePosition(
 
 		try {
 			// Try SignalR first
-			const connection = signalr.getConnection();
+			const connection = signalr.getConnection(EVENTS_API_URL, "position");
 			if (connection && connectionStatus === "connected") {
 				await connection.invoke("ReleasePosition", position.id);
 				// SignalR will handle the real-time update - no need to refresh

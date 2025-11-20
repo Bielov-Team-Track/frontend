@@ -12,6 +12,7 @@ import { EventParticipant } from "@/lib/models/EventParticipant";
 import AuditParticipantList from "@/components/features/audit/components/AuditParticipantList";
 import { Loader } from "@/components/ui";
 import AuditTeamsList from "@/components/features/audit/components/AuditTeamsList";
+import { EVENTS_API_URL } from "@/lib/constants";
 
 type AuditPageProps = {
 	params: Promise<{
@@ -54,7 +55,11 @@ function AuditPage({ params }: AuditPageProps) {
 				// Join the event's payment group
 				if (token) {
 					try {
-						const connection = await signalr.start("payments", token);
+						const connection = await signalr.start({
+							baseUrl: EVENTS_API_URL,
+							hub: "payments",
+							token,
+						});
 						await connection.invoke("JoinEventGroup", parameters.id);
 					} catch (error) {
 						console.error("Failed to join event group:", error);

@@ -4,7 +4,7 @@ import Loader from "@/components/ui/loader";
 import { verifyEmail as confirmEmailRequest } from "@/lib/requests/auth";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useRef, useState, Suspense } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 function ConfirmEmailContent() {
 	const [error, setError] = useState<string>("");
@@ -62,7 +62,7 @@ function ConfirmEmailContent() {
 
 				setIsLoading(false);
 			});
-	}, []);
+	}, [isEmailVerified, params]);
 
 	return isLoading ? (
 		<Loader />

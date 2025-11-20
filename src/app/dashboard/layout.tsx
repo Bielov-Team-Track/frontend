@@ -25,6 +25,7 @@ export default async function RootLayout({
 	return (
 		<html
 			lang="en"
+			data-theme="mainTheme"
 			className="min-h-screen relative bg-background-dark text-background-content"
 		>
 			<Head>

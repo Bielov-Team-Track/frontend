@@ -18,7 +18,7 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" className="min-h-screen relative bg-background-dark">
+		<html lang="en" data-theme="mainTheme" className="min-h-screen relative bg-background-dark">
 			<Head>
 				<meta
 					name="viewport"

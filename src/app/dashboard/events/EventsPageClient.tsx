@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
-import { Event } from "@/lib/models/Event";
-import { EventsList } from "@/components/features/events";
-import { EventsCalendar } from "@/components/ui/Calendar/EventsCalendar";
-import { FaCalendar, FaList, FaTh } from "react-icons/fa";
 import { RadioGroup } from "@/components";
+import { EventsList } from "@/components/features/events";
+import { EventsCalendar } from "@/components/ui/calendar/EventsCalendar";
+import { Event } from "@/lib/models/Event";
+import { useState } from "react";
+import { FaCalendar, FaList, FaTh } from "react-icons/fa";
 
 const VIEWS = [
 	{ value: "list", label: "List", icon: FaList },
@@ -57,7 +57,11 @@ function EventsPageClient({ events }: EventsPageClientProps) {
 
 				{currentView === "grid" && (
 					<div>
-						<EventsList events={events} variant="grid" cardVariant="vertical" />
+						<EventsList
+							events={events}
+							variant="grid"
+							cardVariant="vertical"
+						/>
 					</div>
 				)}
 			</div>

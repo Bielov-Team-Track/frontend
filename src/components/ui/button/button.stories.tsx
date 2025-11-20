@@ -17,8 +17,24 @@ const meta: Meta<typeof Button> = {
 	argTypes: {
 		variant: {
 			control: { type: "select" },
-			options: ["primary", "secondary", "accent", "ghost", "outline"],
+			options: ["solid", "outline", "ghost", "link", "icon"],
 			description: "The visual style variant of the button",
+			table: {
+				defaultValue: { summary: "solid" },
+			},
+		},
+		color: {
+			control: { type: "select" },
+			options: [
+				"primary",
+				"secondary",
+				"accent",
+				"neutral",
+				"success",
+				"warning",
+				"error",
+			],
+			description: "The color scheme of the button",
 			table: {
 				defaultValue: { summary: "primary" },
 			},
@@ -73,31 +89,11 @@ export const Default: Story = {
 };
 
 // Variant stories
-export const Primary: Story = {
+export const Solid: Story = {
 	args: {
-		children: "Primary Button",
+		children: "Solid Button",
 		variant: "solid",
-	},
-};
-
-export const Secondary: Story = {
-	args: {
-		children: "Secondary Button",
-		variant: "solid",
-	},
-};
-
-export const Accent: Story = {
-	args: {
-		children: "Accent Button",
-		variant: "solid",
-	},
-};
-
-export const Ghost: Story = {
-	args: {
-		children: "Ghost Button",
-		variant: "ghost",
+		color: "primary",
 	},
 };
 
@@ -105,6 +101,102 @@ export const Outline: Story = {
 	args: {
 		children: "Outline Button",
 		variant: "outline",
+		color: "primary",
+	},
+};
+
+export const Ghost: Story = {
+	args: {
+		children: "Ghost Button",
+		variant: "ghost",
+		color: "primary",
+	},
+};
+
+export const Link: Story = {
+	args: {
+		children: "Link Button",
+		variant: "link",
+		color: "primary",
+	},
+};
+
+export const Icon: Story = {
+	args: {
+		variant: "icon",
+		color: "primary",
+		children: (
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+				strokeWidth={1.5}
+				stroke="currentColor"
+				className="w-5 h-5">
+				<path
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					d="M12 4.5v15m7.5-7.5h-15"
+				/>
+			</svg>
+		),
+	},
+};
+
+// Color stories
+export const PrimaryColor: Story = {
+	args: {
+		children: "Primary",
+		variant: "solid",
+		color: "primary",
+	},
+};
+
+export const SecondaryColor: Story = {
+	args: {
+		children: "Secondary",
+		variant: "solid",
+		color: "secondary",
+	},
+};
+
+export const AccentColor: Story = {
+	args: {
+		children: "Accent",
+		variant: "solid",
+		color: "accent",
+	},
+};
+
+export const NeutralColor: Story = {
+	args: {
+		children: "Neutral",
+		variant: "solid",
+		color: "neutral",
+	},
+};
+
+export const SuccessColor: Story = {
+	args: {
+		children: "Success",
+		variant: "solid",
+		color: "success",
+	},
+};
+
+export const WarningColor: Story = {
+	args: {
+		children: "Warning",
+		variant: "solid",
+		color: "warning",
+	},
+};
+
+export const ErrorColor: Story = {
+	args: {
+		children: "Error",
+		variant: "solid",
+		color: "error",
 	},
 };
 
@@ -155,13 +247,13 @@ export const Loading: Story = {
 export const LoadingWithVariants: Story = {
 	render: () => (
 		<div className="flex flex-wrap gap-4">
-			<Button variant="solid" loading>
+			<Button variant="solid" color="primary" loading>
 				Saving...
 			</Button>
-			<Button variant="solid" loading>
+			<Button variant="outline" color="secondary" loading>
 				Processing...
 			</Button>
-			<Button variant="outline" loading>
+			<Button variant="ghost" color="accent" loading>
 				Loading...
 			</Button>
 		</div>
@@ -189,17 +281,308 @@ export const FullWidth: Story = {
 export const AllVariants: Story = {
 	render: () => (
 		<div className="flex flex-wrap gap-4">
-			<Button variant="solid">Primary</Button>
-			<Button variant="solid">Secondary</Button>
-			<Button variant="solid">Accent</Button>
-			<Button variant="ghost">Ghost</Button>
-			<Button variant="outline">Outline</Button>
+			<Button variant="solid" color="primary">
+				Solid
+			</Button>
+			<Button variant="outline" color="primary">
+				Outline
+			</Button>
+			<Button variant="ghost" color="primary">
+				Ghost
+			</Button>
+			<Button variant="link" color="primary">
+				Link
+			</Button>
+			<Button variant="icon" color="primary">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					strokeWidth={1.5}
+					stroke="currentColor"
+					className="w-5 h-5">
+					<path
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						d="M12 4.5v15m7.5-7.5h-15"
+					/>
+				</svg>
+			</Button>
 		</div>
 	),
 	parameters: {
 		docs: {
 			description: {
 				story: "All available button variants displayed together.",
+			},
+		},
+	},
+};
+
+// Showcase all colors
+export const AllColors: Story = {
+	render: () => (
+		<div className="flex flex-wrap gap-4">
+			<Button variant="solid" color="primary">
+				Primary
+			</Button>
+			<Button variant="solid" color="secondary">
+				Secondary
+			</Button>
+			<Button variant="solid" color="accent">
+				Accent
+			</Button>
+			<Button variant="solid" color="neutral">
+				Neutral
+			</Button>
+			<Button variant="solid" color="success">
+				Success
+			</Button>
+			<Button variant="solid" color="warning">
+				Warning
+			</Button>
+			<Button variant="solid" color="error">
+				Error
+			</Button>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: "All available button colors displayed together.",
+			},
+		},
+	},
+};
+
+// Comprehensive showcase: All variants with all colors
+export const CompleteShowcase: Story = {
+	render: () => (
+		<div className="space-y-8">
+			<div>
+				<h3 className="text-lg font-semibold mb-4">Solid Variant</h3>
+				<div className="flex flex-wrap gap-4">
+					<Button variant="solid" color="primary">
+						Primary
+					</Button>
+					<Button variant="solid" color="secondary">
+						Secondary
+					</Button>
+					<Button variant="solid" color="accent">
+						Accent
+					</Button>
+					<Button variant="solid" color="neutral">
+						Neutral
+					</Button>
+					<Button variant="solid" color="success">
+						Success
+					</Button>
+					<Button variant="solid" color="warning">
+						Warning
+					</Button>
+					<Button variant="solid" color="error">
+						Error
+					</Button>
+				</div>
+			</div>
+
+			<div>
+				<h3 className="text-lg font-semibold mb-4">Outline Variant</h3>
+				<div className="flex flex-wrap gap-4">
+					<Button variant="outline" color="primary">
+						Primary
+					</Button>
+					<Button variant="outline" color="secondary">
+						Secondary
+					</Button>
+					<Button variant="outline" color="accent">
+						Accent
+					</Button>
+					<Button variant="outline" color="neutral">
+						Neutral
+					</Button>
+					<Button variant="outline" color="success">
+						Success
+					</Button>
+					<Button variant="outline" color="warning">
+						Warning
+					</Button>
+					<Button variant="outline" color="error">
+						Error
+					</Button>
+				</div>
+			</div>
+
+			<div>
+				<h3 className="text-lg font-semibold mb-4">Ghost Variant</h3>
+				<div className="flex flex-wrap gap-4">
+					<Button variant="ghost" color="primary">
+						Primary
+					</Button>
+					<Button variant="ghost" color="secondary">
+						Secondary
+					</Button>
+					<Button variant="ghost" color="accent">
+						Accent
+					</Button>
+					<Button variant="ghost" color="neutral">
+						Neutral
+					</Button>
+					<Button variant="ghost" color="success">
+						Success
+					</Button>
+					<Button variant="ghost" color="warning">
+						Warning
+					</Button>
+					<Button variant="ghost" color="error">
+						Error
+					</Button>
+				</div>
+			</div>
+
+			<div>
+				<h3 className="text-lg font-semibold mb-4">Link Variant</h3>
+				<div className="flex flex-wrap gap-4">
+					<Button variant="link" color="primary">
+						Primary
+					</Button>
+					<Button variant="link" color="secondary">
+						Secondary
+					</Button>
+					<Button variant="link" color="accent">
+						Accent
+					</Button>
+					<Button variant="link" color="neutral">
+						Neutral
+					</Button>
+					<Button variant="link" color="success">
+						Success
+					</Button>
+					<Button variant="link" color="warning">
+						Warning
+					</Button>
+					<Button variant="link" color="error">
+						Error
+					</Button>
+				</div>
+			</div>
+
+			<div>
+				<h3 className="text-lg font-semibold mb-4">Icon Variant</h3>
+				<div className="flex flex-wrap gap-4">
+					<Button variant="icon" color="primary">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							strokeWidth={1.5}
+							stroke="currentColor"
+							className="w-5 h-5">
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M12 4.5v15m7.5-7.5h-15"
+							/>
+						</svg>
+					</Button>
+					<Button variant="icon" color="secondary">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							strokeWidth={1.5}
+							stroke="currentColor"
+							className="w-5 h-5">
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M12 4.5v15m7.5-7.5h-15"
+							/>
+						</svg>
+					</Button>
+					<Button variant="icon" color="accent">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							strokeWidth={1.5}
+							stroke="currentColor"
+							className="w-5 h-5">
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M12 4.5v15m7.5-7.5h-15"
+							/>
+						</svg>
+					</Button>
+					<Button variant="icon" color="neutral">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							strokeWidth={1.5}
+							stroke="currentColor"
+							className="w-5 h-5">
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M12 4.5v15m7.5-7.5h-15"
+							/>
+						</svg>
+					</Button>
+					<Button variant="icon" color="success">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							strokeWidth={1.5}
+							stroke="currentColor"
+							className="w-5 h-5">
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M12 4.5v15m7.5-7.5h-15"
+							/>
+						</svg>
+					</Button>
+					<Button variant="icon" color="warning">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							strokeWidth={1.5}
+							stroke="currentColor"
+							className="w-5 h-5">
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M12 4.5v15m7.5-7.5h-15"
+							/>
+						</svg>
+					</Button>
+					<Button variant="icon" color="error">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							strokeWidth={1.5}
+							stroke="currentColor"
+							className="w-5 h-5">
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M12 4.5v15m7.5-7.5h-15"
+							/>
+						</svg>
+					</Button>
+				</div>
+			</div>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: "Comprehensive showcase of all variants combined with all color options.",
 			},
 		},
 	},
@@ -235,8 +618,7 @@ export const WithLeftIcon: Story = {
 				viewBox="0 0 24 24"
 				strokeWidth={1.5}
 				stroke="currentColor"
-				className="w-4 h-4"
-			>
+				className="w-4 h-4">
 				<path
 					strokeLinecap="round"
 					strokeLinejoin="round"
@@ -258,8 +640,7 @@ export const WithRightIcon: Story = {
 				viewBox="0 0 24 24"
 				strokeWidth={1.5}
 				stroke="currentColor"
-				className="w-4 h-4"
-			>
+				className="w-4 h-4">
 				<path
 					strokeLinecap="round"
 					strokeLinejoin="round"
@@ -281,8 +662,7 @@ export const WithBothIcons: Story = {
 				viewBox="0 0 24 24"
 				strokeWidth={1.5}
 				stroke="currentColor"
-				className="w-4 h-4"
-			>
+				className="w-4 h-4">
 				<path
 					strokeLinecap="round"
 					strokeLinejoin="round"
@@ -297,8 +677,7 @@ export const WithBothIcons: Story = {
 				viewBox="0 0 24 24"
 				strokeWidth={1.5}
 				stroke="currentColor"
-				className="w-4 h-4"
-			>
+				className="w-4 h-4">
 				<path
 					strokeLinecap="round"
 					strokeLinejoin="round"
@@ -322,16 +701,14 @@ export const IconExamples: Story = {
 							viewBox="0 0 24 24"
 							strokeWidth={1.5}
 							stroke="currentColor"
-							className="w-4 h-4"
-						>
+							className="w-4 h-4">
 							<path
 								strokeLinecap="round"
 								strokeLinejoin="round"
 								d="M12 4.5v15m7.5-7.5h-15"
 							/>
 						</svg>
-					}
-				>
+					}>
 					Create New
 				</Button>
 
@@ -344,16 +721,14 @@ export const IconExamples: Story = {
 							viewBox="0 0 24 24"
 							strokeWidth={1.5}
 							stroke="currentColor"
-							className="w-4 h-4"
-						>
+							className="w-4 h-4">
 							<path
 								strokeLinecap="round"
 								strokeLinejoin="round"
 								d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"
 							/>
 						</svg>
-					}
-				>
+					}>
 					Save
 				</Button>
 
@@ -366,16 +741,14 @@ export const IconExamples: Story = {
 							viewBox="0 0 24 24"
 							strokeWidth={1.5}
 							stroke="currentColor"
-							className="w-4 h-4"
-						>
+							className="w-4 h-4">
 							<path
 								strokeLinecap="round"
 								strokeLinejoin="round"
 								d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
 							/>
 						</svg>
-					}
-				>
+					}>
 					Delete
 				</Button>
 			</div>
@@ -384,8 +757,7 @@ export const IconExamples: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story:
-					"Examples of buttons with icons using the leftIcon and rightIcon props.",
+				story: "Examples of buttons with icons using the leftIcon and rightIcon props.",
 			},
 		},
 	},
@@ -396,7 +768,9 @@ export const ResponsiveShowcase: Story = {
 	render: () => (
 		<div className="space-y-8">
 			<div>
-				<h3 className="text-lg font-semibold mb-4">Responsive Typography</h3>
+				<h3 className="text-lg font-semibold mb-4">
+					Responsive Typography
+				</h3>
 				<div className="space-y-4">
 					<div className="flex flex-wrap gap-4">
 						<Button size="sm">Small (Responsive)</Button>
@@ -408,7 +782,9 @@ export const ResponsiveShowcase: Story = {
 			</div>
 
 			<div>
-				<h3 className="text-lg font-semibold mb-4">Full Width Examples</h3>
+				<h3 className="text-lg font-semibold mb-4">
+					Full Width Examples
+				</h3>
 				<div className="space-y-2 max-w-md">
 					<Button fullWidth>Full Width Primary</Button>
 					<Button fullWidth variant="outline">
@@ -424,8 +800,7 @@ export const ResponsiveShowcase: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story:
-					"Demonstrates responsive typography and full-width button options.",
+				story: "Demonstrates responsive typography and full-width button options.",
 			},
 		},
 	},
@@ -473,8 +848,7 @@ export const InteractionExamples: Story = {
 								className="w-4 h-4"
 								fill="none"
 								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
+								viewBox="0 0 24 24">
 								<path
 									strokeLinecap="round"
 									strokeLinejoin="round"
@@ -482,8 +856,7 @@ export const InteractionExamples: Story = {
 									d="M12 6v6m0 0v6m0-6h6m-6 0H6"
 								/>
 							</svg>
-						}
-					>
+						}>
 						Create Event
 					</Button>
 
@@ -494,8 +867,7 @@ export const InteractionExamples: Story = {
 								className="w-4 h-4"
 								fill="none"
 								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
+								viewBox="0 0 24 24">
 								<path
 									strokeLinecap="round"
 									strokeLinejoin="round"
@@ -503,8 +875,7 @@ export const InteractionExamples: Story = {
 									d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
 								/>
 							</svg>
-						}
-					>
+						}>
 						Edit Profile
 					</Button>
 
@@ -515,8 +886,7 @@ export const InteractionExamples: Story = {
 								className="w-4 h-4"
 								fill="none"
 								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
+								viewBox="0 0 24 24">
 								<path
 									strokeLinecap="round"
 									strokeLinejoin="round"
@@ -524,8 +894,7 @@ export const InteractionExamples: Story = {
 									d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
 								/>
 							</svg>
-						}
-					>
+						}>
 						Share
 					</Button>
 				</div>
@@ -535,8 +904,7 @@ export const InteractionExamples: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story:
-					"Real-world examples showing common button use cases with icons and various states.",
+				story: "Real-world examples showing common button use cases with icons and various states.",
 			},
 		},
 	},

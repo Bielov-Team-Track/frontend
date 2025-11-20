@@ -35,26 +35,30 @@ function MapComponent({
 	const geocodingLib = useMapsLibrary("geocoding");
 	const geocoder = useMemo(
 		() => geocodingLib && new geocodingLib.Geocoder(),
-		[geocodingLib],
+		[geocodingLib]
 	);
 
 	useEffect(() => {
 		if (!defaultAddress) {
 			return;
 		}
-		geocoder?.geocode({ address: defaultAddress }, function (results, status) {
-			if (status == "OK") {
-				const loc = results![0].geometry.location;
-				const position = { lat: loc.lat(), lng: loc.lng() };
-				setPosition(position);
-				setCenter(position);
-				onPositionChanged && onPositionChanged(loc.lat(), loc.lng());
-			} else {
-				onError && onError("Address is not found");
-				setPosition(undefined);
+		geocoder?.geocode(
+			{ address: defaultAddress },
+			function (results, status) {
+				if (status == "OK") {
+					const loc = results![0].geometry.location;
+					const position = { lat: loc.lat(), lng: loc.lng() };
+					setPosition(position);
+					setCenter(position);
+					onPositionChanged &&
+						onPositionChanged(loc.lat(), loc.lng());
+				} else {
+					onError && onError("Address is not found");
+					setPosition(undefined);
+				}
 			}
-		});
-	}, [geocoder, defaultAddress]);
+		);
+	}, [geocoder, defaultAddress, onPositionChanged, onError]);
 
 	const handleClick = useCallback(
 		async (clickEvent: MapMouseEvent) => {
@@ -71,10 +75,10 @@ function MapComponent({
 			onLocationCalculated &&
 				onLocationCalculated(
 					clickEvent.detail.latLng?.lat!,
-					clickEvent.detail.latLng?.lng!,
+					clickEvent.detail.latLng?.lng!
 				);
 		},
-		[geocoder, readonly],
+		[geocoder, onAddressSelected, onLocationCalculated, readonly]
 	);
 
 	const handleCenterOnMarker = () => {
@@ -96,8 +100,7 @@ function MapComponent({
 				onClick={handleClick}
 				gestureHandling="auto"
 				disableDefaultUI={readonly}
-				onTilesLoaded={() => setIsLoading(false)}
-			>
+				onTilesLoaded={() => setIsLoading(false)}>
 				{position && <AdvancedMarker position={position} />}
 			</GoogleMap>
 
@@ -106,14 +109,12 @@ function MapComponent({
 				<button
 					onClick={handleCenterOnMarker}
 					className="absolute top-2 right-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 flex items-center gap-1.5 z-10"
-					type="button"
-				>
+					type="button">
 					<svg
 						className="w-4 h-4"
 						fill="none"
 						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
+						viewBox="0 0 24 24">
 						<path
 							strokeLinecap="round"
 							strokeLinejoin="round"

@@ -16,6 +16,8 @@ export { default as Drawer } from "./drawer";
 export { default as ImageCropper } from "./image-cropper";
 export { default as DelayWrapper } from "./delay-wrapper";
 export { default as Section } from "./section";
+export { MultiSelectInput } from "./multi-select-input";
+export { default as ResizableContainer } from "./resizable-container";
 
 // Re-export types
 export type { ButtonProps } from "./button";
@@ -29,3 +31,5 @@ export type {
 export type { SelectProps, SelectOption } from "./select";
 export type { TextAreaProps } from "./textarea";
 export type { SectionVariant } from "./section";
+export type { MultiSelectInputProps } from "./multi-select-input";
+export type { ResizableContainerProps } from "./resizable-container";

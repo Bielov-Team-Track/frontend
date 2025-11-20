@@ -1,16 +1,16 @@
 "use client";
 
-import { loadApprovalRequests } from "@/lib/requests/approvals";
-import Image from "next/image";
-import { FiX, FiCheck } from "react-icons/fi";
+import { Loader } from "@/components/ui";
+import { Approval } from "@/lib/models/Approval";
 import {
 	approveUser as approveUserRequest,
 	disapproveUser as disapproveUserRequest,
+	loadApprovalRequests,
 	resetApproval as resetApprovalRequest,
 } from "@/lib/requests/approvals";
-import { useEffect, useState } from "react";
-import { Loader } from "@/components/ui";
-import { Approval } from "@/lib/models/Approval";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
+import { FiCheck, FiX } from "react-icons/fi";
 
 export default function ApprovalRequestsSection({
 	eventId,
@@ -20,17 +20,17 @@ export default function ApprovalRequestsSection({
 	const [isLoading, setIsLoading] = useState<Boolean>(true);
 	const [requests, setRequests] = useState<Approval[]>();
 
-	useEffect(() => {
-		refreshRequests();
-	}, []);
-
-	const refreshRequests = () => {
+	const refreshRequests = useCallback(() => {
 		setIsLoading(true);
 		loadApprovalRequests(eventId).then((rs) => {
 			setIsLoading(false);
 			setRequests(rs);
 		});
-	};
+	}, [eventId]);
+
+	useEffect(() => {
+		refreshRequests();
+	}, [refreshRequests]);
 
 	const newRequestsCount = requests
 		? requests.filter((r) => r.approved == null).length
@@ -72,8 +72,7 @@ export default function ApprovalRequestsSection({
 							<div key={r.user.userId}>
 								<div
 									key={r.user?.userId}
-									className="bg-primary/90 text-primary-content rounded-md"
-								>
+									className="bg-primary/90 text-primary-content rounded-md">
 									<div className="collapse-title p-4 h-14 rounded-md bg-primary w-full flex justify-between">
 										<div className=" flex items-center gap-2">
 											<Image
@@ -90,14 +89,20 @@ export default function ApprovalRequestsSection({
 												<>
 													<button
 														className="btn btn-xs btn-success"
-														onClick={() => approveUser(r.user.userId!)}
-													>
+														onClick={() =>
+															approveUser(
+																r.user.userId!
+															)
+														}>
 														<FiCheck></FiCheck>
 													</button>
 													<button
 														className="btn btn-xs btn-error"
-														onClick={() => disapproveUser(r.user.userId!)}
-													>
+														onClick={() =>
+															disapproveUser(
+																r.user.userId!
+															)
+														}>
 														<FiX></FiX>
 													</button>
 												</>
@@ -105,8 +110,11 @@ export default function ApprovalRequestsSection({
 												<>
 													<button
 														className="btn btn-xs btn-ghost link text-error"
-														onClick={() => resetApproval(r.user.userId!)}
-													>
+														onClick={() =>
+															resetApproval(
+																r.user.userId!
+															)
+														}>
 														reset
 													</button>
 													<span className="flex btn-xs bg-success rounded-md text-center items-center">
@@ -117,8 +125,11 @@ export default function ApprovalRequestsSection({
 												<>
 													<button
 														className="btn btn-xs btn-ghost link text-error"
-														onClick={() => resetApproval(r.user.userId!)}
-													>
+														onClick={() =>
+															resetApproval(
+																r.user.userId!
+															)
+														}>
 														reset
 													</button>
 													<span className="flex btn-xs bg-error rounded-md text-center items-center">

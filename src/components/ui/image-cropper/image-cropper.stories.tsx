@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
-import ImageCropper from "./index";
 import Button from "../button";
+import ImageCropper from "./index";
 
 const meta: Meta<typeof ImageCropper> = {
 	title: "UI/ImageCropper",
@@ -21,7 +21,8 @@ const meta: Meta<typeof ImageCropper> = {
 			description: "The image file to be cropped",
 		},
 		onImageSave: {
-			description: "Callback function called when the cropped image is saved",
+			description:
+				"Callback function called when the cropped image is saved",
 		},
 	},
 };
@@ -43,7 +44,7 @@ const createMockImageFile = (): File => {
 			0,
 			0,
 			canvas.width,
-			canvas.height,
+			canvas.height
 		);
 		gradient.addColorStop(0, "#ff7b7b");
 		gradient.addColorStop(0.5, "#4ecdc4");
@@ -64,7 +65,9 @@ const createMockImageFile = (): File => {
 	return new Promise<File>((resolve) => {
 		canvas.toBlob((blob) => {
 			if (blob) {
-				resolve(new File([blob], "sample-image.png", { type: "image/png" }));
+				resolve(
+					new File([blob], "sample-image.png", { type: "image/png" })
+				);
 			}
 		});
 	}) as any;
@@ -103,7 +106,7 @@ const InteractiveTemplate = () => {
 				0,
 				0,
 				canvas.width,
-				canvas.height,
+				canvas.height
 			);
 			gradient.addColorStop(0, "#ff7b7b");
 			gradient.addColorStop(0.5, "#4ecdc4");
@@ -116,7 +119,11 @@ const InteractiveTemplate = () => {
 			ctx.textAlign = "center";
 			ctx.fillText("Sample Image", canvas.width / 2, canvas.height / 2);
 			ctx.font = "16px Arial";
-			ctx.fillText("for Cropping", canvas.width / 2, canvas.height / 2 + 30);
+			ctx.fillText(
+				"for Cropping",
+				canvas.width / 2,
+				canvas.height / 2 + 30
+			);
 		}
 
 		canvas.toBlob((blob) => {
@@ -134,7 +141,9 @@ const InteractiveTemplate = () => {
 	return (
 		<div className="w-full max-w-2xl mx-auto space-y-6">
 			<div className="space-y-4">
-				<h3 className="text-lg font-semibold">Upload an image to crop</h3>
+				<h3 className="text-lg font-semibold">
+					Upload an image to crop
+				</h3>
 				<div className="flex gap-4">
 					<input
 						type="file"
@@ -150,7 +159,9 @@ const InteractiveTemplate = () => {
 
 			{selectedFile && (
 				<div className="space-y-4">
-					<h4 className="font-medium">Crop your image (1:1 aspect ratio)</h4>
+					<h4 className="font-medium">
+						Crop your image (1:1 aspect ratio)
+					</h4>
 					<div className="border rounded-lg p-4 bg-gray-50">
 						<ImageCropper
 							imageFile={selectedFile}
@@ -164,6 +175,7 @@ const InteractiveTemplate = () => {
 				<div className="space-y-4">
 					<h4 className="font-medium">Cropped Result</h4>
 					<div className="flex justify-center">
+						{/* eslint-disable-next-line @next/next/no-img-element*/}
 						<img
 							src={croppedImageUrl}
 							alt="Cropped result"
@@ -181,8 +193,7 @@ export const Interactive: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story:
-					"Interactive image cropper. Upload an image or load a sample to try the cropping functionality.",
+				story: "Interactive image cropper. Upload an image or load a sample to try the cropping functionality.",
 			},
 		},
 	},
@@ -201,7 +212,14 @@ export const WithSampleImage: Story = {
 
 			if (ctx) {
 				// Create a more complex sample image
-				const gradient = ctx.createRadialGradient(300, 200, 0, 300, 200, 300);
+				const gradient = ctx.createRadialGradient(
+					300,
+					200,
+					0,
+					300,
+					200,
+					300
+				);
 				gradient.addColorStop(0, "#ffd89b");
 				gradient.addColorStop(1, "#19547b");
 				ctx.fillStyle = gradient;
@@ -226,9 +244,13 @@ export const WithSampleImage: Story = {
 
 			canvas.toBlob((blob) => {
 				if (blob) {
-					const mockFile = new File([blob], "sample-for-cropping.png", {
-						type: "image/png",
-					});
+					const mockFile = new File(
+						[blob],
+						"sample-for-cropping.png",
+						{
+							type: "image/png",
+						}
+					);
 					setFile(mockFile);
 				}
 			});
@@ -253,8 +275,7 @@ export const WithSampleImage: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story:
-					"Image cropper with a pre-loaded sample image for demonstration.",
+				story: "Image cropper with a pre-loaded sample image for demonstration.",
 			},
 		},
 	},

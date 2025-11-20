@@ -6,52 +6,104 @@ import {
 	IHttpConnectionOptions,
 	LogLevel,
 } from "@microsoft/signalr";
-import { EVENTS_API_URL } from "../constants";
 
-class SignalRClient {
-	private static instance: SignalRClient;
-	private connection: HubConnection | null = null;
-	private started: boolean = false;
-	private onSyncNeeded?: () => Promise<void>;
+/**
+ * Configuration for establishing a SignalR hub connection
+ */
+export interface ConnectionConfig {
+	/** Base URL of the service (e.g., MESSAGES_API_URL, EVENTS_API_URL) */
+	baseUrl: string;
+	/** Hub name to connect to (e.g., 'messaging', 'position', 'payments') */
+	hub: string;
+	/** Optional authentication token */
+	token?: string;
+}
 
-	private constructor() {}
+/**
+ * Callbacks for connection lifecycle events
+ */
+export interface ConnectionCallbacks {
+	/** Called when connection is successfully reconnected after a drop */
+	onReconnected?: () => Promise<void> | void;
+	/** Called when connection is closed (includes error if unexpected) */
+	onClose?: (error?: Error) => void;
+}
 
-	public static getInstance(): SignalRClient {
-		if (!SignalRClient.instance) {
-			SignalRClient.instance = new SignalRClient();
-		}
-		return SignalRClient.instance;
+/**
+ * Manages multiple independent SignalR hub connections across different services.
+ *
+ * This class allows you to maintain separate connections to different hubs
+ * (e.g., messaging, position, payments) on different services (e.g., messages-service,
+ * events-service) without conflicts.
+ *
+ * @example
+ * ```ts
+ * // Connect to messaging hub on messages service
+ * const messagingConnection = await signalRManager.start({
+ *   baseUrl: MESSAGES_API_URL,
+ *   hub: 'messaging',
+ *   token: accessToken
+ * });
+ *
+ * // Connect to position hub on events service
+ * const positionConnection = await signalRManager.start({
+ *   baseUrl: EVENTS_API_URL,
+ *   hub: 'position',
+ *   token: accessToken
+ * });
+ * ```
+ */
+class SignalRConnectionManager {
+	/** Map of active connections keyed by "baseUrl:hub" */
+	private connections: Map<string, HubConnection> = new Map();
+	/** Map of callbacks keyed by "baseUrl:hub" */
+	private callbacks: Map<string, ConnectionCallbacks> = new Map();
+
+	/**
+	 * Generates a unique key for a connection based on baseUrl and hub name
+	 */
+	private getConnectionKey(baseUrl: string, hub: string): string {
+		// Normalize baseUrl by removing trailing slashes
+		const normalizedUrl = baseUrl.replace(/\/+$/, "");
+		return `${normalizedUrl}:${hub}`;
 	}
 
-	public setSyncCallback(callback: () => Promise<void>): void {
-		this.onSyncNeeded = callback;
-	}
+	/**
+	 * Starts a SignalR connection to the specified hub.
+	 * If a connection already exists and is connected, returns the existing connection.
+	 *
+	 * @param config - Connection configuration
+	 * @param callbacks - Optional lifecycle callbacks
+	 * @returns Promise resolving to the hub connection
+	 */
+	public async start(
+		config: ConnectionConfig,
+		callbacks?: ConnectionCallbacks
+	): Promise<HubConnection> {
+		const { baseUrl, hub, token } = config;
+		const key = this.getConnectionKey(baseUrl, hub);
 
-	public getConnection(): HubConnection | null {
-		return this.connection;
-	}
-
-	public async start(hub: string, token?: string): Promise<HubConnection> {
+		// Check if connection already exists and is connected
+		const existingConnection = this.connections.get(key);
 		if (
-			this.connection &&
-			this.connection.state === HubConnectionState.Connected
+			existingConnection &&
+			existingConnection.state === HubConnectionState.Connected
 		) {
-			return this.connection;
+			return existingConnection;
 		}
 
-		const apiBase = EVENTS_API_URL;
-		const hubUrl = `${apiBase}/hubs/${hub}`;
+		const hubUrl = `${baseUrl}/hubs/${hub}`;
 
 		const options: IHttpConnectionOptions = {
 			accessTokenFactory: token ? () => token : undefined,
 			transport:
 				HttpTransportType.LongPolling |
 				HttpTransportType.WebSockets |
-				HttpTransportType.ServerSentEvents, // All transports: WebSockets | ServerSentEvents | LongPolling
-			withCredentials: true, // For CORS support
+				HttpTransportType.ServerSentEvents,
+			withCredentials: true,
 		};
 
-		this.connection = new HubConnectionBuilder()
+		const connection = new HubConnectionBuilder()
 			.withUrl(hubUrl, options)
 			.withAutomaticReconnect({
 				nextRetryDelayInMilliseconds: (retryContext) => {
@@ -67,48 +119,126 @@ class SignalRClient {
 			.configureLogging(LogLevel.Error)
 			.build();
 
+		// Store callbacks for this connection
+		if (callbacks) {
+			this.callbacks.set(key, callbacks);
+		}
+
 		// Enhanced connection event handlers
-		this.connection.onreconnected(async () => {
-			if (this.onSyncNeeded) {
+		connection.onreconnected(async () => {
+			const storedCallbacks = this.callbacks.get(key);
+			if (storedCallbacks?.onReconnected) {
 				try {
-					await this.onSyncNeeded();
+					await storedCallbacks.onReconnected();
 				} catch (error) {
-					console.error("Position sync failed after reconnection:", error);
+					console.error(
+						`[SignalR:${hub}] Reconnection callback failed:`,
+						error
+					);
 				}
 			}
 		});
 
-		this.connection.onclose(async (error) => {
-			this.started = false;
+		connection.onclose(async (error) => {
+			const storedCallbacks = this.callbacks.get(key);
+			if (storedCallbacks?.onClose) {
+				storedCallbacks.onClose(error);
+			}
+
+			// Remove connection from map when closed
+			this.connections.delete(key);
+			this.callbacks.delete(key);
 
 			// Attempt to restart connection if it was unexpected
-			if (error && !this.connection) {
+			if (error) {
+				console.warn(
+					`[SignalR:${hub}] Connection closed unexpectedly, attempting restart...`
+				);
 				try {
-					await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds
-					await this.start(hub, token);
+					await new Promise((resolve) => setTimeout(resolve, 5000));
+					await this.start(config, callbacks);
 				} catch (restartError) {
-					console.error("Failed to restart connection:", restartError);
+					console.error(
+						`[SignalR:${hub}] Failed to restart connection:`,
+						restartError
+					);
 				}
 			}
 		});
 
-		if (!this.started) {
-			await this.connection.start();
-			this.started = true;
-		}
+		await connection.start();
+		this.connections.set(key, connection);
 
-		return this.connection;
+		return connection;
 	}
 
-	public async stop(): Promise<void> {
+	/**
+	 * Stops a specific hub connection
+	 *
+	 * @param baseUrl - Base URL of the service
+	 * @param hub - Hub name
+	 */
+	public async stop(baseUrl: string, hub: string): Promise<void> {
+		const key = this.getConnectionKey(baseUrl, hub);
+		const connection = this.connections.get(key);
+
 		if (
-			this.connection &&
-			this.connection.state !== HubConnectionState.Disconnected
+			connection &&
+			connection.state !== HubConnectionState.Disconnected
 		) {
-			await this.connection.stop();
-			this.started = false;
+			await connection.stop();
+			this.connections.delete(key);
+			this.callbacks.delete(key);
 		}
+	}
+
+	/**
+	 * Gets the connection instance for a specific hub
+	 *
+	 * @param baseUrl - Base URL of the service
+	 * @param hub - Hub name
+	 * @returns The hub connection or null if not found
+	 */
+	public getConnection(baseUrl: string, hub: string): HubConnection | null {
+		const key = this.getConnectionKey(baseUrl, hub);
+		return this.connections.get(key) || null;
+	}
+
+	/**
+	 * Stops all active connections
+	 * Useful for cleanup on app unmount or logout
+	 */
+	public async stopAll(): Promise<void> {
+		const stopPromises = Array.from(this.connections.values()).map(
+			(connection) => {
+				if (connection.state !== HubConnectionState.Disconnected) {
+					return connection.stop();
+				}
+				return Promise.resolve();
+			}
+		);
+
+		await Promise.all(stopPromises);
+		this.connections.clear();
+		this.callbacks.clear();
+	}
+
+	/**
+	 * Gets the number of active connections
+	 */
+	public get activeConnectionCount(): number {
+		return this.connections.size;
+	}
+
+	/**
+	 * Checks if a specific connection exists and is connected
+	 */
+	public isConnected(baseUrl: string, hub: string): boolean {
+		const connection = this.getConnection(baseUrl, hub);
+		return connection?.state === HubConnectionState.Connected;
 	}
 }
 
-export default SignalRClient.getInstance();
+// Export singleton instance
+const signalRManager = new SignalRConnectionManager();
+export default signalRManager;

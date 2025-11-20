@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import client from "../client";
-import { User, UserProfile } from "../models/User";
+import { UserProfile } from "../models/User";
 
 export interface AuthResponse {
 	token: string;
@@ -22,21 +22,24 @@ export interface EmailVerificationResult {
 }
 
 const AUTH_PREFIX = "/auth";
-const EVENTS_PREFIX = "/events";
+const PROFILES_PREFIX = "/profiles";
 
 export async function login(
 	email: string,
-	password: string,
+	password: string
 ): Promise<AuthResponse> {
 	const endpoint = "/v1/auth/login";
 
 	return (
-		await client.post<AuthResponse>(AUTH_PREFIX + endpoint, { email, password })
+		await client.post<AuthResponse>(AUTH_PREFIX + endpoint, {
+			email,
+			password,
+		})
 	).data;
 }
 
 export async function refreshToken(
-	refreshTokenValue: string,
+	refreshTokenValue: string
 ): Promise<AuthResponse> {
 	const endpoint = "/v1/auth/refresh";
 
@@ -57,7 +60,8 @@ export async function logout(refreshTokenValue: string): Promise<void> {
 		localStorage.removeItem("accessToken");
 		localStorage.removeItem("refreshToken");
 		localStorage.removeItem("accessTokenExpiry");
-		document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+		document.cookie =
+			"token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 	}
 }
 
@@ -77,7 +81,7 @@ export async function sendVerification() {
 }
 
 export async function verifyEmail(
-	token: string,
+	token: string
 ): Promise<EmailVerificationResult> {
 	const endpoint = `/v1/auth/verify-email`;
 
@@ -90,7 +94,7 @@ export async function verifyEmail(
 
 export async function isEmailVerified(email: string) {
 	throw new Error(
-		"Email verification check not implemented in current backend",
+		"Email verification check not implemented in current backend"
 	);
 }
 
@@ -112,7 +116,7 @@ export async function resetPassword(token: string, newPassword: string) {
 export async function getCurrentUserProfile(): Promise<UserProfile | null> {
 	const endpoint = `/v1/profiles/me`;
 	try {
-		return (await client.get<UserProfile>(EVENTS_PREFIX + endpoint)).data;
+		return (await client.get<UserProfile>(PROFILES_PREFIX + endpoint)).data;
 	} catch (error: any) {
 		if (error instanceof AxiosError && error.response?.status === 401) {
 			return null;
@@ -123,7 +127,7 @@ export async function getCurrentUserProfile(): Promise<UserProfile | null> {
 
 export async function register(
 	email: string,
-	password: string,
+	password: string
 ): Promise<AuthResponse> {
 	const endpoint = "/v1/auth/register";
 

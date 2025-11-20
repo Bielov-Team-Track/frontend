@@ -1,11 +1,11 @@
 "use client";
 
 import { Button, Modal } from "@/components/ui";
-import { useState } from "react";
-import { cancelEvent } from "@/lib/requests/events";
-import { FaExclamationTriangle } from "react-icons/fa";
 import { Event } from "@/lib/models/Event";
+import { cancelEvent } from "@/lib/requests/events";
 import { redirect } from "next/navigation";
+import { useState } from "react";
+import { FaExclamationTriangle } from "react-icons/fa";
 
 type EventPageButtonsProps = {
 	event: Event;
@@ -33,18 +33,18 @@ const EventPageButtons = ({ event }: EventPageButtonsProps) => {
 		<>
 			<div className="flex gap-2">
 				<Button
-					variant="outline"
+					variant="ghost"
 					color="secondary"
 					onClick={() => {
 						redirect("/dashboard/audit/" + event.id);
 					}}>
 					Audit
 				</Button>
-				<Button variant="outline" color="primary">
+				<Button variant="ghost" color="primary">
 					Edit
 				</Button>
 				<Button
-					variant="outline"
+					variant="ghost"
 					color="error"
 					onClick={() => setShowCancelModal(true)}>
 					Cancel

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { AUTH_API_V1, EVENTS_API_V1 } from "./lib/constants";
+import { NextRequest, NextResponse } from "next/server";
+import { AUTH_API_V1, PROFILES_API_V1 } from "./lib/constants";
 
 // Public routes that don't require authentication
 const publicRoutes = [
@@ -30,7 +30,7 @@ export default async function authMiddleware(request: NextRequest) {
 
 	// Check if it's a public route
 	const isPublicRoute = publicRoutes.some(
-		(route) => pathname.startsWith(route) || pathname === "/",
+		(route) => pathname.startsWith(route) || pathname === "/"
 	);
 
 	if (isPublicRoute) {
@@ -82,14 +82,17 @@ export default async function authMiddleware(request: NextRequest) {
 
 		console.log(
 			"Middleware - token valid, email verified:",
-			result.isEmailVerified,
+			result.isEmailVerified
 		);
 
 		if (!result.isEmailVerified && pathname !== "/verify-email") {
 			console.log(
-				"Middleware - email not verified, redirecting to verification-sent",
+				"Middleware - email not verified, redirecting to verification-sent"
 			);
-			const emailVerificationUrl = new URL("/email-verification", request.url);
+			const emailVerificationUrl = new URL(
+				"/email-verification",
+				request.url
+			);
 			return NextResponse.redirect(emailVerificationUrl);
 		}
 
@@ -97,13 +100,16 @@ export default async function authMiddleware(request: NextRequest) {
 		if (!isProfileSetupRoute) {
 			console.log("Middleware - checking profile completeness");
 			try {
-				const profileResponse = await fetch(`${EVENTS_API_V1}/profiles/me`, {
-					method: "GET",
-					headers: {
-						Authorization: `Bearer ${token}`,
-						"Content-Type": "application/json",
-					},
-				});
+				const profileResponse = await fetch(
+					`${PROFILES_API_V1}/profiles/me`,
+					{
+						method: "GET",
+						headers: {
+							Authorization: `Bearer ${token}`,
+							"Content-Type": "application/json",
+						},
+					}
+				);
 
 				if (profileResponse.ok) {
 					const profile = await profileResponse.json();
@@ -114,19 +120,25 @@ export default async function authMiddleware(request: NextRequest) {
 
 					if (!isProfileComplete) {
 						console.log(
-							"Middleware - profile incomplete, redirecting to profile setup",
+							"Middleware - profile incomplete, redirecting to profile setup"
 						);
-						const profileSetupUrl = new URL(profileSetupRoute, request.url);
-						console.log("Redirecting to:", profileSetupUrl.toString());
+						const profileSetupUrl = new URL(
+							profileSetupRoute,
+							request.url
+						);
+						console.log(
+							"Redirecting to:",
+							profileSetupUrl.toString()
+						);
 						return NextResponse.redirect(profileSetupUrl);
 					}
 				} else {
 					console.log(
 						"Middleware - failed to fetch profile, status:",
-						profileResponse.status,
+						profileResponse.status
 					);
 					const errorUrl = new URL("/error", request.url);
-					return NextResponse.redirect(errorUrl);
+					return NextResponse.rewrite(errorUrl);
 				}
 			} catch (profileError) {
 				console.log("Middleware - profile check error:", profileError);

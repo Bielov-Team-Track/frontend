@@ -5,6 +5,7 @@ import signalr from "@/lib/realtime/signalrClient";
 import { HubConnection, HubConnectionState } from "@microsoft/signalr";
 import { useAccessToken } from "@/lib/auth/authContext";
 import { usePaymentsStore } from "@/lib/realtime/paymentStore";
+import { EVENTS_API_URL } from "@/lib/constants";
 
 export function useRealtimePayments() {
 	const applyPaymentReceived = usePaymentsStore((s) => s.applyPaymentReceived);
@@ -31,7 +32,19 @@ export function useRealtimePayments() {
 		const start = async () => {
 			try {
 				setConnectionStatus("connecting");
-				connection = await signalr.start("payments", token);
+				connection = await signalr.start(
+					{
+						baseUrl: EVENTS_API_URL,
+						hub: "payments",
+						token,
+					},
+					{
+						onReconnected: () => {
+							setConnectionStatus("connected");
+						},
+						onClose: handleConnectionError,
+					}
+				);
 
 				// Set up event handlers
 				connection.on(
@@ -49,14 +62,6 @@ export function useRealtimePayments() {
 				connection.onreconnecting(() => {
 					setConnectionStatus("reconnecting");
 				});
-
-				connection.onreconnected(() => {
-					setConnectionStatus("connected");
-				});
-
-				signalr.setSyncCallback(async () => {});
-
-				connection.onclose(handleConnectionError);
 			} catch (error) {
 				handleConnectionError(error as Error);
 			}
@@ -66,7 +71,7 @@ export function useRealtimePayments() {
 
 		return () => {
 			if (!stopped && connection?.state !== HubConnectionState.Disconnected) {
-				signalr.stop();
+				signalr.stop(EVENTS_API_URL, "payments");
 				stopped = true;
 			}
 		};

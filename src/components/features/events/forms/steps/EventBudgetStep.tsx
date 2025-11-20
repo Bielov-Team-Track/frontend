@@ -102,7 +102,7 @@ const EventBudgetStep = () => {
 							{...field}
 							checked={value}
 							onChange={onChange}
-							variant="secondary"
+							variant="bordered"
 							disabled={!useBudget}
 							label="Require payment to join event"
 							helperText="If enabled, participants must complete payment to confirm their registration."

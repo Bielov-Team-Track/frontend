@@ -1,15 +1,15 @@
 import client from "../client";
+import { AuthData } from "../models/Auth";
+import { PositionPayment } from "../models/Position";
 import {
 	BaseUser,
 	GoogleUserCreate,
 	Suspension,
 	UserProfile,
 } from "../models/User";
-import { PositionPayment } from "../models/Position";
-import { AuthData } from "../models/Auth";
 import { AuthResponse } from "./auth";
 
-const PREFIX = "/events/v1";
+const PREFIX = "/profiles/v1";
 
 export async function getUserProfile(userId: string) {
 	const endpoint = `/users/${userId}`;
@@ -32,7 +32,7 @@ export async function getUserPositionPayments(userId: string) {
 
 export async function getSuspension(
 	eventId: string,
-	userId: string,
+	userId: string
 ): Promise<Suspension> {
 	const endpoint = `/users/${userId}/events/${eventId}/suspension`;
 
@@ -67,7 +67,7 @@ export async function updateProfileImage(image: Blob): Promise<string> {
 	// Step 1: Get presigned URL from backend
 	const fileType = image.type; // e.g., "image/jpeg", "image/png"
 	const getUploadUrlEndpoint = `/v1/profiles/me/profile-image-upload-url?fileType=${encodeURIComponent(
-		fileType,
+		fileType
 	)}`;
 
 	const response = await client.get(PREFIX + getUploadUrlEndpoint);
@@ -103,7 +103,7 @@ export async function unfollowUser(userId: string) {
 	return await client.post(PREFIX + endpoint);
 }
 
-export async function search(query: string): Promise<UserProfile[]> {
+export async function searchUsers(query: string): Promise<UserProfile[]> {
 	const processedQuery = encodeURIComponent(query.trim());
 
 	const endpoint = `/profiles?query=${processedQuery}`;

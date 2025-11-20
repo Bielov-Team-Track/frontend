@@ -1,22 +1,23 @@
 "use client";
 
-import { Team as TeamModel } from "@/lib/models/Team";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Position as PositionComponent } from "@/components/features/teams/";
 import { Button, Input, Loader } from "@/components/ui";
-import TeamMenu from "./TeamMenu";
-import { usePositionStore } from "@/lib/realtime/positionStore";
 import { useRealtimePositions } from "@/hooks/useRealtimePositions";
-import signalr from "@/lib/realtime/signalrClient";
-import { UserProfile } from "@/lib/models/User";
-import {
-	FaUser as PersonIcon,
-	FaTimes as CancelIcon,
-	FaPlus as AddIcon,
-} from "react-icons/fa";
-import { addPosition } from "@/lib/requests/positions";
 import { Position } from "@/lib/models/Position";
+import { Team as TeamModel } from "@/lib/models/Team";
+import { UserProfile } from "@/lib/models/User";
+import { usePositionStore } from "@/lib/realtime/positionStore";
+import signalr from "@/lib/realtime/signalrClient";
+import { addPosition } from "@/lib/requests/positions";
 import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+	FaPlus as AddIcon,
+	FaTimes as CancelIcon,
+	FaUser as PersonIcon,
+} from "react-icons/fa";
+import TeamMenu from "./TeamMenu";
+import { EVENTS_API_URL } from "@/lib/constants";
 
 type TeamProps = {
 	open?: boolean;
@@ -38,7 +39,7 @@ function Team({
 
 	const filteredPositions = useMemo(() => {
 		return positions?.filter(
-			(p) => p.eventParticipant?.userProfile || open || editable,
+			(p) => p.eventParticipant?.userProfile || open || editable
 		);
 	}, [positions, open, editable]);
 
@@ -57,7 +58,7 @@ function Team({
 
 	// Join event group for position updates
 	useEffect(() => {
-		const connection = signalr.getConnection();
+		const connection = signalr.getConnection(EVENTS_API_URL, "position");
 		if (connection && team.event?.id && connectionStatus === "connected") {
 			const joinGroup = async () => {
 				try {
@@ -70,7 +71,10 @@ function Team({
 			const leaveGroup = async () => {
 				try {
 					if (connection && connectionStatus === "connected") {
-						await connection.invoke("LeaveEventGroup", team.event.id);
+						await connection.invoke(
+							"LeaveEventGroup",
+							team.event.id
+						);
 					}
 				} catch (error) {
 					console.error("Failed to leave event group:", error);
@@ -89,7 +93,7 @@ function Team({
 		setLocalPositions((prev) => {
 			if (!prev) return prev;
 			return prev.map((p) =>
-				positionStore[p.id] ? { ...p, ...positionStore[p.id] } : p,
+				positionStore[p.id] ? { ...p, ...positionStore[p.id] } : p
 			);
 		});
 	}, [positionStore]);
@@ -109,7 +113,9 @@ function Team({
 		setTeam((prevTeam) => ({ ...prevTeam, captain: undefined }));
 	};
 
-	const isTeamFull = !positions?.find((p) => !p.eventParticipant?.userProfile);
+	const isTeamFull = !positions?.find(
+		(p) => !p.eventParticipant?.userProfile
+	);
 
 	return (
 		<div className="bg-background relative max-w-96 flex flex-col p-4 gap-4 rounded-lg w-80 shadow-lg  shadow-black/50">
@@ -117,16 +123,19 @@ function Team({
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-between w-full">
 						<div className="flex gap-2 justify-between w-full">
-							<span className="text-lg font-bold">{team.name}</span>
+							<span className="text-lg font-bold">
+								{team.name}
+							</span>
 							{/* TODO: team menu is not visible when tam is collapsed */}
 							<div className="flex items-center gap-2">
 								{captain && (
 									<div className="flex gap-1 items-center">
-										<span className="-translate-y-[2px]">👑</span>
+										<span className="-translate-y-[2px]">
+											👑
+										</span>
 										<Link
-											href={"/pofiles/" + captain.userId}
-											className="flex items-center gap-1 hover:underline"
-										>
+											href={"/profiles/" + captain.userId}
+											className="flex items-center gap-1 hover:underline">
 											<span className="text-sm font-bold">
 												{captain.name} {captain.surname}
 											</span>
@@ -138,9 +147,13 @@ function Team({
 									positions &&
 									positions.length > 0 &&
 									(isTeamFull ? (
-										<span className="text-success text-sm">Full</span>
+										<span className="text-success text-sm">
+											Full
+										</span>
 									) : (
-										<span className="text-accent text-sm">Spots available</span>
+										<span className="text-accent text-sm">
+											Spots available
+										</span>
 									))}
 								<TeamMenu
 									team={team}
@@ -165,10 +178,17 @@ function Team({
 								position={p}
 								onPositionRemoved={(id) => {
 									setLocalPositions((prev) =>
-										prev ? prev.filter((pos) => pos.id !== id) : prev,
+										prev
+											? prev.filter(
+													(pos) => pos.id !== id
+											  )
+											: prev
 									);
 								}}
-								key={p.id + p.eventParticipant?.userProfile?.userId}
+								key={
+									p.id +
+									p.eventParticipant?.userProfile?.userId
+								}
 							/>
 						))
 					) : (
@@ -179,7 +199,10 @@ function Team({
 							teamId={team.id!}
 							onPositionAdded={(p) => {
 								upsertPosition(p);
-								setLocalPositions((prev) => [...(prev || []), p]);
+								setLocalPositions((prev) => [
+									...(prev || []),
+									p,
+								]);
 							}}
 						/>
 					)}
@@ -241,8 +264,7 @@ const AddNewPosition = ({ teamId, onPositionAdded }: AddNewPositionProps) => {
 					variant="icon"
 					color="primary"
 					className="mt-1"
-					onClick={() => handleAddNewPosition()}
-				>
+					onClick={() => handleAddNewPosition()}>
 					<AddIcon />
 				</Button>
 				<Button
@@ -253,8 +275,7 @@ const AddNewPosition = ({ teamId, onPositionAdded }: AddNewPositionProps) => {
 						setAddingNewPosition(false);
 						setNewPositionName("");
 						setError(null);
-					}}
-				>
+					}}>
 					<CancelIcon />
 				</Button>
 			</div>
@@ -266,8 +287,7 @@ const AddNewPosition = ({ teamId, onPositionAdded }: AddNewPositionProps) => {
 			color="neutral"
 			size="sm"
 			leftIcon={<PersonIcon />}
-			onClick={() => setAddingNewPosition(true)}
-		>
+			onClick={() => setAddingNewPosition(true)}>
 			Add new position
 		</Button>
 	);

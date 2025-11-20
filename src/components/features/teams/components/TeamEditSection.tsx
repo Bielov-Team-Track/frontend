@@ -1,11 +1,11 @@
 "use client";
-import TeamsEditList from "./TeamsEditList";
+import { Loader } from "@/components/ui";
+import { Event } from "@/lib/models/Event";
 import { Team } from "@/lib/models/Team";
 import { createTeam, loadTeams } from "@/lib/requests/teams";
 import { useEffect, useState } from "react";
 import { FiPlus as PlusIcon } from "react-icons/fi";
-import { Event } from "@/lib/models/Event";
-import { Loader } from "@/components/ui";
+import TeamsEditList from "./TeamsEditList";
 
 export default function TeamsEditSection({ event }: { event: Event }) {
 	const [teams, setTeams] = useState<Team[]>();
@@ -16,7 +16,7 @@ export default function TeamsEditSection({ event }: { event: Event }) {
 			setIsLoading(false);
 			setTeams(tms);
 		});
-	}, []);
+	}, [event.id]);
 
 	const updateTeams = () => {
 		setIsLoading(true);

@@ -1,3 +1,6 @@
+"use client";
+
+import { Button } from "@/components";
 import Link from "next/link";
 
 const ErrorPage = () => {
@@ -11,10 +14,12 @@ const ErrorPage = () => {
 			</p>
 			<Link
 				href="/"
-				className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/60 transition"
-			>
+				className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/60 transition">
 				Go to Home
 			</Link>
+			<Button onClick={() => window && window.location.reload()}>
+				Refresh
+			</Button>
 		</div>
 	);
 };

@@ -1,23 +1,21 @@
+import { Button } from "@/components/ui";
+import { Event } from "@/lib/models/Event";
 import {
-	format,
-	startOfMonth,
-	endOfMonth,
-	startOfWeek,
-	endOfWeek,
+	addMonths,
 	eachDayOfInterval,
+	endOfMonth,
+	endOfWeek,
+	format,
+	isSameDay,
 	isSameMonth,
 	isToday,
-	isSameDay,
-	addMonths,
+	startOfMonth,
+	startOfWeek,
 	subMonths,
-	getMonth,
-	getYear,
 } from "date-fns";
-import { useState, useEffect } from "react";
-import { ViewComponentProps } from "./ViewProps";
-import { Button } from "@/components/ui";
+import { useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { Event } from "@/lib/models/Event";
+import { ViewComponentProps } from "./ViewProps";
 
 function MonthView({
 	events,
@@ -37,7 +35,10 @@ function MonthView({
 	const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
 
 	// Always show 6 weeks (42 days)
-	const days = eachDayOfInterval({ start: calendarStart, end: calendarStart });
+	const days = eachDayOfInterval({
+		start: calendarStart,
+		end: calendarStart,
+	});
 	const allDays = [] as Date[];
 	for (let i = 0; i < 42; i++) {
 		const day = new Date(calendarStart);
@@ -76,8 +77,7 @@ function MonthView({
 					{weekDays.map((day) => (
 						<div
 							key={day}
-							className="text-center font-semibold text-foreground-content py-2"
-						>
+							className="text-center font-semibold text-foreground-content py-2">
 							{day}
 						</div>
 					))}
@@ -87,25 +87,30 @@ function MonthView({
 				<div className="flex-1 grid grid-rows-6">
 					{[0, 1, 2, 3, 4, 5].map((week) => (
 						<div key={week} className="grid grid-cols-7">
-							{allDays.slice(week * 7, (week + 1) * 7).map((day, dayIndex) => {
-								const dayEvents = getEventsForDay(day);
-								const isCurrentMonth = isSameMonth(day, currentDate);
-								const isTodayDate = isToday(day);
+							{allDays
+								.slice(week * 7, (week + 1) * 7)
+								.map((day, dayIndex) => {
+									const dayEvents = getEventsForDay(day);
+									const isCurrentMonth = isSameMonth(
+										day,
+										currentDate
+									);
+									const isTodayDate = isToday(day);
 
-								return (
-									<DayCell
-										key={day.toISOString()}
-										day={day}
-										events={dayEvents}
-										isCurrentMonth={isCurrentMonth}
-										isToday={isTodayDate}
-										onEventClick={onEventClick}
-										onViewChange={onViewChange}
-										isFirstCol={dayIndex === 0}
-										isFirstRow={week === 0}
-									/>
-								);
-							})}
+									return (
+										<DayCell
+											key={day.toISOString()}
+											day={day}
+											events={dayEvents}
+											isCurrentMonth={isCurrentMonth}
+											isToday={isTodayDate}
+											onEventClick={onEventClick}
+											onViewChange={onViewChange}
+											isFirstCol={dayIndex === 0}
+											isFirstRow={week === 0}
+										/>
+									);
+								})}
 						</div>
 					))}
 				</div>
@@ -124,19 +129,24 @@ function MonthNavigation({
 	onNext: () => void;
 }) {
 	return (
-		<div className="flex items-center mb-4">
-			<Button
-				size="sm"
-				variant="ghost"
-				color="neutral"
-				onClick={onPrev}
-				className="px-3 py-1"
-			>
-				<FaChevronLeft />
-			</Button>
-			<Button onClick={onNext} variant="ghost" color="neutral" size="sm">
-				<FaChevronRight />
-			</Button>
+		<div className="flex gap-2 items-center mb-4">
+			<div>
+				<Button
+					size="sm"
+					variant="ghost"
+					color="neutral"
+					onClick={onPrev}
+					className="px-3 py-1">
+					<FaChevronLeft />
+				</Button>
+				<Button
+					onClick={onNext}
+					variant="ghost"
+					color="neutral"
+					size="sm">
+					<FaChevronRight />
+				</Button>
+			</div>
 			<span className="text-foreground-content font-semibold text-xl">
 				{format(date, "MMMM yyyy")}
 			</span>
@@ -182,25 +192,23 @@ function DayCell({
         ${isFirstRow ? "border-t" : ""}
         border-r border-b
         ${
-					isCurrentMonth
-						? "bg-background border-muted/20"
-						: "bg-background-dark border-muted/10"
-				}
+			isCurrentMonth
+				? "bg-background border-muted/20"
+				: "bg-background-dark border-muted/10"
+		}
         ${isToday ? "bg-accent/5 ring-2 ring-accent ring-inset" : ""}
         hover:bg-background-light transition-colors
-      `}
-		>
+      `}>
 			<div
 				className={`
           text-sm font-semibold mb-1
           ${
-						isCurrentMonth
-							? "text-foreground-content"
-							: "text-foreground-content/40"
-					}
+				isCurrentMonth
+					? "text-foreground-content"
+					: "text-foreground-content/40"
+			}
           ${isToday ? "text-accent font-bold" : ""}
-        `}
-			>
+        `}>
 				{format(day, "d")}
 			</div>
 
@@ -213,8 +221,7 @@ function DayCell({
 							e.stopPropagation();
 							onEventClick(event.id);
 						}}
-						className="text-xs bg-primary text-primary-content rounded px-2 py-1 truncate cursor-pointer hover:brightness-110 transition-all"
-					>
+						className="text-xs bg-primary text-primary-content rounded px-2 py-1 truncate cursor-pointer hover:brightness-110 transition-all">
 						{event.name}
 					</div>
 				))}

@@ -1,23 +1,22 @@
-import React from "react";
+import { ApprovalSection } from "@/components/features/events";
+import { Map } from "@/components/features/locations";
+import { TeamsList } from "@/components/features/teams";
+import PositionsRealtimeClient from "@/components/features/teams/components/PositionsRealtimeClient";
+import { Avatar } from "@/components/ui";
+import { checkUserApproval } from "@/lib/requests/approvals";
 import { loadEvent } from "@/lib/requests/events";
 import { loadTeams } from "@/lib/requests/teams";
-import { TeamsList } from "@/components/features/teams";
-import { notFound } from "next/navigation";
-import { Avatar } from "@/components/ui";
-import Link from "next/link";
-import { checkUserApproval } from "@/lib/requests/approvals";
-import { ApprovalSection } from "@/components/features/events";
-import PositionsRealtimeClient from "@/components/features/teams/components/PositionsRealtimeClient";
-import { Map } from "@/components/features/locations";
 import { getUserProfile } from "@/lib/server/auth";
 import {
 	getDuration,
 	getFormattedDateWithDay,
 	getFormattedTime,
 } from "@/lib/utils/date";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
-import { UserProfile } from "@/lib/models/User";
 import CommentsSection from "@/components/features/comments/components/CommentsSection";
+import { UserProfile } from "@/lib/models/User";
 import EventPageButtons from "./components/EventPageButtons";
 import PaymentsSection from "./components/PaymentsSection";
 
@@ -77,16 +76,22 @@ async function EventPage({ params }: EventPageParams) {
 					</div>
 				)}
 				<div className="flex flex-wrap gap-4 items-center justify-between">
-					<h1 className="md:text-6xl text-5xl font-bold">{event.name}</h1>
+					<h1 className="md:text-6xl text-5xl font-bold">
+						{event.name}
+					</h1>
 					{isAdmin && <EventPageButtons event={event} />}
 				</div>
 				<div>{event.description}</div>
 				<div>
 					<div className="flex items-center gap-2">
-						<span className="text-3xl font-bold">Date and time</span>
+						<span className="text-3xl font-bold">
+							Date and time
+						</span>
 					</div>
 					<div className="flex gap-12 py-4">
-						<div className="">{getFormattedDateWithDay(event.startTime)}</div>
+						<div className="">
+							{getFormattedDateWithDay(event.startTime)}
+						</div>
 						<div className="flex flex-col">
 							<div className="font-bold">
 								{getFormattedTime(event.startTime)} -{" "}
@@ -110,14 +115,16 @@ async function EventPage({ params }: EventPageParams) {
 										<b>Address:</b> {event.location.address}
 									</span>
 								</div>
-								<Map defaultAddress={event.location.address} readonly={true} />
+								<Map
+									defaultAddress={event.location.address}
+									readonly={true}
+								/>
 								<Link
 									target="_blank"
 									href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-										event.location.address!,
+										event.location.address!
 									)}`}
-									className="btn w-full bg-primary text-primary-content"
-								>
+									className="btn w-full bg-primary text-primary-content">
 									Get Directions
 								</Link>
 							</>
@@ -135,8 +142,7 @@ async function EventPage({ params }: EventPageParams) {
 								<Link
 									href={"/profiles/" + admin.userId}
 									key={admin.userId}
-									className="inline-flex items-center gap-2"
-								>
+									className="inline-flex items-center gap-2">
 									<Avatar profile={admin} />
 									<span className="whitespace-nowrap">
 										{admin.name} {admin.surname}
@@ -146,7 +152,11 @@ async function EventPage({ params }: EventPageParams) {
 						</div>
 					</div>
 				)}
-				<PaymentsSection event={event} teams={teams} userProfile={user} />
+				<PaymentsSection
+					event={event}
+					teams={teams}
+					userProfile={user}
+				/>
 				{teams && teams.length > 0 && (
 					<div className="flex flex-col gap-4">
 						<div className="flex items-center gap-2">

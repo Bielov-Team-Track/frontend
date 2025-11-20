@@ -1,8 +1,7 @@
+import TeamsEditSection from "@/components/features/teams/components/TeamEditSection";
 import { loadEvent, loadEvents } from "@/lib/requests/events";
 import moment from "moment";
 import { notFound } from "next/navigation";
-import { loadLocations } from "@/lib/requests/locations";
-import TeamsEditSection from "@/components/features/teams/components/TeamEditSection";
 
 async function EventEditPage({ params }: Params) {
 	const parameters = await params;

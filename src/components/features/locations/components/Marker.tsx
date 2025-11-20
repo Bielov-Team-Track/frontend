@@ -1,18 +1,14 @@
 "use client";
 
-import {
-	AdvancedMarker,
-	useMap,
-	useMapsLibrary,
-} from "@vis.gl/react-google-maps";
-import React, { useEffect, useMemo } from "react";
+import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
+import { useEffect, useMemo } from "react";
 
 function Marker({ location, addressCallback }: MarkerProps) {
 	const map = useMap();
 	const geocodingLib = useMapsLibrary("geocoding");
 	const geocoder = useMemo(
 		() => geocodingLib && new geocodingLib.Geocoder(),
-		[geocodingLib],
+		[geocodingLib]
 	);
 
 	useEffect(() => {
@@ -29,11 +25,12 @@ function Marker({ location, addressCallback }: MarkerProps) {
 				addressCallback();
 			} else {
 				console.error(
-					"Geocode was not successful for the following reason: " + status,
+					"Geocode was not successful for the following reason: " +
+						status
 				);
 			}
 		});
-	}, [location, geocoder, map]);
+	}, [location, geocoder, map, addressCallback]);
 
 	return <></>;
 }

@@ -1,8 +1,8 @@
 "use client";
 
+import { responsiveClasses } from "@/lib/utils/responsive";
 import React, { forwardRef, useState } from "react";
 import { FaExclamationCircle } from "react-icons/fa";
-import { responsiveClasses } from "@/lib/utils/responsive";
 
 export interface TextAreaProps
 	extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
@@ -36,7 +36,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 			value,
 			...props
 		},
-		ref,
+		ref
 	) => {
 		const [isFocused, setIsFocused] = useState(false);
 
@@ -93,15 +93,20 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 		// Calculate rows based on constraints
 		const getRows = () => {
 			if (props.rows) return props.rows;
-			return Math.max(minRows, maxRows ? Math.min(minRows, maxRows) : minRows);
+			return Math.max(
+				minRows,
+				maxRows ? Math.min(minRows, maxRows) : minRows
+			);
 		};
 
 		return (
-			<div className={`form-control ${fullWidth ? "w-full" : "w-auto"}`}>
+			<div className={`${fullWidth ? "w-full" : "w-auto"}`}>
 				{label && (
 					<label className={labelClasses}>
 						{label}
-						{props.required && <span className="text-red-500 ml-1">*</span>}
+						{props.required && (
+							<span className="text-red-500 ml-1">*</span>
+						)}
 					</label>
 				)}
 
@@ -109,8 +114,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 				{helperText && !error && (
 					<div className="mb-1">
 						<span
-							className={`${responsiveClasses.text.caption} text-primary-content/40 text-sm`}
-						>
+							className={`${responsiveClasses.text.caption} text-primary-content/40 text-sm`}>
 							{helperText}
 						</span>
 					</div>
@@ -140,7 +144,9 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 				{error && (
 					<div className="flex items-center gap-1 mt-1 text-red-600">
 						<FaExclamationCircle size={12} />
-						<span className={responsiveClasses.text.caption}>{error}</span>
+						<span className={responsiveClasses.text.caption}>
+							{error}
+						</span>
 					</div>
 				)}
 
@@ -149,9 +155,10 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 					<div className="mt-1">
 						<span
 							className={`${responsiveClasses.text.caption} ${
-								characterCount >= maxLength ? "text-red-600" : "text-yellow-600"
-							}`}
-						>
+								characterCount >= maxLength
+									? "text-red-600"
+									: "text-yellow-600"
+							}`}>
 							{characterCount >= maxLength
 								? "Maximum character limit reached"
 								: `Approaching character limit (${characterCount}/${maxLength})`}
@@ -160,7 +167,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 				)}
 			</div>
 		);
-	},
+	}
 );
 
 TextArea.displayName = "TextArea";

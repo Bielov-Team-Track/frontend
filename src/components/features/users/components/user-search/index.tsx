@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import { Input } from "@/components/ui";
 import Avatar from "@/components/ui/avatar";
 import { UserProfile } from "@/lib/models/User";
-import { search as searchUsers } from "@/lib/requests/user";
-import { Input } from "@/components/ui";
+import { searchUsers } from "@/lib/requests/user";
+import React, { useState } from "react";
 
 type UserSearchProps = {
 	onUserSelect: (userProfile: UserProfile) => void;
@@ -36,8 +36,7 @@ const UserSearch = ({ onUserSelect }: UserSearchProps) => {
 						<div
 							key={user.userId}
 							onClick={() => onUserSelect && onUserSelect(user)}
-							className="flex gap-2 p-2 items-center cursor-pointer hover:bg-primary/10 rounded-lg"
-						>
+							className="flex gap-2 p-2 items-center cursor-pointer hover:bg-primary/10 rounded-lg">
 							<Avatar profile={user} />
 							<span>
 								{user.name} {user.surname}

@@ -1,32 +1,31 @@
+import { Button } from "@/components/ui";
+import { Event } from "@/lib/models/Event";
 import {
 	addWeeks,
+	differenceInMinutes,
 	eachDayOfInterval,
 	endOfWeek,
 	format,
 	getHours,
 	getMinutes,
+	isSameDay,
 	isToday,
 	startOfWeek,
 	subWeeks,
-	isSameDay,
-	differenceInMinutes,
-	parseISO,
 } from "date-fns";
-import { useState, useEffect, useRef } from "react";
-import { ViewComponentProps } from "./ViewProps";
-import { Button } from "@/components/ui";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
-import { Event } from "@/lib/models/Event";
+import { ViewComponentProps } from "./ViewProps";
 
 const HOUR_HEIGHT = 40;
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 function WeekView({ events, date, scrollToNow }: ViewComponentProps) {
 	const [currentDate, setCurrentDate] = useState(date);
-	const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(
-		null,
-	);
+	const [slideDirection, setSlideDirection] = useState<
+		"left" | "right" | null
+	>(null);
 	const [shouldScroll, setShouldScroll] = useState(false);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const now = new Date();
@@ -46,7 +45,11 @@ function WeekView({ events, date, scrollToNow }: ViewComponentProps) {
 
 	// Trigger scroll after animation completes (for week navigation only)
 	useEffect(() => {
-		if (slideDirection === null && shouldScroll && scrollContainerRef.current) {
+		if (
+			slideDirection === null &&
+			shouldScroll &&
+			scrollContainerRef.current
+		) {
 			setShouldScroll(false);
 
 			// Calculate scroll position based on week's events
@@ -66,7 +69,8 @@ function WeekView({ events, date, scrollToNow }: ViewComponentProps) {
 				});
 
 				const eventStart = new Date(earliestEvent.startTime);
-				const startMinutes = getHours(eventStart) * 60 + getMinutes(eventStart);
+				const startMinutes =
+					getHours(eventStart) * 60 + getMinutes(eventStart);
 				const eventPosition = (startMinutes / 60) * HOUR_HEIGHT;
 
 				// Scroll to show the earliest event with some padding
@@ -109,8 +113,7 @@ function WeekView({ events, date, scrollToNow }: ViewComponentProps) {
 					mode="wait"
 					initial={false}
 					custom={slideDirection}
-					onExitComplete={() => setSlideDirection(null)}
-				>
+					onExitComplete={() => setSlideDirection(null)}>
 					<motion.div
 						key={weekStart.toISOString()}
 						custom={slideDirection}
@@ -120,8 +123,8 @@ function WeekView({ events, date, scrollToNow }: ViewComponentProps) {
 									direction === "left"
 										? "5%"
 										: direction === "right"
-											? "-5%"
-											: 0,
+										? "-5%"
+										: 0,
 								opacity: 0.3,
 							}),
 							center: {
@@ -133,8 +136,8 @@ function WeekView({ events, date, scrollToNow }: ViewComponentProps) {
 									direction === "left"
 										? "-5%"
 										: direction === "right"
-											? "5%"
-											: 0,
+										? "5%"
+										: 0,
 								opacity: 0.3,
 							}),
 						}}
@@ -145,8 +148,7 @@ function WeekView({ events, date, scrollToNow }: ViewComponentProps) {
 							duration: 0.15,
 							ease: "easeInOut",
 						}}
-						className="flex-1 flex flex-col min-h-0"
-					>
+						className="flex-1 flex flex-col min-h-0">
 						<DaysHeader days={weekDays} />
 
 						<TimeGrid
@@ -180,19 +182,24 @@ function WeekNavigation({
 	onNext: () => void;
 }) {
 	return (
-		<div className="flex items-center mb-4">
-			<Button
-				size="sm"
-				variant="ghost"
-				color="neutral"
-				onClick={onPrev}
-				className="px-3 py-1"
-			>
-				<FaChevronLeft />
-			</Button>
-			<Button onClick={onNext} variant="ghost" color="neutral" size="sm">
-				<FaChevronRight />
-			</Button>
+		<div className="flex gap-2 items-center mb-4">
+			<div>
+				<Button
+					size="sm"
+					variant="ghost"
+					color="neutral"
+					onClick={onPrev}
+					className="px-3 py-1">
+					<FaChevronLeft />
+				</Button>
+				<Button
+					onClick={onNext}
+					variant="ghost"
+					color="neutral"
+					size="sm">
+					<FaChevronRight />
+				</Button>
+			</div>
 			<span className="text-foreground-content font-semibold">
 				{start.getMonth() != end.getMonth()
 					? format(start, "MMMM") + " - " + format(end, "MMMM yyyy")
@@ -210,12 +217,13 @@ function DaysHeader({ days }: { days: Date[] }) {
 				{days.map((day) => (
 					<div
 						key={day.toISOString()}
-						className={`text-foreground-content text-center p-2  rounded ${
-							isToday(day) && "border border-accent bg-accent/10"
-						}`}
-					>
-						<div className="text-sm">{format(day, "d")}</div>
-						<div className="font-semibold">{format(day, "EEE")}</div>
+						className={`text-foreground-content text-center p-2 rounded ${
+							isToday(day) && "bg-accent/10"
+						}`}>
+						<div>{format(day, "d")}</div>
+						<div className="font-semibold">
+							{format(day, "EEE")}
+						</div>
 					</div>
 				))}
 			</div>
@@ -242,8 +250,7 @@ function TimeGrid({
 		<div className="flex-1 flex overflow-hidden">
 			<div
 				ref={scrollRef}
-				className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-foreground-content/20 scrollbar-track-transparent"
-			>
+				className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-foreground-content/20 scrollbar-track-transparent">
 				<div className="flex">
 					<HoursColumn hours={hours} hourHeight={hourHeight} />
 					<DaysGrid
@@ -272,8 +279,7 @@ function HoursColumn({
 				<div
 					key={hour}
 					style={{ height: hourHeight }}
-					className="flex items-start justify-end pr-2 text-foreground-content/60 text-xs border-b border-muted/20"
-				>
+					className="flex items-start justify-end pr-2 text-foreground-content/60 text-xs border-b border-muted/20">
 					{format(new Date().setHours(hour, 0, 0, 0), "ha")}
 				</div>
 			))}
@@ -304,8 +310,12 @@ function DaysGrid({
 			.map((event) => {
 				const eventStart = new Date(event.startTime);
 				const eventEnd = new Date(event.endTime);
-				const startMinutes = getHours(eventStart) * 60 + getMinutes(eventStart);
-				const durationMinutes = differenceInMinutes(eventEnd, eventStart);
+				const startMinutes =
+					getHours(eventStart) * 60 + getMinutes(eventStart);
+				const durationMinutes = differenceInMinutes(
+					eventEnd,
+					eventStart
+				);
 
 				return {
 					event,
@@ -321,7 +331,9 @@ function DaysGrid({
 				const dayEvents = getEventsForDay(day);
 
 				return (
-					<div key={day.toISOString()} className="flex flex-col relative">
+					<div
+						key={day.toISOString()}
+						className="flex flex-col relative">
 						{hours.map((hour) => (
 							<div
 								key={`${day.toISOString()}-${hour}`}
@@ -335,11 +347,18 @@ function DaysGrid({
 							<div
 								key={event.id}
 								className="absolute left-1 right-1 bg-primary text-primary-content rounded px-1 py-0.5 text-xs overflow-hidden z-20 cursor-pointer hover:brightness-110"
-								style={{ top: `${top}px`, height: `${Math.max(height, 20)}px` }}
-							>
-								<div className="font-semibold truncate">{event.name}</div>
+								style={{
+									top: `${top}px`,
+									height: `${Math.max(height, 20)}px`,
+								}}>
+								<div className="font-semibold truncate">
+									{event.name}
+								</div>
 								<div className="text-[10px] opacity-80">
-									{format(new Date(event.startTime), "h:mm a")}
+									{format(
+										new Date(event.startTime),
+										"h:mm a"
+									)}
 								</div>
 							</div>
 						))}
@@ -348,11 +367,12 @@ function DaysGrid({
 						{isToday(day) && (
 							<div
 								className="absolute left-0 right-0 h-0.5 bg-accent z-10"
-								style={{ top: `${currentTime.position}px` }}
-							>
+								style={{ top: `${currentTime.position}px` }}>
 								<span className="text-accent absolute -top-4 right-1 text-xs">
 									{currentTime.hour}:
-									{currentTime.minutes.toString().padStart(2, "0")}
+									{currentTime.minutes
+										.toString()
+										.padStart(2, "0")}
 								</span>
 								<div className="absolute -left-1 -top-1 w-2 h-2 rounded-full bg-accent" />
 							</div>
