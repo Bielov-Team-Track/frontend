@@ -1,4 +1,4 @@
-import { Avatar, Button, Loader } from "@/components";
+import { Avatar, Button, Input, Loader } from "@/components";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Chat } from "@/lib/models/Messages";
 import { UserProfile } from "@/lib/models/User";
@@ -9,17 +9,17 @@ import {
 	Camera,
 	Check,
 	ChevronRight,
-	Search,
 	Users,
 	X,
 } from "lucide-react";
 import React, { useState } from "react";
+import { FaMagnifyingGlass } from "react-icons/fa6";
 
 interface NewChatModalProps {
 	onChatCreated?: (chat: Chat) => void;
 }
 
-export default function NewChatModal({ onChatCreated }: NewChatModalProps) {
+export default function NewChat({ onChatCreated }: NewChatModalProps) {
 	const [mode, setMode] = useState<"direct" | "group">("direct");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedUsers, setSelectedUsers] = useState<UserProfile[]>([]);
@@ -35,10 +35,6 @@ export default function NewChatModal({ onChatCreated }: NewChatModalProps) {
 	// Search users via API
 	const searchUsers = (term: string) => {
 		setSearchError(null);
-		if (term.length < 3) {
-			setUsers([]);
-			return;
-		}
 		setIsSearching(true);
 
 		searchUsersAPI(term)
@@ -187,16 +183,17 @@ export default function NewChatModal({ onChatCreated }: NewChatModalProps) {
 
 			{/* Search Bar */}
 			<div className="relative mb-3">
-				<Search
-					className="absolute left-3 top-2.5 text-gray-500"
-					size={18}
-				/>
-				<input
+				<Input
 					type="text"
+					leftIcon={
+						<FaMagnifyingGlass
+							className="absolute left-3 top-2.5 text-gray-500"
+							size={18}
+						/>
+					}
 					value={searchQuery}
 					onChange={(e) => handleSearchChange(e.target.value)}
 					placeholder="Search players..."
-					className="w-full bg-black/20 border border-white/5 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-white/20"
 				/>
 			</div>
 
@@ -211,12 +208,6 @@ export default function NewChatModal({ onChatCreated }: NewChatModalProps) {
 				{searchError && (
 					<div className="text-center py-8 text-error text-sm">
 						{searchError}
-					</div>
-				)}
-
-				{!isSearching && !searchError && searchQuery.length < 3 && (
-					<div className="text-center py-8 text-gray-500 text-sm">
-						Type at least 3 characters to search
 					</div>
 				)}
 
@@ -305,7 +296,7 @@ export default function NewChatModal({ onChatCreated }: NewChatModalProps) {
 
 			{/* --- FOOTER (Group Mode Only) --- */}
 			{mode === "group" && (
-				<div className="pt-4 border-t border-white/10 mt-4">
+				<div className="pt-4 border-t border-white/20 mt-4">
 					<Button
 						onClick={handleCreateGroup}
 						disabled={

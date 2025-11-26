@@ -14,7 +14,7 @@ const buttonVariants = cva(
 					"bg-transparent border-2 hover:shadow-sm active:scale-[0.98]",
 				ghost: "hover:shadow-sm active:scale-[0.98]",
 				link: "bg-transparent p-0 underline decoration-2 underline-offset-2 active:scale-[0.98]",
-				icon: "bg-transparent p-2 hover:shadow-sm active:scale-[0.98]",
+				icon: "bg-transparent py-2 !px-2 rounded-xl hover:bg-white/5 active:scale-[0.98]",
 			},
 			color: {
 				primary: "",
@@ -199,12 +199,12 @@ const buttonVariants = cva(
 			{
 				variant: "icon",
 				color: "accent",
-				class: "text-accent hover:bg-accent/10 focus:bg-accent/10 focus:ring-accent/50",
+				class: "bg-accent text-white hover:bg-accent/90",
 			},
 			{
 				variant: "icon",
 				color: "neutral",
-				class: "hover:bg-white/10 focus:bg-neutral/10 focus:ring-neutral/50",
+				class: "text-gray-400 hover:text-white hover:bg-white/5",
 			},
 			{
 				variant: "icon",

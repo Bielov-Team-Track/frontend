@@ -1,21 +1,28 @@
-import { Button, TextArea } from "@/components";
+import { Button } from "@/components";
 import { Chat, Message } from "@/lib/models/Messages";
+import { Image as ImageIcon, Info, Paperclip, Send, Smile } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FaEllipsisV } from "react-icons/fa";
-import { FaPaperPlane } from "react-icons/fa6";
+import ChatInfoPanel from "./ChatInfoPanel";
 import MessageComponent from "./Message";
 
 type ChatWindowProps = {
 	chat: Chat;
 	messages: Message[];
 	onSendMessage: (text: string) => Promise<void>;
-    onViewChatInfo: () => void;
+	onViewChatInfo: () => void;
+	onChatUpdated: (chatId: string) => void;
 };
 
-const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo }: ChatWindowProps) => {
+const ChatWindow = ({
+	chat,
+	messages,
+	onSendMessage,
+	onViewChatInfo,
+	onChatUpdated,
+}: ChatWindowProps) => {
 	const [messageText, setMessageText] = useState("");
 	const [isSending, setIsSending] = useState(false);
-	const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Controlled dropdown
+	const [showInfoPanel, setShowInfoPanel] = useState(false);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -24,26 +31,10 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo }: ChatWindo
 		messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
 	}, [messages]);
 
-    // Reset input when chat changes
-    useEffect(() => {
-        setMessageText("");
-    }, [chat.id]);
-
-	// Handle outside click for dropdown
+	// Reset input when chat changes
 	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				dropdownRef.current &&
-				!dropdownRef.current.contains(event.target as Node)
-			) {
-				setIsDropdownOpen(false);
-			}
-		};
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, []);
+		setMessageText("");
+	}, [chat.id]);
 
 	const handleSend = async () => {
 		if (!messageText.trim() || isSending) return;
@@ -64,71 +55,39 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo }: ChatWindo
 		}
 	};
 
-    const sortedMessages = useMemo(() => {
-        return [...messages].sort(
-            (m1, m2) => new Date(m1.sentAt).getTime() - new Date(m2.sentAt).getTime()
-        );
-    }, [messages]);
+	const sortedMessages = useMemo(() => {
+		return [...messages].sort(
+			(m1, m2) =>
+				new Date(m1.sentAt).getTime() - new Date(m2.sentAt).getTime()
+		);
+	}, [messages]);
 
 	return (
-		<div className="flex flex-col h-full">
+		<div className="relative flex flex-col h-full overflow-hidden">
 			{/* Header */}
-			<div className="flex justify-between items-center h-16 bg-background-dark flex-shrink-0 px-4 border-b border-muted/10">
-				<span className="font-bold truncate">{chat.title}</span>
-				<div className={`dropdown dropdown-end ${isDropdownOpen ? "dropdown-open" : ""}`} ref={dropdownRef}>
+			<div className="flex justify-between items-center h-20 bg-background-dark flex-shrink-0 px-6 border-b border-white/5">
+				<div className="flex items-center gap-4">
+					<span className="font-bold text-lg truncate">
+						{chat.title}
+					</span>
+					<p className="text-xs text-gray-400">
+						{chat.participantIds?.length > 2
+							? `${chat.participantIds.length} participants`
+							: "Active now"}
+					</p>
+				</div>
+
+				<div className="flex items-center gap-4 text-gray-400">
 					<Button
-						leftIcon={<FaEllipsisV />}
-						variant={"icon"}
-						color={"neutral"}
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+						variant="icon"
+						color="neutral"
+						leftIcon={<Info size={20} />}
+						onClick={() => setShowInfoPanel(!showInfoPanel)}
+						className={
+							showInfoPanel ? "bg-accent/10 !text-accent" : ""
+						}
+						title="Chat details"
 					/>
-					{isDropdownOpen && (
-						<ul className="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52 absolute right-0 top-full z-50 mt-2">
-							<li>
-								<button type="button" className="text-left" onClick={(e) => { 
-                                    e.stopPropagation(); // Prevent bubbling
-                                    setIsDropdownOpen(false); 
-                                    onViewChatInfo(); 
-                                }}>
-									View chat info
-								</button>
-							</li>
-							<li>
-								<a onClick={() => setIsDropdownOpen(false)}>
-									Mute notifications
-								</a>
-							</li>
-							<li>
-								<a onClick={() => setIsDropdownOpen(false)}>
-									Search in chat
-								</a>
-							</li>
-							<li>
-								<a onClick={() => setIsDropdownOpen(false)}>
-									Pin chat
-								</a>
-							</li>
-							<li className="border-t border-muted/20 mt-2 pt-2">
-								<a onClick={() => setIsDropdownOpen(false)}>
-									Clear chat history
-								</a>
-							</li>
-							<li>
-								<a
-									onClick={() => setIsDropdownOpen(false)}
-									className="text-warning">
-									Leave chat
-								</a>
-							</li>
-							<li>
-								<a
-									onClick={() => setIsDropdownOpen(false)}
-									className="text-error">
-									Delete chat
-								</a>
-							</li>
-						</ul>
-					)}
 				</div>
 			</div>
 
@@ -137,9 +96,7 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo }: ChatWindo
 				{sortedMessages.map((message) => (
 					<MessageComponent
 						type={
-							chat.participantIds?.length > 2
-								? "group"
-								: "direct"
+							chat.participantIds?.length > 2 ? "group" : "direct"
 						}
 						message={message}
 						key={message.id}
@@ -149,29 +106,60 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo }: ChatWindo
 			</div>
 
 			{/* Input Area */}
-			<div className="p-4 border-t border-muted/20 flex-shrink-0 bg-background-dark/50">
-				<div className="flex items-end gap-2">
-					<TextArea
-						minRows={1}
-						maxRows={4}
-						textAreaSize="sm"
-						placeholder="Type a message..."
+			<div className="p-4 flex-shrink-0">
+				<div className="max-w-4xl mx-auto bg-[#161616] border border-white/10 rounded-2xl p-2 flex items-end gap-2 shadow-lg">
+					<Button
+						variant="icon"
+						color="neutral"
+						leftIcon={<Paperclip size={20} />}
+					/>
+					<textarea
 						value={messageText}
 						onChange={(e) => setMessageText(e.target.value)}
 						onKeyDown={handleKeyDown}
+						placeholder="Type a message..."
+						className="flex-1 bg-transparent text-white text-sm placeholder-gray-500 resize-none outline-none py-2 max-h-32"
+						rows={1}
 						disabled={isSending}
-                        className="flex-1"
 					/>
-					<Button
-						onClick={handleSend}
-						variant={"icon"}
-						color={"neutral"}
-						leftIcon={<FaPaperPlane />}
-						loading={isSending}
-						disabled={isSending || !messageText.trim()}
-					/>
+					<div className="flex items-center gap-1">
+						<Button
+							variant="icon"
+							color="neutral"
+							leftIcon={<ImageIcon size={20} />}
+						/>
+						<Button
+							variant="icon"
+							color="neutral"
+							leftIcon={<Smile size={20} />}
+						/>
+						<Button
+							onClick={handleSend}
+							disabled={isSending || !messageText.trim()}
+							variant="icon"
+							color={messageText.trim() ? "accent" : "neutral"}
+							loading={isSending}
+							leftIcon={
+								<Send
+									size={18}
+									className={
+										messageText.trim() ? "ml-0.5" : ""
+									}
+								/>
+							}
+							className="ml-2"
+						/>
+					</div>
 				</div>
 			</div>
+
+			{/* Info Panel Overlay */}
+			<ChatInfoPanel
+				chat={chat}
+				isOpen={showInfoPanel}
+				onClose={() => setShowInfoPanel(false)}
+				onChatUpdated={onChatUpdated}
+			/>
 		</div>
 	);
 };

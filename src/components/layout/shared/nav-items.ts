@@ -20,11 +20,21 @@ export interface NavigationItem {
 	href: string;
 	icon: React.ComponentType<any>;
 	subItems?: NavigationSubItem[];
+	badge?: number | (() => number); // Support static number or dynamic function
 }
 
-export const navigationItems: NavigationItem[] = [
+/**
+ * Creates navigation items with dynamic badge support
+ * @param unreadMessageCount - Current unread message count from store
+ */
+export const getNavigationItems = (unreadMessageCount: number): NavigationItem[] => [
 	{ name: "Events", href: "/dashboard/events", icon: FaCalendar },
-	{ name: "Messages", href: "/dashboard/messages", icon: FaEnvelope },
+	{
+		name: "Messages",
+		href: "/dashboard/messages",
+		icon: FaEnvelope,
+		badge: unreadMessageCount
+	},
 	{ name: "Audit", href: "/dashboard/audit", icon: FaChartPie },
 	{
 		name: "Settings",
@@ -40,3 +50,6 @@ export const navigationItems: NavigationItem[] = [
 		],
 	},
 ];
+
+// Export static version for backwards compatibility
+export const navigationItems: NavigationItem[] = getNavigationItems(0);

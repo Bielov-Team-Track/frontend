@@ -28,14 +28,14 @@ const Chat = ({ chat, active, onClick }: ChatProps) => {
 					<FaEnvelope />
 				</div>
 			)}
-			<div className="flex flex-col flex-1 min-w-0">
+			<div className="flex flex-col flex-1 min-w-0 gap-1">
 				<span className="truncate block">{chat.title}</span>
 				<span
 					className={classNames(
 						"text-sm text-muted text-ellipsis overflow-hidden whitespace-nowrap",
 						chat.unreadCount > 0 && "font-bold"
 					)}>
-					{chat.lastMessage?.content ?? "lorem ipsum dolor sit amet"}
+					{chat.lastMessage?.content}
 				</span>
 			</div>
 			{chat.unreadCount > 0 && (

@@ -1,9 +1,7 @@
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_API_V1, PROFILES_API_V1 } from "./lib/constants";
 
-// Public routes that don't require authentication
-const publicRoutes = [
+const PUBLIC_ROUTES = [
 	"/login",
 	"/sign-up",
 	"/forgot-password",
@@ -13,48 +11,38 @@ const publicRoutes = [
 	"/verify-email",
 	"/privacy-policy",
 	"/terms-of-service",
-	"/_next",
-	"/api",
-	"/favicon.ico",
-	"/events",
-	"/.well-known",
 	"/error",
 ];
 
-// Routes that require authentication but not complete profile
-const profileSetupRoute = "/complete-profile-setup";
+const PROFILE_SETUP_ROUTE = "/complete-profile-setup";
 
-export default async function authMiddleware(request: NextRequest) {
-	const { pathname } = request.nextUrl;
-	console.log("Middleware - checking path:", pathname);
+// Cookie options - Centralized to ensure consistency
+const COOKIE_OPTIONS = {
+	path: "/",
+	sameSite: "lax" as const,
+	httpOnly: true,
+	secure: process.env.NODE_ENV === "production",
+};
 
-	// Check if it's a public route
-	const isPublicRoute = publicRoutes.some(
-		(route) => pathname.startsWith(route) || pathname === "/"
-	);
-
-	if (isPublicRoute) {
-		console.log("Middleware - public route, allowing");
-		return NextResponse.next();
-	}
-
-	// Check if it's a profile setup route
-	const isProfileSetupRoute = pathname.startsWith(profileSetupRoute);
-
-	// Check for authentication token in cookies
-	const cookieStore = cookies();
-	const token = (await cookieStore).get("token")?.value;
-
-	if (!token) {
-		console.log("Middleware - no token, redirecting to login");
-		return NextResponse.redirect(new URL("/login", request.url));
-	}
-
-	console.log("Middleware - token found, validating");
-
-	// Verify token using the new auth endpoint
+// Helper: Refresh Token
+async function refreshAccessToken(refreshToken: string) {
 	try {
-		//TODO: change to request from lib/client.ts
+		const response = await fetch(`${AUTH_API_V1}/auth/refresh`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ refreshToken }),
+		});
+
+		if (!response.ok) return null;
+		return await response.json(); // { token, refreshToken }
+	} catch (error) {
+		return null;
+	}
+}
+
+// Helper: Validate Token
+async function validateToken(token: string) {
+	try {
 		const response = await fetch(`${AUTH_API_V1}/auth/validate`, {
 			method: "POST",
 			headers: {
@@ -62,115 +50,138 @@ export default async function authMiddleware(request: NextRequest) {
 				"Content-Type": "application/json",
 			},
 		});
-		if (!response.ok) {
-			const loginUrl = new URL("/login", request.url);
-			const redirectResponse = NextResponse.redirect(loginUrl);
-
-			redirectResponse.cookies.delete("token");
-			return redirectResponse;
-		}
-		const result = await response.json();
-
-		if (!result.isValid) {
-			console.log("Middleware - token invalid, redirecting to login");
-			const loginUrl = new URL("/login", request.url);
-			const redirectResponse = NextResponse.redirect(loginUrl);
-
-			redirectResponse.cookies.delete("token");
-			return redirectResponse;
-		}
-
-		console.log(
-			"Middleware - token valid, email verified:",
-			result.isEmailVerified
-		);
-
-		if (!result.isEmailVerified && pathname !== "/verify-email") {
-			console.log(
-				"Middleware - email not verified, redirecting to verification-sent"
-			);
-			const emailVerificationUrl = new URL(
-				"/email-verification",
-				request.url
-			);
-			return NextResponse.redirect(emailVerificationUrl);
-		}
-
-		// Check profile completeness for non-setup routes
-		if (!isProfileSetupRoute) {
-			console.log("Middleware - checking profile completeness");
-			try {
-				const profileResponse = await fetch(
-					`${PROFILES_API_V1}/profiles/me`,
-					{
-						method: "GET",
-						headers: {
-							Authorization: `Bearer ${token}`,
-							"Content-Type": "application/json",
-						},
-					}
-				);
-
-				if (profileResponse.ok) {
-					const profile = await profileResponse.json();
-					console.log("Middleware - profile data:", profile);
-
-					// Check if profile is complete (has name and surname)
-					const isProfileComplete = profile.name && profile.surname;
-
-					if (!isProfileComplete) {
-						console.log(
-							"Middleware - profile incomplete, redirecting to profile setup"
-						);
-						const profileSetupUrl = new URL(
-							profileSetupRoute,
-							request.url
-						);
-						console.log(
-							"Redirecting to:",
-							profileSetupUrl.toString()
-						);
-						return NextResponse.redirect(profileSetupUrl);
-					}
-				} else {
-					console.log(
-						"Middleware - failed to fetch profile, status:",
-						profileResponse.status
-					);
-					const errorUrl = new URL("/error", request.url);
-					return NextResponse.rewrite(errorUrl);
-				}
-			} catch (profileError) {
-				console.log("Middleware - profile check error:", profileError);
-				const profileSetupUrl = new URL(profileSetupRoute, request.url);
-				return NextResponse.redirect(profileSetupUrl);
-			}
-		}
-
-		// User is authenticated, email verified, and profile complete (or on setup route)
-		console.log("Middleware - all checks passed, allowing access");
-		return NextResponse.next();
+		if (!response.ok) return null;
+		return await response.json();
 	} catch (error) {
-		console.log("Auth middleware error:", error);
-		// On error, redirect to login and clear token
-		const loginUrl = new URL("/login", request.url);
-		const redirectResponse = NextResponse.redirect(loginUrl);
-		redirectResponse.cookies.delete("token");
-		return redirectResponse;
+		return null;
 	}
+}
+
+export default async function authMiddleware(request: NextRequest) {
+	const { pathname } = request.nextUrl;
+
+	// 1. Bypass Public Routes
+	if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
+		return NextResponse.next();
+	}
+
+	// 2. Get Tokens
+	const token = request.cookies.get("token")?.value;
+	const refreshToken = request.cookies.get("refreshToken")?.value;
+
+	let accessToken = token;
+	let newTokens = null;
+	let tokenWasRefreshed = false;
+
+	// 3. Initial Token Check & Refresh
+	// If we have no access token but have a refresh token, OR if we assume it might be expired
+	if (!accessToken && refreshToken) {
+		newTokens = await refreshAccessToken(refreshToken);
+		if (newTokens) {
+			accessToken = newTokens.token;
+			tokenWasRefreshed = true;
+		}
+	}
+
+	// 4. Validate Access Token (Existing or Refreshed)
+	let validation = accessToken ? await validateToken(accessToken) : null;
+
+	// 5. Secondary Refresh (If token existed but was invalid/expired)
+	if (!validation?.isValid && refreshToken && !tokenWasRefreshed) {
+		console.log("Middleware - Token invalid, attempting refresh...");
+		newTokens = await refreshAccessToken(refreshToken);
+		if (newTokens) {
+			accessToken = newTokens.token;
+			tokenWasRefreshed = true;
+			validation = await validateToken(accessToken);
+		}
+	}
+
+	// 6. Final Authentication Check
+	if (!validation?.isValid) {
+		// If validation fails after all attempts, redirect to login
+		// We strictly clear cookies here to prevent loop issues
+		const response = NextResponse.redirect(new URL("/login", request.url));
+		response.cookies.delete("token");
+		response.cookies.delete("refreshToken");
+		return response;
+	}
+
+	// =========================================================================
+	// CRITICAL SECTION: HANDLING REQUEST MUTATION
+	// =========================================================================
+
+	// If we refreshed the token, we MUST update the request headers/cookies
+	// so that Server Components (or the downstream API) see the NEW token immediately.
+	if (tokenWasRefreshed && accessToken) {
+		request.cookies.set("token", accessToken);
+		request.cookies.set("refreshToken", newTokens.refreshToken);
+		request.headers.set("Authorization", `Bearer ${accessToken}`);
+	}
+
+	// 7. Check Profile Completeness
+	let response: NextResponse;
+	const isProfileSetupRoute = pathname.startsWith(PROFILE_SETUP_ROUTE);
+
+	// Use the (potentially new) accessToken for the profile check
+	const profileResponse = await fetch(`${PROFILES_API_V1}/profiles/me`, {
+		headers: { Authorization: `Bearer ${accessToken}` },
+	});
+
+	if (profileResponse.ok) {
+		const profile = await profileResponse.json();
+		const isProfileComplete = profile.name && profile.surname;
+
+		if (!isProfileComplete && !isProfileSetupRoute) {
+			response = NextResponse.redirect(
+				new URL(PROFILE_SETUP_ROUTE, request.url)
+			);
+		} else {
+			// Pass the updated request headers to next()
+			response = NextResponse.next({
+				request: {
+					headers: request.headers,
+				},
+			});
+		}
+	} else {
+		// If profile fetch fails but auth is valid, usually allow or show error
+		// Here we allow, or you could redirect to an error page
+		response = NextResponse.next({
+			request: {
+				headers: request.headers,
+			},
+		});
+	}
+
+	// 8. Email Verification Redirect
+	if (!validation.isEmailVerified && pathname !== "/verify-email") {
+		response = NextResponse.redirect(
+			new URL("/email-verification", request.url)
+		);
+	}
+
+	// =========================================================================
+	// CRITICAL SECTION: SETTING COOKIES ON FINAL RESPONSE
+	// =========================================================================
+
+	// If we refreshed the token, we MUST apply the Set-Cookie header to the
+	// FINAL response object (whether it's a redirect or a next()).
+	if (tokenWasRefreshed && newTokens) {
+		console.log("Middleware - Setting new cookies on response");
+		response.cookies.set("token", newTokens.token, COOKIE_OPTIONS);
+		response.cookies.set(
+			"refreshToken",
+			newTokens.refreshToken,
+			COOKIE_OPTIONS
+		);
+	}
+
+	return response;
 }
 
 export const config = {
 	matcher: [
-		/*
-		 * Match all request paths except for the ones starting with:
-		 * - api (API routes)
-		 * - _next/static (static files)
-		 * - _next/image (image optimization files)
-		 * - _next/webpack-hmr (webpack hot module reload)
-		 * - favicon.ico (favicon file)
-		 * - static assets (css, js, images, etc.)
-		 */
 		"/((?!api|_next/static|_next/image|_next/webpack-hmr|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js|ico|woff|woff2|ttf|eot)$).*)",
 	],
 };

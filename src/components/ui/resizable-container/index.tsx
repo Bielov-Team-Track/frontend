@@ -17,7 +17,7 @@ const ResizableContainer = ({
 	initialWidth = 384,
 	minWidth = 250,
 	maxWidth = 600,
-	dividerClassName = "w-1 bg-border hover:bg-primary cursor-col-resize transition-colors",
+	dividerClassName = "w-1 bg-border hover:bg-primary cursor-col-resize transition-colors z-10",
 }: ResizableContainerProps) => {
 	const [sidebarWidth, setSidebarWidth] = useState(initialWidth);
 	const [isResizing, setIsResizing] = useState(false);
@@ -57,14 +57,14 @@ const ResizableContainer = ({
 
 	return (
 		<div
-			className="flex h-full"
+			className="flex h-full isolate"
 			style={{
 				cursor: isResizing ? "col-resize" : "default",
 				userSelect: isResizing ? "none" : "auto",
 			}}>
 			<div style={{ width: `${sidebarWidth}px` }}>{leftPanel}</div>
 			<div className={dividerClassName} onMouseDown={startResizing} />
-			<div className="flex-1">{rightPanel}</div>
+			<div className="flex-1 -translate-x-1">{rightPanel}</div>
 		</div>
 	);
 };

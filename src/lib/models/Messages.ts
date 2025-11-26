@@ -17,8 +17,10 @@ export interface Chat {
 	id: string;
 	title: string;
 	participantIds: string[];
+	participants: UserProfile[];
 	lastMessage: Message;
 	unreadCount: number;
+	createdAt: Date;
 }
 
 export interface Attachment {

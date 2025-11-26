@@ -16,12 +16,13 @@ function cn(...inputs: ClassValue[]) {
 // 1. Define Variants using CVA
 const inputVariants = cva(
 	// Base classes applied to all inputs
-	"flex w-full rounded-md border transition-colors duration-200 bg-background-light text-muted placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60 file:border-0 file:bg-transparent file:text-sm file:font-medium",
+	// w-full bg-black/20 border border-white/5 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-white/20
+	"flex w-full rounded-md transition-colors duration-200 bg-background-light text-muted placeholder:text-muted/70 focus:outline-none border-white/5 focus:border-white/20 disabled:cursor-not-allowed disabled:opacity-60 file:border-0 file:bg-transparent file:text-sm file:font-medium",
 	{
 		variants: {
 			variant: {
 				default:
-					"border-input focus:border-primary focus:ring-primary/20",
+					"border-input focus:border-white/10 focus:ring-primary/20",
 				bordered:
 					"border-base-content/20 focus:border-primary focus:ring-primary/20",
 				ghost: "border-transparent bg-transparent shadow-none focus:bg-background-light",

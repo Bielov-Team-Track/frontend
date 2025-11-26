@@ -2,11 +2,26 @@
 
 import React from "react";
 import Link from "next/link";
-import { navigationItems } from "./shared/nav-items";
+import { getNavigationItems } from "./shared/nav-items";
 import { useNavigation } from "./shared/useNavigation";
+import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
 
 const MobileNav = () => {
 	const { isItemOrSubItemActive } = useNavigation();
+	const unreadMessageCount = useUnreadMessageCount();
+	const navigationItems = getNavigationItems(unreadMessageCount);
+
+	// Get badge value for a navigation item
+	const getBadgeValue = (item: typeof navigationItems[0]): number | undefined => {
+		if (!item.badge) return undefined;
+
+		// If badge is a function, call it
+		if (typeof item.badge === "function") {
+			return item.badge();
+		}
+
+		return item.badge;
+	};
 
 	// Flatten navigation items for mobile (no nested items in mobile nav)
 	const flattenedItems = navigationItems.flatMap((item) => {
@@ -22,6 +37,7 @@ const MobileNav = () => {
 				{flattenedItems.map((item) => {
 					const Icon = item.icon;
 					const isActive = isItemOrSubItemActive(item);
+					const badgeValue = getBadgeValue(item);
 					return (
 						<Link
 							key={item.name}
@@ -32,7 +48,14 @@ const MobileNav = () => {
 									: "text-muted/70 hover:text-primary hover:bg-primary/5"
 							}`}
 						>
-							<Icon size={18} />
+							<div className="relative">
+								<Icon size={18} />
+								{badgeValue && badgeValue > 0 && (
+									<span className="absolute -top-1 -right-2 flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-white bg-error rounded-full">
+										{badgeValue > 99 ? '99+' : badgeValue}
+									</span>
+								)}
+							</div>
 							<span className="text-xs font-medium">{item.name}</span>
 						</Link>
 					);

@@ -9,6 +9,8 @@ export const MESSAGES_API_URL =
 	process.env.NEXT_PUBLIC_MESSAGES_API_URL || `${API_BASE_URL}messages`;
 export const PROFILES_API_URL =
 	process.env.NEXT_PUBLIC_PROFILES_API_URL || `${API_BASE_URL}profiles`;
+export const CLUBS_API_URL =
+	process.env.NEXT_PUBLIC_CLUBS_API_URL || `${API_BASE_URL}clubs`;
 
 // WebSocket URL
 export const WEBSOCKET_URL =
@@ -18,3 +20,4 @@ export const WEBSOCKET_URL =
 export const AUTH_API_V1 = `${AUTH_API_URL}/v1`;
 export const EVENTS_API_V1 = `${EVENTS_API_URL}/v1`;
 export const PROFILES_API_V1 = `${PROFILES_API_URL}/v1`;
+export const CLUBS_API_V1 = `${CLUBS_API_URL}/v1`;

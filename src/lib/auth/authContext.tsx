@@ -36,6 +36,9 @@ const TOKEN_EXPIRY_STORAGE_KEY = "accessTokenExpiry";
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
+	const [refreshTimerId, setRefreshTimerId] = useState<NodeJS.Timeout | null>(
+		null
+	);
 
 	const isAuthenticated = !!userProfile;
 
@@ -52,12 +55,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		);
 		localStorage.setItem(TOKEN_EXPIRY_STORAGE_KEY, authResponse.expiresAt);
 
-		// Also set in cookie for SSR
-		const cookieValue = `token=${authResponse.token}; path=/; max-age=${
-			15 * 60
-		}; SameSite=Lax`;
-		document.cookie = cookieValue;
-		console.log("Cookie set:", cookieValue.substring(0, 50) + "...");
+		// Calculate token expiration time
+		const expiresAt = new Date(authResponse.expiresAt);
+		const now = new Date();
+		const timeUntilExpiry = expiresAt.getTime() - now.getTime();
+
+		// Set access token cookie to expire at the same time as the token
+		const maxAge = Math.max(0, Math.floor(timeUntilExpiry / 1000));
+		const tokenCookie = `token=${authResponse.token}; path=/; max-age=${maxAge}; SameSite=Lax`;
+		document.cookie = tokenCookie;
+		console.log("Access token cookie set with max-age:", maxAge, "seconds");
+
+		// Set refresh token cookie (with longer expiration, e.g., 7 days)
+		const refreshTokenMaxAge = 7 * 24 * 60 * 60; // 7 days in seconds
+		const refreshTokenCookie = `refreshToken=${authResponse.refreshToken}; path=/; max-age=${refreshTokenMaxAge}; SameSite=Lax`;
+		document.cookie = refreshTokenCookie;
+		console.log(
+			"Refresh token cookie set with max-age:",
+			refreshTokenMaxAge,
+			"seconds"
+		);
+
+		// Schedule proactive token refresh (5 seconds before expiry)
+		const refreshBuffer = 5000; // 5 seconds buffer
+		const refreshIn = Math.max(0, timeUntilExpiry - refreshBuffer);
+
+		console.log(
+			`Scheduling token refresh in ${refreshIn}ms (${refreshIn / 1000}s)`
+		);
+
+		// Clear any existing timer
+		if (refreshTimerId) {
+			clearTimeout(refreshTimerId);
+		}
+
+		// Set new timer for proactive refresh
+		const timerId = setTimeout(() => {
+			console.log("Proactive token refresh triggered");
+			refreshAuth();
+		}, refreshIn);
+
+		setRefreshTimerId(timerId);
 	};
 
 	const clearTokens = () => {
@@ -65,9 +103,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		localStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY);
 		localStorage.removeItem(TOKEN_EXPIRY_STORAGE_KEY);
 
-		// Clear cookie
+		// Clear cookies
 		document.cookie =
 			"token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+		document.cookie =
+			"refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+		// Clear refresh timer
+		if (refreshTimerId) {
+			clearTimeout(refreshTimerId);
+			setRefreshTimerId(null);
+		}
 	};
 
 	const getStoredAccessToken = (): string | null => {
@@ -142,11 +188,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			setUserProfile(userProfile ?? null);
 		} catch (error) {
 			console.error("Token refresh failed:", error);
+			console.error(
+				"Full error details:",
+				JSON.stringify(error, Object.getOwnPropertyNames(error))
+			);
 			clearTokens();
 			setUserProfile(null);
 
 			// Redirect to login on refresh failure
 			if (typeof window !== "undefined") {
+				console.log("Redirecting to login page1");
 				window.location.href = "/login";
 			}
 		}
@@ -190,6 +241,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 		initializeAuth();
 	}, [refreshAuth]);
+
+	// Cleanup timer on unmount
+	useEffect(() => {
+		return () => {
+			if (refreshTimerId) {
+				clearTimeout(refreshTimerId);
+			}
+		};
+	}, [refreshTimerId]);
 
 	const value: AuthContextType = {
 		userProfile,

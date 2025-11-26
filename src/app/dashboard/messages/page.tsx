@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader, Modal, ResizableContainer } from "@/components";
+import { Button, Loader, ResizableContainer } from "@/components";
 import { useAuth } from "@/lib/auth/authContext";
 import { MESSAGES_API_URL } from "@/lib/constants";
 import { Chat, Message } from "@/lib/models/Messages";
@@ -10,16 +10,17 @@ import {
 	getChat,
 	loadConversationsForUser as loadChatsForUser,
 	loadMessagesForChat,
+	markChatAsRead,
 	sendMessage,
 } from "@/lib/requests/messages";
 import { HubConnectionState } from "@microsoft/signalr";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FaChevronLeft } from "react-icons/fa";
 import { FaEnvelope } from "react-icons/fa6";
-import ChatInfoModal from "./components/ChatInfoModal";
 import ChatList from "./components/ChatList";
 import ChatsRealtimeClient from "./components/ChatsRealtimeClient";
 import ChatWindow from "./components/ChatWindow";
-import NewChatModal from "./components/NewChatModal";
+import NewChat from "./components/NewChat";
 
 const MessagesPage = () => {
 	const [error, setError] = useState<string | null>(null);
@@ -34,6 +35,7 @@ const MessagesPage = () => {
 	const [currentChatMessages, setMessages] = useState<Message[]>([]);
 	const [isChatInfoModalOpen, setIsChatInfoModalOpen] = useState(false);
 	const [sendError, setSendError] = useState<string | null>(null);
+	const [messagesAreLoading, setMessagesAreLoading] = useState(false);
 
 	const user = useAuth().userProfile;
 
@@ -120,14 +122,22 @@ const MessagesPage = () => {
 				}
 
 				// Join new chat group
-				await connection.invoke("JoinChatGroup", chat.id);
+				const updated_chat = await connection.invoke(
+					"JoinChatGroup",
+					chat.id
+				);
 				currentChatGroupRef.current = chat.id;
 			}
 
 			// Load chat and messages
+
 			setSelectedChatId(chat.id);
+			setMessagesAreLoading(true);
 			const messages = await loadMessagesForChat(chat.id);
+			const updatedChat = await markChatAsRead(chat.id);
+			upsertChat(updatedChat);
 			setMessages(messages);
+			setMessagesAreLoading(false);
 		} catch (error) {
 			console.error("Failed to select chat:", error);
 			// Still set the chat even if SignalR fails
@@ -219,35 +229,64 @@ const MessagesPage = () => {
 			<ChatsRealtimeClient />
 			<ResizableContainer
 				leftPanel={
-					<ChatList
-						chats={chats}
-						selectedChatId={selectedChat?.id}
-						onSelectChat={selectChat}
-						onCreateChatClick={() => setIsNewChatModalOpen(true)}
-					/>
+					isNewChatModalOpen ? (
+						<div className="p-4 flex flex-col gap-4 h-full bg-black/30">
+							<div>
+								<Button
+									leftIcon={<FaChevronLeft />}
+									size={"sm"}
+									color={"neutral"}
+									variant={"ghost"}
+									onClick={() => {
+										setIsNewChatModalOpen(false);
+									}}
+								/>
+								<span className="font-bold text-2xl">
+									New chat
+								</span>
+							</div>
+							<NewChat onChatCreated={handleOnChatCreated} />
+						</div>
+					) : (
+						<ChatList
+							chats={chats}
+							selectedChatId={selectedChat?.id}
+							onSelectChat={selectChat}
+							onCreateChatClick={() =>
+								setIsNewChatModalOpen(true)
+							}
+						/>
+					)
 				}
 				rightPanel={
 					selectedChat ? (
-						<div className="relative h-full">
-							{sendError && (
-								<div className="absolute top-0 left-0 right-0 z-10 bg-error text-white p-2 text-center text-sm">
-									{sendError}
-									<button
-										onClick={() => setSendError(null)}
-										className="ml-2 underline">
-										Dismiss
-									</button>
-								</div>
-							)}
-							<ChatWindow
-								chat={selectedChat}
-								messages={currentChatMessages}
-								onSendMessage={handleSendMessage}
-								onViewChatInfo={() =>
-									setIsChatInfoModalOpen(true)
-								}
-							/>
-						</div>
+						messagesAreLoading ? (
+							<div className="h-full flex items-center justify-center">
+								<Loader />
+							</div>
+						) : (
+							<div className="relative h-full">
+								{sendError && (
+									<div className="absolute top-0 left-0 right-0 z-10 bg-error text-white p-2 text-center text-sm">
+										{sendError}
+										<button
+											onClick={() => setSendError(null)}
+											className="ml-2 underline">
+											Dismiss
+										</button>
+									</div>
+								)}
+								<ChatWindow
+									chat={selectedChat}
+									messages={currentChatMessages}
+									onSendMessage={handleSendMessage}
+									onViewChatInfo={() =>
+										setIsChatInfoModalOpen(true)
+									}
+									onChatUpdated={handleChatUpdated}
+								/>
+							</div>
+						)
 					) : (
 						<div className="grid h-full place-items-center bg-background">
 							<div className="flex flex-col items-center">
@@ -260,26 +299,6 @@ const MessagesPage = () => {
 					)
 				}
 			/>
-
-			<Modal
-				isOpen={isNewChatModalOpen}
-				title="New Chat"
-				onClose={() => setIsNewChatModalOpen(false)}>
-				<NewChatModal onChatCreated={handleOnChatCreated} />
-			</Modal>
-
-			{selectedChat && (
-				<Modal
-					title={selectedChat.title}
-					isOpen={isChatInfoModalOpen}
-					onClose={() => setIsChatInfoModalOpen(false)}>
-					<ChatInfoModal
-						chat={selectedChat}
-						onClose={() => setIsChatInfoModalOpen(false)}
-						onChatUpdated={handleChatUpdated}
-					/>
-				</Modal>
-			)}
 		</div>
 	);
 };

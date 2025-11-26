@@ -55,13 +55,15 @@ export async function logout(refreshTokenValue: string): Promise<void> {
 	// const endpoint = "/v1/auth/logout"
 	// await client.post(PREFIX + endpoint, { refreshToken: refreshTokenValue })
 
-	// Clear local storage
+	// Clear local storage and cookies
 	if (typeof window !== "undefined") {
 		localStorage.removeItem("accessToken");
 		localStorage.removeItem("refreshToken");
 		localStorage.removeItem("accessTokenExpiry");
 		document.cookie =
 			"token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+		document.cookie =
+			"refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 	}
 }
 

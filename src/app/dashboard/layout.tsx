@@ -9,6 +9,7 @@ import {
 import Head from "next/head";
 import { AuthProvider } from "@/lib/auth/authContext";
 import { Sidebar } from "@/components/layout/";
+import { ClubProvider } from "@/lib/club/ClubContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,19 +39,21 @@ export default async function RootLayout({
 				className={`${inter.className} min-h-screen-safe flex flex-col text-mobile-base sm:text-tablet-base lg:text-desktop-base antialiased`}
 			>
 				<AuthProvider>
-					<ReactQueryProvider>
-						<div className="min-h-screen-safe max-h-screen flex gap-4 sm:p-4">
-							<div className="hidden sm:flex">
-								<Sidebar />
+					<ClubProvider>
+						<ReactQueryProvider>
+							<div className="min-h-screen-safe max-h-screen flex gap-4 sm:p-4">
+								<div className="hidden sm:flex">
+									<Sidebar />
+								</div>
+								<div className="flex flex-col gap-4 flex-1">
+									<DashboardHeader />
+									<main className="flex-0 relative w-full h-full rounded-lg bg-background overflow-y-auto">
+										{children}
+									</main>
+								</div>
 							</div>
-							<div className="flex flex-col gap-4 flex-1">
-								<DashboardHeader />
-								<main className="flex-0 relative w-full h-full rounded-lg bg-background overflow-y-auto">
-									{children}
-								</main>
-							</div>
-						</div>
-					</ReactQueryProvider>
+						</ReactQueryProvider>
+					</ClubProvider>
 				</AuthProvider>
 			</body>
 		</html>

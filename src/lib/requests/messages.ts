@@ -33,6 +33,11 @@ export async function loadMessagesForChat(chatId: string): Promise<Message[]> {
 	return (await client.get(PREFIX + endpoint)).data;
 }
 
+export async function markChatAsRead(chatId: string): Promise<Chat> {
+	const endpoint = `/chats/${chatId}/read`;
+	return (await client.post(PREFIX + endpoint)).data;
+}
+
 export async function addParticipants(
 	chatId: string,
 	userIds: string[]
