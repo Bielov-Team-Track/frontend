@@ -2,9 +2,34 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useClub } from "@/lib/club/ClubContext";
-import { FaChevronDown, FaPlus, FaCheck, FaBuilding } from "react-icons/fa";
+import { ChevronDown, Plus, Check, Shield, Crown, Users } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { ClubRole } from "@/lib/models/Club";
+
+const getRoleIcon = (role?: ClubRole) => {
+	switch (role) {
+		case ClubRole.Owner:
+			return <Crown size={10} className="text-accent" />;
+		case ClubRole.Admin:
+		case ClubRole.Coach:
+			return <Shield size={10} className="text-primary" />;
+		default:
+			return <Users size={10} className="text-muted/70" />;
+	}
+};
+
+const getRoleColor = (role?: ClubRole) => {
+	switch (role) {
+		case ClubRole.Owner:
+			return "text-accent";
+		case ClubRole.Admin:
+		case ClubRole.Coach:
+			return "text-primary";
+		default:
+			return "text-muted/70";
+	}
+};
 
 const ClubSelector = () => {
 	const { clubs, selectedClub, selectClub, isLoading } = useClub();
@@ -27,112 +52,220 @@ const ClubSelector = () => {
 		};
 	}, []);
 
+	// Loading state
 	if (isLoading) {
 		return (
-			<div className="px-4 py-2 animate-pulse">
-				<div className="h-8 bg-gray-200 rounded w-full"></div>
+			<div className="animate-pulse">
+				<div className="flex items-center gap-3 p-2 rounded-xl bg-white/5">
+					<div className="w-10 h-10 rounded-xl bg-white/10" />
+					<div className="hidden xl:flex flex-col flex-1 gap-1.5">
+						<div className="h-3.5 bg-white/10 rounded w-24" />
+						<div className="h-2.5 bg-white/5 rounded w-16" />
+					</div>
+				</div>
 			</div>
 		);
 	}
 
+	// No clubs state
 	if (clubs.length === 0) {
 		return (
-			<div className="px-4 py-2">
-				<Link
-					href="/clubs"
-					className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-accent rounded-md hover:bg-accent-focus transition-colors"
-				>
-					<FaPlus className="mr-2" />
-					Join Club
-				</Link>
-			</div>
+			<Link
+				href="/clubs"
+				className="group flex items-center justify-center xl:justify-start gap-3 p-3 rounded-xl
+					bg-gradient-to-r from-accent/10 to-transparent
+					border border-accent/20 hover:border-accent/40
+					transition-all duration-300 hover:shadow-lg hover:shadow-accent/5"
+			>
+				<div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center
+					group-hover:bg-accent/30 transition-colors duration-300">
+					<Plus size={18} className="text-accent" />
+				</div>
+				<div className="hidden xl:block">
+					<p className="text-sm font-medium text-white">Join a Club</p>
+					<p className="text-xs text-muted/70">Find your community</p>
+				</div>
+			</Link>
 		);
 	}
 
 	return (
-		<div className="relative px-2 mb-4" ref={dropdownRef}>
+		<div className="relative" ref={dropdownRef}>
+			{/* Selector Button */}
 			<button
 				onClick={() => setIsOpen(!isOpen)}
-				className="flex items-center w-full px-3 py-2 text-left bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+				className={`
+					w-full flex items-center gap-3 p-2 rounded-xl
+					transition-all duration-300 cursor-pointer
+					${isOpen
+						? "bg-white/10 ring-1 ring-white/10"
+						: "bg-white/5 hover:bg-white/10"
+					}
+				`}
 			>
-				<div className="flex-shrink-0 w-8 h-8 relative mr-3">
-					{selectedClub?.logoUrl ? (
-						<Image
-							src={selectedClub.logoUrl}
-							alt={selectedClub.name}
-							fill
-							className="rounded-full object-cover"
-						/>
-					) : (
-						<div className="w-full h-full bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-500">
-							<FaBuilding />
+				{/* Club Avatar */}
+				<div className="relative flex-shrink-0">
+					<div className={`
+						w-10 h-10 rounded-xl overflow-hidden
+						ring-2 transition-all duration-300
+						${selectedClub
+							? "ring-accent/30 shadow-lg shadow-accent/10"
+							: "ring-white/10"
+						}
+					`}>
+						{selectedClub?.logoUrl ? (
+							<Image
+								src={selectedClub.logoUrl}
+								alt={selectedClub.name}
+								fill
+								className="object-cover"
+							/>
+						) : (
+							<div className="w-full h-full bg-gradient-to-br from-accent/30 to-primary/30
+								flex items-center justify-center">
+								<Shield size={18} className="text-white/70" />
+							</div>
+						)}
+					</div>
+					{/* Role indicator dot */}
+					{selectedClub?.role && (selectedClub.role === ClubRole.Owner || selectedClub.role === ClubRole.Admin) && (
+						<div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full
+							bg-background flex items-center justify-center ring-2 ring-background">
+							{getRoleIcon(selectedClub.role)}
 						</div>
 					)}
 				</div>
-				<div className="flex-1 min-w-0 hidden xl:block">
-					<p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+
+				{/* Club Info - Hidden on collapsed sidebar */}
+				<div className="hidden xl:flex flex-col flex-1 min-w-0 text-left">
+					<p className="text-sm font-medium text-white truncate">
 						{selectedClub?.name || "Select Club"}
 					</p>
-					<p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-						{selectedClub?.role || "Member"}
+					<p className={`text-xs truncate flex items-center gap-1 ${getRoleColor(selectedClub?.role)}`}>
+						{getRoleIcon(selectedClub?.role)}
+						<span>{selectedClub?.role || "Member"}</span>
 					</p>
 				</div>
-				<FaChevronDown
-					className={`w-4 h-4 text-gray-400 transition-transform hidden xl:block ${
-						isOpen ? "transform rotate-180" : ""
-					}`}
+
+				{/* Chevron - Hidden on collapsed sidebar */}
+				<ChevronDown
+					size={16}
+					className={`
+						hidden xl:block flex-shrink-0 text-muted/50
+						transition-transform duration-300
+						${isOpen ? "rotate-180" : ""}
+					`}
 				/>
 			</button>
 
-			{isOpen && (
-				<div className="absolute z-50 w-full left-0 px-2 mt-1 min-w-[200px]">
-					<div className="bg-white dark:bg-gray-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 max-h-60 overflow-auto">
-						<div className="py-1">
-							{clubs.map((club) => (
+			{/* Dropdown Menu */}
+			<div className={`
+				absolute left-0 right-0 top-full mt-2 z-50
+				transition-all duration-300 origin-top
+				${isOpen
+					? "opacity-100 scale-100 translate-y-0"
+					: "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+				}
+			`}>
+				<div className="bg-background/95 backdrop-blur-xl rounded-xl border border-white/10
+					shadow-2xl shadow-black/50 overflow-hidden">
+
+					{/* Club List */}
+					<div className="max-h-64 overflow-y-auto p-1.5 space-y-0.5 no-scrollbar">
+						{clubs.map((club, index) => {
+							const isSelected = selectedClub?.id === club.id;
+
+							return (
 								<button
 									key={club.id}
 									onClick={() => {
 										selectClub(club);
 										setIsOpen(false);
 									}}
-									className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+									className={`
+										w-full flex items-center gap-3 p-2.5 rounded-lg
+										transition-all duration-200 cursor-pointer text-left
+										${isSelected
+											? "bg-accent/15 ring-1 ring-accent/30"
+											: "hover:bg-white/5"
+										}
+									`}
+									style={{
+										animationDelay: `${index * 30}ms`,
+									}}
 								>
-									<div className="flex-shrink-0 w-6 h-6 relative mr-3">
+									{/* Club Logo */}
+									<div className={`
+										relative w-8 h-8 rounded-lg overflow-hidden flex-shrink-0
+										ring-1 transition-all duration-200
+										${isSelected ? "ring-accent/50" : "ring-white/10"}
+									`}>
 										{club.logoUrl ? (
 											<Image
 												src={club.logoUrl}
 												alt={club.name}
 												fill
-												className="rounded-full object-cover"
+												className="object-cover"
 											/>
 										) : (
-											<div className="w-full h-full bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-xs text-gray-500">
-												<FaBuilding />
+											<div className="w-full h-full bg-gradient-to-br from-accent/25 to-primary/25
+												flex items-center justify-center">
+												<Shield size={14} className="text-white/60" />
 											</div>
 										)}
 									</div>
-									<span className="flex-1 truncate text-left">
-										{club.name}
-									</span>
-									{selectedClub?.id === club.id && (
-										<FaCheck className="w-4 h-4 text-accent" />
+
+									{/* Club Details */}
+									<div className="flex-1 min-w-0">
+										<p className={`text-sm font-medium truncate transition-colors duration-200 ${
+											isSelected ? "text-white" : "text-white/80"
+										}`}>
+											{club.name}
+										</p>
+										<p className={`text-xs truncate flex items-center gap-1 ${getRoleColor(club.role)}`}>
+											{getRoleIcon(club.role)}
+											<span>{club.role || "Member"}</span>
+											{club.memberCount && (
+												<span className="text-muted/50 ml-1">
+													· {club.memberCount} members
+												</span>
+											)}
+										</p>
+									</div>
+
+									{/* Selected Indicator */}
+									{isSelected && (
+										<div className="flex-shrink-0 w-5 h-5 rounded-full bg-accent
+											flex items-center justify-center">
+											<Check size={12} className="text-white" strokeWidth={3} />
+										</div>
 									)}
 								</button>
-							))}
-							<div className="border-t border-gray-100 dark:border-gray-700 mt-1 pt-1">
-								<Link
-									href="/clubs"
-									className="flex items-center w-full px-4 py-2 text-sm text-accent hover:bg-gray-100 dark:hover:bg-gray-700"
-									onClick={() => setIsOpen(false)}
-								>
-									<FaPlus className="mr-3 w-4 h-4" />
-									Find or Create Club
-								</Link>
+							);
+						})}
+					</div>
+
+					{/* Divider */}
+					<div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mx-3" />
+
+					{/* Create/Find Club Link */}
+					<div className="p-1.5">
+						<Link
+							href="/clubs"
+							onClick={() => setIsOpen(false)}
+							className="flex items-center gap-3 p-2.5 rounded-lg
+								text-accent hover:bg-accent/10
+								transition-all duration-200 group"
+						>
+							<div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center
+								group-hover:bg-accent/20 transition-colors duration-200">
+								<Plus size={16} className="text-accent" />
 							</div>
-						</div>
+							<span className="text-sm font-medium">Find or Create Club</span>
+						</Link>
 					</div>
 				</div>
-			)}
+			</div>
 		</div>
 	);
 };

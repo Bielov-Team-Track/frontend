@@ -5,15 +5,19 @@ import { UserProfile } from "@/lib/models/User";
 import { usePaymentAccount } from "@/components/features/events/forms/hooks/usePaymentAccount";
 import { PaymentAccountStatus } from "@/lib/models/Payment";
 import {
-	FaCreditCard,
-	FaCheckCircle,
-	FaClock,
-	FaExclamationTriangle,
-	FaExternalLinkAlt,
-} from "react-icons/fa";
-import { Button, Loader, Section } from "@/components";
+	CreditCard,
+	CheckCircle,
+	Clock,
+	AlertTriangle,
+	ExternalLink,
+	RefreshCw,
+    FileText,
+    DollarSign,
+    Globe,
+    Info
+} from "lucide-react";
+import { Button, Loader } from "@/components";
 import { getDashboardLink } from "@/lib/requests/payments";
-import { FiRefreshCcw } from "react-icons/fi";
 
 interface PaymentSettingsProps {
 	user: UserProfile;
@@ -30,20 +34,6 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
 		completeOnboarding,
 		refetch,
 	} = usePaymentAccount();
-
-	const getStatusIcon = () => {
-		switch (status) {
-			case PaymentAccountStatus.Active:
-				return <FaCheckCircle className="text-success" />;
-			case PaymentAccountStatus.Pending:
-				return <FaClock className="text-warning" />;
-			case PaymentAccountStatus.Restricted:
-			case PaymentAccountStatus.Rejected:
-				return <FaExclamationTriangle className="text-error" />;
-			default:
-				return <FaCreditCard className="/60" />;
-		}
-	};
 
 	const getStatusText = () => {
 		switch (status) {
@@ -63,25 +53,20 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
 	};
 
 	const getStatusBadge = () => {
+		const baseClasses = "px-3 py-1 rounded-full text-xs font-medium border";
 		switch (status) {
 			case PaymentAccountStatus.Active:
-				return <span className="badge p-2 badge-success badge-sm">Active</span>;
+				return <span className={`${baseClasses} bg-green-500/10 text-green-400 border-green-500/20`}>Active</span>;
 			case PaymentAccountStatus.Pending:
-				return (
-					<span className="badge p-2 badge-warning badge-sm">Pending</span>
-				);
+				return <span className={`${baseClasses} bg-yellow-500/10 text-yellow-400 border-yellow-500/20`}>Pending</span>;
 			case PaymentAccountStatus.Restricted:
-				return (
-					<span className="badge p-2 badge-error badge-sm">Restricted</span>
-				);
+				return <span className={`${baseClasses} bg-red-500/10 text-red-400 border-red-500/20`}>Restricted</span>;
 			case PaymentAccountStatus.Rejected:
-				return <span className="badge p-2 badge-error badge-sm">Rejected</span>;
+				return <span className={`${baseClasses} bg-red-500/10 text-red-400 border-red-500/20`}>Rejected</span>;
 			case PaymentAccountStatus.Created:
-				return <span className="badge p-2 badge-info badge-sm">Created</span>;
+				return <span className={`${baseClasses} bg-blue-500/10 text-blue-400 border-blue-500/20`}>Created</span>;
 			case PaymentAccountStatus.None:
-				return (
-					<span className="badge p-2 badge-ghost badge-sm">Not Created</span>
-				);
+				return <span className={`${baseClasses} bg-white/5 text-muted border-white/10`}>Not Created</span>;
 			default:
 				return null;
 		}
@@ -97,181 +82,227 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
 	};
 
 	return (
-		<div className="p-8 w-full">
+		<div className="flex flex-col gap-6 w-full max-w-4xl mx-auto">
+            {/* Header */}
 			<div>
-				<h1 className="text-2xl font-bold  mb-2">Payment Settings</h1>
-				<p className="/60 mb-8">
-					Manage your payment account to receive payments from event
-					participants
+				<h1 className="text-2xl font-bold text-white mb-2">Payment Settings</h1>
+				<p className="text-muted text-sm">
+					Manage your payment account to receive payments from event participants.
 				</p>
-				{error && (
-					<div className="mb-6 flex items-center space-x-2 text-error border border-error/50 bg-error/10 rounded-lg p-4">
-						<FaExclamationTriangle />
-						<span>{error}</span>
-					</div>
-				)}{" "}
-				<div className="bg-background-light rounded-lg p-6">
-					<div className="flex items-start space-x-4">
-						<div className="flex-1 flex flex-col gap-4">
-							<div className="flex flex-col xl:justify-between xl:flex-row xl:items-start gap-4">
-								<div className="flex items-start gap-4">
-									<div className="flex flex-col">
-										<h2 className="text-4xl font-semibold flex flex-col lg:flex-row lg:items-center gap-2">
-											Stripe Payment Account
-											{!isLoading && getStatusBadge()}
-										</h2>
-										{!isLoading && (
-											<p className="text-muted">{getStatusText()}</p>
-										)}
-									</div>
-								</div>
-								<div className="flex items-center gap-3">
-									<Button
-										size="sm"
-										onClick={refetch}
-										leftIcon={<FiRefreshCcw />}
-										loading={isLoading}
-									>
-										Refresh Status
-									</Button>
-									{account?.createdAt && (
-										<Button
-											leftIcon={<FaExternalLinkAlt />}
-											onClick={openDashboard}
-											variant="outline"
-											size="sm"
-										>
-											Open Stripe Dashboard
-										</Button>
-									)}
-								</div>
-							</div>
-
-							{isLoading ? (
-								<Loader />
-							) : (
-								<>
-									{account && (
-										<div className="flex flex-col space-y-3 gap-4">
-											<div className="flex items-center gap-6 flex-wrap  lg:flex-row">
-												<div className="flex items-center space-x-2 bg-neutral/15 p-4 rounded-lg">
-													<span className="text-4xl">📃</span>
-													<div className="flex flex-col">
-														<span>Onboarding</span>
-														{account.detailsSubmitted ? (
-															<span className="text-sm text-success">
-																Completed
-															</span>
-														) : (
-															<span className="text-sm text-muted">Needed</span>
-														)}
-													</div>
-												</div>
-
-												<div className="flex items-center gap-2 bg-neutral/15 p-4 rounded-lg">
-													<span className="text-4xl">💳</span>
-													<div className="flex flex-col">
-														<span>Receive Payments</span>
-														{account.chargesEnabled ? (
-															<span className="text-sm text-success">
-																Enabled
-															</span>
-														) : (
-															<span className="text-sm text-muted">
-																Disabled
-															</span>
-														)}
-													</div>
-												</div>
-
-												<div className="flex items-center space-x-2 bg-neutral/15 p-4 rounded-lg">
-													<span className="text-4xl">💰</span>
-													<div className="flex flex-col">
-														<span>Payouts</span>
-														{account.payoutsEnabled ? (
-															<span className="text-sm text-success">
-																Enabled
-															</span>
-														) : (
-															<span className="text-sm text-muted">
-																Disabled
-															</span>
-														)}
-													</div>
-												</div>
-
-												{account.isDeleted && (
-													<div className="flex items-center space-x-2">
-														<FaExclamationTriangle className="text-error" />
-														<span className="text-sm text-error">
-															Account Deleted
-														</span>
-													</div>
-												)}
-											</div>
-
-											{account.country && (
-												<div className="text-sm /60">
-													🌍 Country:{" "}
-													<span className="font-bold">
-														{account.country.toUpperCase()}
-													</span>{" "}
-													| 💷 Currency:{" "}
-													<span className="font-bold">
-														{account.currency?.toUpperCase()}
-													</span>
-												</div>
-											)}
-										</div>
-									)}
-
-									<div className="flex flex-wrap gap-3">
-										{!account ? (
-											<Button
-												leftIcon={<FaCreditCard />}
-												onClick={createAccount}
-											>
-												Create Payment Account
-											</Button>
-										) : status === PaymentAccountStatus.Created ||
-											status === PaymentAccountStatus.Pending ? (
-											<Button
-												leftIcon={<FaClock />}
-												onClick={completeOnboarding}
-											>
-												Complete Onboarding
-											</Button>
-										) : (
-											<></>
-										)}
-									</div>
-								</>
-							)}
-						</div>
-					</div>
-				</div>
-				<Section
-					variant="info"
-					className="mt-8"
-					title="How Payment Accounts Work"
-				>
-					<ul className="space-y-2 text-muted">
-						<li>
-							• Create a Stripe Connect account to receive payments from your
-							events
-						</li>
-						<li>• Complete the onboarding process to verify your identity</li>
-						<li>
-							• Once verified, you can accept card payments for your volleyball
-							events
-						</li>
-						<li>• Payments are processed securely through Stripe</li>
-						<li>
-							• You can always accept cash payments without a payment account
-						</li>
-					</ul>
-				</Section>
 			</div>
+
+            {/* Error Message */}
+			{error && (
+				<div className="flex items-center gap-3 text-red-400 border border-red-500/20 bg-red-500/10 rounded-xl p-4 animate-in fade-in slide-in-from-top-2">
+					<AlertTriangle size={20} />
+					<span className="text-sm font-medium">{error}</span>
+				</div>
+			)}
+
+            {/* Main Content Card */}
+			<div className="bg-[#141414] border border-white/5 rounded-2xl p-6 md:p-8">
+                <div className="flex flex-col gap-8">
+                    {/* Status Header */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-white/5">
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-3">
+                                <h2 className="text-xl font-semibold text-white">Stripe Payment Account</h2>
+                                {!isLoading && getStatusBadge()}
+                            </div>
+                            {!isLoading && (
+                                <p className="text-sm text-muted">{getStatusText()}</p>
+                            )}
+                        </div>
+                        
+                        <div className="flex items-center gap-3 w-full md:w-auto">
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={refetch}
+                                leftIcon={<RefreshCw size={16} />}
+                                loading={isLoading}
+                                className="text-muted hover:text-white"
+                            >
+                                Refresh
+                            </Button>
+                            {account?.createdAt && (
+                                <Button
+                                    leftIcon={<ExternalLink size={16} />}
+                                    onClick={openDashboard}
+                                    variant="bordered"
+                                    size="sm"
+                                >
+                                    Stripe Dashboard
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+
+                    {isLoading ? (
+                        <div className="flex justify-center py-12">
+                            <Loader />
+                        </div>
+                    ) : (
+                        <>
+                            {account ? (
+                                <div className="flex flex-col gap-6">
+                                    {/* Status Cards Grid */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        {/* Onboarding Status */}
+                                        <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+                                                <FileText size={20} />
+                                            </div>
+                                            <div>
+                                                <span className="text-sm text-muted block mb-1">Onboarding</span>
+                                                {account.detailsSubmitted ? (
+                                                    <div className="flex items-center gap-2 text-green-400">
+                                                        <CheckCircle size={16} />
+                                                        <span className="font-medium">Completed</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-yellow-400">
+                                                        <Clock size={16} />
+                                                        <span className="font-medium">Action Needed</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Payments Status */}
+                                        <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400">
+                                                <CreditCard size={20} />
+                                            </div>
+                                            <div>
+                                                <span className="text-sm text-muted block mb-1">Receive Payments</span>
+                                                {account.chargesEnabled ? (
+                                                    <div className="flex items-center gap-2 text-green-400">
+                                                        <CheckCircle size={16} />
+                                                        <span className="font-medium">Enabled</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-muted">
+                                                        <AlertTriangle size={16} />
+                                                        <span className="font-medium">Disabled</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Payouts Status */}
+                                        <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-400">
+                                                <DollarSign size={20} />
+                                            </div>
+                                            <div>
+                                                <span className="text-sm text-muted block mb-1">Payouts</span>
+                                                {account.payoutsEnabled ? (
+                                                    <div className="flex items-center gap-2 text-green-400">
+                                                        <CheckCircle size={16} />
+                                                        <span className="font-medium">Enabled</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-muted">
+                                                        <AlertTriangle size={16} />
+                                                        <span className="font-medium">Disabled</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Account Details & Deleted Warning */}
+                                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/10">
+                                         {account.country && (
+                                            <div className="flex items-center gap-4 text-sm text-muted">
+                                                <div className="flex items-center gap-2">
+                                                    <Globe size={16} />
+                                                    <span>Country: <span className="text-white font-medium">{account.country.toUpperCase()}</span></span>
+                                                </div>
+                                                <div className="w-px h-4 bg-white/10"></div>
+                                                <div>
+                                                    <span>Currency: <span className="text-white font-medium">{account.currency?.toUpperCase()}</span></span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {account.isDeleted && (
+                                            <div className="flex items-center gap-2 text-red-400 text-sm font-medium">
+                                                <AlertTriangle size={16} />
+                                                <span>Account Deleted</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center py-12 text-muted">
+                                    <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+                                        <CreditCard size={32} className="opacity-50" />
+                                    </div>
+                                    <p>No payment account linked yet.</p>
+                                </div>
+                            )}
+
+                            {/* Actions Footer */}
+                            <div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
+                                {!account ? (
+                                    <Button
+                                        leftIcon={<CreditCard size={18} />}
+                                        onClick={createAccount}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        Create Payment Account
+                                    </Button>
+                                ) : status === PaymentAccountStatus.Created ||
+                                    status === PaymentAccountStatus.Pending ? (
+                                    <Button
+                                        leftIcon={<Clock size={18} />}
+                                        onClick={completeOnboarding}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        Complete Onboarding
+                                    </Button>
+                                ) : null}
+                            </div>
+                        </>
+                    )}
+                </div>
+			</div>
+            
+            {/* Info Section */}
+            <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-6">
+                <div className="flex items-start gap-4">
+                    <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 flex-shrink-0">
+                        <Info size={18} />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <h3 className="font-semibold text-white">How Payment Accounts Work</h3>
+                        <ul className="space-y-2 text-sm text-muted">
+                            <li className="flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 flex-shrink-0"></span>
+                                Create a Stripe Connect account to receive payments from your events.
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 flex-shrink-0"></span>
+                                Complete the onboarding process to verify your identity.
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 flex-shrink-0"></span>
+                                Once verified, you can accept card payments for your volleyball events.
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 flex-shrink-0"></span>
+                                Payments are processed securely through Stripe.
+                            </li>
+                             <li className="flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 flex-shrink-0"></span>
+                                You can always accept cash payments without a payment account.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 		</div>
 	);
 };

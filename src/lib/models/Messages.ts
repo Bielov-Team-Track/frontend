@@ -10,6 +10,10 @@ export interface Message {
 	read: boolean;
 	chatId: string;
 	attachments?: Attachment[];
+	replyTo?: MessageSummary;
+	forwardedFrom?: MessageSummary;
+	isDeleted: boolean;
+	reactions: Reaction[];
 }
 
 export interface Chat {
@@ -21,6 +25,16 @@ export interface Chat {
 	lastMessage: Message;
 	unreadCount: number;
 	createdAt: Date;
+	source?: ChatSource;
+}
+
+export interface ChatParticipant {
+	id: string;
+	userId: string;
+	role: "Member" | "Admin"; // ADD
+	joinedAt: Date;
+	lastReadAt?: Date;
+	userProfile?: UserProfile;
 }
 
 export interface Attachment {
@@ -29,4 +43,23 @@ export interface Attachment {
 	fileType: string;
 	fileSize: number;
 	downloadUrl: string;
+}
+export interface MessageSummary {
+	id: string;
+	content: string;
+	sender: UserProfile;
+}
+
+export interface Reaction {
+	emoji: string;
+	count: number;
+	hasReacted: boolean;
+	userIds: string[];
+}
+
+export interface ChatSource {
+	type: "event" | "team";
+	id: string;
+	name: string;
+	imageUrl?: string;
 }

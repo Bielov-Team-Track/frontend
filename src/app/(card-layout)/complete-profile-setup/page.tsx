@@ -1,7 +1,8 @@
 "use client";
 
 import { CompleteProfileSetupForm } from "@/components/features/profile";
-import { redirect, useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const CompleteProfileSetupPage = () => {
 	const router = useRouter();
@@ -13,14 +14,21 @@ const CompleteProfileSetupPage = () => {
 
 	return (
 		<>
-			<h1 className="text-2xl text-center font-bold">
-				🎉 Welcome to the Volleyer!
+			<h1 className="text-3xl font-bold text-white text-center mb-2">
+				Welcome to Volleyer! 🎉
 			</h1>
-			<p className="text-primary-content/70 text-center">
-				Please complete your profile setup to access all features of the
-				application.
+			<p className="text-muted text-center">
+				Let's get your profile set up so you can start playing.
 			</p>
-			<CompleteProfileSetupForm onProfileComplete={handleProfileComplete} />
+			<p className="text-muted text-center mb-8">
+				Wrong profile? Go back to{" "}
+				<Link className="link" href="/login">
+					login page
+				</Link>
+			</p>
+			<CompleteProfileSetupForm
+				onProfileComplete={handleProfileComplete}
+			/>
 		</>
 	);
 };

@@ -12,8 +12,10 @@ import {
 	Plus,
 	Trash2,
 	Users,
+    ImageOff
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import Image from "next/image";
 
 // --- Types ---
 interface Drill {
@@ -154,9 +156,9 @@ export default function TrainingSessionPage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-base-100 text-gray-100 font-sans pb-20">
+		<div className="min-h-screen bg-background-dark text-white font-sans pb-20">
 			{/* --- SHARED HEADER COMPONENT (The Shell) --- */}
-			<div className="bg-[#1A1A1A] border-b border-white/5 pt-8 pb-6 px-4 md:px-8">
+			<div className="bg-background border-b border-white/5 pt-8 pb-6 px-4 md:px-8">
 				<div className="max-w-desktop mx-auto">
 					<div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
 						<div>
@@ -164,7 +166,7 @@ export default function TrainingSessionPage() {
 								<span className="px-2 py-0.5 rounded bg-primary/20 text-primary border border-primary/20 text-xs font-bold uppercase">
 									Training
 								</span>
-								<span className="text-gray-500 text-sm font-medium flex items-center gap-1">
+								<span className="text-muted text-sm font-medium flex items-center gap-1">
 									<Clock size={14} />{" "}
 									{EVENT_DETAILS.totalDuration} mins
 								</span>
@@ -173,7 +175,7 @@ export default function TrainingSessionPage() {
 								{EVENT_DETAILS.title}
 							</h1>
 
-							<div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+							<div className="flex flex-wrap items-center gap-4 text-sm text-muted">
 								<span className="flex items-center gap-1">
 									<Calendar size={14} /> {EVENT_DETAILS.date}
 								</span>
@@ -186,12 +188,21 @@ export default function TrainingSessionPage() {
 								<div className="flex items-center gap-2 pl-4 border-l border-white/10">
 									<div className="flex -space-x-2">
 										{EVENT_DETAILS.participants.map((p) => (
-											<img
-												key={p.id}
-												src={p.img}
-												className="w-6 h-6 rounded-full border border-[#1A1A1A] bg-gray-700"
-												alt=""
-											/>
+											<div key={p.id} className="w-6 h-6 rounded-full border border-background bg-background-light overflow-hidden flex items-center justify-center">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img
+                                                    src={p.img}
+                                                    className="w-full h-full object-cover"
+                                                    alt=""
+                                                    onError={(e) => {
+                                                        e.currentTarget.style.display = 'none';
+                                                        e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
+                                                        const icon = document.createElement('div');
+                                                        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted/50"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+                                                        e.currentTarget.parentElement?.appendChild(icon);
+                                                    }}
+                                                />
+                                            </div>
 										))}
 									</div>
 									<span className="text-xs">
@@ -203,14 +214,14 @@ export default function TrainingSessionPage() {
 						</div>
 
 						{/* Header Actions */}
-						<div className="flex gap-3 w-full md:w-auto">
-							<button className="flex-1 md:flex-none btn bg-white/5 hover:bg-white/10 text-white border border-white/10 gap-2">
+						<div className="flex gap-3 w-full md:w-auto mt-4 md:mt-0">
+							<button className="flex-1 md:flex-none btn bg-white/5 hover:bg-white/10 text-white border border-white/10 gap-2 flex items-center justify-center px-4 py-2 rounded-lg transition-colors">
 								<Users size={18} /> Invite
 							</button>
-							<button className="flex-1 md:flex-none btn bg-white/5 hover:bg-white/10 text-white border border-white/10 gap-2">
+							<button className="flex-1 md:flex-none btn bg-white/5 hover:bg-white/10 text-white border border-white/10 gap-2 flex items-center justify-center px-4 py-2 rounded-lg transition-colors">
 								<MoreHorizontal size={18} />
 							</button>
-							<button className="flex-1 md:flex-none btn bg-accent hover:bg-accent/90 text-white border-none shadow-[0_0_15px_rgba(249,115,22,0.3)] gap-2 px-6">
+							<button className="flex-1 md:flex-none btn bg-accent hover:bg-accent/90 text-white border-none shadow-[0_0_15px_rgba(249,115,22,0.3)] gap-2 px-6 flex items-center justify-center py-2 rounded-lg transition-colors font-medium">
 								<Play size={18} fill="currentColor" /> Start
 								Session
 							</button>
@@ -224,7 +235,7 @@ export default function TrainingSessionPage() {
 				{/* LEFT COLUMN: DRILL FINDER (4 Cols) */}
 				<div className="lg:col-span-4 space-y-6">
 					{/* 1. Skill Selector */}
-					<div className="bg-[#1E1E1E] rounded-2xl border border-white/5 p-5">
+					<div className="bg-background rounded-2xl border border-white/5 p-5">
 						<h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
 							<Filter size={16} className="text-accent" /> Focus
 							Areas
@@ -239,7 +250,7 @@ export default function TrainingSessionPage() {
                     ${
 						selectedSkills.includes(skill)
 							? "bg-accent text-white border-accent"
-							: "bg-white/5 text-gray-400 border-transparent hover:border-white/20 hover:text-white"
+							: "bg-white/5 text-muted border-transparent hover:border-white/20 hover:text-white"
 					}
                   `}>
 									{skill}
@@ -249,31 +260,31 @@ export default function TrainingSessionPage() {
 					</div>
 
 					{/* 2. Recommendations List */}
-					<div className="bg-[#1E1E1E] rounded-2xl border border-white/5 overflow-hidden flex flex-col h-[500px]">
+					<div className="bg-background rounded-2xl border border-white/5 overflow-hidden flex flex-col h-[500px]">
 						<div className="p-4 border-b border-white/5 bg-white/[0.02]">
 							<h3 className="font-bold text-white">
 								Recommended Drills
 							</h3>
-							<p className="text-xs text-gray-500">
+							<p className="text-xs text-muted">
 								Based on your selection
 							</p>
 						</div>
 
 						<div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
 							{recommendedDrills.length === 0 ? (
-								<div className="p-4 text-center text-gray-500 text-sm">
+								<div className="p-4 text-center text-muted text-sm">
 									No drills found for this combination.
 								</div>
 							) : (
 								recommendedDrills.map((drill) => (
 									<div
 										key={drill.id}
-										className="group flex items-center justify-between p-3 rounded-xl bg-[#161616] border border-white/5 hover:border-white/20 transition-all">
+										className="group flex items-center justify-between p-3 rounded-xl bg-background-light border border-white/5 hover:border-white/20 transition-all">
 										<div>
-											<div className="font-bold text-gray-200 text-sm">
+											<div className="font-bold text-white text-sm">
 												{drill.name}
 											</div>
-											<div className="flex items-center gap-2 text-[10px] text-gray-500 mt-1">
+											<div className="flex items-center gap-2 text-[10px] text-muted mt-1">
 												<span className="flex items-center gap-1">
 													<Clock size={10} />{" "}
 													{drill.duration}m
@@ -284,7 +295,7 @@ export default function TrainingSessionPage() {
 										</div>
 										<button
 											onClick={() => addToTimeline(drill)}
-											className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-accent hover:text-white transition-colors">
+											className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-muted hover:bg-accent hover:text-white transition-colors">
 											<Plus size={16} />
 										</button>
 									</div>
@@ -297,7 +308,7 @@ export default function TrainingSessionPage() {
 				{/* RIGHT COLUMN: SESSION TIMELINE (8 Cols) */}
 				<div className="lg:col-span-8 space-y-6">
 					{/* Time Budget Bar */}
-					<div className="bg-[#1E1E1E] rounded-2xl border border-white/5 p-6 relative overflow-hidden">
+					<div className="bg-background rounded-2xl border border-white/5 p-6 relative overflow-hidden">
 						{/* Background Progress */}
 						<div
 							className={`absolute bottom-0 left-0 h-1 transition-all duration-500 ${
@@ -310,7 +321,7 @@ export default function TrainingSessionPage() {
 								<h2 className="text-xl font-bold text-white">
 									Session Timeline
 								</h2>
-								<p className="text-sm text-gray-400">
+								<p className="text-sm text-muted">
 									Drag drills to reorder
 								</p>
 							</div>
@@ -323,11 +334,11 @@ export default function TrainingSessionPage() {
 											: "text-white"
 									}`}>
 									{plannedDuration}
-									<span className="text-lg text-gray-500 font-medium">
+									<span className="text-lg text-muted font-medium">
 										/{EVENT_DETAILS.totalDuration}m
 									</span>
 								</div>
-								<div className="text-xs font-bold uppercase tracking-wider text-gray-500">
+								<div className="text-xs font-bold uppercase tracking-wider text-muted">
 									{remainingTime < 0
 										? `${Math.abs(
 												remainingTime
@@ -341,10 +352,10 @@ export default function TrainingSessionPage() {
 					{/* The Timeline */}
 					<div className="relative pl-6 border-l-2 border-white/5 space-y-6 min-h-[400px]">
 						{/* Start Node */}
-						<div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-accent border-4 border-[#1A1A1A]"></div>
+						<div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-accent border-4 border-background-dark"></div>
 
 						{timeline.length === 0 && (
-							<div className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center flex flex-col items-center justify-center text-gray-500 h-64">
+							<div className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center flex flex-col items-center justify-center text-muted h-64">
 								<Dumbbell
 									size={32}
 									className="mb-2 opacity-50"
@@ -361,10 +372,10 @@ export default function TrainingSessionPage() {
 								key={item.instanceId}
 								className="relative animate-in slide-in-from-left-2 duration-300">
 								{/* Connector Dot */}
-								<div className="absolute -left-[31px] top-8 w-3 h-3 rounded-full bg-gray-600 border-2 border-[#1A1A1A]"></div>
+								<div className="absolute -left-[31px] top-8 w-3 h-3 rounded-full bg-muted border-2 border-background-dark"></div>
 
 								{/* Time Stamp (Accumulated) */}
-								<div className="absolute -left-20 top-8 text-xs font-mono text-gray-500 w-12 text-right">
+								<div className="absolute -left-20 top-8 text-xs font-mono text-muted w-12 text-right">
 									{index === 0
 										? "00:00"
 										: `+${timeline
@@ -376,8 +387,8 @@ export default function TrainingSessionPage() {
 								</div>
 
 								{/* Card */}
-								<div className="group bg-[#1E1E1E] rounded-xl border border-white/5 p-4 flex items-center gap-4 hover:border-accent/50 hover:shadow-lg transition-all cursor-grab active:cursor-grabbing">
-									<div className="text-gray-600 cursor-grab">
+								<div className="group bg-background rounded-xl border border-white/5 p-4 flex items-center gap-4 hover:border-accent/50 hover:shadow-lg transition-all cursor-grab active:cursor-grabbing">
+									<div className="text-muted cursor-grab">
 										<GripVertical size={20} />
 									</div>
 
@@ -398,13 +409,13 @@ export default function TrainingSessionPage() {
 												{item.intensity}
 											</span>
 										</div>
-										<div className="flex items-center gap-3 mt-1 text-sm text-gray-400">
+										<div className="flex items-center gap-3 mt-1 text-sm text-muted">
 											<span className="flex items-center gap-1">
 												<Clock size={14} />{" "}
 												{item.duration} mins
 											</span>
 											<span>•</span>
-											<span className="text-gray-500">
+											<span className="text-muted">
 												{item.category}
 											</span>
 										</div>
@@ -414,7 +425,7 @@ export default function TrainingSessionPage() {
 										onClick={() =>
 											removeFromTimeline(item.instanceId)
 										}
-										className="p-2 text-gray-600 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+										className="p-2 text-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
 										<Trash2 size={18} />
 									</button>
 								</div>
@@ -423,7 +434,7 @@ export default function TrainingSessionPage() {
 
 						{/* End Node (only if items exist) */}
 						{timeline.length > 0 && (
-							<div className="absolute -left-[9px] bottom-0 w-4 h-4 rounded-full bg-gray-700 border-4 border-[#1A1A1A]"></div>
+							<div className="absolute -left-[9px] bottom-0 w-4 h-4 rounded-full bg-muted border-4 border-background-dark"></div>
 						)}
 					</div>
 				</div>

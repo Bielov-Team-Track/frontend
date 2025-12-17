@@ -1,7 +1,8 @@
 "use client";
 
-import { Brain, Dumbbell, Save, Target } from "lucide-react";
+import { Brain, Dumbbell, Save, Target, Users as UsersIcon } from "lucide-react";
 import { useMemo, useState } from "react";
+import Image from "next/image";
 
 // --- Types & Configuration ---
 
@@ -127,18 +128,18 @@ export default function EvaluationPage() {
 	}, [drillScores]);
 
 	return (
-		<div className="h-screen bg-base-100 text-gray-100 font-sans flex overflow-hidden">
+		<div className="h-screen bg-background-dark text-white font-sans flex flex-col lg:flex-row overflow-hidden">
 			{/* --- 1. ROSTER SIDEBAR --- */}
-			<div className="w-72 bg-[#161616] border-r border-white/5 flex flex-col z-20">
-				<div className="p-6 border-b border-white/5">
+			<div className="w-full lg:w-72 bg-[#161616] border-b lg:border-r border-white/5 flex flex-col z-20 shrink-0 h-48 lg:h-full">
+				<div className="p-4 lg:p-6 border-b border-white/5 bg-[#161616] sticky top-0 z-10">
 					<h1 className="font-bold text-white text-lg">
 						Evaluation Day
 					</h1>
-					<p className="text-xs text-gray-400">
+					<p className="text-xs text-muted">
 						Select a player to grade
 					</p>
 				</div>
-				<div className="flex-1 overflow-y-auto p-2 space-y-1">
+				<div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
 					{PLAYERS.map((player) => (
 						<div
 							key={player.id}
@@ -151,21 +152,31 @@ export default function EvaluationPage() {
 						: "border-transparent hover:bg-white/5"
 				}
               `}>
-							<img
-								src={player.avatar}
-								className="w-10 h-10 rounded-full bg-gray-700"
-								alt=""
-							/>
+							<div className="w-10 h-10 rounded-full bg-background-light overflow-hidden flex items-center justify-center shrink-0">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src={player.avatar}
+                                    className="w-full h-full object-cover"
+                                    alt=""
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                        e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
+                                        const icon = document.createElement('div');
+                                        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted/50"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+                                        e.currentTarget.parentElement?.appendChild(icon);
+                                    }}
+                                />
+                            </div>
 							<div>
 								<div
 									className={`text-sm font-bold ${
 										selectedPlayerId === player.id
 											? "text-white"
-											: "text-gray-300"
+											: "text-muted"
 									}`}>
 									{player.name}
 								</div>
-								<div className="text-xs text-gray-500">
+								<div className="text-xs text-muted/60">
 									#{player.number} • {player.position}
 								</div>
 							</div>
@@ -175,33 +186,33 @@ export default function EvaluationPage() {
 			</div>
 
 			{/* --- 2. MAIN: DRILL LIST --- */}
-			<div className="flex-1 flex flex-col bg-[#1E1E1E] relative">
-				<div className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#1E1E1E]/95 backdrop-blur z-10">
-					<h2 className="text-lg font-bold text-white">
+			<div className="flex-1 flex flex-col bg-background relative overflow-hidden">
+				<div className="h-16 border-b border-white/5 flex items-center justify-between px-4 lg:px-8 bg-background/95 backdrop-blur z-10 shrink-0">
+					<h2 className="text-base lg:text-lg font-bold text-white truncate mr-4">
 						Drills & Assessments
 					</h2>
-					<button className="btn btn-sm bg-accent text-white border-none gap-2 hover:bg-accent/90 shadow-[0_0_15px_rgba(249,115,22,0.3)]">
-						<Save size={16} /> Save Evaluation
+					<button className="btn btn-sm bg-accent text-white border-none gap-2 hover:bg-accent/90 shadow-[0_0_15px_rgba(249,115,22,0.3)] shrink-0">
+						<Save size={16} /> <span className="hidden sm:inline">Save Evaluation</span>
 					</button>
 				</div>
 
-				<div className="flex-1 overflow-y-auto p-6 md:p-8 max-w-3xl mx-auto w-full space-y-6">
+				<div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4 lg:space-y-6 custom-scrollbar pb-20">
 					{/* Drills Loop */}
 					{DRILLS.map((drill, index) => (
 						<div
 							key={drill.id}
-							className="bg-[#161616] border border-white/5 rounded-2xl p-6 shadow-lg transition-all hover:border-white/10">
+							className="bg-[#161616] border border-white/5 rounded-2xl p-4 lg:p-6 shadow-lg transition-all hover:border-white/10">
 							{/* Header */}
 							<div className="flex justify-between items-start mb-4">
 								<div className="flex items-start gap-4">
-									<div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-sm font-bold text-gray-500 border border-white/5">
+									<div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-sm font-bold text-muted border border-white/5 shrink-0">
 										{index + 1}
 									</div>
 									<div>
-										<h3 className="text-lg font-bold text-white">
+										<h3 className="text-base lg:text-lg font-bold text-white">
 											{drill.name}
 										</h3>
-										<p className="text-sm text-gray-400 mt-1">
+										<p className="text-xs lg:text-sm text-muted mt-1">
 											{drill.description}
 										</p>
 
@@ -248,14 +259,14 @@ export default function EvaluationPage() {
 								</div>
 
 								{/* Score Display (Big Number) */}
-								<div className="text-right">
+								<div className="text-right ml-2 shrink-0">
 									<div
-										className={`text-3xl font-black ${getScoreColor(
+										className={`text-2xl lg:text-3xl font-black ${getScoreColor(
 											drillScores[drill.id] || 0
 										)}`}>
 										{drillScores[drill.id] || 0}
 									</div>
-									<div className="text-[10px] text-gray-500 uppercase tracking-wider">
+									<div className="text-[10px] text-muted uppercase tracking-wider">
 										Score
 									</div>
 								</div>
@@ -277,7 +288,7 @@ export default function EvaluationPage() {
 									}
 									className="w-full h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-accent hover:accent-orange-400"
 								/>
-								<div className="flex justify-between text-xs text-gray-500 mt-2 font-medium px-1">
+								<div className="flex justify-between text-xs text-muted mt-2 font-medium px-1">
 									<span>0 (Poor)</span>
 									<span>5 (Average)</span>
 									<span>10 (Elite)</span>
@@ -289,17 +300,17 @@ export default function EvaluationPage() {
 			</div>
 
 			{/* --- 3. RIGHT: LIVE STAT BREAKDOWN --- */}
-			<div className="w-80 bg-[#1E1E1E] border-l border-white/5 flex flex-col shadow-2xl z-20">
+			<div className="hidden xl:flex w-80 bg-[#1E1E1E] border-l border-white/5 flex-col shadow-2xl z-20 shrink-0">
 				<div className="p-6 border-b border-white/5 bg-gradient-to-b from-white/5 to-transparent">
 					<h2 className="text-xl font-bold text-white mb-1">
 						Live Analysis
 					</h2>
-					<p className="text-sm text-gray-400">
+					<p className="text-sm text-muted">
 						Real-time category calculation
 					</p>
 				</div>
 
-				<div className="flex-1 overflow-y-auto p-6 space-y-8">
+				<div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
 					{/* Physical */}
 					<StatCard
 						label="Physical"
@@ -332,7 +343,7 @@ export default function EvaluationPage() {
 
 					{/* Total Weighted Score */}
 					<div className="mt-8 p-6 rounded-2xl bg-gradient-to-br from-gray-800 to-black border border-white/10 text-center shadow-lg">
-						<div className="text-xs text-gray-500 uppercase font-bold tracking-widest mb-2">
+						<div className="text-xs text-muted uppercase font-bold tracking-widest mb-2">
 							Estimated OVR
 						</div>
 						<div className="text-5xl font-black text-white tracking-tighter">
@@ -358,6 +369,8 @@ export default function EvaluationPage() {
 					</div>
 				</div>
 			</div>
+            
+            {/* Mobile Stat Overlay / Bottom Sheet could go here */}
 		</div>
 	);
 }
@@ -389,7 +402,7 @@ function StatCard({ label, score, icon: Icon, color, bg, desc }: any) {
 					style={{ width }}
 				/>
 			</div>
-			<p className="text-xs text-gray-500">{desc}</p>
+			<p className="text-xs text-muted">{desc}</p>
 		</div>
 	);
 }

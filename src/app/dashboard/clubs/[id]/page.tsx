@@ -1,7 +1,10 @@
-import React from "react";
+import ClubDetailClient from "./ClubDetailClient";
 
-function GroupPage() {
-	return <div>GroupPage</div>;
+interface Props {
+	params: Promise<{ id: string }>;
 }
 
-export default GroupPage;
+export default async function ClubDetailPage({ params }: Props) {
+	const { id } = await params;
+	return <ClubDetailClient clubId={id} />;
+}

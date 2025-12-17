@@ -1,8 +1,7 @@
 "use client";
 
-import { responsiveClasses } from "@/lib/utils/responsive";
+import { AlertCircle } from "lucide-react";
 import React, { forwardRef, useState } from "react";
-import { FaExclamationCircle } from "react-icons/fa";
 
 export interface TextAreaProps
 	extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
@@ -16,6 +15,7 @@ export interface TextAreaProps
 	showCharCount?: boolean;
 	minRows?: number;
 	maxRows?: number;
+	optional?: boolean;
 }
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
@@ -34,63 +34,28 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 			className = "",
 			disabled,
 			value,
+			optional,
 			...props
 		},
 		ref
 	) => {
 		const [isFocused, setIsFocused] = useState(false);
-
-		// Calculate character count
 		const characterCount = typeof value === "string" ? value.length : 0;
 
-		// Build CSS classes
-		const baseClasses =
-			"textarea resize-y transition-colors duration-200 bg-background-light " +
-			"focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-muted " +
-			"rounded-md outline-1 text-muted placeholder:text-muted " +
-			"focus:placeholder:text ";
-
-		const variantClasses = {
-			default: "textarea-ghost",
-			bordered: "textarea-bordered",
-			ghost: "textarea-ghost",
+		const variantStyles = {
+			default:
+				"bg-white/5 border border-white/10 focus:border-white/20 focus:bg-white/[0.07]",
+			bordered:
+				"bg-white/5 border border-white/10 focus:border-accent/50 focus:ring-1 focus:ring-accent/20",
+			ghost: "border-transparent bg-transparent focus:bg-white/5",
 		};
 
-		const sizeClasses = {
-			sm: "textarea-sm text-mobile-sm sm:text-mobile-base",
-			md: "textarea-md text-mobile-base sm:text-tablet-base lg:text-desktop-base",
-			lg: "textarea-lg text-mobile-base sm:text-tablet-base lg:text-desktop-lg",
+		const sizeStyles = {
+			sm: "text-sm px-3 py-2",
+			md: "text-sm px-4 py-3",
+			lg: "text-base px-4 py-3",
 		};
 
-		const stateClasses = {
-			error: "textarea-error border-red-500 focus:border-red-500",
-			focused: "ring-2 ring-primary ring-opacity-20",
-			disabled: "textarea-disabled opacity-60 cursor-not-allowed",
-		};
-
-		const textAreaClasses = [
-			baseClasses,
-			variantClasses[variant],
-			sizeClasses[textAreaSize],
-			error ? stateClasses.error : "",
-			isFocused && !error ? stateClasses.focused : "",
-			disabled ? stateClasses.disabled : "",
-			!fullWidth ? "w-auto" : "w-full",
-			className,
-		]
-			.filter(Boolean)
-			.join(" ");
-
-		const labelClasses = [
-			"block font-medium",
-			responsiveClasses.text.label,
-			error ? "text-red-600" : "",
-			disabled ? "opacity-60" : "",
-		]
-			.filter(Boolean)
-			.join(" ");
-
-		// Calculate rows based on constraints
 		const getRows = () => {
 			if (props.rows) return props.rows;
 			return Math.max(
@@ -100,30 +65,40 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 		};
 
 		return (
-			<div className={`${fullWidth ? "w-full" : "w-auto"}`}>
+			<div className={fullWidth ? "w-full" : "w-auto"}>
 				{label && (
-					<label className={labelClasses}>
+					<label
+						className={`block text-sm font-medium mb-2 ${
+							error ? "text-red-400" : "text-white"
+						} ${disabled ? "opacity-50" : ""}`}>
 						{label}
 						{props.required && (
-							<span className="text-red-500 ml-1">*</span>
+							<span className="text-red-400 ml-1">*</span>
+						)}
+						{optional && !props.required && (
+							<span className="text-muted ml-1.5 font-normal text-xs">
+								(optional)
+							</span>
 						)}
 					</label>
-				)}
-
-				{/* Helper Text */}
-				{helperText && !error && (
-					<div className="mb-1">
-						<span
-							className={`${responsiveClasses.text.caption} text-primary-content/40 text-sm`}>
-							{helperText}
-						</span>
-					</div>
 				)}
 
 				<div className="relative">
 					<textarea
 						ref={ref}
-						className={textAreaClasses}
+						className={`
+							w-full rounded-xl transition-all duration-200 text-white
+							placeholder:text-muted/50 focus:outline-none resize-y
+							disabled:cursor-not-allowed disabled:opacity-50
+							${variantStyles[variant]}
+							${sizeStyles[textAreaSize]}
+							${
+								error
+									? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20 bg-red-500/5"
+									: ""
+							}
+							${className}
+						`}
 						disabled={disabled}
 						maxLength={maxLength}
 						rows={getRows()}
@@ -138,31 +113,34 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 						}}
 						{...props}
 					/>
+
+					{/* Character count */}
+					{showCharCount && maxLength && (
+						<div className="absolute bottom-2 right-3 pointer-events-none">
+							<span
+								className={`text-xs ${
+									characterCount >= maxLength
+										? "text-red-400"
+										: characterCount > maxLength * 0.8
+										? "text-yellow-400"
+										: "text-muted/50"
+								}`}>
+								{characterCount}/{maxLength}
+							</span>
+						</div>
+					)}
 				</div>
+
+				{/* Helper Text */}
+				{helperText && !error && (
+					<p className="mt-1.5 text-xs text-muted">{helperText}</p>
+				)}
 
 				{/* Error Message */}
 				{error && (
-					<div className="flex items-center gap-1 mt-1 text-red-600">
-						<FaExclamationCircle size={12} />
-						<span className={responsiveClasses.text.caption}>
-							{error}
-						</span>
-					</div>
-				)}
-
-				{/* Character limit warning */}
-				{maxLength && characterCount > maxLength * 0.9 && (
-					<div className="mt-1">
-						<span
-							className={`${responsiveClasses.text.caption} ${
-								characterCount >= maxLength
-									? "text-red-600"
-									: "text-yellow-600"
-							}`}>
-							{characterCount >= maxLength
-								? "Maximum character limit reached"
-								: `Approaching character limit (${characterCount}/${maxLength})`}
-						</span>
+					<div className="flex items-center gap-1.5 mt-1.5 text-red-400 animate-in slide-in-from-top-1 fade-in duration-200">
+						<AlertCircle size={14} />
+						<span className="text-xs">{error}</span>
 					</div>
 				)}
 			</div>

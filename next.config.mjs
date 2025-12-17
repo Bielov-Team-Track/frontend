@@ -6,6 +6,7 @@ const nextConfig = {
 			"volleyer.s3.eu-west-2.amazonaws.com",
 			"lh3.googleusercontent.com",
 			"www.gravatar.com",
+			"api.dicebear.com",
 		],
 		unoptimized: process.env.NODE_ENV === "production",
 	},

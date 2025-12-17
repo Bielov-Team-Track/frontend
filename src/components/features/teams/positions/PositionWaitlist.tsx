@@ -1,9 +1,11 @@
-import { Avatar, Button, Loader } from "@/components/ui";
+"use client";
+
+import { Avatar, Loader } from "@/components/ui";
 import { useWaitlist } from "@/hooks/useWaitlist";
 import { Position } from "@/lib/models/Position";
 import { Team } from "@/lib/models/Team";
 import Link from "next/link";
-import { FaTimes as CancelIcon } from "react-icons/fa";
+import { X, Clock, UserPlus } from "lucide-react";
 
 type PositionWaitlistProps = {
 	position: Position;
@@ -22,55 +24,73 @@ const PositionWaitlist = ({
 		shouldLoad,
 	);
 
-	return (
-		<div>
-			<div className="py-4 w-full flex items-center justify-between border-b h-16 border-neutral/20 mb-4">
-				<span className="text-lg">Waitlist</span>
+    const isOnWaitlist = waitlist?.find((u) => u.userId === userId);
+    const isOccupant = position.eventParticipant?.userProfile?.userId === userId;
 
-				{position.eventParticipant?.userProfile?.userId !== userId &&
-					(!waitlist || !waitlist.find((u) => u.userId === userId)) && (
-						<Button size="sm" onClick={joinWaitlist}>
-							Join waitlist
-						</Button>
-					)}
+	return (
+		<div className="bg-white/5 rounded-xl p-3 border border-white/5 mt-2">
+			<div className="flex items-center justify-between mb-3">
+				<div className="flex items-center gap-2 text-sm font-bold text-white">
+                    <Clock size={14} className="text-accent" />
+                    <span>Waitlist</span>
+                    {waitlist && waitlist.length > 0 && (
+                        <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-xs text-muted">
+                            {waitlist.length}
+                        </span>
+                    )}
+                </div>
+
+				{!isOccupant && !isOnWaitlist && (
+                    <button 
+                        onClick={joinWaitlist}
+                        className="flex items-center gap-1.5 text-xs font-bold text-accent hover:text-white transition-colors"
+                    >
+                        <UserPlus size={14} /> Join
+                    </button>
+				)}
 			</div>
+
 			{isLoading ? (
-				<Loader />
+				<div className="flex justify-center py-4">
+                    <Loader className="w-5 h-5 opacity-50" />
+                </div>
 			) : (
-				<div className="flex flex-col items-center gap-4">
-					<div className="w-full flex flex-col gap-2">
-						{waitlist && waitlist.length > 0 ? (
-							waitlist.map((waitlistEntry, i) => (
-								<div
-									key={`waitlist-${position.id}-${waitlistEntry.userId}`}
-									className="flex w-full items-center justify-between gap-2"
-								>
+				<div className="flex flex-col gap-2">
+					{waitlist && waitlist.length > 0 ? (
+						waitlist.map((waitlistEntry, i) => (
+							<div
+								key={`waitlist-${position.id}-${waitlistEntry.userId}`}
+								className="flex w-full items-center justify-between gap-3 p-2 rounded-lg bg-black/20 hover:bg-black/40 transition-colors group"
+							>
+								<div className="flex items-center gap-3 min-w-0">
+                                    <span className="text-xs font-mono text-muted/50 w-4 text-center">{i + 1}</span>
 									<Link
 										href={`/profiles/${waitlistEntry.userId}`}
-										className="flex gap-2 items-center z-50"
+										className="flex gap-2 items-center"
 									>
-										<span>{i + 1}.</span>
-										<Avatar profile={waitlistEntry.user} />
-										<Link
-											href={`/profiles/${waitlistEntry.userId}`}
-											className="hover:underline"
-										>
+										<Avatar profile={waitlistEntry.user} className="w-6 h-6 border border-white/10" />
+										<span className="text-sm text-gray-300 hover:text-white hover:underline truncate">
 											{waitlistEntry.user.name} {waitlistEntry.user.surname}
-										</Link>
+										</span>
 									</Link>
-									{userId === waitlistEntry.userId && (
-										<button className="link text-error" onClick={leaveWaitlist}>
-											<CancelIcon />
-										</button>
-									)}
 								</div>
-							))
-						) : (
-							<span className="text-sm text-center text-muted">
-								Waitlist is empty
-							</span>
-						)}
-					</div>
+                                
+								{userId === waitlistEntry.userId && (
+									<button 
+                                        className="p-1 text-muted hover:text-error hover:bg-red-500/10 rounded transition-colors" 
+                                        onClick={leaveWaitlist}
+                                        title="Leave waitlist"
+                                    >
+										<X size={14} />
+									</button>
+								)}
+							</div>
+						))
+					) : (
+						<div className="text-center py-3 text-muted text-xs italic">
+							No one is waiting for this spot yet.
+						</div>
+					)}
 				</div>
 			)}
 		</div>

@@ -4,6 +4,7 @@ import { getAccountBalance } from "@/lib/server/payments";
 import { getUserProfile } from "@/lib/server/auth";
 import { getOutstandingBalance } from "@/lib/server/audit";
 import { getFormatedCurrency } from "@/lib/utils/currency";
+import { Wallet, AlertCircle, CheckCircle } from "lucide-react";
 
 const AuditPage = async () => {
 	const userProfile = await getUserProfile();
@@ -30,38 +31,61 @@ const AuditPage = async () => {
 		: "£0.00";
 
 	return (
-		<div className="flex flex-col gap-4 p-6 max-w-full overflow-hidden">
+		<div className="flex flex-col gap-6 w-full max-w-7xl mx-auto">
 			<div>
-				<h2>Financial Audit</h2>
+				<h2 className="text-2xl font-bold text-white">Financial Audit</h2>
 				<p className="text-sm text-muted">
 					Overview of your account balance and outstanding payments
 				</p>
 			</div>
-			<div className="flex gap-4 flex-wrap">
-				<div className="flex flex-col p-4 bg-background-light rounded-lg w-fit">
-					<div>Current balance</div>
-					<div className="text-3xl font-semibold text-success">
-						{formattedBalance}
+			
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div className="bg-[#141414] border border-white/5 rounded-2xl p-6 flex flex-col gap-4">
+					<div className="flex items-center gap-3 text-white">
+						<div className="p-2 rounded-lg bg-green-500/10 text-green-500">
+							<Wallet size={24} />
+						</div>
+						<span className="font-medium">Current Balance</span>
 					</div>
-					<div className="text-sm text-muted">Connected via Stripe</div>
+					<div>
+						<div className="text-3xl font-bold text-green-500">
+							{formattedBalance}
+						</div>
+						<div className="text-sm text-muted mt-1">Connected via Stripe</div>
+					</div>
 				</div>
 
-				<div className="flex flex-col p-4  bg-background-light rounded-lg w-fit">
-					<div>Outstanding balance</div>
-					<div className="text-3xl font-semibold text-warning">
-						{formattedOutstandingBalance}
+				<div className="bg-[#141414] border border-white/5 rounded-2xl p-6 flex flex-col gap-4">
+					<div className="flex items-center gap-3 text-white">
+						<div className="p-2 rounded-lg bg-yellow-500/10 text-yellow-500">
+							<AlertCircle size={24} />
+						</div>
+						<span className="font-medium">Outstanding Balance</span>
 					</div>
-					<div className="text-sm text-muted">For {events?.length} events</div>
+					<div>
+						<div className="text-3xl font-bold text-yellow-500">
+							{formattedOutstandingBalance}
+						</div>
+						<div className="text-sm text-muted mt-1">For {events?.length} events</div>
+					</div>
 				</div>
 			</div>
+
 			{events && events.length > 0 ? (
-				<AuditEventsTable events={events} />
+				<div className="bg-[#141414] border border-white/5 rounded-2xl overflow-hidden">
+					<AuditEventsTable events={events} />
+				</div>
 			) : (
-				<div className="flex flex-col gap-2 items-center justify-center mt-20">
-					<span className="text-lg font-medium">No outstanding payments</span>
-					<span className="text-sm text-muted">
-						All your events are settled
-					</span>
+				<div className="bg-[#141414] border border-white/5 rounded-2xl p-12 text-center flex flex-col items-center gap-4">
+					<div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
+						<CheckCircle size={32} />
+					</div>
+					<div>
+						<span className="text-lg font-medium text-white block">No outstanding payments</span>
+						<span className="text-sm text-muted">
+							All your events are settled
+						</span>
+					</div>
 				</div>
 			)}
 		</div>

@@ -55,7 +55,7 @@ const buttonVariants = cva(
 			{
 				variant: "solid",
 				color: "accent",
-				class: "bg-accent text-accent-content hover:bg-accent/90 focus:bg-accent/90 focus:ring-accent/50",
+				class: "bg-accent text-white font-bold hover:bg-accent/90 focus:bg-accent/90 focus:ring-accent/50",
 			},
 			{
 				variant: "solid",
@@ -96,7 +96,7 @@ const buttonVariants = cva(
 			{
 				variant: "outline",
 				color: "neutral",
-				class: "text-neutral border-neutral hover:bg-neutral/10 focus:bg-neutral/10 focus:ring-neutral/50",
+				class: "text-muted border-muted hover:bg-neutral/10 focus:bg-neutral/10 focus:ring-neutral/50",
 			},
 			{
 				variant: "outline",
@@ -168,7 +168,7 @@ const buttonVariants = cva(
 			{
 				variant: "link",
 				color: "neutral",
-				class: "text-neutral hover:text-neutral/90 focus:text-neutral/90",
+				class: "text-muted hover:text-neutral/90 focus:text-neutral/90",
 			},
 			{
 				variant: "link",

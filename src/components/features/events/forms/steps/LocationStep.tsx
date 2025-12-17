@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Controller } from "react-hook-form";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { MapPin } from "lucide-react";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import AddressAutocomplete from "@/components/ui/address-autocomplete";
 import { Map } from "@/components";
@@ -34,14 +34,13 @@ export function LocationStep() {
 	};
 
 	return (
-		<div className="space-y-6">
-			<div className="text-center mb-8">
-				<span className="w-12 h-12 text-[48px] mx-auto mb-3">🗺️</span>
-				<h2 className="text-xl font-semibold  mb-2">Location</h2>
-				<p className="/60">Where will your event take place?</p>
+		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+			<div>
+				<h2 className="text-xl font-bold text-white mb-1">Location</h2>
+				<p className="text-muted text-sm">Where will your event take place?</p>
 			</div>
 
-			<div className="grid gap-6">
+			<div className="space-y-4">
 				<Controller
 					name="location"
 					control={control}
@@ -55,14 +54,12 @@ export function LocationStep() {
 								onPlaceSelected={(place) => {
 									const locationData = parseAddressComponents(place);
 
-									// Set all location fields from parsed data
 									Object.entries(locationData).forEach(([key, value]) => {
 										if (value !== undefined) {
 											setValue(`location.${key}` as any, value);
 										}
 									});
 
-									// Update map position if place has geometry
 									if (place.geometry?.location) {
 										const lat = place.geometry.location.lat();
 										const lng = place.geometry.location.lng();
@@ -77,17 +74,20 @@ export function LocationStep() {
 						</APIProvider>
 					)}
 				/>
-			</div>
 
-			<div>
-				<span className="text-sm text-primary-content/60">
-					You can select the exact location by clicking on the map
-				</span>
-				<Map
-					defaultAddress={values.location?.address}
-					onAddressSelected={handleAddressSelected}
-					onPositionChanged={handleMapPositionChanged}
-				/>
+				<div className="space-y-2">
+					<div className="flex items-center gap-2 text-sm text-muted">
+						<MapPin size={14} />
+						<span>Click on the map to fine-tune the exact location</span>
+					</div>
+					<div className="rounded-xl overflow-hidden border border-white/10">
+						<Map
+							defaultAddress={values.location?.address}
+							onAddressSelected={handleAddressSelected}
+							onPositionChanged={handleMapPositionChanged}
+						/>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

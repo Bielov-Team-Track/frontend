@@ -5,9 +5,10 @@ import { Position as PositionModel } from "@/lib/models/Position";
 import { Team } from "@/lib/models/Team";
 import { Button } from "@/components/ui";
 import {
-	FaSignOutAlt as LeaveIcon,
-	FaUserAlt as PersonIcon,
-} from "react-icons/fa";
+    LogOut,
+    Crown,
+    ChevronDown
+} from "lucide-react";
 import Link from "next/link";
 import { loadWaitlist } from "@/lib/requests/waitlist";
 import { useState } from "react";
@@ -55,20 +56,21 @@ function PositionWithUser({
 		editable ||
 		position.eventParticipant?.userProfile?.userId === userId;
 
+    const userProfile = position.eventParticipant?.userProfile;
+
 	if (!collapsable) {
 		return (
-			<div className="p-4 h-14 rounded-md bg-background-light w-full flex justify-between items-center">
+			<div className="p-3 rounded-xl bg-background-light border border-white/5 w-full flex justify-between items-center transition-all hover:bg-white/5">
 				<Link
-					href={`/profiles/${position.eventParticipant?.userProfile!.userId}`}
-					className="flex gap-2 items-center z-50"
+					href={`/profiles/${userProfile?.userId}`}
+					className="flex gap-3 items-center z-50 group"
 				>
-					<Avatar profile={position.eventParticipant?.userProfile!} />
+					<Avatar profile={userProfile!} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors" />
 					<div className="flex flex-col">
-						<span className="whitespace-nowrap font-bold text-sm  hover:underline">
-							{position.eventParticipant?.userProfile?.name}{" "}
-							{position.eventParticipant?.userProfile?.surname}
+						<span className="whitespace-nowrap font-bold text-sm text-white group-hover:text-accent transition-colors">
+							{userProfile?.name} {userProfile?.surname}
 						</span>
-						<span className="text-muted text-xs">{position.name}</span>
+						<span className="text-muted text-[10px] uppercase font-bold tracking-wider">{position.name}</span>
 					</div>
 				</Link>
 			</div>
@@ -76,66 +78,78 @@ function PositionWithUser({
 	}
 
 	return (
-		<div className="collapse collapse-arrow bg-background-dark/30 text-primary-content rounded-md">
+		<div className={`rounded-xl border transition-all duration-300 overflow-hidden ${isExpanded ? "bg-[#1E1E1E] border-white/10 shadow-lg" : "bg-background-light border-white/5"}`}>
+            {/* Header / Trigger */}
+            <div 
+                className="p-3 flex items-center justify-between cursor-pointer hover:bg-white/5 transition-colors"
+                onClick={() => {
+                    const newValue = !isExpanded;
+                    setIsExpanded(newValue);
+                    if (newValue) collapseOtherPositions(position.id);
+                }}
+            >
+				<Link
+					href={`/profiles/${userProfile?.userId}`}
+					className="flex gap-3 items-center group flex-1 min-w-0"
+                    onClick={(e) => e.stopPropagation()} // Prevent expansion when clicking profile
+				>
+					<Avatar profile={userProfile!} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors flex-shrink-0" />
+					<div className="flex flex-col min-w-0">
+						<div className="flex items-center gap-1.5">
+							<span className="whitespace-nowrap font-bold text-sm text-white group-hover:text-accent transition-colors truncate">
+								{userProfile?.name} {userProfile?.surname}
+							</span>
+							{team.captain?.userId === userProfile?.userId && (
+								<Crown size={12} className="text-accent flex-shrink-0 fill-accent" />
+							)}
+						</div>
+						<span className="text-muted text-[10px] uppercase font-bold tracking-wider truncate">{position.name}</span>
+					</div>
+				</Link>
+
+                {/* Arrow */}
+                <div className={`p-1 text-muted transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}>
+                    <ChevronDown size={16} />
+                </div>
+            </div>
+
+            {/* Collapsible Content */}
+            <div className={`transition-all duration-300 ease-in-out ${isExpanded ? "max-h-96 opacity-100 border-t border-white/5" : "max-h-0 opacity-0 border-none"}`}>
+                <div className="p-3 bg-black/20">
+                    {(userProfile?.userId === userId || editable) && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleLeavePosition();
+                            }}
+                            className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-red-500/10 text-error hover:bg-red-500/20 transition-colors text-xs font-bold uppercase tracking-wide border border-red-500/20"
+                        >
+                            <LogOut size={14} /> Free Position
+                        </button>
+                    )}
+                    
+                    {open && (
+                        <div className="mt-3">
+                             <PositionWaitlist
+                                position={position}
+                                team={team}
+                                userId={userId}
+                                shouldLoad={isExpanded}
+                            />
+                        </div>
+                    )}
+                </div>
+            </div>
+            
+            {/* Hidden Checkbox for Logic Preservation (if needed by other components, though mostly handled by state now) */}
 			<input
 				id={position.id}
 				type="checkbox"
 				name={team?.id!}
 				checked={isExpanded}
-				onChange={(e) => {
-					setIsExpanded(e.target.checked);
-					collapseOtherPositions(position.id);
-				}}
+				onChange={() => {}} // Controlled by div click
+                className="hidden"
 			/>
-			<div className="collapse-title p-4 h-14 rounded-md bg-background-light w-full flex justify-between items-center">
-				<Link
-					href={`/profiles/${position.eventParticipant?.userProfile!.userId}`}
-					className="flex gap-2 items-center z-50"
-				>
-					<Avatar profile={position.eventParticipant?.userProfile!} />
-					<div className="flex flex-col">
-						<div className="flex items-center gap-1">
-							<span className="whitespace-nowrap font-bold text-sm hover:underline">
-								{position.eventParticipant?.userProfile?.name}{" "}
-								{position.eventParticipant?.userProfile?.surname}
-							</span>
-							{team.captain?.userId ===
-								position.eventParticipant?.userProfile?.userId && (
-								<span className="text-sm pb-1"> 👑</span>
-							)}
-						</div>
-						<span className="text-muted text-xs">{position.name}</span>
-					</div>
-				</Link>
-			</div>
-			<div className="collapse-content relative">
-				{(position.eventParticipant?.userProfile?.userId === userId ||
-					editable) && (
-					<div className="flex justify-end pt-4">
-						<Button
-							fullWidth={true}
-							variant="solid"
-							color="secondary"
-							leftIcon={<LeaveIcon />}
-							className="text-error !min-h-0"
-							onClick={(e) => {
-								e.stopPropagation();
-								handleLeavePosition();
-							}}
-						>
-							Free position
-						</Button>
-					</div>
-				)}
-				{open && (
-					<PositionWaitlist
-						position={position}
-						team={team}
-						userId={userId}
-						shouldLoad={isExpanded}
-					/>
-				)}
-			</div>
 		</div>
 	);
 }

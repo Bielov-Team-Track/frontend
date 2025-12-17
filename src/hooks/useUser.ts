@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getCurrentUserProfile } from "@/lib/requests/auth";
 import { UserProfile } from "@/lib/models/User";
+import { useAuth } from "@/lib/auth/authContext";
 
 interface UseUserReturn {
 	userProfile: UserProfile | null;
@@ -9,34 +7,18 @@ interface UseUserReturn {
 	error: string | null;
 }
 
+/**
+ * Hook to get the current user profile from AuthContext.
+ * This hook reads from the centralized auth state to avoid duplicate profile fetches.
+ */
 const useUser = (): UseUserReturn => {
-	const [userProfile, setUserProfile] = useState<UserProfile | null>();
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const router = useRouter();
+	const { userProfile, isLoading } = useAuth();
 
-	useEffect(() => {
-		const fetchUser = async () => {
-			try {
-				setLoading(true);
-				setError(null);
-
-				const userData = await getCurrentUserProfile();
-				setUserProfile(userData);
-			} catch (err: any) {
-				console.error("Error fetching user:", err);
-				setError(err.message || "Failed to fetch user");
-
-				setUserProfile(null);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchUser();
-	}, [router]);
-
-	return { userProfile: userProfile ?? null, loading, error };
+	return {
+		userProfile,
+		loading: isLoading,
+		error: null,
+	};
 };
 
 export default useUser;

@@ -1,69 +1,185 @@
 "use client";
 
 import React, { useState, useEffect, use } from "react";
-import Avatar from "@/components/ui/avatar";
-import { followUser, getUserProfile } from "@/lib/requests/user";
+import { followUser, getFullUserProfile, unfollowUser } from "@/lib/requests/user";
 import { redirect } from "next/navigation";
 import Loader from "@/components/ui/loader";
 import { Event } from "@/lib/models/Event";
 import { loadEventsByFilter } from "@/lib/requests/events";
-import { UserProfile } from "@/lib/models/User";
+import { FullProfileDto } from "@/lib/models/Profile";
 import { useAuth } from "@/lib/auth/authContext";
+import ProfileHeader from "../components/ProfileHeader";
+import ProfileOverview from "../components/ProfileOverview";
+import PlayerStats from "../components/PlayerStats";
+import CoachStats from "../components/CoachStats";
+import ProfileHistory from "../components/ProfileHistory";
+import ProfileEvents from "../components/ProfileEvents";
+import {
+    LayoutDashboard,
+    Activity,
+    ClipboardList,
+    History,
+    Calendar
+} from "lucide-react";
+
+// Extended interface to match backend response structure
+interface ExtendedProfile extends FullProfileDto {
+    location?: string;
+    website?: string;
+    followersCount?: number;
+    followingCount?: number;
+    joinedAt?: string;
+    isFollowing?: boolean;
+}
 
 function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
-	const [profile, setProfile] = useState<UserProfile>();
-	const [events, setEvents] = useState<Event[]>();
-	const { id } = use(params);
+    const { id } = use(params);
+	const [profile, setProfile] = useState<ExtendedProfile>();
+	const [organizedEvents, setOrganizedEvents] = useState<Event[]>([]);
+    const [participatedEvents, setParticipatedEvents] = useState<Event[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState("overview");
 	const { userProfile } = useAuth();
 
 	useEffect(() => {
-		getUserProfile(id as string).then((profileUser) => {
-			if (!profileUser) {
-				redirect("/404");
-			}
+        if (!id) return;
 
-			setProfile(profileUser);
-		});
+        const loadData = async () => {
+            setIsLoading(true);
+            try {
+                // 1. Fetch Full Profile (includes player, coach, history)
+                const profileData = await getFullUserProfile(id);
+                if (!profileData) {
+                    redirect("/404");
+                }
+                setProfile(profileData as ExtendedProfile);
+
+                // 2. Fetch Events (Organizer)
+                const organized = await loadEventsByFilter({
+                    organizerId: id,
+                    sortBy: "startDate",
+                    sortOrder: "desc"
+                });
+                setOrganizedEvents(organized || []);
+
+                // 3. Fetch Events (Participant)
+                const participated = await loadEventsByFilter({
+                    participantId: id,
+                    sortBy: "startDate",
+                    sortOrder: "desc"
+                });
+                setParticipatedEvents(participated || []);
+
+            } catch (error) {
+                console.error("Failed to load profile data", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
 	}, [id]);
 
-	useEffect(() => {
-		loadEventsByFilter({ organizerId: id as string }).then((events) => {
-			setEvents(events);
-		});
-	}, [id]);
+    const handleFollowToggle = async () => {
+        if (!profile || !userProfile) return;
 
-	if (!id) {
-		redirect("/404");
+        try {
+            if (profile.isFollowing) {
+                await unfollowUser(id);
+                setProfile(prev => prev ? ({...prev, isFollowing: false, followersCount: (prev.followersCount || 1) - 1}) : undefined);
+            } else {
+                await followUser(id);
+                setProfile(prev => prev ? ({...prev, isFollowing: true, followersCount: (prev.followersCount || 0) + 1}) : undefined);
+            }
+        } catch (error) {
+            console.error("Follow toggle failed", error);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <Loader />
+            </div>
+        );
+    }
+
+	if (!profile) {
+		return null; // Redirect handled in useEffect
 	}
 
-	const handleFollow = () => {
-		followUser;
-	};
+    const isOwnProfile = userProfile?.userId === profile.userId;
 
-	const displayName = profile?.email?.split("@")[0] || "User";
+    const tabs = [
+        { id: "overview", label: "Overview", icon: <LayoutDashboard size={18} /> },
+        { id: "player", label: "Player Profile", icon: <Activity size={18} /> },
+        { id: "coach", label: "Coach Profile", icon: <ClipboardList size={18} /> },
+        { id: "history", label: "History", icon: <History size={18} /> },
+        { id: "events", label: "Events", icon: <Calendar size={18} /> },
+    ];
 
-	return profile ? (
-		<div>
-			<div className="flex items-center flex-col gap-4">
-				<Avatar profile={profile} size="large" />
-				<div>{displayName}</div>
-				{profile.userId !== userProfile?.userId && (
-					<button className="btn btn-info btn-md w-32">Follow</button>
-				)}
-			</div>
-			<div>
-				<h2>Events</h2>
-				{events ? (
-					events?.map((event) => {
-						return <div key={event.id}>{event.name}</div>;
-					})
-				) : (
-					<Loader />
-				)}
-			</div>
+	return (
+		<div className="flex flex-col w-full max-w-7xl mx-auto pb-12">
+            <ProfileHeader 
+                profile={profile} 
+                onFollow={handleFollowToggle} 
+                isOwnProfile={isOwnProfile} 
+            />
+
+            {/* Tabs Navigation */}
+            <div className="mt-12 px-6 border-b border-white/10 flex overflow-x-auto no-scrollbar gap-1">
+                {tabs.map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`
+                            flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all border-b-2 whitespace-nowrap
+                            ${activeTab === tab.id 
+                                ? "border-accent text-accent bg-accent/5" 
+                                : "border-transparent text-muted hover:text-white hover:border-white/20 hover:bg-white/5"}
+                        `}
+                    >
+                        {tab.icon}
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* Content Area */}
+            <div className="px-6 py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {activeTab === "overview" && (
+                    <ProfileOverview 
+                        badges={profile.badges} 
+                        stats={profile.stats} 
+                    />
+                )}
+
+                {activeTab === "player" && (
+                    <PlayerStats playerProfile={profile.playerProfile} />
+                )}
+
+                {activeTab === "coach" && (
+                    <CoachStats coachProfile={profile.coachProfile} />
+                )}
+
+                {activeTab === "history" && (
+                    <ProfileHistory historyEntries={profile.historyEntries} />
+                )}
+
+                {activeTab === "events" && (
+                    <div className="flex flex-col gap-12">
+                        <ProfileEvents 
+                            title="Upcoming & Past Events (Organized)" 
+                            events={organizedEvents} 
+                        />
+                        <ProfileEvents 
+                            title="Participated Events" 
+                            events={participatedEvents} 
+                        />
+                    </div>
+                )}
+            </div>
 		</div>
-	) : (
-		<Loader />
 	);
 }
 

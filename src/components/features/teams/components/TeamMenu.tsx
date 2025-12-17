@@ -1,9 +1,16 @@
 "use client";
 
 import { Team } from "@/lib/models/Team";
+import { UserProfile } from "@/lib/models/User";
 import { useAuth } from "@/lib/auth/authContext";
-import React from "react";
-import { FaEllipsisH as MenuIcon } from "react-icons/fa";
+import React, { useState } from "react";
+import { 
+    MoreHorizontal, 
+    Crown, 
+    UserMinus, 
+    UserPlus, 
+    Trash2
+} from "lucide-react";
 import { Modal } from "@/components/ui";
 import { UserSearch } from "@/components/features/users";
 import {
@@ -11,7 +18,6 @@ import {
 	removeCaptain as removeCaptainRequest,
 } from "@/lib/requests/teams";
 import useUser from "@/hooks/useUser";
-import { UserProfile } from "@/lib/models/User";
 
 type TeamMenuProps = {
 	team: Team;
@@ -24,8 +30,8 @@ function TeamMenu({
 	onCaptainAssigned,
 	onCaptainRemoved,
 }: TeamMenuProps) {
-	const [isModalOpen, setIsModalOpen] = React.useState(false);
-	const [isLoading, setIsLoading] = React.useState(false);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 	const { userProfile } = useUser();
 
 	const isAdmin = !!team.event.admins?.find(
@@ -66,31 +72,49 @@ function TeamMenu({
 	};
 
 	return (
-		<div className="dropdown dropdown-end z-50">
-			<MenuIcon tabIndex={0} role="button" className="m-1" />
-			<ul
-				tabIndex={0}
-				className="dropdown-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow"
-			>
-				<li>
-					<button onClick={() => setIsModalOpen(true)}>Assign a captain</button>
-				</li>
-				{team.captain && (
-					<li>
-						<button onClick={() => removeCaptain()}>Remove the captain</button>
-					</li>
-				)}
-			</ul>
+		<>
+            <div className="dropdown dropdown-end">
+                <div tabIndex={0} role="button" className="btn btn-ghost btn-xs btn-circle text-muted hover:text-white">
+                    <MoreHorizontal size={16} />
+                </div>
+                <ul
+                    tabIndex={0}
+                    className="dropdown-content z-[1] menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-48 mt-1"
+                >
+                    <li>
+                        <button 
+                            onClick={() => setIsModalOpen(true)}
+                            className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2"
+                        >
+                            {team.captain ? <UserPlus size={14} /> : <Crown size={14} />} 
+                            {team.captain ? "Change Captain" : "Assign Captain"}
+                        </button>
+                    </li>
+                    {team.captain && (
+                        <li>
+                            <button 
+                                onClick={() => removeCaptain()}
+                                className="text-xs hover:bg-red-500/10 hover:text-error text-error gap-2"
+                            >
+                                <UserMinus size={14} /> Remove Captain
+                            </button>
+                        </li>
+                    )}
+                </ul>
+            </div>
+
 			<Modal
 				isLoading={isLoading}
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
+                title="Assign Captain"
 			>
-				<div className="p-12">
+				<div className="p-4">
+                    <p className="text-sm text-muted mb-4">Search for a user to make them the captain of <span className="text-white font-bold">{team.name}</span>.</p>
 					<UserSearch onUserSelect={assignCaptain} />
 				</div>
 			</Modal>
-		</div>
+		</>
 	);
 }
 

@@ -6,6 +6,7 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useRef,
 	useState,
 } from "react";
 import { UserProfile } from "../models/User";
@@ -29,112 +30,121 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_STORAGE_KEY = "accessToken";
-const REFRESH_TOKEN_STORAGE_KEY = "refreshToken";
-const TOKEN_EXPIRY_STORAGE_KEY = "accessTokenExpiry";
+// Cookie utility functions
+const getCookie = (name: string): string | null => {
+	if (typeof window === "undefined") return null;
+	const row = document.cookie
+		.split("; ")
+		.find((row) => row.startsWith(`${name}=`));
+	if (!row) return null;
+	// Use slice(1).join("=") to handle values containing "=" characters (like JWT tokens)
+	return row.split("=").slice(1).join("=") || null;
+};
+
+const setCookie = (name: string, value: string, maxAge: number): void => {
+	if (typeof window === "undefined") return;
+	document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Lax`;
+};
+
+const deleteCookie = (name: string): void => {
+	if (typeof window === "undefined") return;
+	document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
+
+// Parse JWT to get expiration time
+const getTokenExpiration = (token: string): Date | null => {
+	try {
+		const payload = token.split(".")[1];
+		const decoded = JSON.parse(atob(payload));
+		if (decoded.exp) {
+			return new Date(decoded.exp * 1000);
+		}
+		return null;
+	} catch {
+		return null;
+	}
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
-	const [refreshTimerId, setRefreshTimerId] = useState<NodeJS.Timeout | null>(
-		null
-	);
+	const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
 
 	const isAuthenticated = !!userProfile;
 
-	// Token management utilities
-	const saveTokens = (authResponse: AuthResponse) => {
+	// Token management utilities (cookies only)
+	const saveTokens = useCallback((authResponse: AuthResponse) => {
 		console.log("Saving tokens:", {
 			token: authResponse.token.substring(0, 20) + "...",
 			expiry: authResponse.expiresAt,
 		});
-		localStorage.setItem(TOKEN_STORAGE_KEY, authResponse.token);
-		localStorage.setItem(
-			REFRESH_TOKEN_STORAGE_KEY,
-			authResponse.refreshToken
-		);
-		localStorage.setItem(TOKEN_EXPIRY_STORAGE_KEY, authResponse.expiresAt);
 
 		// Calculate token expiration time
 		const expiresAt = new Date(authResponse.expiresAt);
 		const now = new Date();
 		const timeUntilExpiry = expiresAt.getTime() - now.getTime();
 
-		// Set access token cookie to expire at the same time as the token
-		const maxAge = Math.max(0, Math.floor(timeUntilExpiry / 1000));
-		const tokenCookie = `token=${authResponse.token}; path=/; max-age=${maxAge}; SameSite=Lax`;
-		document.cookie = tokenCookie;
+		// Set access token cookie
+		// Subtract 60s from maxAge to ensure cookie expires before token (preventing race conditions)
+		const maxAge = Math.max(0, Math.floor(timeUntilExpiry / 1000) - 60);
+		setCookie("token", authResponse.token, maxAge);
 		console.log("Access token cookie set with max-age:", maxAge, "seconds");
 
-		// Set refresh token cookie (with longer expiration, e.g., 7 days)
-		const refreshTokenMaxAge = 7 * 24 * 60 * 60; // 7 days in seconds
-		const refreshTokenCookie = `refreshToken=${authResponse.refreshToken}; path=/; max-age=${refreshTokenMaxAge}; SameSite=Lax`;
-		document.cookie = refreshTokenCookie;
-		console.log(
-			"Refresh token cookie set with max-age:",
-			refreshTokenMaxAge,
-			"seconds"
-		);
+		// Set refresh token cookie (7 days)
+		const refreshTokenMaxAge = 7 * 24 * 60 * 60;
+		setCookie("refreshToken", authResponse.refreshToken, refreshTokenMaxAge);
+		console.log("Refresh token cookie set with max-age:", refreshTokenMaxAge, "seconds");
 
-		// Schedule proactive token refresh (5 seconds before expiry)
-		const refreshBuffer = 5000; // 5 seconds buffer
+		// Schedule proactive token refresh (60 seconds before expiry)
+		const refreshBuffer = 60000; // 60 seconds buffer
 		const refreshIn = Math.max(0, timeUntilExpiry - refreshBuffer);
 
-		console.log(
-			`Scheduling token refresh in ${refreshIn}ms (${refreshIn / 1000}s)`
-		);
+		console.log(`Scheduling token refresh in ${refreshIn}ms (${refreshIn / 1000}s)`);
 
 		// Clear any existing timer
-		if (refreshTimerId) {
-			clearTimeout(refreshTimerId);
+		if (refreshTimerRef.current) {
+			clearTimeout(refreshTimerRef.current);
 		}
 
 		// Set new timer for proactive refresh
-		const timerId = setTimeout(() => {
+		refreshTimerRef.current = setTimeout(() => {
 			console.log("Proactive token refresh triggered");
 			refreshAuth();
 		}, refreshIn);
+	}, []);
 
-		setRefreshTimerId(timerId);
-	};
-
-	const clearTokens = () => {
-		localStorage.removeItem(TOKEN_STORAGE_KEY);
-		localStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY);
-		localStorage.removeItem(TOKEN_EXPIRY_STORAGE_KEY);
-
-		// Clear cookies
-		document.cookie =
-			"token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-		document.cookie =
-			"refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+	const clearTokens = useCallback(() => {
+		deleteCookie("token");
+		deleteCookie("refreshToken");
 
 		// Clear refresh timer
-		if (refreshTimerId) {
-			clearTimeout(refreshTimerId);
-			setRefreshTimerId(null);
+		if (refreshTimerRef.current) {
+			clearTimeout(refreshTimerRef.current);
+			refreshTimerRef.current = null;
 		}
-	};
+	}, []);
 
 	const getStoredAccessToken = (): string | null => {
-		return localStorage.getItem(TOKEN_STORAGE_KEY);
+		return getCookie("token");
 	};
 
 	const getStoredRefreshToken = (): string | null => {
-		return localStorage.getItem(REFRESH_TOKEN_STORAGE_KEY);
+		return getCookie("refreshToken");
 	};
 
 	const isTokenExpired = (): boolean => {
-		const expiry = localStorage.getItem(TOKEN_EXPIRY_STORAGE_KEY);
-		if (!expiry) return true;
+		const token = getStoredAccessToken();
+		if (!token) return true;
 
-		return new Date() >= new Date(expiry);
+		const expiration = getTokenExpiration(token);
+		if (!expiration) return true;
+
+		return new Date() >= expiration;
 	};
 
 	const login = async (email: string, password: string): Promise<void> => {
 		try {
 			const user = await apiLogin(email, password);
-
 			saveTokens(user);
 		} catch (error) {
 			console.error("Login failed:", error);
@@ -144,13 +154,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		}
 	};
 
-	const loginFromTokens = async (
-		authResponse: AuthResponse
-	): Promise<void> => {
+	const loginFromTokens = async (authResponse: AuthResponse): Promise<void> => {
 		try {
 			saveTokens(authResponse);
-			const userProfile = await getCurrentUserProfile();
-			setUserProfile(userProfile ?? null);
+			const profile = await getCurrentUserProfile();
+			setUserProfile(profile ?? null);
 		} catch (error) {
 			console.error("Login from tokens failed:", error);
 			clearTokens();
@@ -184,8 +192,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			const authResponse = await apiRefreshToken(refreshTokenValue);
 
 			saveTokens(authResponse);
-			const userProfile = await getCurrentUserProfile();
-			setUserProfile(userProfile ?? null);
+			const profile = await getCurrentUserProfile();
+			setUserProfile(profile ?? null);
 		} catch (error) {
 			console.error("Token refresh failed:", error);
 			console.error(
@@ -197,11 +205,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 			// Redirect to login on refresh failure
 			if (typeof window !== "undefined") {
-				console.log("Redirecting to login page1");
+				console.log("Redirecting to login page");
 				window.location.href = "/login";
 			}
 		}
-	}, []);
+	}, [saveTokens, clearTokens]);
 
 	// Initialize authentication state
 	useEffect(() => {
@@ -210,7 +218,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				const accessToken = getStoredAccessToken();
 				const refreshTokenValue = getStoredRefreshToken();
 
-				if (!accessToken || !refreshTokenValue) {
+				if (!accessToken && !refreshTokenValue) {
+					setIsLoading(false);
+					return;
+				}
+
+				// If we have a refresh token but no access token, try to refresh
+				if (!accessToken && refreshTokenValue) {
+					await refreshAuth();
 					setIsLoading(false);
 					return;
 				}
@@ -222,8 +237,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				} else {
 					// Token is valid, get current user
 					try {
-						const currentUserProfile =
-							await getCurrentUserProfile();
+						const currentUserProfile = await getCurrentUserProfile();
 						setUserProfile(currentUserProfile ?? null);
 					} catch (error) {
 						// If getting user fails, try refresh
@@ -240,16 +254,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		};
 
 		initializeAuth();
-	}, [refreshAuth]);
+	}, [refreshAuth, clearTokens]);
 
 	// Cleanup timer on unmount
 	useEffect(() => {
 		return () => {
-			if (refreshTimerId) {
-				clearTimeout(refreshTimerId);
+			if (refreshTimerRef.current) {
+				clearTimeout(refreshTimerRef.current);
 			}
 		};
-	}, [refreshTimerId]);
+	}, []);
 
 	const value: AuthContextType = {
 		userProfile,
@@ -274,8 +288,8 @@ export function useAuth(): AuthContextType {
 	return context;
 }
 
-// Utility hook for getting access token
+// Utility hook for getting access token from cookies
 export function useAccessToken(): string | null {
 	if (typeof window === "undefined") return null;
-	return localStorage.getItem(TOKEN_STORAGE_KEY);
+	return getCookie("token");
 }

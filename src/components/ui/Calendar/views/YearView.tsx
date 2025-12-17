@@ -2,16 +2,31 @@ import { Button } from "@/components/ui";
 import { Event } from "@/lib/models/Event";
 import {
 	addYears,
+	eachDayOfInterval,
+	endOfMonth,
+	endOfYear,
+	format,
 	getDay,
-	getDaysInMonth,
 	getYear,
+	isBefore,
+	isSameDay,
 	isToday,
+	startOfDay,
 	startOfMonth,
+	startOfYear,
 	subYears,
 } from "date-fns";
-import { useEffect, useState } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { CalendarDays, ChevronLeft, ChevronRight, Clock, MapPin } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ViewComponentProps } from "./ViewProps";
+
+const MONTHS = [
+	"January", "February", "March", "April",
+	"May", "June", "July", "August",
+	"September", "October", "November", "December",
+];
+
+const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
 function YearView({
 	events,
@@ -20,241 +35,181 @@ function YearView({
 	onViewChange,
 }: ViewComponentProps) {
 	const [currentDate, setCurrentDate] = useState(date);
-	const [selectedDate, setSelectedDate] = useState<string | null>(null);
-
-	const months = [
-		"January",
-		"February",
-		"March",
-		"April",
-		"May",
-		"June",
-		"July",
-		"August",
-		"September",
-		"October",
-		"November",
-		"December",
-	];
-
-	const dayLabels = ["S", "M", "T", "W", "T", "F", "S"];
 
 	useEffect(() => {
 		setCurrentDate(date);
 	}, [date]);
 
-	const handlePrevYear = () => {
-		setCurrentDate(subYears(currentDate, 1));
+	const handlePrevYear = () => setCurrentDate(subYears(currentDate, 1));
+	const handleNextYear = () => setCurrentDate(addYears(currentDate, 1));
+
+	const getEventsForDate = (dateToCheck: Date) => {
+		return events.filter((event) => isSameDay(new Date(event.startTime), dateToCheck));
 	};
 
-	const handleNextYear = () => {
-		setCurrentDate(addYears(currentDate, 1));
-	};
-
-	const formatDateKey = (year: number, month: number, day: number) => {
-		return `${year}-${String(month + 1).padStart(2, "0")}-${String(
-			day
-		).padStart(2, "0")}`;
-	};
-
-	const getEventsForDate = (dateKey: string) => {
-		return events.filter((event) => {
-			const eventStart = new Date(event.startTime);
-			const eventDateKey = formatDateKey(
-				eventStart.getFullYear(),
-				eventStart.getMonth(),
-				eventStart.getDate()
-			);
-			return eventDateKey === dateKey;
-		});
-	};
-
-	const getDaysInMonthArray = (year: number, monthIndex: number) => {
-		const daysInMonth = getDaysInMonth(new Date(year, monthIndex));
-		const firstDayOfMonth = getDay(
-			startOfMonth(new Date(year, monthIndex))
-		);
-		const days = [];
-
-		// Empty cells for days before month starts
-		for (let i = 0; i < firstDayOfMonth; i++) {
-			days.push(null);
-		}
-
-		// Days of the month
-		for (let day = 1; day <= daysInMonth; day++) {
-			days.push(day);
-		}
-
-		return days;
-	};
-
-	const selectedEvents = selectedDate ? getEventsForDate(selectedDate) : [];
 	const year = getYear(currentDate);
 
-	return (
-		<div className="w-full h-full flex flex-col">
-			<YearNavigation
-				year={year}
-				onPrev={handlePrevYear}
-				onNext={handleNextYear}
-			/>
+	// Filter and sort events for the current year
+	const yearEvents = useMemo(() => {
+		const yearStart = startOfYear(new Date(year, 0, 1));
+		const yearEnd = endOfYear(new Date(year, 0, 1));
 
-			<div className="flex-1 flex gap-6 overflow-hidden">
-				{/* Calendar Grid */}
-				<div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-foreground-content/20 scrollbar-track-transparent">
-					<div className="flex flex-wrap gap-4 justify-center">
-						{months.map((monthName, monthIndex) => (
-							<MonthCalendar
+		return events
+			.filter((event) => {
+				const eventDate = new Date(event.startTime);
+				return eventDate >= yearStart && eventDate <= yearEnd;
+			})
+			.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+	}, [events, year]);
+
+	return (
+		<div className="w-full h-full flex flex-col border border-white/5 rounded-2xl backdrop-blur-xl overflow-hidden shadow-2xl">
+			{/* Header - consistent with MonthView/WeekView */}
+			<div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/[0.02]">
+				<h2 className="text-2xl font-bold text-white tracking-tight">
+					{year}
+				</h2>
+				<div className="flex items-center bg-black/20 rounded-lg p-1 border border-white/5">
+					<Button
+						size="sm"
+						variant="ghost"
+						color="neutral"
+						onClick={handlePrevYear}
+						className="h-8 w-8 p-0 hover:bg-white/10 hover:text-white rounded-md">
+						<ChevronLeft size={16} />
+					</Button>
+					<div className="w-[1px] h-4 bg-white/10 mx-1" />
+					<Button
+						size="sm"
+						variant="ghost"
+						color="neutral"
+						onClick={handleNextYear}
+						className="h-8 w-8 p-0 hover:bg-white/10 hover:text-white rounded-md">
+						<ChevronRight size={16} />
+					</Button>
+				</div>
+			</div>
+
+			{/* Main content area */}
+			<div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
+				{/* Year Grid */}
+				<div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+					<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+						{MONTHS.map((monthName, monthIndex) => (
+							<MonthCard
 								key={monthIndex}
 								monthName={monthName}
 								monthIndex={monthIndex}
 								year={year}
-								days={getDaysInMonthArray(year, monthIndex)}
-								dayLabels={dayLabels}
-								formatDateKey={formatDateKey}
 								getEventsForDate={getEventsForDate}
-								selectedDate={selectedDate}
-								setSelectedDate={setSelectedDate}
 								onViewChange={onViewChange}
 							/>
 						))}
 					</div>
 				</div>
 
-				{/* Event Sidebar */}
-				<EventSidebar
-					selectedEvents={selectedEvents}
-					allEvents={events}
-					formatDateKey={formatDateKey}
-					setSelectedDate={setSelectedDate}
-					onEventClick={onEventClick}
-				/>
+				{/* Agenda Sidebar */}
+				<div className="w-full lg:w-80 xl:w-96 border-t lg:border-t-0 lg:border-l border-white/5 flex flex-col bg-white/[0.02]">
+					<YearAgendaSidebar
+						events={yearEvents}
+						year={year}
+						onEventClick={onEventClick}
+						onViewChange={onViewChange}
+					/>
+				</div>
 			</div>
 		</div>
 	);
 }
 
-function YearNavigation({
-	year,
-	onPrev,
-	onNext,
-}: {
-	year: number;
-	onPrev: () => void;
-	onNext: () => void;
-}) {
-	return (
-		<div className="flex items-center mb-4">
-			<Button
-				size="sm"
-				variant="ghost"
-				color="neutral"
-				onClick={onPrev}
-				className="px-3 py-1">
-				<FaChevronLeft />
-			</Button>
-			<Button onClick={onNext} variant="ghost" color="neutral" size="sm">
-				<FaChevronRight />
-			</Button>
-			<span className="text-foreground-content font-semibold text-xl ml-2">
-				{year}
-			</span>
-		</div>
-	);
-}
-
-function MonthCalendar({
+function MonthCard({
 	monthName,
 	monthIndex,
 	year,
-	days,
-	dayLabels,
-	formatDateKey,
 	getEventsForDate,
-	selectedDate,
-	setSelectedDate,
 	onViewChange,
 }: {
 	monthName: string;
 	monthIndex: number;
 	year: number;
-	days: (number | null)[];
-	dayLabels: string[];
-	formatDateKey: (year: number, month: number, day: number) => string;
-	getEventsForDate: (dateKey: string) => Event[];
-	selectedDate: string | null;
-	setSelectedDate: (date: string) => void;
+	getEventsForDate: (date: Date) => Event[];
 	onViewChange?: (view: "month" | "week" | "year", date: Date) => void;
 }) {
+	const start = startOfMonth(new Date(year, monthIndex));
+	const end = endOfMonth(start);
+	const daysInMonth = eachDayOfInterval({ start, end });
+	const startDayOfWeek = getDay(start);
+
+	const days = Array.from({ length: startDayOfWeek })
+		.fill(null)
+		.concat(daysInMonth);
+
 	const handleMonthClick = () => {
-		if (onViewChange) {
-			onViewChange("month", new Date(year, monthIndex, 1));
-		}
+		onViewChange?.("month", new Date(year, monthIndex, 1));
 	};
 
+	// Check if this month has any events
+	const monthHasEvents = daysInMonth.some(day => getEventsForDate(day).length > 0);
+
 	return (
-		<div className="rounded-lg p-3 min-w-44 shadow-sm">
-			<div
-				className="font-semibold text-sm text-foreground-content mb-2 text-center cursor-pointer hover:text-primary transition-colors"
-				onClick={handleMonthClick}>
-				{monthName}
-			</div>
-			<div className="grid grid-cols-7 gap-1 mb-1">
-				{dayLabels.map((label) => (
+		<div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 hover:bg-white/[0.04] hover:border-white/10 transition-all duration-200">
+			{/* Month Header */}
+			<button
+				onClick={handleMonthClick}
+				className="w-full flex items-center justify-between mb-3 group">
+				<span className="text-sm font-bold text-white group-hover:text-accent transition-colors">
+					{monthName}
+				</span>
+				{monthHasEvents && (
+					<span className="w-1.5 h-1.5 rounded-full bg-accent/60" />
+				)}
+			</button>
+
+			{/* Day Labels */}
+			<div className="grid grid-cols-7 gap-0.5 mb-1">
+				{DAY_LABELS.map((label, i) => (
 					<div
-						key={label}
-						className="text-xs text-foreground-content/60 font-medium text-center h-5 flex items-center justify-center">
+						key={i}
+						className="text-[9px] text-muted/50 font-medium text-center py-1">
 						{label}
 					</div>
 				))}
 			</div>
-			<div className="grid grid-cols-7 gap-1 text-muted">
+
+			{/* Days Grid */}
+			<div className="grid grid-cols-7 gap-0.5">
 				{days.map((day, index) => {
-					if (day === null) {
-						return <div key={`empty-${index}`} className="h-7" />;
+					if (!day) {
+						return <div key={`empty-${index}`} className="aspect-square" />;
 					}
 
-					const dateKey = formatDateKey(year, monthIndex, day);
-					const dayEvents = getEventsForDate(dateKey);
-					const isTodayDate = isToday(
-						new Date(year, monthIndex, day)
-					);
-					const isSelected = selectedDate === dateKey;
-
-					const handleDayClick = () => {
-						if (onViewChange) {
-							onViewChange(
-								"week",
-								new Date(year, monthIndex, day)
-							);
-						}
-					};
+					const date = day as Date;
+					const dayEvents = getEventsForDate(date);
+					const isTodayDate = isToday(date);
+					const hasEvents = dayEvents.length > 0;
 
 					return (
-						<div
-							key={day}
-							onClick={handleDayClick}
-							className={`h-7 flex items-center justify-center text-xs cursor-pointer relative rounded transition-all
-                ${
-					isTodayDate
-						? "bg-accent/20 font-bold text-accent"
-						: "hover:-content/10 text-foreground-content"
-				}
-                ${isSelected ? "ring-2 ring-primary" : ""}
-              `}>
-							<span className="relative z-10">{day}</span>
-							{dayEvents.length > 0 && (
-								<div className="absolute bottom-0.5 flex gap-0.5">
-									{dayEvents.slice(0, 3).map((event, idx) => (
-										<div
-											key={idx}
-											className="w-1 h-1 rounded-full bg-primary"
-										/>
-									))}
-								</div>
+						<button
+							key={date.toISOString()}
+							onClick={() => onViewChange?.("week", date)}
+							className={`
+								aspect-square flex items-center justify-center text-[11px] font-medium
+								rounded-md transition-all duration-150 relative
+								${isTodayDate
+									? "bg-accent/20 text-accent ring-1 ring-accent/30"
+									: "text-white/60 hover:bg-white/10 hover:text-white"
+								}
+							`}>
+							{format(date, "d")}
+
+							{/* Event indicator */}
+							{hasEvents && (
+								<span className={`
+									absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full
+									${isTodayDate ? "bg-accent" : "bg-white/40"}
+								`} />
 							)}
-						</div>
+						</button>
 					);
 				})}
 			</div>
@@ -262,74 +217,271 @@ function MonthCalendar({
 	);
 }
 
-function EventSidebar({
-	allEvents,
-	formatDateKey,
-	setSelectedDate,
+interface EventGroup {
+	date: Date;
+	dateKey: string;
+	events: Event[];
+	isPast: boolean;
+	isToday: boolean;
+}
+
+function YearAgendaSidebar({
+	events,
+	year,
 	onEventClick,
+	onViewChange,
 }: {
-	selectedEvents: Event[];
-	allEvents: Event[];
-	formatDateKey: (year: number, month: number, day: number) => string;
-	setSelectedDate: (date: string) => void;
+	events: Event[];
+	year: number;
 	onEventClick: (eventId: string) => void;
+	onViewChange?: (view: "month" | "week" | "year", date: Date) => void;
 }) {
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const todayMarkerRef = useRef<HTMLDivElement>(null);
+
 	// Group events by date
-	const eventsByDate: Record<string, Event[]> = {};
-	allEvents.forEach((event) => {
-		const eventStart = new Date(event.startTime);
-		const dateKey = formatDateKey(
-			eventStart.getFullYear(),
-			eventStart.getMonth(),
-			eventStart.getDate()
+	const eventGroups = useMemo(() => {
+		const groups: Map<string, EventGroup> = new Map();
+		const today = startOfDay(new Date());
+
+		events.forEach((event) => {
+			const eventDate = startOfDay(new Date(event.startTime));
+			const dateKey = format(eventDate, "yyyy-MM-dd");
+
+			if (!groups.has(dateKey)) {
+				groups.set(dateKey, {
+					date: eventDate,
+					dateKey,
+					events: [],
+					isPast: isBefore(eventDate, today),
+					isToday: isToday(eventDate),
+				});
+			}
+			groups.get(dateKey)!.events.push(event);
+		});
+
+		return Array.from(groups.values()).sort(
+			(a, b) => a.date.getTime() - b.date.getTime()
 		);
-		if (!eventsByDate[dateKey]) {
-			eventsByDate[dateKey] = [];
+	}, [events]);
+
+	// Find the first non-past group index for scroll target
+	const firstUpcomingIndex = useMemo(() => {
+		const idx = eventGroups.findIndex((g) => !g.isPast);
+		return idx >= 0 ? idx : eventGroups.length;
+	}, [eventGroups]);
+
+	const pastCount = firstUpcomingIndex;
+	const upcomingCount = eventGroups.length - firstUpcomingIndex;
+
+	// Auto-scroll to today/upcoming on mount
+	useEffect(() => {
+		if (todayMarkerRef.current && scrollContainerRef.current) {
+			const container = scrollContainerRef.current;
+			const marker = todayMarkerRef.current;
+
+			// Small delay to ensure DOM is ready
+			requestAnimationFrame(() => {
+				const markerTop = marker.offsetTop;
+				container.scrollTo({
+					top: Math.max(0, markerTop - 16),
+					behavior: "smooth",
+				});
+			});
 		}
-		eventsByDate[dateKey].push(event);
-	});
+	}, [eventGroups, year]);
 
 	return (
-		<div className="w-80 bg-background-light rounded-lg shadow-lg p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-foreground-content/20 scrollbar-track-transparent">
-			<h2 className="text-xl font-bold text-foreground-content mb-2">
-				Events
-			</h2>
+		<>
+			{/* Sidebar Header */}
+			<div className="p-5 border-b border-white/5">
+				<div className="flex items-center gap-3">
+					<div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+						<CalendarDays size={18} className="text-accent" />
+					</div>
+					<div className="flex-1">
+						<h3 className="text-base font-bold text-white">
+							{year} Events
+						</h3>
+						<p className="text-sm text-muted">
+							{events.length} {events.length === 1 ? "event" : "events"} total
+						</p>
+					</div>
+				</div>
 
-			<div>
-				<div className="space-y-2 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-foreground-content/20 scrollbar-track-transparent">
-					{Object.entries(eventsByDate)
-						.sort(([a], [b]) => a.localeCompare(b))
-						.map(([dateKey, eventList]) => (
-							<div
-								key={dateKey}
-								onClick={() => setSelectedDate(dateKey)}
-								className="cursor-pointer hover:bg-background-light p-2 rounded-lg transition-colors">
-								<div className="text-xs text-foreground-content/60">
-									{new Date(
-										dateKey + "T00:00:00"
-									).toLocaleDateString("en-US", {
-										month: "short",
-										day: "numeric",
-									})}
-								</div>
-								{eventList.map((event) => (
+				{/* Stats pills */}
+				{events.length > 0 && (
+					<div className="flex gap-2 mt-4">
+						<span className="text-xs px-3 py-1.5 rounded-full bg-white/5 text-muted">
+							{pastCount} past
+						</span>
+						<span className="text-xs px-3 py-1.5 rounded-full bg-accent/10 text-accent border border-accent/20">
+							{upcomingCount} upcoming
+						</span>
+					</div>
+				)}
+			</div>
+
+			{/* Events List */}
+			<div
+				ref={scrollContainerRef}
+				className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+				{eventGroups.length > 0 ? (
+					<div className="p-4 space-y-2">
+						{eventGroups.map((group, index) => (
+							<div key={group.dateKey}>
+								{/* Today marker - scroll target */}
+								{index === firstUpcomingIndex && (
 									<div
-										key={event.id}
-										className="flex items-center gap-2 mt-1"
-										onClick={(e) => {
-											e.stopPropagation();
-											onEventClick(event.id);
-										}}>
-										<div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
-										<span className="text-sm text-foreground-content truncate">
-											{event.name}
-										</span>
+										ref={todayMarkerRef}
+										className="sticky top-0 z-10 py-3 -mx-4 px-4 bg-gradient-to-b from-[#1a1a1a] via-[#1a1a1a] to-transparent">
+										<div className="flex items-center gap-3">
+											<div className="h-px flex-1 bg-accent/30" />
+											<span className="text-xs font-bold text-accent uppercase tracking-wider">
+												{pastCount > 0 ? "Upcoming" : "Events"}
+											</span>
+											<div className="h-px flex-1 bg-accent/30" />
+										</div>
 									</div>
-								))}
+								)}
+
+								<DateGroup
+									group={group}
+									onEventClick={onEventClick}
+									onViewChange={onViewChange}
+								/>
 							</div>
 						))}
+
+						{/* End padding */}
+						<div className="h-4" />
+					</div>
+				) : (
+					<EmptyYearState year={year} />
+				)}
+			</div>
+		</>
+	);
+}
+
+function DateGroup({
+	group,
+	onEventClick,
+	onViewChange,
+}: {
+	group: EventGroup;
+	onEventClick: (eventId: string) => void;
+	onViewChange?: (view: "month" | "week" | "year", date: Date) => void;
+}) {
+	return (
+		<div className={`transition-all duration-200 ${group.isPast ? "opacity-50" : ""}`}>
+			{/* Date Header */}
+			<button
+				onClick={() => onViewChange?.("week", group.date)}
+				className="w-full flex items-center gap-4 p-3 hover:bg-white/5 transition-colors group">
+				{/* Date badge */}
+				<div className={`
+					w-12 h-12 flex flex-col items-center justify-center
+					${group.isToday
+						? "bg-accent text-white"
+						: group.isPast
+							? "bg-white/5 text-muted"
+							: "bg-white/8 text-white group-hover:bg-white/10"
+					}
+				`}>
+					<span className="text-[11px] font-semibold uppercase leading-none">
+						{format(group.date, "MMM")}
+					</span>
+					<span className="text-lg font-bold leading-tight">
+						{format(group.date, "d")}
+					</span>
+				</div>
+
+				{/* Date info */}
+				<div className="flex-1 text-left">
+					<p className={`text-sm font-semibold ${group.isToday ? "text-accent" : "text-white"}`}>
+						{group.isToday ? "Today" : format(group.date, "EEEE")}
+					</p>
+					<p className="text-xs text-muted mt-0.5">
+						{group.events.length} {group.events.length === 1 ? "event" : "events"}
+					</p>
+				</div>
+			</button>
+
+			{/* Events for this date */}
+			<div className="ml-14 space-y-1.5 pb-3 pr-2">
+				{group.events.map((event) => (
+					<CompactEventCard
+						key={event.id}
+						event={event}
+						isPast={group.isPast}
+						onClick={() => onEventClick(event.id)}
+					/>
+				))}
+			</div>
+		</div>
+	);
+}
+
+function CompactEventCard({
+	event,
+	isPast,
+	onClick,
+}: {
+	event: Event;
+	isPast: boolean;
+	onClick: () => void;
+}) {
+	return (
+		<button
+			onClick={onClick}
+			className={`
+				w-full text-left p-2.5 border-b transition-all duration-150 group
+				${isPast
+					? "border-white/5 hover:bg-white/5"
+					: "border-white/5 hover:bg-white/8"
+				}
+			`}>
+			<div className="flex items-start gap-3">
+				{/* Time */}
+				<span className={`text-xs font-medium min-w-[3rem] ${isPast ? "text-muted/60" : "text-white/50"}`}>
+					{format(new Date(event.startTime), "HH:mm")}
+				</span>
+
+				{/* Content */}
+				<div className="flex-1 min-w-0">
+					<h4 className={`
+						text-sm font-medium truncate transition-colors
+						${isPast
+							? "text-muted/80 group-hover:text-muted"
+							: "text-white group-hover:text-accent"
+						}
+					`}>
+						{event.name}
+					</h4>
+
+					{event.location && (
+						<span className="inline-flex items-center gap-1.5 text-xs text-muted/60 mt-1">
+							<MapPin size={12} />
+							<span className="truncate max-w-[140px]">{event.location.name}</span>
+						</span>
+					)}
 				</div>
 			</div>
+		</button>
+	);
+}
+
+function EmptyYearState({ year }: { year: number }) {
+	return (
+		<div className="h-full flex flex-col items-center justify-center text-center p-6">
+			<div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
+				<Clock size={20} className="text-muted/50" />
+			</div>
+			<p className="text-sm text-muted mb-1">No events in {year}</p>
+			<p className="text-xs text-muted/60">
+				Events will appear here as they are scheduled
+			</p>
 		</div>
 	);
 }

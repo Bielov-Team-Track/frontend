@@ -1,0 +1,122 @@
+"use client";
+
+import { Button } from "@/components";
+import { Dropdown, Loader } from "@/components/ui";
+import { ClubInvitation, InvitationStatus } from "@/lib/models/Club";
+import { getClubInvitations, revokeInvitation } from "@/lib/requests/clubs";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Check, Copy, Link, Mail, Trash2, User } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+
+interface InvitationsListProps {
+	clubId: string;
+}
+
+const statusColors: Record<InvitationStatus, string> = {
+	[InvitationStatus.Pending]: "bg-amber-500/20 text-amber-400",
+	[InvitationStatus.Accepted]: "bg-green-500/20 text-green-400",
+	[InvitationStatus.Declined]: "bg-red-500/20 text-red-400",
+	[InvitationStatus.Expired]: "bg-gray-500/20 text-gray-400",
+	[InvitationStatus.Revoked]: "bg-gray-500/20 text-gray-400",
+};
+
+const InvitationsList = ({ clubId }: InvitationsListProps) => {
+	const queryClient = useQueryClient();
+	const [statusFilter, setStatusFilter] = useState<InvitationStatus | "">("");
+	const [copiedId, setCopiedId] = useState<string | null>(null);
+
+	const { data: invitations, isLoading } = useQuery({
+		queryKey: ["club-invitations", clubId, statusFilter],
+		queryFn: () => getClubInvitations(clubId, statusFilter || undefined),
+	});
+
+	const revokeMutation = useMutation({
+		mutationFn: (invitationId: string) => revokeInvitation(clubId, invitationId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["club-invitations", clubId] });
+			toast.success("Invitation revoked");
+		},
+		onError: () => toast.error("Failed to revoke invitation"),
+	});
+
+	const copyLink = (invitation: ClubInvitation) => {
+		const link = `${window.location.origin}/clubs/${clubId}/invitations/${invitation.token}`;
+		navigator.clipboard.writeText(link);
+		setCopiedId(invitation.id);
+		setTimeout(() => setCopiedId(null), 2000);
+	};
+
+	const filterOptions = [
+		{ value: "", label: "All Statuses" },
+		{ value: InvitationStatus.Pending, label: "Pending" },
+		{ value: InvitationStatus.Accepted, label: "Accepted" },
+		{ value: InvitationStatus.Declined, label: "Declined" },
+		{ value: InvitationStatus.Expired, label: "Expired" },
+		{ value: InvitationStatus.Revoked, label: "Revoked" },
+	];
+
+	if (isLoading) return <Loader />;
+
+	return (
+		<div className="flex flex-col gap-4">
+			<Dropdown
+				value={statusFilter}
+				onChange={(val) => setStatusFilter(val as InvitationStatus | "")}
+				options={filterOptions}
+				placeholder="Filter by status"
+			/>
+			{!invitations || invitations.length === 0 ? (
+				<div className="p-8 bg-white/5 rounded-xl text-center">
+					<p className="text-muted">No invitations found</p>
+				</div>
+			) : (
+				<div className="flex flex-col gap-2">
+					{invitations.map((invitation) => (
+						<div key={invitation.id} className="p-4 bg-white/5 rounded-xl border border-white/10 flex items-center justify-between gap-4">
+							<div className="flex items-center gap-3">
+								<div className="w-10 h-10 rounded-full bg-base-300 flex items-center justify-center">
+									{invitation.targetEmail ? (
+										<Mail size={18} className="text-muted" />
+									) : invitation.targetUserId ? (
+										<User size={18} className="text-muted" />
+									) : (
+										<Link size={18} className="text-muted" />
+									)}
+								</div>
+								<div>
+									<p className="text-sm font-medium text-white">{invitation.targetEmail || invitation.targetUserId || "Link Invitation"}</p>
+									<p className="text-xs text-muted">Created {new Date(invitation.createdAt).toLocaleDateString()}</p>
+								</div>
+							</div>
+							<div className="flex items-center gap-2">
+								<span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[invitation.status]}`}>{invitation.status}</span>
+								{invitation.status === InvitationStatus.Pending && (
+									<>
+										<Button
+											variant="ghost"
+											size="sm"
+											onClick={() => copyLink(invitation)}
+											leftIcon={copiedId === invitation.id ? <Check size={14} /> : <Copy size={14} />}>
+											{copiedId === invitation.id ? "Copied" : "Copy"}
+										</Button>
+										<Button
+											variant="ghost"
+											size="sm"
+											onClick={() => revokeMutation.mutate(invitation.id)}
+											loading={revokeMutation.isPending}
+											className="text-red-400 hover:text-red-300">
+											<Trash2 size={14} />
+										</Button>
+									</>
+								)}
+							</div>
+						</div>
+					))}
+				</div>
+			)}
+		</div>
+	);
+};
+
+export default InvitationsList;

@@ -9,15 +9,14 @@ import { StepRenderer } from "./components/StepRenderer";
 import { NavigationButtons } from "./components/NavigationButtons";
 import { useEventFormContext } from "./context/EventFormContext";
 
-// Internal component that uses the context
 function CreateEventFormContent() {
 	const { form } = useEventFormContext();
 	const { isPending, isError } = form;
 
 	return (
-		<form className="relative p-6">
+		<>
 			{isPending && (
-				<Loader className="absolute inset-0 bg-black/55 rounded-xl z-50" />
+				<Loader className="absolute inset-0 bg-black/60 rounded-3xl z-50" />
 			)}
 
 			{isError && (
@@ -29,18 +28,39 @@ function CreateEventFormContent() {
 				</div>
 			)}
 
-			<StepRenderer />
+			<div className="relative z-10 flex-1">
+				<StepRenderer />
+			</div>
+
 			<NavigationButtons />
-		</form>
+		</>
 	);
 }
 
 function CreateEventForm({ locations, event }: CreateEventFormProps) {
 	return (
 		<EventFormProvider event={event} locations={locations}>
-			<div className="overflow-hidden">
+			<div className="w-full max-w-3xl mx-auto py-8 px-4 text-white">
+				{/* Header */}
+				<div className="mb-10 text-center">
+					<h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">
+						{event ? "Edit Event" : "Create a New Event"}
+					</h1>
+					<p className="text-muted text-lg">
+						Set up your volleyball game, practice, or tournament.
+					</p>
+				</div>
+
+				{/* Stepper */}
 				<ProgressIndicator />
-				<CreateEventFormContent />
+
+				{/* Form Card */}
+				<div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-sm min-h-[500px] flex flex-col relative overflow-hidden">
+					{/* Decorative Gradient Blob */}
+					<div className="absolute -top-20 -right-20 w-60 h-60 bg-accent/15 rounded-full blur-[100px] pointer-events-none" />
+
+					<CreateEventFormContent />
+				</div>
 			</div>
 		</EventFormProvider>
 	);

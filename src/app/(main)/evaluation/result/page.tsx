@@ -21,9 +21,9 @@ const REPORT = {
 
 export default function PlayerReportCard() {
 	return (
-		<div className="min-h-screen bg-base-100 text-gray-100 font-sans p-4 md:p-8 flex justify-center">
+		<div className="min-h-screen bg-background-dark text-white font-sans p-4 md:p-8 flex justify-center pb-20">
 			{/* --- THE CARD CONTAINER --- */}
-			<div className="w-full max-w-4xl bg-[#1A1A1A] border border-white/5 rounded-3xl overflow-hidden shadow-2xl relative">
+			<div className="w-full max-w-4xl bg-background border border-white/5 rounded-3xl overflow-hidden shadow-2xl relative">
 				{/* Background Effects */}
 				<div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 				<div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
@@ -34,19 +34,19 @@ export default function PlayerReportCard() {
 						<h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
 							Performance Report
 						</h1>
-						<div className="flex items-center gap-3 text-sm text-gray-400">
+						<div className="flex items-center gap-3 text-sm text-muted">
 							<span className="flex items-center gap-1">
 								<Calendar size={14} /> {REPORT.date}
 							</span>
-							<span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+							<span className="w-1 h-1 bg-muted rounded-full"></span>
 							<span>{REPORT.eventName}</span>
 						</div>
 					</div>
-					<div className="flex gap-2">
-						<button className="btn btn-sm btn-ghost hover:bg-white/5 text-gray-400">
+					<div className="flex gap-2 self-start md:self-auto">
+						<button className="btn btn-sm btn-ghost hover:bg-white/5 text-muted hover:text-white">
 							<Download size={18} />
 						</button>
-						<button className="btn btn-sm btn-ghost hover:bg-white/5 text-gray-400">
+						<button className="btn btn-sm btn-ghost hover:bg-white/5 text-muted hover:text-white">
 							<Share2 size={18} />
 						</button>
 					</div>
@@ -57,12 +57,12 @@ export default function PlayerReportCard() {
 					<div className="md:col-span-5 p-8 border-b md:border-b-0 md:border-r border-white/5 flex flex-col items-center justify-center bg-[#161616]">
 						{/* Overall Rating Badge */}
 						<div className="relative mb-8 text-center">
-							<div className="w-32 h-32 rounded-full border-4 border-[#2A2A2A] bg-[#1E1E1E] flex items-center justify-center relative shadow-[0_0_30px_rgba(249,115,22,0.2)]">
+							<div className="w-32 h-32 rounded-full border-4 border-[#2A2A2A] bg-background flex items-center justify-center relative shadow-[0_0_30px_rgba(249,115,22,0.2)]">
 								<div>
 									<div className="text-5xl font-black text-white tracking-tighter">
 										{REPORT.overallScore}
 									</div>
-									<div className="text-[10px] text-gray-500 uppercase font-bold mt-1 tracking-widest">
+									<div className="text-[10px] text-muted uppercase font-bold mt-1 tracking-widest">
 										OVR
 									</div>
 								</div>
@@ -97,8 +97,8 @@ export default function PlayerReportCard() {
 								{/* Note: In a real app, calculate these points based on REPORT.stats */}
 								<polygon
 									points="50,10 90,30 85,70 50,90 20,72.5 10,40"
-									fill="rgba(249,115,22, 0.2)"
-									stroke="rgba(249,115,22, 1)"
+									fill="hsl(var(--accent) / 0.2)"
+									stroke="hsl(var(--accent))"
 									strokeWidth="2"
 								/>
 
@@ -168,14 +168,14 @@ export default function PlayerReportCard() {
 								([key, value]) => (
 									<div key={key} className="group">
 										<div className="flex justify-between text-sm mb-1">
-											<span className="text-gray-400 capitalize font-medium">
+											<span className="text-muted capitalize font-medium">
 												{key}
 											</span>
 											<span className="text-white font-bold">
 												{value}/10
 											</span>
 										</div>
-										<div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+										<div className="h-2 bg-background-light rounded-full overflow-hidden">
 											<div
 												className="h-full bg-gradient-to-r from-accent/80 to-accent transition-all duration-1000 ease-out"
 												style={{
@@ -190,12 +190,12 @@ export default function PlayerReportCard() {
 						{/* Coach Feedback Box */}
 						<div className="bg-white/5 rounded-xl p-5 border border-white/5">
 							<div className="flex items-center gap-3 mb-3">
-								<div className="w-8 h-8 rounded-full bg-gray-700"></div>
+								<div className="w-8 h-8 rounded-full bg-background-light border border-white/10"></div>
 								<div>
 									<div className="text-sm font-bold text-white">
 										{REPORT.coachName}
 									</div>
-									<div className="text-xs text-gray-500">
+									<div className="text-xs text-muted">
 										Head Coach
 									</div>
 								</div>
@@ -204,15 +204,15 @@ export default function PlayerReportCard() {
 								<span className="absolute -top-2 -left-1 text-4xl text-white/10 font-serif">
 									“
 								</span>
-								<p className="text-gray-300 text-sm leading-relaxed relative z-10 italic">
+								<p className="text-muted text-sm leading-relaxed relative z-10 italic">
 									{REPORT.notes}
 								</p>
 							</div>
 						</div>
 
 						{/* Footer Action */}
-						<div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">
-							<div className="text-xs text-gray-500">
+						<div className="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+							<div className="text-xs text-muted text-center sm:text-left">
 								Stats automatically updated on profile.
 							</div>
 							<button className="flex items-center gap-2 text-sm text-accent font-bold hover:underline">

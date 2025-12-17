@@ -8,37 +8,58 @@ const client = axios.create({
 	timeout: 10000,
 });
 
-// Token management utilities
-const getAccessToken = (): string | null => {
+// Cookie utility functions
+const getCookie = (name: string): string | null => {
 	if (typeof window === "undefined") return null;
-	return localStorage.getItem("accessToken");
+	const value = document.cookie
+		.split("; ")
+		.find((row) => row.startsWith(`${name}=`))
+		?.split("=")[1];
+	return value ?? null;
+};
+
+const setCookie = (name: string, value: string, maxAge: number): void => {
+	if (typeof window === "undefined") return;
+	document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Lax`;
+};
+
+const deleteCookie = (name: string): void => {
+	if (typeof window === "undefined") return;
+	document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
+
+// Token management utilities (cookies only)
+const getAccessToken = (): string | null => {
+	return getCookie("token");
 };
 
 const getRefreshToken = (): string | null => {
-	if (typeof window === "undefined") return null;
-	return localStorage.getItem("refreshToken");
+	return getCookie("refreshToken");
 };
 
 const setAccessToken = (token: string, expiresAt: string): void => {
 	if (typeof window === "undefined") return;
-	localStorage.setItem("accessToken", token);
-	localStorage.setItem("accessTokenExpiry", expiresAt);
 
-	// Update cookie as well
-	document.cookie = `token=${token}; path=/; SameSite=Lax`;
+	// Calculate max-age from expiresAt
+	const expires = new Date(expiresAt);
+	const now = new Date();
+	// 60s buffer to expire cookie before token
+	const maxAge = Math.max(0, Math.floor((expires.getTime() - now.getTime()) / 1000) - 60);
+
+	setCookie("token", token, maxAge);
 };
 
 const setRefreshToken = (token: string): void => {
 	if (typeof window === "undefined") return;
-	localStorage.setItem("refreshToken", token);
+	// Refresh token valid for 7 days
+	const refreshTokenMaxAge = 7 * 24 * 60 * 60;
+	setCookie("refreshToken", token, refreshTokenMaxAge);
 };
 
 const clearTokens = (): void => {
 	if (typeof window === "undefined") return;
-	localStorage.removeItem("accessToken");
-	localStorage.removeItem("refreshToken");
-	localStorage.removeItem("accessTokenExpiry");
-	document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+	deleteCookie("token");
+	deleteCookie("refreshToken");
 };
 
 // Refresh token state management
@@ -64,16 +85,7 @@ const processQueue = (error: any = null, token: string | null = null) => {
 client.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
 		if (typeof window !== "undefined") {
-			let token = getAccessToken();
-
-			// If we don't have a token in localStorage, try cookie fallback
-			if (!token) {
-				token =
-					document.cookie
-						.split("; ")
-						.find((row) => row.startsWith("token="))
-						?.split("=")[1] ?? null;
-			}
+			const token = getAccessToken();
 
 			if (token) {
 				config.headers.Authorization = `Bearer ${token}`;
@@ -149,7 +161,7 @@ client.interceptors.response.use(
 
 				const { token, refreshToken: newRefreshToken, expiresAt } = response.data;
 
-				// Save new tokens
+				// Save new tokens to cookies
 				setAccessToken(token, expiresAt);
 				setRefreshToken(newRefreshToken);
 

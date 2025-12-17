@@ -63,62 +63,58 @@ const ChatWindow = ({
 	}, [messages]);
 
 	return (
-		<div className="relative flex flex-col h-full overflow-hidden">
-			{/* Header */}
-			<div className="flex justify-between items-center h-20 bg-background-dark flex-shrink-0 px-6 border-b border-white/5">
-				<div className="flex items-center gap-4">
-					<span className="font-bold text-lg truncate">
+		<div className="flex flex-col flex-1 min-h-0 h-full">
+			{/* Header - Fixed */}
+			<div className="flex justify-between items-center h-16 bg-background/80 backdrop-blur-md shrink-0 px-6 border-b border-white/10">
+				<div className="flex items-center gap-3">
+					<span className="font-bold text-lg truncate text-white">
 						{chat.title}
 					</span>
-					<p className="text-xs text-gray-400">
+					<span className="text-xs text-muted">
 						{chat.participantIds?.length > 2
 							? `${chat.participantIds.length} participants`
 							: "Active now"}
-					</p>
+					</span>
 				</div>
 
-				<div className="flex items-center gap-4 text-gray-400">
-					<Button
-						variant="icon"
-						color="neutral"
-						leftIcon={<Info size={20} />}
-						onClick={() => setShowInfoPanel(!showInfoPanel)}
-						className={
-							showInfoPanel ? "bg-accent/10 !text-accent" : ""
-						}
-						title="Chat details"
-					/>
+				<Button
+					variant="icon"
+					color="neutral"
+					leftIcon={<Info size={20} />}
+					onClick={() => setShowInfoPanel(!showInfoPanel)}
+					className={showInfoPanel ? "bg-accent/10 !text-accent" : ""}
+					title="Chat details"
+				/>
+			</div>
+
+			{/* Messages Area - Scrollable */}
+			<div className="flex-1 min-h-0 overflow-y-auto">
+				<div className="p-4 flex flex-col gap-2">
+					{sortedMessages.map((message) => (
+						<MessageComponent
+							type={chat.participantIds?.length > 2 ? "group" : "direct"}
+							message={message}
+							key={message.id}
+						/>
+					))}
+					<div ref={messagesEndRef} />
 				</div>
 			</div>
 
-			{/* Messages Area */}
-			<div className="flex-grow overflow-y-auto p-4 flex flex-col gap-2">
-				{sortedMessages.map((message) => (
-					<MessageComponent
-						type={
-							chat.participantIds?.length > 2 ? "group" : "direct"
-						}
-						message={message}
-						key={message.id}
-					/>
-				))}
-				<div ref={messagesEndRef} />
-			</div>
-
-			{/* Input Area */}
-			<div className="p-4 flex-shrink-0">
-				<div className="max-w-4xl mx-auto bg-[#161616] border border-white/10 rounded-2xl p-2 flex items-end gap-2 shadow-lg">
+			{/* Input Area - Fixed */}
+			<div className="shrink-0 p-4 border-t border-white/5 bg-background/50 backdrop-blur-md">
+				<div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-2xl p-2 flex items-end gap-2">
 					<Button
 						variant="icon"
 						color="neutral"
-						leftIcon={<Paperclip size={20} />}
+						leftIcon={<Paperclip size={18} />}
 					/>
 					<textarea
 						value={messageText}
 						onChange={(e) => setMessageText(e.target.value)}
 						onKeyDown={handleKeyDown}
 						placeholder="Type a message..."
-						className="flex-1 bg-transparent text-white text-sm placeholder-gray-500 resize-none outline-none py-2 max-h-32"
+						className="flex-1 bg-transparent text-white text-sm placeholder-muted resize-none outline-none py-2 max-h-32"
 						rows={1}
 						disabled={isSending}
 					/>
@@ -126,12 +122,12 @@ const ChatWindow = ({
 						<Button
 							variant="icon"
 							color="neutral"
-							leftIcon={<ImageIcon size={20} />}
+							leftIcon={<ImageIcon size={18} />}
 						/>
 						<Button
 							variant="icon"
 							color="neutral"
-							leftIcon={<Smile size={20} />}
+							leftIcon={<Smile size={18} />}
 						/>
 						<Button
 							onClick={handleSend}
@@ -139,15 +135,8 @@ const ChatWindow = ({
 							variant="icon"
 							color={messageText.trim() ? "accent" : "neutral"}
 							loading={isSending}
-							leftIcon={
-								<Send
-									size={18}
-									className={
-										messageText.trim() ? "ml-0.5" : ""
-									}
-								/>
-							}
-							className="ml-2"
+							leftIcon={<Send size={16} />}
+							className="ml-1"
 						/>
 					</div>
 				</div>

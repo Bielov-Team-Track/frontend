@@ -1,66 +1,48 @@
 import { Button } from "@/components/ui";
-import { FaChevronLeft, FaVolleyballBall } from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaCheck } from "react-icons/fa";
 import { useEventFormContext } from "../context/EventFormContext";
 
 export function NavigationButtons() {
 	const { wizard, form } = useEventFormContext();
-	const { currentStep, nextStep, prevStep, isFirstStep, isLastStep } = wizard;
+	const { nextStep, prevStep, isFirstStep, isLastStep } = wizard;
 	const { isPending, handleSubmit, saveEvent } = form;
 
 	return (
-		<div className="flex justify-between pt-6">
-			{!isFirstStep && (
+		<div className="relative z-10 mt-10 flex items-center justify-between pt-6 border-t border-white/10">
+			<Button
+				type="button"
+				variant="link"
+				onClick={prevStep}
+				color={"neutral"}
+				disabled={isFirstStep || isPending}
+				leftIcon={<FaArrowLeft />}
+				className="text-muted hover:text-white">
+				Back
+			</Button>
+
+			{!isLastStep ? (
 				<Button
 					type="button"
-					variant="ghost"
-					color="neutral"
-					size="md"
-					onClick={prevStep}
-					leftIcon={<FaChevronLeft className="w-4 h-4" />}
-				>
-					Previous
+					variant="solid"
+					color="primary"
+					onClick={nextStep}
+					rightIcon={<FaArrowRight />}
+					className="px-8 shadow-lg shadow-primary/20">
+					Next Step
+				</Button>
+			) : (
+				<Button
+					type="submit"
+					variant="solid"
+					color="primary"
+					disabled={isPending}
+					loading={isPending}
+					onClick={handleSubmit(saveEvent)}
+					className="px-8 bg-green-600 hover:bg-green-700 text-white border-none shadow-lg shadow-green-600/20"
+					rightIcon={!isPending ? <FaCheck /> : undefined}>
+					{isPending ? "Creating..." : "Create Event"}
 				</Button>
 			)}
-
-			<div className="ml-auto">
-				{!isLastStep ? (
-					<Button
-						type="button"
-						variant="solid"
-						color="primary"
-						onClick={nextStep}
-						rightIcon={
-							<svg
-								className="w-4 h-4"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M9 5l7 7-7 7"
-								/>
-							</svg>
-						}
-					>
-						Next Step
-					</Button>
-				) : (
-					<Button
-						type="submit"
-						variant="solid"
-						color="secondary"
-						disabled={isPending}
-						loading={isPending}
-						onClick={handleSubmit(saveEvent)}
-						rightIcon={<FaVolleyballBall className="w-4 h-4" />}
-					>
-						{isPending ? "Creating..." : "Create Event"}
-					</Button>
-				)}
-			</div>
 		</div>
 	);
 }

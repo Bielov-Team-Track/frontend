@@ -10,10 +10,10 @@ import {
 	Check,
 	ChevronRight,
 	Users,
+    Search,
 	X,
 } from "lucide-react";
 import React, { useState } from "react";
-import { FaMagnifyingGlass } from "react-icons/fa6";
 
 interface NewChatModalProps {
 	onChatCreated?: (chat: Chat) => void;
@@ -112,7 +112,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 	return (
 		<div className="min-w-60 max-w-md flex flex-col">
 			{/* --- MODE SWITCHER --- */}
-			<div className="flex p-1 bg-white/5 rounded-xl mb-4">
+			<div className="flex p-1 bg-white/5 rounded-xl mb-4 border border-white/5">
 				<button
 					onClick={() => {
 						setMode("direct");
@@ -122,8 +122,8 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 					}}
 					className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
 						mode === "direct"
-							? "bg-[#2A2A2A] text-white shadow-lg"
-							: "text-gray-400 hover:text-white"
+							? "bg-accent text-white shadow-lg"
+							: "text-muted hover:text-white"
 					}`}>
 					Direct Message
 				</button>
@@ -134,8 +134,8 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 					}}
 					className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${
 						mode === "group"
-							? "bg-[#2A2A2A] text-white shadow-lg"
-							: "text-gray-400 hover:text-white"
+							? "bg-accent text-white shadow-lg"
+							: "text-muted hover:text-white"
 					}`}>
 					<Users size={14} /> New Group
 				</button>
@@ -145,7 +145,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 			{mode === "group" && (
 				<div className="mb-4 animate-in slide-in-from-top-2">
 					<div className="flex items-center gap-3 mb-4">
-						<div className="w-12 h-12 rounded-full bg-white/5 border border-dashed border-gray-600 flex items-center justify-center text-gray-500 cursor-pointer hover:text-accent hover:border-accent hover:bg-accent/10 transition-all">
+						<div className="w-12 h-12 rounded-full bg-white/5 border border-dashed border-white/20 flex items-center justify-center text-muted cursor-pointer hover:text-accent hover:border-accent hover:bg-accent/10 transition-all">
 							<Camera size={20} />
 						</div>
 						<input
@@ -153,7 +153,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 							value={groupName}
 							onChange={(e) => setGroupName(e.target.value)}
 							placeholder="Group Name"
-							className="flex-1 bg-transparent border-b border-white/10 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors"
+							className="flex-1 bg-transparent border-b border-white/10 py-2 text-white placeholder-muted focus:outline-none focus:border-accent transition-colors"
 						/>
 					</div>
 
@@ -186,8 +186,8 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 				<Input
 					type="text"
 					leftIcon={
-						<FaMagnifyingGlass
-							className="absolute left-3 top-2.5 text-gray-500"
+						<Search
+							className="absolute left-3 top-2.5 text-muted"
 							size={18}
 						/>
 					}
@@ -198,7 +198,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 			</div>
 
 			{/* --- USER LIST --- */}
-			<div className="flex-1 overflow-y-auto space-y-1 min-h-[300px] max-h-[400px]">
+			<div className="flex-1 overflow-y-auto space-y-1 min-h-[300px] max-h-[400px] scrollbar-thin scrollbar-thumb-white/10">
 				{isSearching && (
 					<div className="flex items-center justify-center py-8">
 						<Loader />
@@ -215,7 +215,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 					!searchError &&
 					searchQuery.length >= 3 &&
 					users.length === 0 && (
-						<div className="text-center py-8 text-gray-500 text-sm">
+						<div className="text-center py-8 text-muted text-sm">
 							No players found.
 						</div>
 					)}
@@ -252,7 +252,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 											}`}>
 											{user.name} {user.surname}
 										</div>
-										<div className="text-xs text-gray-500">
+										<div className="text-xs text-muted">
 											{user.email}
 										</div>
 									</div>
@@ -266,7 +266,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
                       ${
 							isSelected
 								? "bg-accent border-accent"
-								: "border-gray-600 group-hover:border-gray-400"
+								: "border-white/20 group-hover:border-white/40"
 						}
                    `}>
 										{isSelected && (
@@ -279,7 +279,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 								) : (
 									<ChevronRight
 										size={16}
-										className="text-gray-600 group-hover:text-white"
+										className="text-muted group-hover:text-white"
 									/>
 								)}
 							</div>
@@ -296,7 +296,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 
 			{/* --- FOOTER (Group Mode Only) --- */}
 			{mode === "group" && (
-				<div className="pt-4 border-t border-white/20 mt-4">
+				<div className="pt-4 border-t border-white/10 mt-4">
 					<Button
 						onClick={handleCreateGroup}
 						disabled={

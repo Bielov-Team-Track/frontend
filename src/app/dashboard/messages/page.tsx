@@ -1,302 +1,278 @@
 "use client";
 
 import { Button, Loader, ResizableContainer } from "@/components";
-import { useAuth } from "@/lib/auth/authContext";
 import { MESSAGES_API_URL } from "@/lib/constants";
-import { Chat, Message } from "@/lib/models/Messages";
-import { useChatStore } from "@/lib/realtime/chatStore";
+import { Chat } from "@/lib/models/Messages";
+import { useChatConnectionStore } from "@/lib/realtime/chatsConnectionStore";
 import signalr from "@/lib/realtime/signalrClient";
-import {
-	getChat,
-	loadConversationsForUser as loadChatsForUser,
-	loadMessagesForChat,
-	markChatAsRead,
-	sendMessage,
-} from "@/lib/requests/messages";
+import { getChat, loadConversationsForUser, loadMessagesForChat, markChatAsRead, sendMessage } from "@/lib/requests/messages";
 import { HubConnectionState } from "@microsoft/signalr";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { FaChevronLeft } from "react-icons/fa";
-import { FaEnvelope } from "react-icons/fa6";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AlertCircle, ChevronLeft, MessageSquare, RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChatList from "./components/ChatList";
 import ChatsRealtimeClient from "./components/ChatsRealtimeClient";
 import ChatWindow from "./components/ChatWindow";
 import NewChat from "./components/NewChat";
 
 const MessagesPage = () => {
-	const [error, setError] = useState<string | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
-	// Use store for chats
-	const chatsMap = useChatStore((state) => state.chats);
-	const setChatsStore = useChatStore((state) => state.setChats);
-	const upsertChat = useChatStore((state) => state.upsert);
-
 	const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
 	const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-	const [currentChatMessages, setMessages] = useState<Message[]>([]);
-	const [isChatInfoModalOpen, setIsChatInfoModalOpen] = useState(false);
 	const [sendError, setSendError] = useState<string | null>(null);
-	const [messagesAreLoading, setMessagesAreLoading] = useState(false);
 
-	const user = useAuth().userProfile;
-
-	// Track current chat group to ensure proper cleanup
+	const queryClient = useQueryClient();
+	const { connection, setCurrentChatId } = useChatConnectionStore();
 	const currentChatGroupRef = useRef<string | null>(null);
 
-	// Derived sorted chats
-	const chats = useMemo(() => {
-		return Object.values(chatsMap).sort((a, b) => {
-			const dateA = new Date(
-				a.lastMessage?.sentAt || a.createdAt
-			).getTime();
-			const dateB = new Date(
-				b.lastMessage?.sentAt || b.createdAt
-			).getTime();
+	// Fetch chats with React Query
+	const {
+		data: chats = [],
+		isLoading: chatsLoading,
+		error: chatsError,
+		refetch: refetchChats,
+	} = useQuery({
+		queryKey: ["chats"],
+		queryFn: loadConversationsForUser,
+		staleTime: 1000 * 60 * 5, // 5 minutes
+	});
+
+	// Fetch messages for selected chat with React Query
+	const {
+		data: messages = [],
+		isLoading: messagesLoading,
+		error: messagesError,
+		refetch: refetchMessages,
+	} = useQuery({
+		queryKey: ["messages", selectedChatId],
+		queryFn: () => loadMessagesForChat(selectedChatId!),
+		enabled: !!selectedChatId,
+		staleTime: 1000 * 60, // 1 minute
+	});
+
+	const sortedChats = useMemo(() => {
+		return [...chats].sort((a, b) => {
+			const dateA = new Date(a.lastMessage?.sentAt || a.createdAt).getTime();
+			const dateB = new Date(b.lastMessage?.sentAt || b.createdAt).getTime();
 			return dateB - dateA;
 		});
-	}, [chatsMap]);
+	}, [chats]);
 
-	const selectedChat = selectedChatId ? chatsMap[selectedChatId] : null;
+	const selectedChat = useMemo(() => {
+		return selectedChatId ? chats.find((chat) => chat.id === selectedChatId) : null;
+	}, [selectedChatId, chats]);
 
+	// Cleanup: Leave chat group when component unmounts
 	useEffect(() => {
-		loadChatsForUser()
-			.then((data) => {
-				setChatsStore(data);
-				setIsLoading(false);
-			})
-			.catch((err) => {
-				setError("Failed to load conversations. Try again later.");
-				setIsLoading(false);
-			});
-
-		// Cleanup: Leave chat group when component unmounts
 		return () => {
-			const connection = signalr.getConnection(
-				MESSAGES_API_URL,
-				"messaging"
-			);
-			if (
-				connection?.state === HubConnectionState.Connected &&
-				currentChatGroupRef.current
-			) {
-				connection
-					.invoke("LeaveChatGroup", currentChatGroupRef.current)
-					.catch((err) =>
-						console.error(
-							"Failed to leave chat group on unmount:",
-							err
-						)
-					);
+			const conn = signalr.getConnection(MESSAGES_API_URL, "messaging");
+			if (conn?.state === HubConnectionState.Connected && currentChatGroupRef.current) {
+				conn.invoke("LeaveChatGroup", currentChatGroupRef.current).catch((err) => console.error("Failed to leave chat group on unmount:", err));
 			}
 		};
-	}, [setChatsStore]);
+	}, []);
 
-	// Sync new messages for the active chat
-	useEffect(() => {
-		if (!selectedChat) return;
+	const selectChat = useCallback(
+		async (chat: Chat) => {
+			try {
+				const conn = signalr.getConnection(MESSAGES_API_URL, "messaging");
 
-		const lastMsg = selectedChat.lastMessage;
-		if (lastMsg) {
-			setMessages((prev) => {
-				if (prev.some((m) => m.id === lastMsg.id)) return prev;
-				// Append new message if it's newer than the last one we have
-				// This check prevents out-of-order issues if multiple updates come fast,
-				// but mostly we just want to append.
-				return [...prev, lastMsg];
-			});
-		}
-	}, [selectedChat]);
-
-	const selectChat = async (chat: Chat) => {
-		try {
-			// Leave previous chat group if any
-			const connection = signalr.getConnection(
-				MESSAGES_API_URL,
-				"messaging"
-			);
-			if (connection?.state === HubConnectionState.Connected) {
-				if (currentChatGroupRef.current) {
-					await connection.invoke(
-						"LeaveChatGroup",
-						currentChatGroupRef.current
-					);
+				// Leave previous chat group if any
+				if (conn?.state === HubConnectionState.Connected) {
+					if (currentChatGroupRef.current) {
+						await conn.invoke("LeaveChatGroup", currentChatGroupRef.current);
+					}
+					// Join new chat group
+					await conn.invoke("JoinChatGroup", chat.id);
+					currentChatGroupRef.current = chat.id;
 				}
 
-				// Join new chat group
-				const updated_chat = await connection.invoke(
-					"JoinChatGroup",
-					chat.id
-				);
-				currentChatGroupRef.current = chat.id;
+				setSelectedChatId(chat.id);
+				setCurrentChatId(chat.id);
+
+				// Mark chat as read and update cache
+				try {
+					const updatedChat = await markChatAsRead(chat.id);
+					queryClient.setQueryData(["chats"], (oldChats: Chat[] | undefined) => {
+						if (!oldChats) return oldChats;
+						return oldChats.map((c) => (c.id === chat.id ? { ...c, unreadCount: 0 } : c));
+					});
+				} catch (e) {
+					console.error("Failed to mark chat as read:", e);
+				}
+			} catch (error) {
+				console.error("Failed to select chat:", error);
+				// Still set the chat even if SignalR fails
+				setSelectedChatId(chat.id);
+				setCurrentChatId(chat.id);
 			}
+		},
+		[queryClient, setCurrentChatId]
+	);
 
-			// Load chat and messages
+	const handleOnChatCreated = useCallback(
+		(newChat: Chat) => {
+			// Add new chat to cache
+			queryClient.setQueryData(["chats"], (oldChats: Chat[] | undefined) => {
+				if (!oldChats) return [newChat];
+				if (oldChats.some((c) => c.id === newChat.id)) return oldChats;
+				return [newChat, ...oldChats];
+			});
+			setIsNewChatModalOpen(false);
+			selectChat(newChat);
+		},
+		[queryClient, selectChat]
+	);
 
-			setSelectedChatId(chat.id);
-			setMessagesAreLoading(true);
-			const messages = await loadMessagesForChat(chat.id);
-			const updatedChat = await markChatAsRead(chat.id);
-			upsertChat(updatedChat);
-			setMessages(messages);
-			setMessagesAreLoading(false);
-		} catch (error) {
-			console.error("Failed to select chat:", error);
-			// Still set the chat even if SignalR fails
-			setSelectedChatId(chat.id);
-			const messages = await loadMessagesForChat(chat.id);
-			setMessages(messages);
-		}
-	};
-
-	const handleOnChatCreated = (newChat: Chat) => {
-		// setChats((prevChats) => [newChat, ...prevChats]); // Store handles this via realtime usually, but we can upsert
-		upsertChat(newChat);
-		setIsNewChatModalOpen(false);
-		selectChat(newChat);
-	};
-
-	const handleChatUpdated = async (chatId: string) => {
-		try {
-			const updatedChat = await getChat(chatId);
-			upsertChat(updatedChat);
-			// no need to update selectedChat manually as it is derived
-		} catch (e) {
-			console.error("Failed to refresh chat", e);
-		}
-	};
-
-	const handleSendMessage = async (text: string) => {
-		if (!selectedChat) return;
-
-		setSendError(null);
-
-		try {
-			// Get the SignalR connection
-			const connection = signalr.getConnection(
-				MESSAGES_API_URL,
-				"messaging"
-			);
-
-			if (connection?.state === HubConnectionState.Connected) {
-				// Send via SignalR - message will come back via "ReceiveMessage" event
-				// Backend broadcasts to all participants including sender
-				await connection.invoke(
-					"SendMessage",
-					{ content: text },
-					selectedChat.id
-				);
-				// No need to fetch - the "ReceiveMessage" event handler in useRealtimeChats
-				// will update the store, and useEffect (line 60-73) will append it to currentChatMessages
-			} else {
-				// Fallback to REST API if SignalR not connected
-				console.warn("SignalR not connected, using REST API fallback");
-				await sendMessage(selectedChat.id, text);
-
-				// Only fetch when using REST fallback since we won't get the real-time event
-				const messages = await loadMessagesForChat(selectedChat.id);
-				setMessages(messages);
-			}
-		} catch (error) {
-			console.error("Failed to send message:", error);
-			setSendError("Failed to send message. Please try again.");
-
-			// Optionally retry with REST API
+	const handleChatUpdated = useCallback(
+		async (chatId: string) => {
 			try {
-				await sendMessage(selectedChat.id, text);
-				const messages = await loadMessagesForChat(selectedChat.id);
-				setMessages(messages);
-				setSendError(null);
-			} catch (restError) {
-				console.error("REST API fallback also failed:", restError);
+				const updatedChat = await getChat(chatId);
+				queryClient.setQueryData(["chats"], (oldChats: Chat[] | undefined) => {
+					if (!oldChats) return oldChats;
+					return oldChats.map((c) => (c.id === chatId ? updatedChat : c));
+				});
+			} catch (e) {
+				console.error("Failed to refresh chat:", e);
 			}
-		}
-	};
+		},
+		[queryClient]
+	);
 
-	if (error) {
+	const handleSendMessage = useCallback(
+		async (text: string) => {
+			if (!selectedChat) return;
+
+			setSendError(null);
+
+			try {
+				const conn = signalr.getConnection(MESSAGES_API_URL, "messaging");
+
+				if (conn?.state === HubConnectionState.Connected) {
+					// Send via SignalR - message will come back via "ReceiveMessage" event
+					await conn.invoke("SendMessage", { content: text }, selectedChat.id);
+				} else {
+					// Fallback to REST API if SignalR not connected
+					console.warn("SignalR not connected, using REST API fallback");
+					await sendMessage(selectedChat.id, text);
+					// Refetch messages since we won't get the real-time event
+					refetchMessages();
+				}
+			} catch (error) {
+				console.error("Failed to send message:", error);
+				setSendError("Failed to send message. Please try again.");
+
+				// Retry with REST API
+				try {
+					await sendMessage(selectedChat.id, text);
+					refetchMessages();
+					setSendError(null);
+				} catch (restError) {
+					console.error("REST API fallback also failed:", restError);
+				}
+			}
+		},
+		[selectedChat, refetchMessages]
+	);
+
+	// Error state for chats
+	if (chatsError) {
 		return (
 			<div className="absolute inset-0 flex flex-col justify-center items-center gap-4">
-				<h2 className="text-error">Something went wrong</h2>
-				<span className="text-muted">{error}</span>
+				<div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mb-2">
+					<AlertCircle size={32} className="text-error" />
+				</div>
+				<h2 className="text-xl font-bold text-error">Failed to load conversations</h2>
+				<span className="text-muted text-center max-w-md">
+					{chatsError instanceof Error ? chatsError.message : "An unexpected error occurred. Please try again."}
+				</span>
+				<Button onClick={() => refetchChats()} leftIcon={<RefreshCw size={16} />} color="accent">
+					Try Again
+				</Button>
 			</div>
 		);
 	}
 
-	if (isLoading) {
+	// Loading state for chats
+	if (chatsLoading) {
 		return <Loader className="inset-0 absolute" />;
 	}
 
 	return (
-		<div className="relative h-full w-full">
+		<div className="relative h-full w-full rounded-2xl overflow-hidden shadow-2xl">
 			<ChatsRealtimeClient />
 			<ResizableContainer
 				leftPanel={
-					isNewChatModalOpen ? (
-						<div className="p-4 flex flex-col gap-4 h-full bg-black/30">
-							<div>
-								<Button
-									leftIcon={<FaChevronLeft />}
-									size={"sm"}
-									color={"neutral"}
-									variant={"ghost"}
-									onClick={() => {
-										setIsNewChatModalOpen(false);
-									}}
-								/>
-								<span className="font-bold text-2xl">
-									New chat
-								</span>
-							</div>
-							<NewChat onChatCreated={handleOnChatCreated} />
-						</div>
-					) : (
-						<ChatList
-							chats={chats}
-							selectedChatId={selectedChat?.id}
-							onSelectChat={selectChat}
-							onCreateChatClick={() =>
-								setIsNewChatModalOpen(true)
-							}
-						/>
-					)
-				}
-				rightPanel={
-					selectedChat ? (
-						messagesAreLoading ? (
-							<div className="h-full flex items-center justify-center">
-								<Loader />
+					<div className="rounded-2xl h-full min-h-0">
+						{isNewChatModalOpen ? (
+							<div className="flex flex-col gap-4 h-full min-h-0 bg-background/50 backdrop-blur-xl border border-white/5 p-6 rounded-r-0 rounded-2xl overflow-hidden">
+								<div className="flex items-center gap-2 mb-4">
+									<Button
+										leftIcon={<ChevronLeft />}
+										size="sm"
+										color="neutral"
+										variant="ghost"
+										onClick={() => setIsNewChatModalOpen(false)}
+										className="h-8 w-8 p-0 rounded-full bg-white/5 hover:bg-white/10"
+									/>
+									<span className="font-bold text-2xl text-white tracking-tight">New chat</span>
+								</div>
+								<NewChat onChatCreated={handleOnChatCreated} />
 							</div>
 						) : (
-							<div className="relative h-full">
-								{sendError && (
-									<div className="absolute top-0 left-0 right-0 z-10 bg-error text-white p-2 text-center text-sm">
-										{sendError}
-										<button
-											onClick={() => setSendError(null)}
-											className="ml-2 underline">
-											Dismiss
-										</button>
+							<ChatList
+								chats={sortedChats}
+								selectedChatId={selectedChat?.id}
+								onSelectChat={selectChat}
+								onCreateChatClick={() => setIsNewChatModalOpen(true)}
+							/>
+						)}
+					</div>
+				}
+				rightPanel={
+					<div className="h-full min-h-0 flex flex-col rounded-l-0">
+						{selectedChat ? (
+							messagesLoading ? (
+								<div className="flex-1 flex items-center justify-center bg-background/50 backdrop-blur-xl border border-white/5">
+									<Loader />
+								</div>
+							) : messagesError ? (
+								<div className="flex-1 flex flex-col items-center justify-center gap-4 bg-background/50 backdrop-blur-xl border border-white/5">
+									<div className="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center">
+										<AlertCircle size={24} className="text-error" />
 									</div>
-								)}
-								<ChatWindow
-									chat={selectedChat}
-									messages={currentChatMessages}
-									onSendMessage={handleSendMessage}
-									onViewChatInfo={() =>
-										setIsChatInfoModalOpen(true)
-									}
-									onChatUpdated={handleChatUpdated}
-								/>
+									<span className="text-error font-medium">Failed to load messages</span>
+									<Button onClick={() => refetchMessages()} size="sm" leftIcon={<RefreshCw size={14} />} color="accent">
+										Retry
+									</Button>
+								</div>
+							) : (
+								<div className="flex flex-col flex-1 min-h-0 bg-background/50 backdrop-blur-xl border border-white/5 overflow-hidden">
+									{sendError && (
+										<div className="shrink-0 bg-error text-white p-2 text-center text-sm z-10">
+											{sendError}
+											<button onClick={() => setSendError(null)} className="ml-2 underline">
+												Dismiss
+											</button>
+										</div>
+									)}
+									<ChatWindow chat={selectedChat} messages={messages} onSendMessage={handleSendMessage} onChatUpdated={handleChatUpdated} />
+								</div>
+							)
+						) : (
+							<div className="grid flex-1 min-h-0 place-items-center bg-background/30 backdrop-blur-xl border border-white/5">
+								<div className="flex flex-col items-center p-8 text-center">
+									<div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6 text-muted">
+										<MessageSquare size={40} className="opacity-50" />
+									</div>
+									<h3 className="text-xl font-bold text-white mb-2">Your Messages</h3>
+									<span className="text-muted max-w-xs">Select a conversation from the list or start a new chat to begin messaging.</span>
+									<Button className="mt-6" onClick={() => setIsNewChatModalOpen(true)} color="accent">
+										Start New Chat
+									</Button>
+								</div>
 							</div>
-						)
-					) : (
-						<div className="grid h-full place-items-center bg-background">
-							<div className="flex flex-col items-center">
-								<FaEnvelope className="text-6xl text-muted mb-4" />
-								<span className="text-muted">
-									Select a conversation to start chatting
-								</span>
-							</div>
-						</div>
-					)
+						)}
+					</div>
 				}
 			/>
 		</div>

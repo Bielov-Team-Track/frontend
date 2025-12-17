@@ -1,20 +1,10 @@
-import React from "react";
-import { notFound } from "next/navigation";
+import GroupDetailClient from "./GroupDetailClient";
 
-export default async function GroupPage({
-	params,
-}: {
+interface Props {
 	params: Promise<{ id: string }>;
-}) {
-	const id = (await params).id;
-	if (id) {
-		notFound();
-	}
+}
 
-	return (
-		<div>
-			<h1>Group {id}</h1>
-			{/* TODO: implement group details page */}
-		</div>
-	);
+export default async function GroupDetailPage({ params }: Props) {
+	const { id } = await params;
+	return <GroupDetailClient groupId={id} />;
 }

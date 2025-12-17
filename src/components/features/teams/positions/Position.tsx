@@ -2,11 +2,13 @@
 
 import React, { useState } from "react";
 import {
-	FiPlus as PlusIcon,
-	FiX as RemoveIcon,
-	FiMoreVertical as MenuIcon,
-} from "react-icons/fi";
-import { Button, Loader } from "@/components/ui";
+    Plus,
+    X,
+    MoreHorizontal,
+    UserPlus,
+    Trash2
+} from "lucide-react";
+import { Loader } from "@/components/ui";
 import { usePosition } from "@/hooks/usePosition";
 import { useAuth } from "@/lib/auth/authContext";
 import PositionWithUser from "./PositionWithUser";
@@ -48,9 +50,9 @@ function Position({
 	};
 
 	return (
-		<div className="relative">
+		<div className="relative group/position">
 			{isLoading && (
-				<Loader className="absolute inset-0 bg-black/55 rounded-md z-50" />
+				<Loader className="absolute inset-0 bg-black/55 rounded-xl z-50" />
 			)}
 			{position.eventParticipant?.userProfile ? (
 				audit ? (
@@ -128,17 +130,20 @@ const AvailablePosition = ({
 				<div
 					tabIndex={0}
 					role="button"
-					className="p-4 h-14 rounded-md bg-black/30 w-full flex justify-between items-center cursor-pointer hover:bg-black/30 transition-colors"
+					className="p-3 rounded-xl bg-white/5 border border-white/5 w-full flex justify-between items-center cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all group-hover/position:border-white/10"
 				>
-					<span className="text-muted text-sm">{position.name}</span>
-					{(open || editable) && (
-						<span className="text-muted text-xs">Available</span>
-					)}
+					<span className="text-gray-300 text-sm font-medium">{position.name}</span>
+					<div className="flex items-center gap-2">
+                        {(open || editable) && (
+                            <span className="text-muted text-[10px] uppercase font-bold tracking-wider">Available</span>
+                        )}
+                        <MoreHorizontal size={14} className="text-muted opacity-0 group-hover/position:opacity-100 transition-opacity" />
+                    </div>
 				</div>
 
 				<ul
 					tabIndex={0}
-					className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+					className="dropdown-content z-[1] menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-52 mt-1"
 				>
 					{!showRemoveConfirm ? (
 						<>
@@ -151,8 +156,9 @@ const AvailablePosition = ({
 											? handlePayment
 											: takePosition
 									}
+                                    className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2"
 								>
-									<PlusIcon />
+									<Plus size={14} />
 									{team.event.budget?.payToJoin &&
 									team.event.registrationUnit === Unit.Individual
 										? `Pay ${team.event.budget.cost} to join`
@@ -164,13 +170,16 @@ const AvailablePosition = ({
 							{editable && (
 								<>
 									<li>
-										<button onClick={() => setIsModalOpen(true)}>
-											Assign player
+										<button 
+                                            onClick={() => setIsModalOpen(true)}
+                                            className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2"
+                                        >
+                                            <UserPlus size={14} /> Assign player
 										</button>
 									</li>
 									<li>
 										<button
-											className="text-error"
+											className="text-xs hover:bg-red-500/10 hover:text-error text-error gap-2"
 											onClick={(e) => {
 												e.preventDefault();
 												e.stopPropagation();
@@ -185,7 +194,7 @@ const AvailablePosition = ({
 												}
 											}}
 										>
-											<RemoveIcon /> Remove position
+											<Trash2 size={14} /> Remove position
 										</button>
 									</li>
 								</>
@@ -194,12 +203,12 @@ const AvailablePosition = ({
 					) : (
 						// Remove confirmation in dropdown
 						<>
-							<li className="menu-title">
-								<span className="text-error text-sm">Remove position?</span>
+							<li className="menu-title px-4 py-2">
+								<span className="text-error text-xs font-bold">Remove position?</span>
 							</li>
 							<li>
 								<button
-									className="text-error"
+									className="text-xs bg-red-500/10 text-error hover:bg-red-500/20"
 									onClick={handlePositionRemoval}
 									disabled={isRemoving}
 								>
@@ -207,7 +216,10 @@ const AvailablePosition = ({
 								</button>
 							</li>
 							<li>
-								<button onClick={() => setShowRemoveConfirm(false)}>
+								<button 
+                                    onClick={() => setShowRemoveConfirm(false)}
+                                    className="text-xs text-gray-400 hover:text-white"
+                                >
 									Cancel
 								</button>
 							</li>
@@ -221,8 +233,10 @@ const AvailablePosition = ({
 				isLoading={false}
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
+                title="Assign Player"
 			>
-				<div className="px-4 py-12">
+				<div className="p-4">
+                    <p className="text-sm text-muted mb-4">Select a player to assign to the <span className="text-white font-bold">{position.name}</span> position.</p>
 					<UserSearch onUserSelect={assignPosition} />
 				</div>
 			</Modal>

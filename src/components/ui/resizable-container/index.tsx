@@ -57,14 +57,14 @@ const ResizableContainer = ({
 
 	return (
 		<div
-			className="flex h-full isolate"
+			className="flex h-full min-h-0 isolate"
 			style={{
 				cursor: isResizing ? "col-resize" : "default",
 				userSelect: isResizing ? "none" : "auto",
 			}}>
-			<div style={{ width: `${sidebarWidth}px` }}>{leftPanel}</div>
+			<div className="h-full min-h-0" style={{ width: `${sidebarWidth}px` }}>{leftPanel}</div>
 			<div className={dividerClassName} onMouseDown={startResizing} />
-			<div className="flex-1 -translate-x-1">{rightPanel}</div>
+			<div className="flex-1 h-full min-h-0 -translate-x-1">{rightPanel}</div>
 		</div>
 	);
 };

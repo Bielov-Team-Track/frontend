@@ -1,12 +1,44 @@
 import { Controller } from "react-hook-form";
-import { Input, Select, TextArea } from "@/components/ui";
-import { FaVolleyballBall } from "react-icons/fa";
+import { Input, TextArea, RadioCards } from "@/components/ui";
+import { Gamepad2, Trophy, Warehouse, Trees, Waves } from "lucide-react";
 import { useEventFormContext } from "../context/EventFormContext";
-import {
-	eventTypeOptions,
-	surfaceOptions,
-} from "../constants/eventFormOptions";
-import { GiRunningShoe } from "react-icons/gi";
+import { EventType, PlayingSurface } from "@/lib/models/Event";
+
+const eventTypeCards = [
+	{
+		value: EventType.CasualPlay,
+		label: "Casual",
+		description: "Relaxed games for fun",
+		icon: Gamepad2,
+	},
+	{
+		value: EventType.Tournament,
+		label: "Tournament",
+		description: "Competitive matches",
+		icon: Trophy,
+	},
+];
+
+const surfaceCards = [
+	{
+		value: PlayingSurface.Indoor,
+		label: "Indoor",
+		description: "Gymnasium or sports hall",
+		icon: Warehouse,
+	},
+	{
+		value: PlayingSurface.Grass,
+		label: "Grass",
+		description: "Outdoor grass court",
+		icon: Trees,
+	},
+	{
+		value: PlayingSurface.Beach,
+		label: "Beach",
+		description: "Sand volleyball",
+		icon: Waves,
+	},
+];
 
 export function EventDetailsStep() {
 	const { form } = useEventFormContext();
@@ -16,16 +48,15 @@ export function EventDetailsStep() {
 	} = form;
 
 	return (
-		<div className="space-y-6">
-			<div className="text-center mb-8">
-				<span className="w-12 h-12 mx-auto text-[48px]">🏐</span>
-				<h2 className="text-xl font-semibold  mb-2">Event Details</h2>
-				<p className="/60">
-					Let&apos;s start with the basic information about your event
+		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+			<div>
+				<h2 className="text-xl font-bold text-white mb-1">Event Details</h2>
+				<p className="text-muted text-sm">
+					Let&apos;s start with the basic information about your event.
 				</p>
 			</div>
 
-			<div className="grid gap-6">
+			<div className="space-y-6">
 				<Controller
 					name="name"
 					control={control}
@@ -41,37 +72,35 @@ export function EventDetailsStep() {
 					)}
 				/>
 
-				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-					<Controller
-						name="type"
-						control={control}
-						render={({ field }) => (
-							<Select
-								{...field}
-								placeholder="Select event type"
-								leftIcon={<FaVolleyballBall />}
-								options={eventTypeOptions}
-								error={errors.type?.message}
-								required
-							/>
-						)}
-					/>
+				<Controller
+					name="type"
+					control={control}
+					render={({ field }) => (
+						<RadioCards
+							label="Event Type"
+							options={eventTypeCards}
+							value={field.value}
+							onChange={field.onChange}
+							error={errors.type?.message}
+							columns={2}
+						/>
+					)}
+				/>
 
-					<Controller
-						name="surface"
-						control={control}
-						render={({ field }) => (
-							<Select
-								{...field}
-								placeholder="Select surface"
-								options={surfaceOptions}
-								error={errors.surface?.message}
-								leftIcon={<GiRunningShoe />}
-								required
-							/>
-						)}
-					/>
-				</div>
+				<Controller
+					name="surface"
+					control={control}
+					render={({ field }) => (
+						<RadioCards
+							label="Playing Surface"
+							options={surfaceCards}
+							value={field.value}
+							onChange={field.onChange}
+							error={errors.surface?.message}
+							columns={3}
+						/>
+					)}
+				/>
 
 				<Controller
 					name="description"
@@ -79,12 +108,13 @@ export function EventDetailsStep() {
 					render={({ field }) => (
 						<TextArea
 							{...field}
-							label="Description (Optional)"
+							label="Description"
 							placeholder="Describe your event, rules, what to bring, etc..."
 							maxLength={500}
 							showCharCount
-							minRows={3}
+							minRows={4}
 							helperText="Help participants know what to expect"
+							optional
 						/>
 					)}
 				/>

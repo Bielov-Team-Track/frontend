@@ -1,124 +1,205 @@
-import { EventsList, PlayerProfileCard } from "@/components";
-import { PlayerProfile } from "@/lib/models/User";
+import { notFound } from "next/navigation";
+import { EventsList } from "@/components";
 import { loadEventsByFilter } from "@/lib/requests/events";
+import { getFullUserProfile } from "@/lib/requests/user";
+import {
+	FullProfileDto,
+	getDominantHandLabel,
+	getVolleyballPositionLabel,
+	getSkillLevelLabel,
+	getClubRoleLabel
+} from "@/lib/models/Profile";
+import Image from "next/image";
+import { MapPin, Calendar, Ruler, ArrowUp, Zap, TrendingUp, Award, History, Shield } from "lucide-react";
 
-// Mock player profile data for demonstration
-const getMockPlayerProfile = (userId: string): PlayerProfile => ({
-	userId,
-	email: "alex.volkov@example.com",
-	name: "Alex",
-	surname: "Volkov",
-	imageUrl: "",
-	bio: "Passionate volleyball player with 8 years of experience. Love competitive matches and helping new players improve their game.",
-	location: "Kyiv, Ukraine",
-	height: 192,
-	verticalJump: 85,
-	reach: 320,
-	dominantHand: "right",
-	preferredPositions: ["outside_hitter", "opposite", "middle_blocker"],
-	skillRatings: {
-		serve: 85,
-		attack: 92,
-		defense: 78,
-		setting: 65,
-		blocking: 88,
-		reception: 72,
-	},
-	experienceLevel: "advanced",
-	yearsPlaying: 8,
-	stats: {
-		gamesPlayed: 247,
-		gamesWon: 168,
-		eventsAttended: 52,
-		totalPoints: 1842,
-		aces: 156,
-		blocks: 312,
-		kills: 728,
-		assists: 89,
-		digs: 445,
-	},
-	badges: [
-		{
-			id: "1",
-			name: "Tournament Champion",
-			description: "Won a community tournament",
-			icon: "🏆",
-			earnedAt: "2024-06-15",
-			rarity: "legendary",
-		},
-		{
-			id: "2",
-			name: "Ace Master",
-			description: "Scored 100+ aces",
-			icon: "🎯",
-			earnedAt: "2024-03-20",
-			rarity: "epic",
-		},
-		{
-			id: "3",
-			name: "Iron Wall",
-			description: "Recorded 300+ blocks",
-			icon: "🧱",
-			earnedAt: "2024-08-10",
-			rarity: "epic",
-		},
-		{
-			id: "4",
-			name: "Team Player",
-			description: "Attended 50+ events",
-			icon: "🤝",
-			earnedAt: "2024-01-05",
-			rarity: "rare",
-		},
-		{
-			id: "5",
-			name: "Early Bird",
-			description: "Founding community member",
-			icon: "🌅",
-			earnedAt: "2023-06-01",
-			rarity: "rare",
-		},
-		{
-			id: "6",
-			name: "Rising Star",
-			description: "Won 100+ games",
-			icon: "⭐",
-			earnedAt: "2024-02-14",
-			rarity: "common",
-		},
-		{
-			id: "7",
-			name: "Dedicated",
-			description: "Played 200+ games",
-			icon: "💪",
-			earnedAt: "2024-09-01",
-			rarity: "common",
-		},
-	],
-	followersCount: 234,
-	followingCount: 89,
-	isFollowing: false,
-	memberSince: "2023-06-01",
-	lastActive: "2024-11-24",
-});
+interface PublicProfileCardProps {
+	profile: FullProfileDto;
+}
+
+const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
+	const fullName = [profile.name, profile.surname].filter(Boolean).join(" ") || "Unknown User";
+
+	return (
+		<div className="bg-base-200 rounded-2xl overflow-hidden">
+			{/* Header */}
+			<div className="bg-gradient-to-r from-accent/20 to-purple-500/20 p-6 md:p-8">
+				<div className="flex flex-col md:flex-row items-center gap-6">
+					<div className="relative">
+						{profile.imageUrl ? (
+							<Image
+								src={profile.imageUrl}
+								alt={fullName}
+								width={120}
+								height={120}
+								className="rounded-full border-4 border-base-100 object-cover"
+							/>
+						) : (
+							<div className="w-[120px] h-[120px] rounded-full border-4 border-base-100 bg-base-300 flex items-center justify-center text-4xl font-bold text-white/50">
+								{(profile.name?.[0] || "?").toUpperCase()}
+							</div>
+						)}
+					</div>
+					<div className="text-center md:text-left">
+						<h1 className="text-2xl md:text-3xl font-bold text-white">{fullName}</h1>
+						{profile.bio && (
+							<p className="text-white/70 mt-2 max-w-xl">{profile.bio}</p>
+						)}
+					</div>
+				</div>
+			</div>
+
+			{/* Player Profile Stats */}
+			{profile.playerProfile && (
+				<div className="p-6 md:p-8 border-t border-white/5">
+					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+						<TrendingUp className="text-accent" size={20} />
+						Player Stats
+					</h2>
+					<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+						{profile.playerProfile.heightCm && (
+							<div className="bg-base-300 rounded-xl p-4 flex items-center gap-3">
+								<Ruler className="text-blue-500" size={20} />
+								<div>
+									<div className="text-xs text-muted">Height</div>
+									<div className="font-semibold text-white">{profile.playerProfile.heightCm} cm</div>
+								</div>
+							</div>
+						)}
+						{profile.playerProfile.verticalJumpCm && (
+							<div className="bg-base-300 rounded-xl p-4 flex items-center gap-3">
+								<ArrowUp className="text-green-500" size={20} />
+								<div>
+									<div className="text-xs text-muted">Vertical Jump</div>
+									<div className="font-semibold text-white">{profile.playerProfile.verticalJumpCm} cm</div>
+								</div>
+							</div>
+						)}
+						<div className="bg-base-300 rounded-xl p-4 flex items-center gap-3">
+							<Zap className="text-purple-500" size={20} />
+							<div>
+								<div className="text-xs text-muted">Dominant Hand</div>
+								<div className="font-semibold text-white">{getDominantHandLabel(profile.playerProfile.dominantHand)}</div>
+							</div>
+						</div>
+						{profile.playerProfile.highestLevelPlayed !== undefined && (
+							<div className="bg-base-300 rounded-xl p-4 flex items-center gap-3">
+								<TrendingUp className="text-orange-500" size={20} />
+								<div>
+									<div className="text-xs text-muted">Highest Level</div>
+									<div className="font-semibold text-white">{getSkillLevelLabel(profile.playerProfile.highestLevelPlayed)}</div>
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* Positions */}
+					{(profile.playerProfile.preferredPosition !== undefined || (profile.playerProfile.secondaryPositions && profile.playerProfile.secondaryPositions.length > 0)) && (
+						<div className="mt-4">
+							<div className="text-sm text-muted mb-2">Positions</div>
+							<div className="flex flex-wrap gap-2">
+								{profile.playerProfile.preferredPosition !== undefined && (
+									<span className="px-3 py-1 bg-accent/20 border border-accent/30 rounded-full text-accent text-sm">
+										{getVolleyballPositionLabel(profile.playerProfile.preferredPosition)} (Preferred)
+									</span>
+								)}
+								{profile.playerProfile.secondaryPositions?.map((pos, idx) => (
+									<span key={idx} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/80 text-sm">
+										{getVolleyballPositionLabel(pos)}
+									</span>
+								))}
+							</div>
+						</div>
+					)}
+				</div>
+			)}
+
+			{/* Coach Profile Stats */}
+			{profile.coachProfile && (
+				<div className="p-6 md:p-8 border-t border-white/5">
+					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+						<Award className="text-accent" size={20} />
+						Coach Profile
+					</h2>
+					<div className="grid grid-cols-2 gap-4 mb-4">
+						{profile.coachProfile.yearsOfExperience && (
+							<div className="bg-base-300 rounded-xl p-4">
+								<div className="text-xs text-muted">Experience</div>
+								<div className="font-semibold text-white">{profile.coachProfile.yearsOfExperience} Years</div>
+							</div>
+						)}
+						{profile.coachProfile.highestLevelCoached !== undefined && (
+							<div className="bg-base-300 rounded-xl p-4">
+								<div className="text-xs text-muted">Highest Level Coached</div>
+								<div className="font-semibold text-white">{getSkillLevelLabel(profile.coachProfile.highestLevelCoached)}</div>
+							</div>
+						)}
+					</div>
+					{profile.coachProfile.qualifications && profile.coachProfile.qualifications.length > 0 && (
+						<div>
+							<div className="text-sm text-muted mb-2">Qualifications</div>
+							<div className="flex flex-wrap gap-2">
+								{profile.coachProfile.qualifications.map((qual) => (
+									<span key={qual.id} className="px-3 py-1 bg-accent/10 border border-accent/20 rounded-full text-accent text-sm">
+										{qual.name} {qual.year > 0 && `(${qual.year})`}
+									</span>
+								))}
+							</div>
+						</div>
+					)}
+				</div>
+			)}
+
+			{/* History */}
+			{profile.historyEntries && profile.historyEntries.length > 0 && (
+				<div className="p-6 md:p-8 border-t border-white/5">
+					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+						<History className="text-accent" size={20} />
+						Career History
+					</h2>
+					<div className="space-y-3">
+						{profile.historyEntries
+							.sort((a, b) => b.year - a.year)
+							.slice(0, 5)
+							.map((entry) => (
+								<div key={entry.id} className="bg-base-300 rounded-xl p-4 flex items-center gap-4">
+									{entry.clubLogoUrl ? (
+										<Image src={entry.clubLogoUrl} alt={entry.clubName} width={40} height={40} className="rounded-lg" />
+									) : (
+										<div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+											<Shield size={20} className="text-muted" />
+										</div>
+									)}
+									<div className="flex-1">
+										<div className="font-semibold text-white">{entry.clubName}</div>
+										<div className="text-sm text-muted">
+											{getClubRoleLabel(entry.role)} {entry.teamName && `- ${entry.teamName}`}
+										</div>
+									</div>
+									<div className="text-accent font-medium">{entry.year}</div>
+								</div>
+							))}
+					</div>
+				</div>
+			)}
+		</div>
+	);
+};
 
 const ProfilePage = async ({ params }: { params: Promise<{ id: string }> }) => {
 	const { id } = await params;
 
-	// Use mock data for demonstration
-	const playerProfile = getMockPlayerProfile(id);
+	// Fetch real profile data from API
+	const profile = await getFullUserProfile(id);
+
+	if (!profile) {
+		notFound();
+	}
 
 	const events = await loadEventsByFilter({ organizerId: id });
 
 	return (
 		<div className="container mx-auto px-4 py-6 max-w-5xl">
-			<PlayerProfileCard
-				player={playerProfile}
-				isOwnProfile={false}
-				onMessage={() => {}}
-				onFollow={() => {}}
-				onUnfollow={() => {}}
-			/>
+			<PublicProfileCard profile={profile} />
 
 			{/* Events Section */}
 			{events && events.length > 0 && (
@@ -141,11 +222,19 @@ export const generateMetadata = async ({
 	params: Promise<{ id: string }>;
 }) => {
 	const { id } = await params;
-	// In production, fetch real profile data
-	const playerProfile = getMockPlayerProfile(id);
+	const profile = await getFullUserProfile(id);
+
+	if (!profile) {
+		return {
+			title: "Profile Not Found",
+			description: "The requested profile could not be found",
+		};
+	}
+
+	const fullName = [profile.name, profile.surname].filter(Boolean).join(" ") || "User";
 
 	return {
-		title: `${playerProfile.name} ${playerProfile.surname} - Player Profile`,
-		description: `View ${playerProfile.name} ${playerProfile.surname}'s volleyball profile, stats, and achievements`,
+		title: `${fullName} - Profile`,
+		description: `View ${fullName}'s volleyball profile and achievements`,
 	};
 };

@@ -49,7 +49,25 @@ const MobileNav = () => {
 							}`}
 						>
 							<div className="relative">
-								<Icon size={18} />
+								{item.logoUrl ? (
+									<img
+										src={item.logoUrl}
+										alt={`${item.name} logo`}
+										className="w-[18px] h-[18px] rounded-full object-cover"
+									/>
+								) : item.color ? (
+									<span
+										className="rounded-full"
+										style={{
+											width: 18,
+											height: 18,
+											backgroundColor: item.color,
+											display: "block",
+										}}
+									/>
+								) : (
+									<Icon size={18} />
+								)}
 								{badgeValue && badgeValue > 0 && (
 									<span className="absolute -top-1 -right-2 flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-white bg-error rounded-full">
 										{badgeValue > 99 ? '99+' : badgeValue}

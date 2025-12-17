@@ -2,7 +2,7 @@ import type { Preview } from "@storybook/nextjs-vite";
 import "../src/app/globals.css";
 
 const preview: Preview = {
-	parameters: {
+    parameters: {
 		controls: {
 			matchers: {
 				color: /(background|color)$/i,
@@ -10,20 +10,21 @@ const preview: Preview = {
 			},
 		},
 		backgrounds: {
-			default: "light",
-			values: [
-				{
+            options: {
+                light: {
 					name: "light",
 					value: "#ffffff",
 				},
-				{
+
+                dark: {
 					name: "dark",
 					value: "#0a0a0a",
-				},
-			],
-		},
+				}
+            }
+        },
 	},
-	globalTypes: {
+
+    globalTypes: {
 		theme: {
 			description: "Global theme for components",
 			defaultValue: "light",
@@ -35,6 +36,12 @@ const preview: Preview = {
 			},
 		},
 	},
+
+    initialGlobals: {
+        backgrounds: {
+            value: "light"
+        }
+    }
 };
 
 export default preview;

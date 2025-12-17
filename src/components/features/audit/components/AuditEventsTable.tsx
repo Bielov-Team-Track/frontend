@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
 	createColumnHelper,
 	flexRender,
@@ -14,8 +15,7 @@ import { EventParticipant } from "@/lib/models/EventParticipant";
 import { loadParticipants } from "@/lib/requests/events";
 import { getFormattedDateWithDay } from "@/lib/utils/date";
 import { getFormatedCurrency } from "@/lib/utils/currency";
-import Link from "@/components/ui/link";
-import classNames from "classnames";
+import { Loader } from "@/components";
 
 declare module "@tanstack/react-table" {
 	interface ColumnMeta<TData, TValue> {
@@ -43,6 +43,7 @@ interface EventWithAuditData extends Event {
 const columnHelper = createColumnHelper<EventWithAuditData>();
 
 const AuditEventsTable = ({ events }: AuditEventsListProps) => {
+    const router = useRouter();
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [participantsData, setParticipantsData] = useState<
 		Record<string, EventParticipant[]>
@@ -66,7 +67,7 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 							[event.id]: participants,
 						}));
 					}
-					console.log("Participants for event", event.id, participants);
+					
 					const paidCount = participants.filter(
 						(p) => p.payment?.status === "completed",
 					).length;
@@ -83,9 +84,6 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 						}
 						return sum;
 					}, 0);
-
-					// Determine if overdue (event is in the past with outstanding payments)
-					const isPast = new Date(event.startTime) < new Date();
 
 					eventsWithData.push({
 						...event,
@@ -127,7 +125,7 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 				header: "Event",
 				cell: (info) => info.getValue(),
 				meta: {
-					cellClassName: "max-w-[100px] font-bold",
+					cellClassName: "font-medium text-white",
 				},
 			}),
 			columnHelper.accessor("location.name", {
@@ -171,10 +169,9 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 				header: "Amount Owed",
 				cell: (info) => {
 					const amount = info.getValue() || 0;
-					// Get currency from event budget or default to GBP
 					const currency = info.row.original.budget?.currency || "gbp";
 					return (
-						<span className="font-bold text-warning">
+						<span className="font-bold text-yellow-500">
 							{getFormatedCurrency(amount, currency)}
 						</span>
 					);
@@ -189,10 +186,9 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 				header: "Amount Paid",
 				cell: (info) => {
 					const amount = info.getValue() || 0;
-					// Get currency from event budget or default to GBP
 					const currency = info.row.original.budget?.currency || "gbp";
 					return (
-						<span className="font-bold text-success">
+						<span className="font-bold text-green-500">
 							{getFormatedCurrency(amount, currency)}
 						</span>
 					);
@@ -207,15 +203,14 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 				header: "Balance",
 				cell: (info) => {
 					const balance = info.getValue() as Balance;
-					// Get currency from event budget or default to GBP
 					const currency = info.row.original.budget?.currency || "gbp";
 					return (
-						<div className="flex ">
-							<span className="font-bold text-warning">
+						<div className="flex gap-2">
+							<span className="font-bold text-yellow-500">
 								{getFormatedCurrency(balance.amountOwed!, currency)}
 							</span>
-							<span>|</span>
-							<span className="font-bold text-success">
+							<span className="text-muted">|</span>
+							<span className="font-bold text-green-500">
 								{getFormatedCurrency(balance.amountCollected!, currency)}
 							</span>
 						</div>
@@ -244,29 +239,18 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 
 	if (isLoading) {
 		return (
-			<div className="space-y-4">
-				<div className="flex items-center gap-3">
-					<h2 className="text-xl font-semibold">
-						Events with Outstanding Balances
-					</h2>
-				</div>
-				<div className="overflow-x-auto rounded-md border border-neutral/20">
-					<div className="bg-background-light bg-neutral/5 p-12 text-center">
-						<div className="flex flex-col items-center gap-4">
-							<span className="loading loading-spinner loading-lg"></span>
-							<p className="text-muted">Loading event data...</p>
-						</div>
-					</div>
-				</div>
+			<div className="p-12 flex flex-col items-center justify-center gap-4 text-center">
+                <Loader />
+                <p className="text-muted">Loading event data...</p>
 			</div>
 		);
 	}
 
 	if (tableData.length === 0) {
 		return (
-			<div className="bg-base-200/50 rounded-xl p-12 text-center">
+			<div className="p-12 text-center">
 				<div className="text-5xl mb-4 opacity-50">✅</div>
-				<h3 className="text-lg font-semibold text-muted mb-2">
+				<h3 className="text-lg font-semibold text-white mb-2">
 					No Outstanding Payments
 				</h3>
 				<p className="text-sm text-muted">
@@ -277,24 +261,24 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 	}
 
 	return (
-		<div className="space-y-4">
-			<div className="flex items-center gap-3">
-				<h2 className="text-xl font-semibold">
+		<div>
+			<div className="p-6 border-b border-white/5">
+				<h2 className="text-lg font-semibold text-white">
 					Events with Outstanding Balances
 				</h2>
 			</div>
 
-			<div className="overflow-x-auto rounded-md">
-				<table className="table bg-background-light bg-neutral/5 w-full">
-					<thead className="bg-background-dark">
+			<div className="overflow-x-auto">
+				<table className="w-full text-left border-collapse">
+					<thead>
 						{table.getHeaderGroups().map((headerGroup) => (
-							<tr key={headerGroup.id}>
+							<tr key={headerGroup.id} className="bg-white/5 border-b border-white/5">
 								{headerGroup.headers.map((header) => (
 									<th
 										key={header.id}
-										className={`text-xs font-semibold text-muted uppercase tracking-wider ${
+										className={`text-xs font-medium text-muted uppercase tracking-wider py-3 px-4 ${
 											header.column.columnDef.meta?.headerClassName || ""
-										} ${header.column.getCanSort() ? "cursor-pointer" : ""}`}
+										} ${header.column.getCanSort() ? "cursor-pointer hover:text-white" : ""}`}
 										onClick={header.column.getToggleSortingHandler()}
 									>
 										{header.isPlaceholder ? null : (
@@ -314,15 +298,13 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 						{table.getRowModel().rows.map((row) => (
 							<tr
 								key={row.id}
-								className="hover:bg-neutral/10 transition-colors cursor-pointer"
-								onClick={() => {
-									window.location.href = `/dashboard/audit/${row.original.id}`;
-								}}
+								className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group"
+								onClick={() => router.push(`/dashboard/audit/${row.original.id}`)}
 							>
 								{row.getVisibleCells().map((cell) => (
 									<td
 										key={cell.id}
-										className={`py-5 ${
+										className={`py-4 px-4 text-sm ${
 											cell.column.columnDef.meta?.cellClassName || ""
 										}`}
 									>

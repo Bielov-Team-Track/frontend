@@ -3,16 +3,22 @@
 import { Button, Modal } from "@/components/ui";
 import { Event } from "@/lib/models/Event";
 import { cancelEvent } from "@/lib/requests/events";
-import { redirect } from "next/navigation";
+import { createEventChat } from "@/lib/requests/messages";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
+import { MessageCircle } from "lucide-react";
+import { toast } from "react-toastify";
 
 type EventPageButtonsProps = {
 	event: Event;
+	participantIds?: string[];
 };
 
-const EventPageButtons = ({ event }: EventPageButtonsProps) => {
+const EventPageButtons = ({ event, participantIds = [] }: EventPageButtonsProps) => {
+	const router = useRouter();
 	const [isCancelling, setIsCancelling] = useState(false);
+	const [isCreatingChat, setIsCreatingChat] = useState(false);
 	const [showCancelModal, setShowCancelModal] = useState(false);
 
 	const handleCancelEvent = async () => {
@@ -29,9 +35,37 @@ const EventPageButtons = ({ event }: EventPageButtonsProps) => {
 		}
 	};
 
+	const handleMessageParticipants = async () => {
+		if (isCreatingChat) return;
+		try {
+			setIsCreatingChat(true);
+			const chat = await createEventChat(
+				event.id!,
+				undefined, // title - will use event name
+				event.name,
+				participantIds
+			);
+			router.push(`/dashboard/messages?chat=${chat.id}`);
+		} catch (error) {
+			console.error("Failed to create event chat:", error);
+			toast.error("Failed to create chat");
+		} finally {
+			setIsCreatingChat(false);
+		}
+	};
+
 	return event.canceled ? null : (
 		<>
 			<div className="flex gap-2">
+				<Button
+					variant="ghost"
+					color="secondary"
+					onClick={handleMessageParticipants}
+					loading={isCreatingChat}
+					disabled={isCreatingChat}>
+					<MessageCircle size={16} className="mr-1" />
+					Message
+				</Button>
 				<Button
 					variant="ghost"
 					color="secondary"
