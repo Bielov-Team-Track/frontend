@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChatList from "./components/ChatList";
 import ChatsRealtimeClient from "./components/ChatsRealtimeClient";
 import ChatWindow from "./components/ChatWindow";
+import MessagesPageSkeleton from "./components/MessagesPageSkeleton";
 import NewChat from "./components/NewChat";
 
 const MessagesPage = () => {
@@ -175,7 +176,7 @@ const MessagesPage = () => {
 
 	// Loading state for chats
 	if (chatsLoading) {
-		return <Loader className="inset-0 absolute" />;
+		return <MessagesPageSkeleton />;
 	}
 
 	return (

@@ -30,6 +30,7 @@
     "clsx": "^2.1.1",
     "daisyui": "^5.0.50",
     "date-fns": "^4.1.0",
+    "emoji-picker-react": "^4.16.1",
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.539.0",
     "moment": "^2.30.1",

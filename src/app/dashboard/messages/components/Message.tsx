@@ -1,30 +1,43 @@
-import { Avatar } from "@/components";
+import { ReactionPicker } from "@/components";
 import { useAuth } from "@/lib/auth/authContext";
 import { Message } from "@/lib/models/Messages";
 import { addReaction } from "@/lib/requests/messages";
+import { stringToColor } from "@/lib/utils/color";
 import { getFormattedTime } from "@/lib/utils/date";
 import getUknownUser from "@/lib/utils/user";
 import { useQueryClient } from "@tanstack/react-query";
 import classNames from "classnames";
-import { useState } from "react";
+import { Forward, Reply, SmilePlus } from "lucide-react";
+import Image from "next/image";
+import { useRef, useState } from "react";
 import { ReactionBadge } from "./ReactionBadge";
-import { ReactionPicker } from "./ReactionPicker";
 
 type MessageProps = {
 	message: Message;
 	type?: "direct" | "group";
 	onReplyClick?: (message: Message) => void;
+	onForwardClick?: (message: Message) => void;
 };
 
-const MessageComponent = ({ message, onReplyClick }: MessageProps) => {
+const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProps) => {
 	const user = useAuth().userProfile;
 	const uknownUser = getUknownUser();
 	const queryClient = useQueryClient();
 	const [showReactionPicker, setShowReactionPicker] = useState(false);
 	const [reactionError, setReactionError] = useState<string | null>(null);
+	const reactionTriggerRef = useRef<HTMLButtonElement>(null);
 
 	const currentUserMessage = message?.sender?.userId === user?.userId;
 	const currentUserId = user?.userId || "";
+	const sender = message.sender ?? uknownUser;
+
+	const senderColor = stringToColor(sender.email || "default");
+	const senderInitials = (sender.name || "?")
+		.split(" ")
+		.map((w) => w[0])
+		.join("")
+		.slice(0, 2)
+		.toUpperCase();
 
 	const handleReactionError = (error: string) => {
 		setReactionError(error);
@@ -81,12 +94,24 @@ const MessageComponent = ({ message, onReplyClick }: MessageProps) => {
 		}
 	};
 
+	const SenderAvatar = () => (
+		<div
+			className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden shrink-0 relative select-none"
+			style={{ backgroundColor: !sender.imageUrl ? senderColor : undefined }}>
+			{sender.imageUrl ? (
+				<Image src={sender.imageUrl} alt={sender.name || "Sender"} fill className="object-cover" />
+			) : (
+				<span className="text-xs font-bold text-black/70">{senderInitials}</span>
+			)}
+		</div>
+	);
+
 	// Render deleted message
 	if (message?.isDeleted) {
 		return (
 			<div className={classNames("flex gap-2 p-4 items-start", currentUserMessage ? "flex-row-reverse" : "")}>
 				<div className="flex-grow-1 cursor-pointer">
-					<Avatar profile={message.sender ?? uknownUser} />
+					<SenderAvatar />
 				</div>
 				<div className={classNames(currentUserMessage ? "text-right" : "text-left", "w-full")}>
 					<div className="inline-block p-2 rounded-lg max-w-[70%] bg-muted/5 italic text-muted">Message deleted</div>
@@ -98,7 +123,7 @@ const MessageComponent = ({ message, onReplyClick }: MessageProps) => {
 	return (
 		<div className={classNames("flex gap-2 p-4 items-start group", currentUserMessage ? "flex-row-reverse" : "")}>
 			<div className="flex-grow-1 cursor-pointer">
-				<Avatar profile={message.sender ?? uknownUser} />
+				<SenderAvatar />
 			</div>
 			<div className={classNames(currentUserMessage ? "text-right" : "text-left", "w-full")}>
 				{/* Reply indicator */}
@@ -140,27 +165,41 @@ const MessageComponent = ({ message, onReplyClick }: MessageProps) => {
 						)}
 					</div>
 
-					{/* Message actions (reaction picker trigger, reply) */}
+					{/* Message actions (reaction picker trigger, reply, forward) */}
 					<div
 						className={classNames(
-							"absolute top-0 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1",
-							currentUserMessage ? "left-0 -translate-x-full pr-2" : "right-0 translate-x-full pl-2"
+							"absolute top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 bg-background/80 backdrop-blur-sm rounded-full border border-white/5 p-0.5 shadow-sm",
+							currentUserMessage ? "left-0 -translate-x-full mr-2" : "right-0 translate-x-full ml-2"
 						)}>
 						<button
+							ref={reactionTriggerRef}
 							onClick={() => setShowReactionPicker(!showReactionPicker)}
-							className="text-sm hover:bg-muted/20 p-1 rounded"
+							className="p-1.5 rounded-full hover:bg-muted/20 text-muted-foreground hover:text-foreground transition-colors"
 							title="Add reaction">
-							😀
+							<SmilePlus size={16} />
 						</button>
+
 						{onReplyClick && (
-							<button onClick={() => onReplyClick(message)} className="text-sm hover:bg-muted/20 p-1 rounded" title="Reply">
-								↩️
+							<button
+								onClick={() => onReplyClick(message)}
+								className="p-1.5 rounded-full hover:bg-muted/20 text-muted-foreground hover:text-foreground transition-colors"
+								title="Reply">
+								<Reply size={16} />
 							</button>
 						)}
+
+						<button
+							onClick={() => onForwardClick?.(message)}
+							className="p-1.5 rounded-full hover:bg-muted/20 text-muted-foreground hover:text-foreground transition-colors"
+							title="Forward">
+							<Forward size={16} />
+						</button>
 					</div>
 
 					{/* Reaction picker */}
-					{showReactionPicker && <ReactionPicker onSelect={handleAddReaction} onClose={() => setShowReactionPicker(false)} />}
+					{showReactionPicker && (
+						<ReactionPicker triggerRef={reactionTriggerRef} onSelect={handleAddReaction} onClose={() => setShowReactionPicker(false)} />
+					)}
 				</div>
 
 				{/* Timestamp and edited indicator */}

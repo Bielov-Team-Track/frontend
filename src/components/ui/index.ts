@@ -20,6 +20,7 @@ export { default as MultiSelectPills } from "./multi-select-pills";
 export { default as RadioButton } from "./radio-button";
 export { RadioGroup } from "./radio-button/RadioGroup";
 export { default as RadioCards } from "./radio-cards";
+export { default as ReactionPicker } from "./reaction-picker";
 export { default as ResizableContainer } from "./resizable-container";
 export { default as Section } from "./section";
 export { default as Select } from "./select";

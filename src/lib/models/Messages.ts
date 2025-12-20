@@ -20,8 +20,7 @@ export interface Chat {
 	imageUrl?: string;
 	id: string;
 	title: string;
-	participantIds: string[];
-	participants: UserProfile[];
+	participants: ChatParticipant[];
 	lastMessage: Message;
 	unreadCount: number;
 	createdAt: Date;
