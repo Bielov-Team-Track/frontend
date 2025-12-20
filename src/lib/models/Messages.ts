@@ -13,7 +13,7 @@ export interface Message {
 	replyTo?: MessageSummary;
 	forwardedFrom?: MessageSummary;
 	isDeleted: boolean;
-	reactions: Reaction[];
+	reactions: ReactionSummary[];
 }
 
 export interface Chat {
@@ -50,11 +50,15 @@ export interface MessageSummary {
 	sender: UserProfile;
 }
 
-export interface Reaction {
+export interface ReactionSummary {
 	emoji: string;
-	count: number;
-	hasReacted: boolean;
 	userIds: string[];
+}
+
+export interface MessageReaction {
+	emoji: string;
+	userId: string;
+	messageId: string;
 }
 
 export interface ChatSource {

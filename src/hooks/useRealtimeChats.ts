@@ -2,7 +2,7 @@
 
 import { useAccessToken } from "@/lib/auth/authContext";
 import { MESSAGES_API_URL } from "@/lib/constants";
-import { Chat, ChatParticipant, Message } from "@/lib/models/Messages";
+import { Chat, ChatParticipant, Message, MessageReaction } from "@/lib/models/Messages";
 import { useChatConnectionStore } from "@/lib/realtime/chatsConnectionStore";
 import signalr from "@/lib/realtime/signalrClient";
 import { HubConnection, HubConnectionState } from "@microsoft/signalr";
@@ -24,68 +24,52 @@ export function useRealtimeChats() {
 		[setConnectionStatus]
 	);
 
-	// Update reactions in React Query cache
-	const updateReactions = useCallback(
-		(chatId: string, messageId: string, emoji: string, userId: string, count: number, added: boolean) => {
-			// Update in chats list (lastMessage)
-			queryClient.setQueryData(["chats"], (oldChats: Chat[] | undefined) => {
-				if (!oldChats) return oldChats;
-				return oldChats.map((chat) => {
-					if (chat.lastMessage?.id !== messageId) return chat;
-
-					const existingReaction = chat.lastMessage.reactions.find((r) => r.emoji === emoji);
-					let updatedReactions;
-
-					if (added) {
-						if (existingReaction) {
-							updatedReactions = chat.lastMessage.reactions.map((r) =>
-								r.emoji === emoji
-									? { ...r, count, userIds: r.userIds.includes(userId) ? r.userIds : [...r.userIds, userId] }
-									: r
-							);
-						} else {
-							updatedReactions = [...chat.lastMessage.reactions, { emoji, count, hasReacted: false, userIds: [userId] }];
-						}
-					} else {
-						updatedReactions = chat.lastMessage.reactions
-							.map((r) => (r.emoji === emoji ? { ...r, count, userIds: r.userIds.filter((id) => id !== userId) } : r))
-							.filter((r) => r.count > 0);
-					}
-
-					return {
-						...chat,
-						lastMessage: { ...chat.lastMessage, reactions: updatedReactions },
-					};
-				});
-			});
-
-			// Update in messages list
-			queryClient.setQueryData(["messages", chatId], (oldMessages: Message[] | undefined) => {
+	const addReaction = useCallback(
+		(messageReaction: MessageReaction) => {
+			queryClient.setQueriesData<Message[]>({ queryKey: ["messages"] }, (oldMessages) => {
 				if (!oldMessages) return oldMessages;
-				return oldMessages.map((message) => {
-					if (message.id !== messageId) return message;
 
-					const existingReaction = message.reactions.find((r) => r.emoji === emoji);
-					let updatedReactions;
+				const message = oldMessages.find((msg) => msg.id === messageReaction.messageId);
+				if (!message) return oldMessages;
 
-					if (added) {
-						if (existingReaction) {
-							updatedReactions = message.reactions.map((r) =>
-								r.emoji === emoji
-									? { ...r, count, userIds: r.userIds.includes(userId) ? r.userIds : [...r.userIds, userId] }
-									: r
-							);
-						} else {
-							updatedReactions = [...message.reactions, { emoji, count, hasReacted: false, userIds: [userId] }];
-						}
-					} else {
-						updatedReactions = message.reactions
-							.map((r) => (r.emoji === emoji ? { ...r, count, userIds: r.userIds.filter((id) => id !== userId) } : r))
-							.filter((r) => r.count > 0);
-					}
+				const existingReaction = message.reactions.find((r) => r.emoji === messageReaction.emoji);
+				let updatedReactions;
+				if (existingReaction) {
+					// Don't add if user already reacted
+					if (existingReaction.userIds.includes(messageReaction.userId)) return oldMessages;
+					updatedReactions = message.reactions.map((r) =>
+						r.emoji === messageReaction.emoji ? { ...r, userIds: [...r.userIds, messageReaction.userId] } : r
+					);
+				} else {
+					updatedReactions = [...message.reactions, { emoji: messageReaction.emoji, userIds: [messageReaction.userId] }];
+				}
+				return oldMessages.map((msg) => (msg.id === messageReaction.messageId ? { ...msg, reactions: updatedReactions } : msg));
+			});
+		},
+		[queryClient]
+	);
 
-					return { ...message, reactions: updatedReactions };
-				});
+	// Update reactions in React Query cache
+	const removeReaction = useCallback(
+		(messageReaction: MessageReaction) => {
+			queryClient.setQueriesData<Message[]>({ queryKey: ["messages"] }, (oldMessages) => {
+				if (!oldMessages) return oldMessages;
+
+				const message = oldMessages.find((msg) => msg.id === messageReaction.messageId);
+				if (!message) return oldMessages;
+
+				const existingReaction = message.reactions.find((r) => r.emoji === messageReaction.emoji);
+				if (!existingReaction) return oldMessages;
+
+				const newUserIds = existingReaction.userIds.filter((id) => id !== messageReaction.userId);
+				let updatedReactions;
+				if (newUserIds.length === 0) {
+					updatedReactions = message.reactions.filter((r) => r.emoji !== messageReaction.emoji);
+				} else {
+					updatedReactions = message.reactions.map((r) => (r.emoji === messageReaction.emoji ? { ...r, userIds: newUserIds } : r));
+				}
+
+				return oldMessages.map((msg) => (msg.id === messageReaction.messageId ? { ...msg, reactions: updatedReactions } : msg));
 			});
 		},
 		[queryClient]
@@ -221,11 +205,7 @@ export function useRealtimeChats() {
 						}
 
 						return oldChats
-							.map((chat) =>
-								chat.id === message.chatId
-									? { ...chat, lastMessage: message, unreadCount: chat.unreadCount + 1 }
-									: chat
-							)
+							.map((chat) => (chat.id === message.chatId ? { ...chat, lastMessage: message, unreadCount: chat.unreadCount + 1 } : chat))
 							.sort((a, b) => {
 								const dateA = new Date(a.lastMessage?.sentAt || 0).getTime();
 								const dateB = new Date(b.lastMessage?.sentAt || 0).getTime();
@@ -269,12 +249,12 @@ export function useRealtimeChats() {
 				});
 
 				// Reactions
-				connection.on("ReactionAdded", ({ chatId, messageId, emoji, userId, count }) => {
-					updateReactions(chatId, messageId, emoji, userId, count, true);
+				connection.on("ReactionAdded", (messageReaction: MessageReaction) => {
+					addReaction(messageReaction);
 				});
 
-				connection.on("ReactionRemoved", ({ chatId, messageId, emoji, userId, count }) => {
-					updateReactions(chatId, messageId, emoji, userId, count, false);
+				connection.on("ReactionRemoved", (messageReaction: MessageReaction) => {
+					removeReaction(messageReaction);
 				});
 
 				// Message edits and deletes
@@ -304,6 +284,21 @@ export function useRealtimeChats() {
 				// Hub errors
 				connection.on("Error", (payload: { message: string }) => {
 					console.error("Hub error:", payload.message);
+				});
+
+				connection.on("ChatCreated", (chat: Chat) => {
+					// Invalidate chats to fetch the new chat
+					queryClient.invalidateQueries({ queryKey: ["chats"] });
+				});
+
+				connection.on("ChatDeleted", (chat: Chat) => {
+					// Invalidate chats to fetch the new chat
+					queryClient.invalidateQueries({ queryKey: ["chats"] });
+				});
+
+				connection.on("ChatUpdated", (chat: Chat) => {
+					// Invalidate chats to fetch the new chat
+					queryClient.invalidateQueries({ queryKey: ["chats"] });
 				});
 
 				// Connection state handlers
@@ -350,7 +345,8 @@ export function useRealtimeChats() {
 		setUserTyping,
 		setUserOnline,
 		handleConnectionError,
-		updateReactions,
+		addReaction,
+		removeReaction,
 		applyMessageEdited,
 		applyMessageDeleted,
 		applyParticipantJoined,

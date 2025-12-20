@@ -145,30 +145,11 @@ const MessagesPage = () => {
 			setSendError(null);
 
 			try {
-				const conn = signalr.getConnection(MESSAGES_API_URL, "messaging");
-
-				if (conn?.state === HubConnectionState.Connected) {
-					// Send via SignalR - message will come back via "ReceiveMessage" event
-					await conn.invoke("SendMessage", { content: text }, selectedChat.id);
-				} else {
-					// Fallback to REST API if SignalR not connected
-					console.warn("SignalR not connected, using REST API fallback");
-					await sendMessage(selectedChat.id, text);
-					// Refetch messages since we won't get the real-time event
-					refetchMessages();
-				}
+				await sendMessage(selectedChat.id, text);
+				refetchMessages();
 			} catch (error) {
 				console.error("Failed to send message:", error);
 				setSendError("Failed to send message. Please try again.");
-
-				// Retry with REST API
-				try {
-					await sendMessage(selectedChat.id, text);
-					refetchMessages();
-					setSendError(null);
-				} catch (restError) {
-					console.error("REST API fallback also failed:", restError);
-				}
 			}
 		},
 		[selectedChat, refetchMessages]

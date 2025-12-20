@@ -1,14 +1,8 @@
-import { error } from "console";
-import { hsla } from "framer-motion";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-	darkMode: ["class"],
-	content: [
-		"./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-		"./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-		"./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-	],
+	darkMode: "class",
+	content: ["./src/pages/**/*.{js,ts,jsx,tsx,mdx}", "./src/components/**/*.{js,ts,jsx,tsx,mdx}", "./src/app/**/*.{js,ts,jsx,tsx,mdx}"],
 	plugins: [require("tailwindcss-animate"), require("daisyui")],
 	daisyui: {
 		themes: [
@@ -154,8 +148,7 @@ const config: Config = {
 				"safe-right": "env(safe-area-inset-right)",
 			},
 			minHeight: {
-				"screen-safe":
-					"calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom))",
+				"screen-safe": "calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom))",
 			},
 			maxWidth: {
 				mobile: "480px",
@@ -187,6 +180,16 @@ const config: Config = {
 			},
 			textColor: {
 				DEFAULT: "hsl(0 0% 95%)",
+			},
+			animation: {
+				shake: "shake 0.5s ease-in-out",
+			},
+			keyframes: {
+				shake: {
+					"0%, 100%": { transform: "translateX(0)" },
+					"25%": { transform: "translateX(-2px)" },
+					"75%": { transform: "translateX(2px)" },
+				},
 			},
 		},
 	},

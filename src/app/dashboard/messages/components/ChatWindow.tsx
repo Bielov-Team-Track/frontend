@@ -13,13 +13,7 @@ type ChatWindowProps = {
 	onChatUpdated: (chatId: string) => void;
 };
 
-const ChatWindow = ({
-	chat,
-	messages,
-	onSendMessage,
-	onViewChatInfo,
-	onChatUpdated,
-}: ChatWindowProps) => {
+const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdated }: ChatWindowProps) => {
 	const [messageText, setMessageText] = useState("");
 	const [isSending, setIsSending] = useState(false);
 	const [showInfoPanel, setShowInfoPanel] = useState(false);
@@ -56,10 +50,7 @@ const ChatWindow = ({
 	};
 
 	const sortedMessages = useMemo(() => {
-		return [...messages].sort(
-			(m1, m2) =>
-				new Date(m1.sentAt).getTime() - new Date(m2.sentAt).getTime()
-		);
+		return [...messages].sort((m1, m2) => new Date(m1.sentAt).getTime() - new Date(m2.sentAt).getTime());
 	}, [messages]);
 
 	return (
@@ -67,14 +58,8 @@ const ChatWindow = ({
 			{/* Header - Fixed */}
 			<div className="flex justify-between items-center h-16 bg-background/80 backdrop-blur-md shrink-0 px-6 border-b border-white/10">
 				<div className="flex items-center gap-3">
-					<span className="font-bold text-lg truncate text-white">
-						{chat.title}
-					</span>
-					<span className="text-xs text-muted">
-						{chat.participantIds?.length > 2
-							? `${chat.participantIds.length} participants`
-							: "Active now"}
-					</span>
+					<span className="font-bold text-lg truncate text-white">{chat.title}</span>
+					<span className="text-xs text-muted">{chat.participantIds?.length > 2 ? `${chat.participantIds.length} participants` : "Active now"}</span>
 				</div>
 
 				<Button
@@ -91,11 +76,7 @@ const ChatWindow = ({
 			<div className="flex-1 min-h-0 overflow-y-auto">
 				<div className="p-4 flex flex-col gap-2">
 					{sortedMessages.map((message) => (
-						<MessageComponent
-							type={chat.participantIds?.length > 2 ? "group" : "direct"}
-							message={message}
-							key={message.id}
-						/>
+						<MessageComponent type={chat.participantIds?.length > 2 ? "group" : "direct"} message={message} key={message.id} />
 					))}
 					<div ref={messagesEndRef} />
 				</div>
@@ -104,11 +85,7 @@ const ChatWindow = ({
 			{/* Input Area - Fixed */}
 			<div className="shrink-0 p-4 border-t border-white/5 bg-background/50 backdrop-blur-md">
 				<div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-2xl p-2 flex items-end gap-2">
-					<Button
-						variant="icon"
-						color="neutral"
-						leftIcon={<Paperclip size={18} />}
-					/>
+					<Button variant="icon" color="neutral" leftIcon={<Paperclip size={18} />} />
 					<textarea
 						value={messageText}
 						onChange={(e) => setMessageText(e.target.value)}
@@ -119,16 +96,8 @@ const ChatWindow = ({
 						disabled={isSending}
 					/>
 					<div className="flex items-center gap-1">
-						<Button
-							variant="icon"
-							color="neutral"
-							leftIcon={<ImageIcon size={18} />}
-						/>
-						<Button
-							variant="icon"
-							color="neutral"
-							leftIcon={<Smile size={18} />}
-						/>
+						<Button variant="icon" color="neutral" leftIcon={<ImageIcon size={18} />} />
+						<Button variant="icon" color="neutral" leftIcon={<Smile size={18} />} />
 						<Button
 							onClick={handleSend}
 							disabled={isSending || !messageText.trim()}
@@ -143,12 +112,7 @@ const ChatWindow = ({
 			</div>
 
 			{/* Info Panel Overlay */}
-			<ChatInfoPanel
-				chat={chat}
-				isOpen={showInfoPanel}
-				onClose={() => setShowInfoPanel(false)}
-				onChatUpdated={onChatUpdated}
-			/>
+			<ChatInfoPanel chat={chat} isOpen={showInfoPanel} onClose={() => setShowInfoPanel(false)} onChatUpdated={onChatUpdated} />
 		</div>
 	);
 };

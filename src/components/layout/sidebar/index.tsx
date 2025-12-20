@@ -7,30 +7,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { getNavigationItems, NavigationItem } from "../shared/nav-items";
 import { useNavigation } from "../shared/useNavigation";
-import ClubSelector from "./ClubSelector";
 
 // Helper to render item icon (logoUrl > color > icon)
-const ItemIcon = ({
-	item,
-	size,
-	className = "",
-}: {
-	item: NavigationItem;
-	size: number;
-	className?: string;
-}) => {
+const ItemIcon = ({ item, size, className = "" }: { item: NavigationItem; size: number; className?: string }) => {
 	const Icon = item.icon;
 
 	if (item.logoUrl) {
-		return (
-			<Image
-				src={item.logoUrl}
-				alt={`${item.name} logo`}
-				width={size}
-				height={size}
-				className={`rounded-full object-cover shrink-0 ${className}`}
-			/>
-		);
+		return <Image src={item.logoUrl} alt={`${item.name} logo`} width={size} height={size} className={`rounded-full object-cover shrink-0 ${className}`} />;
 	}
 
 	if (item.color) {
@@ -86,36 +69,19 @@ const NavItem = ({
 				<div
 					className={`
 						group relative flex items-center justify-center xl:justify-start px-3 py-3 rounded-xl cursor-pointer transition-all duration-200
-						${
-							active
-								? "bg-gradient-to-r from-accent/20 to-transparent text-accent"
-								: "text-muted hover:text-white hover:bg-white/5"
-						}
+						${active ? "bg-gradient-to-r from-accent/20 to-transparent text-accent" : "text-muted hover:text-white hover:bg-white/5"}
 					`}>
-					{active && (
-						<div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-accent rounded-r-full" />
-					)}
+					{active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-accent rounded-r-full" />}
 
 					{hasSubItems ? (
 						<>
-							<Link
-								href={item.href}
-								className="flex items-center flex-1"
-								onClick={(e) => e.stopPropagation()}>
+							<Link href={item.href} className="flex items-center flex-1" onClick={(e) => e.stopPropagation()}>
 								<ItemIcon
 									item={item}
 									size={20}
-									className={
-										!item.logoUrl && !item.color
-											? active
-												? "text-accent"
-												: "text-muted group-hover:text-white"
-											: ""
-									}
+									className={!item.logoUrl && !item.color ? (active ? "text-accent" : "text-muted group-hover:text-white") : ""}
 								/>
-								<span className="hidden xl:block flex-1 ml-4 font-medium text-sm">
-									{item.name}
-								</span>
+								<span className="hidden xl:block flex-1 ml-4 font-medium text-sm">{item.name}</span>
 							</Link>
 							{badgeValue && badgeValue > 0 && (
 								<span className="hidden xl:flex items-center justify-center h-5 min-w-[20px] px-1.5 text-[10px] font-bold text-white bg-error rounded-full shadow-sm">
@@ -128,28 +94,16 @@ const NavItem = ({
 									toggleExpanded(item.name);
 								}}
 								className="hidden xl:block ml-2 text-muted/50 hover:text-white p-1 -mr-1">
-								{itemExpanded ? (
-									<ChevronDown size={14} />
-								) : (
-									<ChevronRight size={14} />
-								)}
+								{itemExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
 							</button>
 						</>
 					) : (
-						<Link
-							href={item.href}
-							className="flex items-center w-full relative">
+						<Link href={item.href} className="flex items-center w-full relative">
 							<div className="relative">
 								<ItemIcon
 									item={item}
 									size={20}
-									className={
-										!item.logoUrl && !item.color
-											? active
-												? "text-accent"
-												: "text-muted group-hover:text-white"
-											: ""
-									}
+									className={!item.logoUrl && !item.color ? (active ? "text-accent" : "text-muted group-hover:text-white") : ""}
 								/>
 								{badgeValue && badgeValue > 0 && (
 									<span className="xl:hidden absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white bg-error rounded-full border border-background">
@@ -157,9 +111,7 @@ const NavItem = ({
 									</span>
 								)}
 							</div>
-							<span className="hidden xl:block flex-1 ml-4 font-medium text-sm">
-								{item.name}
-							</span>
+							<span className="hidden xl:block flex-1 ml-4 font-medium text-sm">{item.name}</span>
 							{badgeValue && badgeValue > 0 && (
 								<span className="hidden xl:flex items-center justify-center h-5 min-w-[20px] px-1.5 text-[10px] font-bold text-white bg-error rounded-full shadow-sm">
 									{badgeValue > 99 ? "99+" : badgeValue}
@@ -199,26 +151,14 @@ const NavItem = ({
 				<div
 					className={`
 						flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer
-						${
-							active
-								? "text-white bg-white/5"
-								: "text-muted hover:text-white hover:bg-white/5"
-						}
+						${active ? "text-white bg-white/5" : "text-muted hover:text-white hover:bg-white/5"}
 					`}>
-					<Link
-						href={item.href}
-						className="flex items-center flex-1">
+					<Link href={item.href} className="flex items-center flex-1">
 						<ItemIcon item={item} size={16} className="mr-3 opacity-70" />
 						<span className="flex-1">{item.name}</span>
 					</Link>
-					<button
-						onClick={() => toggleExpanded(item.name)}
-						className="text-muted/50 hover:text-white p-1 -mr-1">
-						{itemExpanded ? (
-							<ChevronDown size={12} />
-						) : (
-							<ChevronRight size={12} />
-						)}
+					<button onClick={() => toggleExpanded(item.name)} className="text-muted/50 hover:text-white p-1 -mr-1">
+						{itemExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
 					</button>
 				</div>
 			) : (
@@ -226,11 +166,7 @@ const NavItem = ({
 					href={item.href}
 					className={`
 						flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors
-						${
-							isSubActive
-								? "text-white bg-white/5"
-								: "text-muted hover:text-white hover:bg-white/5"
-						}
+						${isSubActive ? "text-white bg-white/5" : "text-muted hover:text-white hover:bg-white/5"}
 					`}>
 					<ItemIcon item={item} size={16} className="mr-3 opacity-70" />
 					<span>{item.name}</span>
@@ -259,13 +195,7 @@ const NavItem = ({
 };
 
 const Sidebar = () => {
-	const {
-		pathname,
-		toggleExpanded,
-		isItemOrSubItemActive,
-		isExpanded,
-		isActive,
-	} = useNavigation();
+	const { pathname, toggleExpanded, isItemOrSubItemActive, isExpanded, isActive } = useNavigation();
 
 	const unreadMessageCount = useUnreadMessageCount();
 	const clubs = useClub().clubs;
@@ -279,15 +209,8 @@ const Sidebar = () => {
 					<div className="w-10 h-10 bg-gradient-to-tr from-accent to-primary rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 text-white">
 						<Volleyball size={20} />
 					</div>
-					<span className="hidden xl:block text-2xl font-bold text-white tracking-tight">
-						Volleyer
-					</span>
+					<span className="hidden xl:block text-2xl font-bold text-white tracking-tight">Volleyer</span>
 				</div>
-			</div>
-
-			{/* --- Club Selector --- */}
-			<div className="p-4 border-b border-white/5">
-				<ClubSelector />
 			</div>
 
 			{/* --- Navigation --- */}

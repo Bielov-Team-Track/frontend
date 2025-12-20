@@ -1,5 +1,5 @@
 import client from "../client";
-import { Chat, Message } from "../models/Messages";
+import { Chat, Message, MessageReaction } from "../models/Messages";
 import { UserProfile } from "../models/User";
 
 const PREFIX = "messages/v1";
@@ -49,7 +49,7 @@ export async function getChat(chatId: string): Promise<Chat> {
 	const endpoint = `/chats/${chatId}`;
 	return (await client.get(PREFIX + endpoint)).data;
 }
-export async function addReaction(messageId: string, emoji: string): Promise<Reaction> {
+export async function addReaction(messageId: string, emoji: string): Promise<MessageReaction> {
 	const response = await client.post(`/messages/v1/messages/${messageId}/reactions`, { emoji });
 	return response.data;
 }
