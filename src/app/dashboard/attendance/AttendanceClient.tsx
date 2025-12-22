@@ -8,7 +8,7 @@ import {
     AttendanceStatus,
     PaymentStatus,
 } from "@/lib/models/Attendance";
-import { getAttendanceMatrix, updateAttendance } from "@/lib/requests/attendance";
+import { getAttendanceMatrix, updateAttendance } from "@/lib/api/attendance";
 import { Loader } from "@/components/ui";
 import {
     Calendar,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 import UserMenu from "../dashboard-header/UserMenu";
 import Link from "next/link";
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getClubs } from "@/lib/requests/clubs";
-import { loadGroups } from "@/lib/requests/groups";
+import { getClubs } from "@/lib/api/clubs";
+import { loadGroups } from "@/lib/api/groups";
 import { Club } from "@/lib/models/Club";
 import Dropdown, { DropdownOption } from "@/components/ui/dropdown";
 import { Building2, User, Users, UsersRound } from "lucide-react";

@@ -1,7 +1,6 @@
-import { DashboardHeader, ReactQueryProvider } from "@/components/layout";
+import { DashboardHeader } from "@/components/layout";
 import { Sidebar } from "@/components/layout/";
-import { AuthProvider } from "@/lib/auth/authContext";
-import { ClubProvider } from "@/lib/club/ClubContext";
+import { AuthProvider, ClubProvider, QueryProvider } from "@/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Head from "next/head";
@@ -20,20 +19,14 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html
-			lang="en"
-			data-theme="mainTheme"
-			className="min-h-screen relative bg-background-dark text-background-content font-sans">
+		<html lang="en" data-theme="mainTheme" className="min-h-screen relative bg-background-dark text-background-content font-sans">
 			<Head>
-				<meta
-					name="viewport"
-					content="width=device-width, initial-scale=1.0, viewport-fit=cover"></meta>
+				<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"></meta>
 			</Head>
-			<body
-				className={`${inter.className} min-h-screen flex flex-col antialiased selection:bg-accent/30 selection:text-white`}>
+			<body className={`${inter.className} min-h-screen flex flex-col antialiased selection:bg-accent/30 selection:text-white`}>
 				<AuthProvider>
 					<ClubProvider>
-						<ReactQueryProvider>
+						<QueryProvider>
 							{/* Main Layout Container */}
 							<div className="flex h-screen sm:p-4 gap-6 overflow-hidden">
 								{/* Sidebar (Sticky) */}
@@ -44,12 +37,10 @@ export default async function RootLayout({
 								{/* Main Content Area */}
 								<div className="flex-1 flex flex-col min-w-0 min-h-0">
 									<DashboardHeader />
-									<main className="flex-1 w-full relative min-h-0 overflow-y-auto">
-										{children}
-									</main>
+									<main className="flex-1 w-full relative min-h-0 overflow-y-auto">{children}</main>
 								</div>
 							</div>
-						</ReactQueryProvider>
+						</QueryProvider>
 					</ClubProvider>
 				</AuthProvider>
 			</body>

@@ -1,4 +1,4 @@
-import client from "../client";
+import client from "./client";
 import { Approval } from "../models/Approval";
 
 const PREFIX = "/events";

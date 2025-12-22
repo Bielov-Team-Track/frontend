@@ -3,13 +3,11 @@ import {
 	Activity,
 	Calendar,
 	ClipboardList,
-	CreditCard,
 	LayoutDashboard,
 	MessageSquare,
 	Search,
 	Settings,
 	Shield,
-	User,
 } from "lucide-react";
 
 export interface NavigationItem {
@@ -63,23 +61,7 @@ export const getNavigationItems = (
 	},
 	{ name: "Audit", href: "/dashboard/audit", icon: Activity },
 	{ name: "Attendance", href: "/dashboard/attendance", icon: ClipboardList },
-	{
-		name: "Settings",
-		href: "/dashboard/settings/profile",
-		icon: Settings,
-		subItems: [
-			{
-				name: "Profile",
-				href: "/dashboard/settings/profile",
-				icon: User,
-			},
-			{
-				name: "Payments",
-				href: "/dashboard/settings/payments",
-				icon: CreditCard,
-			},
-		],
-	},
+	{ name: "Settings", href: "/dashboard/settings/profile", icon: Settings },
 ];
 
 // Export static version for backwards compatibility

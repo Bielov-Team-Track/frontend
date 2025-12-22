@@ -3,7 +3,7 @@
 import { Button } from "@/components";
 import { Dropdown, Input, Modal } from "@/components/ui";
 import { CreateInvitationRequest } from "@/lib/models/Club";
-import { createInvitation, getClubFormTemplates } from "@/lib/requests/clubs";
+import { createInvitation, getClubFormTemplates } from "@/lib/api/clubs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Copy, Link, Mail, Search } from "lucide-react";
 import { useState } from "react";

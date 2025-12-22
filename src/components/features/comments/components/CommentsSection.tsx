@@ -1,10 +1,10 @@
 "use client";
 
-import { loadComments, createComment } from "@/lib/requests/comments";
+import { loadComments, createComment } from "@/lib/api/comments";
 import { useState, useEffect } from "react";
 import { Comment } from "@/lib/models/Comment";
 import CommentItem from "./CommentItem";
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 import { Send, MessageCircle } from "lucide-react";
 import { Avatar } from "@/components/ui";
 

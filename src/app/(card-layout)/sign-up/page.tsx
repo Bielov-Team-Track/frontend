@@ -2,7 +2,7 @@
 
 import React, { ChangeEvent, useRef, useState } from "react";
 import { FaEnvelope, FaLock, FaUser } from "react-icons/fa6";
-import { register as registerUser } from "@/lib/requests/auth";
+import { register as registerUser } from "@/lib/api/auth";
 import { AxiosError } from "axios";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";

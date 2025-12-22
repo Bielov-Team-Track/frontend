@@ -1,5 +1,4 @@
-import { ReactQueryProvider } from "@/components/layout";
-import { AuthProvider } from "@/lib/auth/authContext";
+import { AuthProvider, QueryProvider } from "@/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Head from "next/head";
@@ -30,13 +29,13 @@ export default async function RootLayout({
 			<body
 				className={`${inter.className} min-h-screen-safe flex flex-col text-mobile-base sm:text-tablet-base lg:text-desktop-base antialiased`}>
 				<AuthProvider>
-					<ReactQueryProvider>
+					<QueryProvider>
 						<div className="min-h-screen flex items-center justify-center p-4">
 							<div className="w-fit max-w-2xl relative bg-background p-6 sm:p-8 rounded-lg shadow-lg flex flex-col gap-6">
 								{children}
 							</div>
 						</div>
-					</ReactQueryProvider>
+					</QueryProvider>
 				</AuthProvider>
 			</body>
 		</html>

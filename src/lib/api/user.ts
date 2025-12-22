@@ -1,4 +1,4 @@
-import client from "../client";
+import client from "./client";
 import { AuthData } from "../models/Auth";
 import { PositionPayment } from "../models/Position";
 import {
@@ -10,7 +10,6 @@ import {
 	FullProfileDto,
 	HistoryDto,
 	PlayerProfileDto,
-	ProfileDto,
 	UpdateHistoryDto,
 	UpdateProfileDto,
 } from "../models/Profile";
@@ -21,11 +20,11 @@ const PREFIX = "/profiles/v1";
 
 // ==================== Basic Profile ====================
 
-export async function getUserProfile(userId: string): Promise<ProfileDto | undefined> {
+export async function getUserProfile(userId: string): Promise<UserProfile | undefined> {
 	const endpoint = `/profiles/${userId}`;
 
 	try {
-		return (await client.get<ProfileDto>(PREFIX + endpoint)).data;
+		return (await client.get<UserProfile>(PREFIX + endpoint)).data;
 	} catch (error: any) {
 		if (error.response?.status === 404) {
 			return undefined;
@@ -37,17 +36,17 @@ export async function getUserProfile(userId: string): Promise<ProfileDto | undef
 export async function getFullUserProfile(userId: string): Promise<FullProfileDto | undefined> {
 	try {
 		// Fetch all profile data in parallel
-		const [profile, playerProfile, coachProfile, history] = await Promise.all([
+		const [userProfile, playerProfile, coachProfile, history] = await Promise.all([
 			getUserProfile(userId),
 			getPlayerProfile(userId).catch(() => undefined),
 			getCoachProfile(userId).catch(() => undefined),
 			getUserHistory(userId).catch(() => []),
 		]);
 
-		if (!profile) return undefined;
+		if (!userProfile) return undefined;
 
 		return {
-			...profile,
+			userProfile,
 			playerProfile,
 			coachProfile,
 			historyEntries: history,
@@ -60,14 +59,14 @@ export async function getFullUserProfile(userId: string): Promise<FullProfileDto
 	}
 }
 
-export async function getCurrentUserProfile(): Promise<ProfileDto> {
+export async function getCurrentUserProfile(): Promise<UserProfile> {
 	const endpoint = `/profiles/me`;
-	return (await client.get<ProfileDto>(PREFIX + endpoint)).data;
+	return (await client.get<UserProfile>(PREFIX + endpoint)).data;
 }
 
-export async function updateCurrentProfile(data: UpdateProfileDto): Promise<ProfileDto> {
+export async function updateCurrentProfile(data: UpdateProfileDto): Promise<UserProfile> {
 	const endpoint = `/profiles/me`;
-	return (await client.put<ProfileDto>(PREFIX + endpoint, data)).data;
+	return (await client.put<UserProfile>(PREFIX + endpoint, data)).data;
 }
 
 // ==================== Player Profile ====================

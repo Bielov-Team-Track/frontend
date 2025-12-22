@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "@/components/ui";
-import { getClub, getClubMembers, getTeamsByClub } from "@/lib/requests/clubs";
+import { getClub, getClubMembers, getTeamsByClub } from "@/lib/api/clubs";
 import { useQuery } from "@tanstack/react-query";
 import { Calendar, Heart, ImageIcon, ImageOff, Loader2, MapPin, MessageCircle, MoreHorizontal, Share2, Shield, Trophy, Users } from "lucide-react";
 import { useParams } from "next/navigation";

@@ -5,7 +5,7 @@
 // import { yupResolver } from "@hookform/resolvers/yup";
 // import * as yup from "yup";
 // import { Location } from "@/lib/models/Event";
-// import { createEvent as saveEventRequest } from "@/lib/requests/events";
+// import { createEvent as saveEventRequest } from "@/lib/api/events";
 // import { useRouter } from "next/navigation";
 // import Link from "next/link";
 // import { Event } from "@/lib/models/Event";

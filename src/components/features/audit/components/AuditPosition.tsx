@@ -3,7 +3,7 @@ import { Position as PositionModel } from "@/lib/models/Position";
 import { Team as TeamModel } from "@/lib/models/Team";
 import { Avatar, Button, Loader } from "@/components/ui";
 import Link from "next/link";
-import { updateParticipantPaymentStatus } from "@/lib/requests/events";
+import { updateParticipantPaymentStatus } from "@/lib/api/events";
 import {
 	FaCheckCircle,
 	FaEllipsisH,

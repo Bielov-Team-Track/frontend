@@ -7,7 +7,7 @@ import Modal from "@/components/ui/modal";
 import Button from "@/components/ui/button";
 import { ClubRole } from "@/lib/models/Club";
 import { UserProfile } from "@/lib/models/User";
-import { searchUsers } from "@/lib/requests/user";
+import { searchUsers } from "@/lib/api/user";
 
 interface InviteMemberModalProps {
 	isOpen: boolean;

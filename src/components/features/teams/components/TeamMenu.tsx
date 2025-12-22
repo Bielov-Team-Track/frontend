@@ -2,7 +2,7 @@
 
 import { Team } from "@/lib/models/Team";
 import { UserProfile } from "@/lib/models/User";
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 import React, { useState } from "react";
 import { 
     MoreHorizontal, 
@@ -16,7 +16,7 @@ import { UserSearch } from "@/components/features/users";
 import {
 	assignCaptain as assignCaptainRequest,
 	removeCaptain as removeCaptainRequest,
-} from "@/lib/requests/teams";
+} from "@/lib/api/teams";
 import useUser from "@/hooks/useUser";
 
 type TeamMenuProps = {

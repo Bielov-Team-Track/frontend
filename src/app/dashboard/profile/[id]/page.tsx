@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, use } from "react";
-import { followUser, getFullUserProfile, unfollowUser } from "@/lib/requests/user";
+import { followUser, getFullUserProfile, unfollowUser } from "@/lib/api/user";
 import { redirect } from "next/navigation";
 import Loader from "@/components/ui/loader";
 import { Event } from "@/lib/models/Event";
-import { loadEventsByFilter } from "@/lib/requests/events";
+import { loadEventsByFilter } from "@/lib/api/events";
 import { FullProfileDto } from "@/lib/models/Profile";
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 import ProfileHeader from "../components/ProfileHeader";
 import ProfileOverview from "../components/ProfileOverview";
 import PlayerStats from "../components/PlayerStats";

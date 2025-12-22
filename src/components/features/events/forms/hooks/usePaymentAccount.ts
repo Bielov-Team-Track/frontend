@@ -4,7 +4,7 @@ import {
 	createPaymentAccount,
 	getOnboardingLink,
 	getPaymentAccount,
-} from "@/lib/requests/payments";
+} from "@/lib/api/payments";
 
 interface UsePaymentAccountReturn {
 	account: PaymentAccount | null;

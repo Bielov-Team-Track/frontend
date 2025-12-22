@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Payment } from "@/lib/models/Payment";
-import { loadUserPaymentForEvent } from "@/lib/requests/payments";
+import { loadUserPaymentForEvent } from "@/lib/api/payments";
 
 export function useUserPayment(eventId: string, userId: string | null) {
 	const [payment, setPayment] = useState<Payment | null>(null);

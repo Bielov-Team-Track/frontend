@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { EventsList } from "@/components";
-import { loadEventsByFilter } from "@/lib/requests/events";
-import { getFullUserProfile } from "@/lib/requests/user";
+import { loadEventsByFilter } from "@/lib/api/events";
+import { getFullUserProfile } from "@/lib/api/user";
 import {
 	FullProfileDto,
 	getDominantHandLabel,

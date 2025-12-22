@@ -1,9 +1,9 @@
+import { Header } from "@/components/layout";
+import { AuthProvider, QueryProvider } from "@/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "../globals.css";
-import { Header, ReactQueryProvider } from "@/components/layout";
 import Head from "next/head";
-import { AuthProvider } from "@/lib/auth/authContext";
+import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,21 +20,16 @@ export default async function RootLayout({
 	return (
 		<html lang="en" data-theme="mainTheme" className="min-h-screen relative bg-background-dark">
 			<Head>
-				<meta
-					name="viewport"
-					content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-				></meta>
+				<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"></meta>
 			</Head>
-			<body
-				className={`${inter.className} min-h-screen-safe flex flex-col text-mobile-base sm:text-tablet-base lg:text-desktop-base antialiased`}
-			>
+			<body className={`${inter.className} min-h-screen-safe flex flex-col text-mobile-base sm:text-tablet-base lg:text-desktop-base antialiased`}>
 				<AuthProvider>
-					<ReactQueryProvider>
+					<QueryProvider>
 						<div className="min-h-screen-safe bg-background-dark">
 							<Header />
 							<main className="relative max-w-4xl mx-auto">{children}</main>
 						</div>
-					</ReactQueryProvider>
+					</QueryProvider>
 				</AuthProvider>
 			</body>
 		</html>

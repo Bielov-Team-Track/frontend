@@ -17,7 +17,7 @@ import {
 	getGroup,
 	removeGroupMember,
 	updateGroup,
-} from "@/lib/requests/clubs";
+} from "@/lib/api/clubs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	AlertTriangle,

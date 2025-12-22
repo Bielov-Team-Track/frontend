@@ -5,7 +5,7 @@ import { FaRegHourglassHalf } from "react-icons/fa6";
 import {
 	checkUserApproval,
 	requestApproval as requestApprovalRequest,
-} from "@/lib/requests/approvals";
+} from "@/lib/api/approvals";
 import { Approval } from "@/lib/models/Approval";
 import { useState } from "react";
 import { Loader } from "@/components/ui";

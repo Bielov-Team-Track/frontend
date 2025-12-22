@@ -1,4 +1,4 @@
-import client from "../client";
+import client from "./client";
 import { Position } from "../models/Position";
 import { Team } from "../models/Team";
 import { API_BASE_URL } from "../constants";

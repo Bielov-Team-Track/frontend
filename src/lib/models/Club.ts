@@ -231,6 +231,35 @@ export enum RegistrationStatus {
 	Declined = "Declined",
 }
 
+export enum RegistrationSortBy {
+	SubmittedAt = "SubmittedAt",
+	Status = "Status",
+	UserName = "UserName",
+}
+
+export enum SortDirection {
+	Ascending = "Ascending",
+	Descending = "Descending",
+}
+
+export interface RegistrationFilterRequest {
+	status?: RegistrationStatus;
+	search?: string;
+	submittedFrom?: string; // ISO Date string
+	submittedTo?: string; // ISO Date string
+	sortBy?: RegistrationSortBy;
+	sortDirection?: SortDirection;
+	cursor?: string;
+	limit?: number;
+}
+
+export interface CursorPagedResult<T> {
+	items: T[];
+	nextCursor?: string;
+	hasMore: boolean;
+	totalCount?: number;
+}
+
 export interface ClubRegistration {
 	id: string;
 	clubId: string;
@@ -239,12 +268,14 @@ export interface ClubRegistration {
 	status: RegistrationStatus;
 	statusChangedByUserId?: string;
 	statusChangedAt?: string;
-	statusNote?: string;
+	privateNote?: string;
+	publicNote?: string;
 	submittedAt: string;
 	createdAt: string;
 	club?: Club;
 	formTemplate?: FormTemplate;
 	formResponse?: FormResponse;
+	user?: UserProfile;
 }
 
 export interface CreateRegistrationRequest {
@@ -253,7 +284,15 @@ export interface CreateRegistrationRequest {
 
 export interface UpdateRegistrationStatusRequest {
 	status: RegistrationStatus;
-	statusNote?: string;
+	privateNote?: string;
+	publicNote?: string;
+}
+
+export interface RegistrationStatusCounts {
+	pending: number;
+	waitlist: number;
+	accepted: number;
+	declined: number;
 }
 
 // Form types
@@ -344,6 +383,10 @@ export interface ClubSettings {
 	requireCoachProfile: boolean;
 	defaultFormTemplateId?: string;
 	allowPublicRegistration: boolean;
+	welcomeMessage?: string;
+	pendingMessage?: string;
+	waitlistMessage?: string;
+	declinedMessage?: string;
 }
 
 export interface UpdateClubSettingsRequest {
@@ -353,6 +396,10 @@ export interface UpdateClubSettingsRequest {
 	requireCoachProfile?: boolean;
 	defaultFormTemplateId?: string;
 	allowPublicRegistration?: boolean;
+	welcomeMessage?: string;
+	pendingMessage?: string;
+	waitlistMessage?: string;
+	declinedMessage?: string;
 }
 
 // Invitation preview (public endpoint response)

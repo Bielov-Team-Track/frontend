@@ -10,13 +10,13 @@ import {
 } from "lucide-react";
 import { Loader } from "@/components/ui";
 import { usePosition } from "@/hooks/usePosition";
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 import PositionWithUser from "./PositionWithUser";
 import { Position as PositionModel } from "@/lib/models/Position";
 import { Team } from "@/lib/models/Team";
 import { Modal } from "@/components/ui";
 import { UserSearch } from "@/components/features/users";
-import { deletePosition } from "@/lib/requests/positions";
+import { deletePosition } from "@/lib/api/positions";
 import { Unit } from "@/lib/models/EventBudget";
 import AuditPosition from "../../audit/components/AuditPosition";
 

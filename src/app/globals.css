@@ -36,9 +36,9 @@ h2 {
 		--background-light: 0 0% 15%;
 
 		--error: 11 69% 44%;
-		--warning: 38 92% 50%;
-		--success: 142 71% 45%;
-		--info: 199 89% 48%;
+		--warning: 329 100% 55%;
+		--success: hsla(114, 27%, 37%, 1);
+		--info: hsla(210, 49%, 36%, 1);
 
 		--radius: 0.5rem;
 	}

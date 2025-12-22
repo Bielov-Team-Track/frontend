@@ -1,7 +1,7 @@
 "use client";
 
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
-import { useClub } from "@/lib/club/ClubContext";
+import { useClub } from "@/providers";
 import { ChevronDown, ChevronRight, Volleyball } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

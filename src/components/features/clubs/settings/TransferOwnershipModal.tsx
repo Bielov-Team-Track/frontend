@@ -3,7 +3,7 @@
 
 import { Button, Dropdown, Input, Modal } from "@/components/ui";
 import { ClubRole } from "@/lib/models/Club";
-import { getClubMembers } from "@/lib/requests/clubs";
+import { getClubMembers } from "@/lib/api/clubs";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 

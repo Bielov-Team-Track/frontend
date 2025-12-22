@@ -4,7 +4,7 @@ import { AddTeamMemberModal, EditTeamMemberModal, RosterSidebar, VolleyballCourt
 import { PlayerDragOverlay, groupMembersByPosition, POSITION_ORDER } from "@/components/features/teams/components/RosterSidebar";
 import Button from "@/components/ui/button";
 import { ClubMember, Team, TeamMember, VolleyballPosition, PositionAssignment } from "@/lib/models/Club";
-import { addTeamMember, updateTeamMember } from "@/lib/requests/clubs";
+import { addTeamMember, updateTeamMember } from "@/lib/api/clubs";
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors, DragOverEvent, rectIntersection } from "@dnd-kit/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserPlus } from "lucide-react";

@@ -3,7 +3,7 @@
 import { Button } from "@/components";
 import { Dropdown, Loader } from "@/components/ui";
 import { ClubInvitation, InvitationStatus } from "@/lib/models/Club";
-import { getClubInvitations, revokeInvitation } from "@/lib/requests/clubs";
+import { getClubInvitations, revokeInvitation } from "@/lib/api/clubs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Copy, Link, Mail, Trash2, User } from "lucide-react";
 import { useState } from "react";

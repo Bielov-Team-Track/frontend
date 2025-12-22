@@ -1,6 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
-import { handleDates } from "./utils/date";
-import { API_BASE_URL } from "./constants";
+import { handleDates } from "../utils/date";
+import { API_BASE_URL } from "../constants";
 
 const client = axios.create({
 	baseURL: API_BASE_URL,

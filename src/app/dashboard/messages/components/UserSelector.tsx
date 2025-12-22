@@ -1,7 +1,7 @@
 import { Input, Loader } from "@/components";
 import { useDebounce } from "@/hooks/useDebounce";
 import { UserProfile } from "@/lib/models/User";
-import { searchUsers as searchUsersAPI } from "@/lib/requests/user";
+import { searchUsers as searchUsersAPI } from "@/lib/api/user";
 import { stringToColor } from "@/lib/utils/color";
 import { Check, Search, X } from "lucide-react";
 import Image from "next/image";

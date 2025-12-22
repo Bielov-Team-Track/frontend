@@ -7,7 +7,7 @@ import { UserProfile } from "@/lib/models/User";
 import {
 	loadTeamPayments,
 	loadUserPaymentForEvent,
-} from "@/lib/requests/payments";
+} from "@/lib/api/payments";
 import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import PaymentButton from "./PaymentButton";
 

@@ -2,8 +2,8 @@
 
 import { Button, Modal } from "@/components/ui";
 import { Event } from "@/lib/models/Event";
-import { cancelEvent } from "@/lib/requests/events";
-import { createEventChat } from "@/lib/requests/messages";
+import { cancelEvent } from "@/lib/api/events";
+import { createEventChat } from "@/lib/api/messages";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";

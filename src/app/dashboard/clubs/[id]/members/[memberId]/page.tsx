@@ -1,5 +1,5 @@
 import ClubMemberDetailClient from "./ClubMemberDetailClient";
-import { getClub } from "@/lib/requests/clubs";
+import { getClub } from "@/lib/api/clubs";
 
 interface Props {
 	params: Promise<{ id: string; memberId: string }>;

@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { createEvent } from "@/lib/requests/events";
+import { createEvent } from "@/lib/api/events";
 import { Event } from "@/lib/models/Event";
 import {
 	eventValidationSchema,

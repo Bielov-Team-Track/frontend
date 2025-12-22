@@ -1,9 +1,9 @@
 import { Button, Modal } from "@/components";
 import UserProfileModal from "@/components/features/user/UserProfileModal";
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 import { Chat } from "@/lib/models/Messages";
 import { UserProfile } from "@/lib/models/User";
-import { addParticipants, removeParticipant } from "@/lib/requests/messages";
+import { addParticipants, removeParticipant } from "@/lib/api/messages";
 import { stringToColor } from "@/lib/utils/color";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bell, LogOut, Search, Trash, UserPlus, X } from "lucide-react";

@@ -1,5 +1,5 @@
 import React from "react";
-import { loadEventsByFilter } from "@/lib/requests/events";
+import { loadEventsByFilter } from "@/lib/api/events";
 import { redirect } from "next/navigation";
 import { getUserProfile } from "@/lib/server/auth";
 import EventsPageClient from "./EventsPageClient";

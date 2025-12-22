@@ -1,6 +1,6 @@
 import Link from "@/components/ui/link";
 import { Event } from "@/lib/models/Event";
-import { loadParticipants } from "@/lib/requests/events";
+import { loadParticipants } from "@/lib/api/events";
 import { getFormattedDateWithDay } from "@/lib/utils/date";
 import {
 	FaCheck as CheckIcon,

@@ -8,9 +8,9 @@ import {
 	useEffect,
 	useState,
 } from "react";
-import { Club } from "../models/Club";
-import { getUserClubs } from "../requests/clubs";
-import { useAuth } from "../auth/authContext";
+import { Club } from "@/lib/models/Club";
+import { getUserClubs } from "@/lib/api/clubs";
+import { useAuth } from "./AuthProvider";
 
 interface ClubContextType {
 	clubs: Club[];

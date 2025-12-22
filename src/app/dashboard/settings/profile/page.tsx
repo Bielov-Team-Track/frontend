@@ -1,6 +1,6 @@
 import { getFullUserProfile } from "@/lib/server/auth";
 import { redirect } from "next/navigation";
-import UserSettings from "../components/UserSettings";
+import BasicInfoSettings from "../components/BasicInfoSettings";
 
 async function ProfileSettingsPage() {
 	const user = await getFullUserProfile();
@@ -9,11 +9,7 @@ async function ProfileSettingsPage() {
 		redirect("/login");
 	}
 
-	return (
-		<div>
-			<UserSettings user={user}></UserSettings>
-		</div>
-	);
+	return <BasicInfoSettings user={user} />;
 }
 
 export default ProfileSettingsPage;

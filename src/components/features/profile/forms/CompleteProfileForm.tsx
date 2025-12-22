@@ -8,7 +8,7 @@ import {
 	updateCurrentProfile,
 	createOrUpdatePlayerProfile,
 	createOrUpdateCoachProfile
-} from "@/lib/requests/user";
+} from "@/lib/api/user";
 
 import {
 	CreateOrUpdatePlayerProfileDto,

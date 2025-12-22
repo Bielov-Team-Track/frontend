@@ -5,15 +5,18 @@ import {
 	CreateFormTemplateRequest,
 	CreateInvitationRequest,
 	CreateRegistrationRequest,
+	CursorPagedResult,
 	FormFieldAnswerDto,
 	FormTemplate,
 	InvitationPreview,
 	InvitationStatus,
+	RegistrationFilterRequest,
 	RegistrationStatus,
+	RegistrationStatusCounts,
 	UpdateFormTemplateRequest,
 	UpdateRegistrationStatusRequest,
 } from "@/lib/models/Club";
-import client from "../client";
+import client from "./client";
 import { CLUBS_API_V1 } from "../constants";
 import {
 	Club,
@@ -272,6 +275,20 @@ export async function getClubRegistrations(clubId: string, status?: Registration
 	return (await client.get<ClubRegistration[]>(CLUBS_API_V1 + `/clubs/${clubId}/registrations${params}`)).data;
 }
 
+export async function getClubRegistrationsPaged(clubId: string, filter: RegistrationFilterRequest): Promise<CursorPagedResult<ClubRegistration>> {
+	const params = new URLSearchParams();
+	if (filter.status) params.append("Status", filter.status);
+	if (filter.search) params.append("Search", filter.search);
+	if (filter.submittedFrom) params.append("SubmittedFrom", filter.submittedFrom);
+	if (filter.submittedTo) params.append("SubmittedTo", filter.submittedTo);
+	if (filter.sortBy) params.append("SortBy", filter.sortBy);
+	if (filter.sortDirection) params.append("SortDirection", filter.sortDirection);
+	if (filter.cursor) params.append("Cursor", filter.cursor);
+	if (filter.limit) params.append("Limit", filter.limit.toString());
+
+	return (await client.get<CursorPagedResult<ClubRegistration>>(CLUBS_API_V1 + `/clubs/${clubId}/registrations?${params.toString()}`)).data;
+}
+
 export async function getClubRegistration(clubId: string, registrationId: string): Promise<ClubRegistration> {
 	return (await client.get<ClubRegistration>(CLUBS_API_V1 + `/clubs/${clubId}/registrations/${registrationId}`)).data;
 }
@@ -283,6 +300,11 @@ export async function updateRegistrationStatus(clubId: string, registrationId: s
 export async function getPendingRegistrationsCount(clubId: string): Promise<number> {
 	const response = await client.get<{ count: number }>(CLUBS_API_V1 + `/clubs/${clubId}/registrations/pending-count`);
 	return response.data.count;
+}
+
+export async function getRegistrationStatusCounts(clubId: string): Promise<RegistrationStatusCounts> {
+	const response = await client.get<RegistrationStatusCounts>(CLUBS_API_V1 + `/clubs/${clubId}/registrations/counts`);
+	return response.data;
 }
 
 // Form template endpoints

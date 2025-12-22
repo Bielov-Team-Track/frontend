@@ -21,7 +21,7 @@ import {
 	deleteGroup,
 	addGroupMember,
 	removeGroupMember,
-} from "@/lib/requests/clubs";
+} from "@/lib/api/clubs";
 
 interface GroupsTabProps {
 	groups: Group[];

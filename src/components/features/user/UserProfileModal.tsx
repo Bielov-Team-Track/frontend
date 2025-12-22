@@ -2,7 +2,7 @@
 
 import { Button, Modal } from "@/components";
 import { UserProfile } from "@/lib/models/User";
-import { createChat } from "@/lib/requests/messages";
+import { createChat } from "@/lib/api/messages";
 import { stringToColor } from "@/lib/utils/color";
 import { ExternalLink, Mail, MessageSquare } from "lucide-react";
 import Image from "next/image";

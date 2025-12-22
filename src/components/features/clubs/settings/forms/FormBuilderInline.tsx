@@ -4,7 +4,7 @@
 import FormRenderer from "@/components/features/clubs/forms/FormRenderer";
 import { Button, Loader, Modal } from "@/components/ui";
 import { CreateFormFieldRequest, FieldType, FormTemplate } from "@/lib/models/Club";
-import { createFormTemplate, getFormTemplate, updateFormTemplate } from "@/lib/requests/clubs";
+import { createFormTemplate, getFormTemplate, updateFormTemplate } from "@/lib/api/clubs";
 import { closestCenter, DndContext, DragEndEvent, DragStartEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

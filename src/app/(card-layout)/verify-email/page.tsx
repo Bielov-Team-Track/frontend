@@ -1,8 +1,8 @@
 "use client";
 
 import { Button, Loader } from "@/components";
-import { verifyEmail } from "@/lib/requests/auth";
-import { useAuth } from "@/lib/auth/authContext";
+import { verifyEmail } from "@/lib/api/auth";
+import { useAuth } from "@/providers";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect } from "react";
 import { FaCheck } from "react-icons/fa6";

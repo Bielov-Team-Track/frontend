@@ -1,6 +1,6 @@
 "use client";
 
-import { getClubs } from "@/lib/requests/clubs";
+import { getClubs } from "@/lib/api/clubs";
 import { useQuery } from "@tanstack/react-query";
 import {
 	ArrowUpRight,

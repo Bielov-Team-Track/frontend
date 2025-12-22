@@ -5,7 +5,7 @@ import SettingsSidebar, { SettingsSection } from "@/components/features/clubs/se
 import TransferOwnershipModal from "@/components/features/clubs/settings/TransferOwnershipModal";
 import { Button } from "@/components/ui";
 import { Club } from "@/lib/models/Club";
-import { archiveClub, deleteClub, exportClubData, transferClubOwnership } from "@/lib/requests/clubs";
+import { archiveClub, deleteClub, exportClubData, transferClubOwnership } from "@/lib/api/clubs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Archive, Download, Trash2, UserCog } from "lucide-react";
 import { useRouter } from "next/navigation";

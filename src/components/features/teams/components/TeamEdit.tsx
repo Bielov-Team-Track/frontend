@@ -7,12 +7,12 @@ import { FiPlus as PlusIcon, FiTrash2 as TrashIcon } from "react-icons/fi";
 import {
 	addPosition as addPositionRequest,
 	loadPositionTypes,
-} from "@/lib/requests/positions";
+} from "@/lib/api/positions";
 import {
 	deleteTeam,
 	deleteTeamPosition,
 	loadTeamPositions,
-} from "@/lib/requests/teams";
+} from "@/lib/api/teams";
 import { Avatar, Loader } from "@/components/ui";
 import Image from "next/image";
 import { PositionType } from "@/lib/models/PositionType";

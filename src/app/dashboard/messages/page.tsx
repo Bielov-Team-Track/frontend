@@ -5,7 +5,7 @@ import { MESSAGES_API_URL } from "@/lib/constants";
 import { Chat } from "@/lib/models/Messages";
 import { useChatConnectionStore } from "@/lib/realtime/chatsConnectionStore";
 import signalr from "@/lib/realtime/signalrClient";
-import { getChat, loadConversationsForUser, loadMessagesForChat, markChatAsRead, sendMessage } from "@/lib/requests/messages";
+import { getChat, loadConversationsForUser, loadMessagesForChat, markChatAsRead, sendMessage } from "@/lib/api/messages";
 import { HubConnectionState } from "@microsoft/signalr";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, ChevronLeft, MessageSquare, RefreshCw } from "lucide-react";

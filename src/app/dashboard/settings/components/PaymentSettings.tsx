@@ -17,7 +17,7 @@ import {
     Info
 } from "lucide-react";
 import { Button, Loader } from "@/components";
-import { getDashboardLink } from "@/lib/requests/payments";
+import { getDashboardLink } from "@/lib/api/payments";
 
 interface PaymentSettingsProps {
 	user: UserProfile;
@@ -82,15 +82,7 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
 	};
 
 	return (
-		<div className="flex flex-col gap-6 w-full max-w-4xl mx-auto">
-            {/* Header */}
-			<div>
-				<h1 className="text-2xl font-bold text-white mb-2">Payment Settings</h1>
-				<p className="text-muted text-sm">
-					Manage your payment account to receive payments from event participants.
-				</p>
-			</div>
-
+		<div className="flex flex-col gap-6 w-full">
             {/* Error Message */}
 			{error && (
 				<div className="flex items-center gap-3 text-red-400 border border-red-500/20 bg-red-500/10 rounded-xl p-4 animate-in fade-in slide-in-from-top-2">

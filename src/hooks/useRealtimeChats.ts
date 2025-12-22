@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccessToken } from "@/lib/auth/authContext";
+import { useAccessToken } from "@/providers";
 import { MESSAGES_API_URL } from "@/lib/constants";
 import { Chat, ChatParticipant, Message, MessageReaction } from "@/lib/models/Messages";
 import { useChatConnectionStore } from "@/lib/realtime/chatsConnectionStore";

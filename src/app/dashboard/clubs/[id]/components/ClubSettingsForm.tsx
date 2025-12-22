@@ -7,7 +7,7 @@ import { Camera, Save, Shield, ImageIcon } from "lucide-react";
 import Modal from "@/components/ui/modal";
 import ImageCropper from "@/components/ui/image-cropper";
 import { Club } from "@/lib/models/Club";
-import { updateClub, uploadClubImage } from "@/lib/requests/clubs";
+import { updateClub, uploadClubImage } from "@/lib/api/clubs";
 
 interface ClubSettingsFormProps {
     club: Club;

@@ -1,12 +1,12 @@
 "use client";
 
 import React, { use, useEffect, useState } from "react";
-import { loadEvent, loadParticipants } from "@/lib/requests/events";
+import { loadEvent, loadParticipants } from "@/lib/api/events";
 import { notFound } from "next/navigation";
 import { useRealtimePayments } from "@/hooks/useRealtimePayments";
 import { usePaymentsStore } from "@/lib/realtime/paymentStore";
 import signalr from "@/lib/realtime/signalrClient";
-import { useAccessToken } from "@/lib/auth/authContext";
+import { useAccessToken } from "@/providers";
 import { Event, EventFormat, EventType } from "@/lib/models/Event";
 import { EventParticipant } from "@/lib/models/EventParticipant";
 import AuditParticipantList from "@/components/features/audit/components/AuditParticipantList";

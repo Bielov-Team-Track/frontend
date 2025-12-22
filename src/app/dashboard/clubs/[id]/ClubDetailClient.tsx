@@ -2,7 +2,7 @@
 
 import { InviteMemberModal } from "@/components/features/clubs";
 import { Club } from "@/lib/models/Club";
-import { getClub, getClubMembers, getGroupsByClub, getTeamsByClub, inviteMember } from "@/lib/requests/clubs";
+import { getClub, getClubMembers, getGroupsByClub, getPendingRegistrationsCount, getTeamsByClub, inviteMember } from "@/lib/api/clubs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Building2, Calendar, ImageOff, Layers, Settings, Shield, UserPlus, Users } from "lucide-react";
 import Link from "next/link";
@@ -55,6 +55,12 @@ export default function ClubDetailClient({ clubId }: Props) {
 		enabled: !!clubId,
 	});
 
+	const { data: pendingCount = 0 } = useQuery({
+		queryKey: ["club-registrations-count", clubId],
+		queryFn: () => getPendingRegistrationsCount(clubId),
+		enabled: !!clubId,
+	});
+
 	// Mutations
 	const inviteMutation = useMutation({
 		mutationFn: ({ userId, role }: { userId: string; role: string }) => inviteMember(clubId, userId, role),
@@ -87,14 +93,14 @@ export default function ClubDetailClient({ clubId }: Props) {
 	}
 
 	// Get tab counts
-	const getTabCount = (tabId: TabType) => {
+	const getTabCount = (tabId: TabType): number | string | undefined => {
 		switch (tabId) {
 			case "teams":
 				return teams.length;
 			case "groups":
 				return groups.length;
 			case "members":
-				return members.length;
+				return pendingCount > 0 ? `+${pendingCount}` : members.length;
 			default:
 				return undefined;
 		}
@@ -170,7 +176,7 @@ interface ClubBannerCardProps {
 	onBannerError: () => void;
 	activeTab: TabType;
 	onTabChange: (tab: TabType) => void;
-	getTabCount: (tabId: TabType) => number | undefined;
+	getTabCount: (tabId: TabType) => number | string | undefined;
 }
 
 function ClubBannerCard({

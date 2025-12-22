@@ -10,7 +10,7 @@ import {
     ChevronDown
 } from "lucide-react";
 import Link from "next/link";
-import { loadWaitlist } from "@/lib/requests/waitlist";
+import { loadWaitlist } from "@/lib/api/waitlist";
 import { useState } from "react";
 import PositionWaitlist from "./PositionWaitlist";
 

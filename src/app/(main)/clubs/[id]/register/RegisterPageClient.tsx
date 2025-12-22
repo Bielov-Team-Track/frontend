@@ -2,12 +2,13 @@
 
 import { RegistrationForm } from "@/components/features/clubs/registrations/RegistrationForm";
 import { Button, Loader } from "@/components/ui";
-import { useAuth } from "@/lib/auth/authContext";
-import { FormFieldAnswerDto } from "@/lib/models/Club";
-import { createRegistration, getClub, getClubSettings, getFormTemplate, getMyRegistration } from "@/lib/requests/clubs";
-import { createOrUpdateCoachProfile, createOrUpdatePlayerProfile, getCoachProfile, getPlayerProfile } from "@/lib/requests/user";
+import { useAuth } from "@/providers";
+import { ClubRegistration, FormFieldAnswerDto, RegistrationStatus } from "@/lib/models/Club";
+import { createRegistration, getClub, getClubSettings, getFormTemplate, getMyRegistration } from "@/lib/api/clubs";
+import { createOrUpdateCoachProfile, createOrUpdatePlayerProfile, getCoachProfile, getPlayerProfile } from "@/lib/api/user";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, CheckCircle, ImageOff, MapPin, Shield, Users } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowLeft, ArrowRight, Clock, ImageOff, MapPin, PartyPopper, Shield, Users, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -74,7 +75,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 
 	if (isLoadingClub || isLoadingSettings || isLoadingRegistration) {
 		return (
-			<div className="flex justify-center py-24 min-h-screen bg-background-dark">
+			<div className="flex justify-center items-center min-h-screen bg-background-dark">
 				<Loader size="lg" />
 			</div>
 		);
@@ -82,12 +83,14 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 
 	if (!club) {
 		return (
-			<div className="flex flex-col items-center justify-center min-h-screen bg-background-dark text-white">
-				<Shield className="w-16 h-16 text-muted mb-4" />
-				<h1 className="text-2xl font-bold mb-2">Club Not Found</h1>
-				<p className="text-muted mb-6">The club you&apos;re looking for doesn&apos;t exist.</p>
+			<div className="flex flex-col items-center justify-center min-h-screen bg-background-dark text-white p-4 text-center">
+				<Shield className="w-20 h-20 text-muted/50 mb-6" />
+				<h1 className="text-3xl font-bold mb-3">Club Not Found</h1>
+				<p className="text-muted mb-8 max-w-md">The club you&apos;re looking for doesn&apos;t exist or may have been removed.</p>
 				<Link href="/clubs">
-					<Button variant="outline">Browse Clubs</Button>
+					<Button variant="outline" size="lg">
+						Browse Clubs
+					</Button>
 				</Link>
 			</div>
 		);
@@ -97,21 +100,30 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 		<div className="min-h-screen bg-background-dark pb-20">
 			{/* --- HERO SECTION --- */}
 			<div className="relative w-full">
-				{/* Banner Image */}
-				<div className="h-48 md:h-64 w-full relative overflow-hidden bg-background-light">
+				<div className="h-64 md:h-80 w-full relative overflow-hidden bg-background-light">
 					{club.bannerUrl && !bannerError ? (
-						// eslint-disable-next-line @next/next/no-img-element
-						<img src={club.bannerUrl} alt="Club Banner" className="w-full h-full object-cover opacity-60" onError={() => setBannerError(true)} />
+						<motion.img
+							initial={{ scale: 1.1, opacity: 0 }}
+							animate={{ scale: 1, opacity: 0.6 }}
+							transition={{ duration: 1 }}
+							src={club.bannerUrl}
+							alt="Club Banner"
+							className="w-full h-full object-cover"
+							onError={() => setBannerError(true)}
+						/>
 					) : (
-						<div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-accent/20 to-primary/20">
-							<ImageOff size={48} className="text-white/20" />
+						<div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-accent/10 to-primary/10">
+							<ImageOff size={48} className="text-white/10" />
 						</div>
 					)}
-					<div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/20 to-transparent" />
+					<div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent" />
 
-					<div className="absolute top-4 left-4 z-10">
+					<div className="absolute top-6 left-6 z-10">
 						<Link href={`/clubs/${clubId}`}>
-							<Button variant="ghost" className="bg-black/30 backdrop-blur-sm text-white hover:bg-black/50" leftIcon={<ArrowLeft size={16} />}>
+							<Button
+								variant="ghost"
+								className="bg-black/20 backdrop-blur-md text-white hover:bg-black/40 border border-white/10"
+								leftIcon={<ArrowLeft size={16} />}>
 								Back to Club
 							</Button>
 						</Link>
@@ -120,81 +132,79 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 			</div>
 
 			{/* --- MAIN CONTENT --- */}
-			<div className="max-w-3xl mx-auto px-4 relative z-10">
-				{/* Club Header */}
-				<div className="flex flex-col items-center text-center mb-8">
-					<div className="relative group shrink-0 -mt-16 md:-mt-20 mb-4">
-						<div className="h-32 w-32 rounded-2xl border-4 border-background-dark bg-background-light overflow-hidden shadow-2xl flex items-center justify-center">
+			<div className="max-w-4xl mx-auto px-4 relative z-10 -mt-24">
+				<motion.div
+					initial={{ y: 20, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					transition={{ delay: 0.2 }}
+					className="flex flex-col items-center text-center mb-10">
+					<div className="relative group shrink-0 mb-6">
+						<div className="h-40 w-40 rounded-3xl border-4 border-background-dark bg-background-light overflow-hidden shadow-2xl flex items-center justify-center relative z-20">
 							{club.logoUrl && !logoError ? (
 								// eslint-disable-next-line @next/next/no-img-element
 								<img src={club.logoUrl} alt="Logo" className="w-full h-full object-cover" onError={() => setLogoError(true)} />
 							) : (
-								<Shield className="text-muted/50 w-12 h-12" />
+								<Shield className="text-muted/30 w-16 h-16" />
 							)}
 						</div>
 					</div>
 
-					<div className="mb-6">
-						<h1 className="text-3xl font-bold text-white mb-2">{club.name}</h1>
-						<div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted">
+					<div>
+						<h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3 tracking-tight">{club.name}</h1>
+						<div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-muted-foreground">
 							{club.location && (
-								<span className="flex items-center gap-1">
+								<span className="flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full border border-white/5 text-sm">
 									<MapPin size={14} /> {club.location}
 								</span>
 							)}
-							<span className="flex items-center gap-1">
+							<span className="flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full border border-white/5 text-sm">
 								<Users size={14} /> {club.memberCount || 0} Members
 							</span>
 						</div>
 					</div>
 
 					{club.description && (
-						<div className="max-w-xl mx-auto mb-8">
-							<p className="text-muted text-sm leading-relaxed">{club.description}</p>
+						<div className="max-w-2xl mx-auto mb-10">
+							<p className="text-lg text-muted/80 leading-relaxed font-light">{club.description}</p>
 						</div>
 					)}
-				</div>
+				</motion.div>
 
 				{/* Registration Content */}
-				<div className="w-full">
+				<motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="w-full">
 					{!userProfile ? (
-						<div className="p-8 rounded-2xl bg-white/5 border border-white/10 text-center">
-							<h2 className="text-xl font-bold text-white mb-2">Join {club.name}</h2>
-							<p className="text-muted mb-6">Sign in to start your registration process.</p>
-							<Button variant="solid" color="primary" onClick={() => router.push(`/login?redirect=/clubs/${clubId}/register`)}>
+						<div className="max-w-md mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center backdrop-blur-sm">
+							<h2 className="text-2xl font-bold text-white mb-3">Join {club.name}</h2>
+							<p className="text-muted mb-8">Sign in or create an account to start your registration.</p>
+							<Button
+								variant="solid"
+								color="primary"
+								size="lg"
+								className="w-full"
+								onClick={() => router.push(`/login?redirect=/clubs/${clubId}/register`)}>
 								Sign In to Register
 							</Button>
 						</div>
 					) : existingRegistration ? (
-						<div className="p-8 rounded-2xl bg-white/5 border border-white/10 text-center">
-							<CheckCircle size={48} className="mx-auto mb-4 text-accent" />
-							<h2 className="text-xl font-bold text-white mb-2">Request Submitted</h2>
-							<p className="text-muted mb-6">
-								Your registration request is currently{" "}
-								<span className="font-semibold text-white">{existingRegistration.status.toLowerCase()}</span>.
+						<RegistrationStatusView registration={existingRegistration} clubName={club.name} clubId={clubId} settings={settings} />
+					) : settings && !settings.allowPublicRegistration ? (
+						<div className="max-w-lg mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center">
+							<Shield size={64} className="mx-auto mb-6 text-muted/50" />
+							<h2 className="text-2xl font-bold text-white mb-3">Registration Closed</h2>
+							<p className="text-muted mb-8">
+								This club is not accepting new public registrations at the moment. Please contact the club administrator for an invitation.
 							</p>
 							<Link href={`/clubs/${clubId}`}>
-								<Button variant="outline" leftIcon={<ArrowLeft size={16} />}>
-									Return to Club Page
-								</Button>
-							</Link>
-						</div>
-					) : settings && !settings.allowPublicRegistration ? (
-						<div className="p-8 rounded-2xl bg-white/5 border border-white/10 text-center">
-							<Shield size={48} className="mx-auto mb-4 text-muted" />
-							<h2 className="text-xl font-bold text-white mb-2">Registration Closed</h2>
-							<p className="text-muted mb-6">This club does not accept public registration requests at this time.</p>
-							<Link href={`/clubs/${clubId}`}>
-								<Button variant="outline" leftIcon={<ArrowLeft size={16} />}>
+								<Button variant="link" color={"neutral"} size="lg" leftIcon={<ArrowLeft size={16} />}>
 									Return to Club Page
 								</Button>
 							</Link>
 						</div>
 					) : (
-						<div className="p-6 md:p-8 rounded-2xl bg-white/5 border border-white/10">
-							<div className="mb-6 text-center">
-								<h2 className="text-xl font-bold text-white">Registration</h2>
-								<p className="text-sm text-muted">Complete the form below to join the club.</p>
+						<div className="p-6 md:p-10 rounded-3xl bg-white/5 border border-white/10 shadow-xl backdrop-blur-sm">
+							<div className="mb-8 text-center border-b border-white/10 pb-8">
+								<h2 className="text-2xl font-bold text-white mb-2">Registration Form</h2>
+								<p className="text-muted">Please provide the required details to join the team.</p>
 							</div>
 
 							<RegistrationForm
@@ -214,10 +224,149 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 							/>
 						</div>
 					)}
-				</div>
+				</motion.div>
 			</div>
 		</div>
 	);
 };
 
 export default RegisterPageClient;
+
+// --- STATUS VIEWS ---
+
+interface RegistrationStatusViewProps {
+	registration: ClubRegistration;
+	clubName: string;
+	clubId: string;
+	settings?: {
+		welcomeMessage?: string;
+		pendingMessage?: string;
+		waitlistMessage?: string;
+		declinedMessage?: string;
+	};
+}
+
+function RegistrationStatusView({ registration, clubName, clubId, settings }: RegistrationStatusViewProps) {
+	if (registration.status === RegistrationStatus.Accepted) {
+		const defaultMessage = "Congratulations! Your registration has been accepted. You are now an official member of the team.";
+		const message = settings?.welcomeMessage || defaultMessage;
+
+		return (
+			<div className="max-w-2xl mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center relative overflow-hidden">
+				<div className="absolute top-0 left-0 w-full h-full bg-grid-white/[0.02] -z-10" />
+				<div className="inline-flex items-center justify-center p-5 bg-green-500/10 rounded-full mb-6 relative">
+					<PartyPopper size={48} className="text-green-400" />
+				</div>
+				<h2 className="text-3xl font-bold text-white mb-4">Welcome to {clubName}!</h2>
+				<p className="text-lg text-muted mb-8 max-w-lg mx-auto leading-relaxed">{message}</p>
+
+				{registration.publicNote && (
+					<div className="bg-white/5 border-l-4 border-l-green-500 border-white/10 rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
+						<h4 className="text-xs font-bold text-green-400 uppercase tracking-wider mb-2">Message from Club</h4>
+						<p className="text-white italic font-light">&quot;{registration.publicNote}&quot;</p>
+					</div>
+				)}
+
+				<div className="flex flex-col sm:flex-row gap-4 justify-center">
+					<Link href={`/dashboard/clubs/${clubId}`}>
+						<Button variant="ghost" color="neutral" rightIcon={<ArrowRight size={16} />}>
+							Go to Dashboard
+						</Button>
+					</Link>
+					<Link href={`/clubs/${clubId}`}>
+						<Button variant="solid" color="primary">
+							View Club Page
+						</Button>
+					</Link>
+				</div>
+			</div>
+		);
+	}
+
+	if (registration.status === RegistrationStatus.Pending) {
+		const defaultMessage =
+			"Your registration is currently Pending Review. The club administrators have been notified and will review your application shortly.";
+		const message = settings?.pendingMessage || defaultMessage;
+
+		return (
+			<div className="max-w-xl mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center backdrop-blur-sm">
+				<div className="inline-flex items-center justify-center p-5 bg-yellow-500/10 rounded-full mb-6">
+					<Clock size={48} className="text-yellow-400" />
+				</div>
+				<h2 className="text-2xl font-bold text-white mb-3">Request Submitted</h2>
+				<p className="text-muted mb-8 text-lg">{message}</p>
+
+				<div className="flex justify-center">
+					<Link href={`/clubs/${clubId}`}>
+						<Button variant="link" color={"neutral"} size="lg" leftIcon={<ArrowLeft size={16} />}>
+							Return to Club Page
+						</Button>
+					</Link>
+				</div>
+			</div>
+		);
+	}
+
+	if (registration.status === RegistrationStatus.Waitlist) {
+		const defaultMessage =
+			"Thank you for your interest. The club is currently full, but you have been added to the Waitlist. We will notify you as soon as a spot becomes available.";
+		const message = settings?.waitlistMessage || defaultMessage;
+
+		return (
+			<div className="max-w-xl mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center backdrop-blur-sm">
+				<div className="inline-flex items-center justify-center p-5 bg-blue-500/10 rounded-full mb-6">
+					<Users size={48} className="text-blue-400" />
+				</div>
+				<h2 className="text-2xl font-bold text-white mb-3">Added to Waitlist</h2>
+				<p className="text-muted mb-8 text-lg">{message}</p>
+
+				{registration.publicNote && (
+					<div className="bg-white/5 border-l-4 border-l-blue-500 border-white/10 rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
+						<h4 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">Note from Club</h4>
+						<p className="text-white italic font-light">&quot;{registration.publicNote}&quot;</p>
+					</div>
+				)}
+
+				<div className="flex justify-center">
+					<Link href={`/clubs/${clubId}`}>
+						<Button variant="link" color={"neutral"} size="lg" leftIcon={<ArrowLeft size={16} />}>
+							Return to Club Page
+						</Button>
+					</Link>
+				</div>
+			</div>
+		);
+	}
+
+	if (registration.status === RegistrationStatus.Declined) {
+		const defaultMessage = `We appreciate your interest in joining ${clubName}. Unfortunately, we are unable to accept your registration at this time.`;
+		const message = settings?.declinedMessage || defaultMessage;
+
+		return (
+			<div className="max-w-xl mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center backdrop-blur-sm">
+				<div className="inline-flex items-center justify-center p-5 bg-red-500/10 rounded-full mb-6">
+					<XCircle size={48} className="text-red-400" />
+				</div>
+				<h2 className="text-2xl font-bold text-white mb-3">Registration Declined</h2>
+				<p className="text-muted mb-8 text-lg">{message}</p>
+
+				{registration.publicNote && (
+					<div className="bg-white/5 border-l-4 border-l-red-500 border-white/10 rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
+						<h4 className="text-xs font-bold text-red-400 uppercase tracking-wider mb-2">Reason / Note</h4>
+						<p className="text-white italic font-light">&quot;{registration.publicNote}&quot;</p>
+					</div>
+				)}
+
+				<div className="flex justify-center">
+					<Link href={`/clubs/${clubId}`}>
+						<Button variant="link" color={"neutral"} size="lg" leftIcon={<ArrowLeft size={16} />}>
+							Return to Club Page
+						</Button>
+					</Link>
+				</div>
+			</div>
+		);
+	}
+
+	return null;
+}

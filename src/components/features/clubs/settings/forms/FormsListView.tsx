@@ -3,7 +3,7 @@
 
 import { Button, DeleteConfirmModal, Dropdown, EmptyState, Input, Loader } from "@/components/ui";
 import { FormTemplate } from "@/lib/models/Club";
-import { deleteFormTemplate, duplicateFormTemplate, updateClubSettings, updateFormTemplate } from "@/lib/requests/clubs";
+import { deleteFormTemplate, duplicateFormTemplate, updateClubSettings, updateFormTemplate } from "@/lib/api/clubs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FileText, Plus, Search } from "lucide-react";
 import { useState } from "react";

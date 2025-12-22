@@ -2,8 +2,8 @@ import { Avatar, Button, Input, Loader } from "@/components";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Chat } from "@/lib/models/Messages";
 import { UserProfile } from "@/lib/models/User";
-import { createChat } from "@/lib/requests/messages";
-import { searchUsers as searchUsersAPI } from "@/lib/requests/user";
+import { createChat } from "@/lib/api/messages";
+import { searchUsers as searchUsersAPI } from "@/lib/api/user";
 import {
 	ArrowRight,
 	Camera,

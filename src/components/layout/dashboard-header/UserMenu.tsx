@@ -9,7 +9,7 @@ import {
 	FaCog as SettingsIcon,
 } from "react-icons/fa";
 import { Avatar, Button, Loader } from "@/components/ui";
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 import { useRouter } from "next/navigation";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 

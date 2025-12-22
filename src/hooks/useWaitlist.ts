@@ -5,7 +5,7 @@ import {
 	joinWaitlist as joinWaitlistRequest,
 	leaveWaitlist as leaveWaitlistRequest,
 	loadWaitlist as loadWaitlistRequest,
-} from "@/lib/requests/waitlist";
+} from "@/lib/api/waitlist";
 import { WaitlistEntry } from "@/lib/models/Position";
 
 export function useWaitlist(positionId: string, shouldLoad: boolean = true) {

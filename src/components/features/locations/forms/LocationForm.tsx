@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { createLocation as createLocationRequest } from "@/lib/requests/locations";
+import { createLocation as createLocationRequest } from "@/lib/api/locations";
 import { useRouter } from "next/navigation";
 import Map from "@/components/features/locations/components/Map";
 import { useDebounce } from "@/hooks/useDebounce";

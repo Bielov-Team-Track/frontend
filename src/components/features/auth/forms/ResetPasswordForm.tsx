@@ -2,7 +2,7 @@
 
 import { Button, Input } from "@/components/ui";
 import Loader from "@/components/ui/loader";
-import { resetPassword } from "@/lib/requests/auth";
+import { resetPassword } from "@/lib/api/auth";
 import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Input, Loader } from "@/components/ui";
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";

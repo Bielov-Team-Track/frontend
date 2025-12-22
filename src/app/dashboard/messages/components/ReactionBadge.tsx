@@ -1,4 +1,4 @@
-import { addReaction, removeReaction } from "@/lib/requests/messages";
+import { addReaction, removeReaction } from "@/lib/api/messages";
 import classNames from "classnames";
 import { useState } from "react";
 

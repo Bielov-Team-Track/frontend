@@ -1,4 +1,4 @@
-import { loadEventsByFilter } from "@/lib/requests/events";
+import { loadEventsByFilter } from "@/lib/api/events";
 import { getUserProfile } from "@/lib/server/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";

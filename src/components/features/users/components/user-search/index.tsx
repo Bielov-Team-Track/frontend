@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui";
 import Avatar from "@/components/ui/avatar";
 import { UserProfile } from "@/lib/models/User";
-import { searchUsers } from "@/lib/requests/user";
+import { searchUsers } from "@/lib/api/user";
 import React, { useState } from "react";
 
 type UserSearchProps = {

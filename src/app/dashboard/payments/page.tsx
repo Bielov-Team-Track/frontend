@@ -1,7 +1,7 @@
 import { getUserProfile } from "@/lib/server/auth";
 import UserPaymentsList from "@/components/features/payments/components/UserPaymentsList";
 import React from "react";
-import { getUserPayments } from "@/lib/requests/payments";
+import { getUserPayments } from "@/lib/api/payments";
 
 async function PaymentsPage() {
 	const user = await getUserProfile();

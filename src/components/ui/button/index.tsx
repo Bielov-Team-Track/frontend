@@ -10,8 +10,7 @@ const buttonVariants = cva(
 		variants: {
 			variant: {
 				solid: "shadow-md hover:shadow-lg active:scale-[0.98]",
-				outline:
-					"bg-transparent border-2 hover:shadow-sm active:scale-[0.98]",
+				outline: "bg-transparent ring-2 ring-inset hover:shadow-sm active:scale-[0.98]",
 				ghost: "hover:shadow-sm active:scale-[0.98]",
 				link: "bg-transparent p-0 underline decoration-2 underline-offset-2 active:scale-[0.98]",
 				icon: "bg-transparent py-2 !px-2 rounded-xl hover:bg-white/5 active:scale-[0.98]",
@@ -26,10 +25,11 @@ const buttonVariants = cva(
 				error: "",
 			},
 			size: {
-				sm: "px-3 py-1.5 gap-1.5 text-mobile-sm sm:text-mobile-base min-h-[2rem]",
-				md: "px-4 py-2 gap-2 text-mobile-base sm:text-tablet-base lg:text-desktop-base min-h-[2.5rem]",
-				lg: "px-6 py-3 gap-2 text-mobile-base sm:text-tablet-base lg:text-desktop-lg min-h-[3rem]",
-				xl: "px-8 py-4 gap-3 text-mobile-lg sm:text-tablet-lg lg:text-xl min-h-[3.5rem]",
+				xs: "px-2 py-0.5 gap-1 text-xs h-7",
+				sm: "px-2.5 py-1 gap-1.5 text-sm h-8",
+				md: "px-3 py-1.5 gap-2 text-sm h-9",
+				lg: "px-4 py-2 gap-2 text-base h-10",
+				xl: "px-6 py-2.5 gap-3 text-base h-11",
 			},
 			fullWidth: {
 				true: "w-full",
@@ -81,37 +81,37 @@ const buttonVariants = cva(
 			{
 				variant: "outline",
 				color: "primary",
-				class: "text-primary border-primary hover:bg-primary/10 focus:bg-primary/10 focus:ring-primary/50",
+				class: "text-primary ring-primary hover:bg-primary/10 focus:bg-primary/10",
 			},
 			{
 				variant: "outline",
 				color: "secondary",
-				class: "text-secondary border-secondary hover:bg-secondary/10 focus:bg-secondary/10 focus:ring-secondary/50",
+				class: "text-secondary ring-secondary hover:bg-secondary/10 focus:bg-secondary/10",
 			},
 			{
 				variant: "outline",
 				color: "accent",
-				class: "text-accent border-accent hover:bg-accent/10 focus:bg-accent/10 focus:ring-accent/50",
+				class: "text-accent ring-accent hover:bg-accent/10 focus:bg-accent/10",
 			},
 			{
 				variant: "outline",
 				color: "neutral",
-				class: "text-muted border-muted hover:bg-neutral/10 focus:bg-neutral/10 focus:ring-neutral/50",
+				class: "text-muted ring-muted hover:bg-neutral/10 focus:bg-neutral/10",
 			},
 			{
 				variant: "outline",
 				color: "success",
-				class: "text-success border-success hover:bg-success/10 focus:bg-success/10 focus:ring-success/50",
+				class: "text-success ring-success hover:bg-success/10 focus:bg-success/10",
 			},
 			{
 				variant: "outline",
 				color: "warning",
-				class: "text-warning border-warning hover:bg-warning/10 focus:bg-warning/10 focus:ring-warning/50",
+				class: "text-warning ring-warning hover:bg-warning/10 focus:bg-warning/10",
 			},
 			{
 				variant: "outline",
 				color: "error",
-				class: "text-error border-error hover:bg-error/10 focus:bg-error/10 focus:ring-error/50",
+				class: "text-error ring-error hover:bg-error/10 focus:bg-error/10",
 			},
 			// Ghost variants with colors
 			{
@@ -233,10 +233,7 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-	extends Omit<
-			React.ButtonHTMLAttributes<HTMLButtonElement>,
-			"color" | "disabled"
-		>,
+	extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color" | "disabled">,
 		Omit<VariantProps<typeof buttonVariants>, "loading" | "fullWidth"> {
 	leftIcon?: React.ReactNode;
 	rightIcon?: React.ReactNode;
@@ -247,37 +244,11 @@ export interface ButtonProps
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-	(
-		{
-			variant,
-			color,
-			size,
-			fullWidth,
-			loading,
-			leftIcon,
-			rightIcon,
-			children,
-			className,
-			disabled,
-			...props
-		},
-		ref
-	) => {
+	({ variant, color, size, fullWidth, loading, leftIcon, rightIcon, children, className, disabled, ...props }, ref) => {
 		// Loading spinner component
 		const LoadingSpinner = () => (
-			<svg
-				className="animate-spin h-4 w-4"
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24">
-				<circle
-					className="opacity-25"
-					cx="12"
-					cy="12"
-					r="10"
-					stroke="currentColor"
-					strokeWidth="4"
-				/>
+			<svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+				<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
 				<path
 					className="opacity-75"
 					fill="currentColor"
@@ -302,17 +273,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 				disabled={disabled || loading}
 				{...props}>
 				{loading && <LoadingSpinner />}
-				{!loading && leftIcon && (
-					<span className="flex-shrink-0">{leftIcon}</span>
-				)}
-				{children && (
-					<span className={loading ? "opacity-75" : ""}>
-						{children}
-					</span>
-				)}
-				{!loading && rightIcon && (
-					<span className="flex-shrink-0">{rightIcon}</span>
-				)}
+				{!loading && leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
+				{children && <span className={loading ? "opacity-75" : ""}>{children}</span>}
+				{!loading && rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
 			</button>
 		);
 	}

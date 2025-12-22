@@ -5,7 +5,7 @@ import {
 	releasePosition,
 	getPosition,
 	claimPosition,
-} from "@/lib/requests/positions";
+} from "@/lib/api/positions";
 import { usePositionStore } from "@/lib/realtime/positionStore";
 import signalr from "@/lib/realtime/signalrClient";
 import { UserProfile } from "@/lib/models/User";

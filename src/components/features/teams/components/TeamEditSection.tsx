@@ -2,7 +2,7 @@
 import { Loader } from "@/components/ui";
 import { Event } from "@/lib/models/Event";
 import { Team } from "@/lib/models/Team";
-import { createTeam, loadTeams } from "@/lib/requests/teams";
+import { createTeam, loadTeams } from "@/lib/api/teams";
 import { useEffect, useState } from "react";
 import { FiPlus as PlusIcon } from "react-icons/fi";
 import TeamsEditList from "./TeamsEditList";

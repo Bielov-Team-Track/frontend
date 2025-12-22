@@ -3,7 +3,7 @@
 import { useEffect, useCallback } from "react";
 import signalr from "@/lib/realtime/signalrClient";
 import { HubConnection, HubConnectionState } from "@microsoft/signalr";
-import { useAccessToken } from "@/lib/auth/authContext";
+import { useAccessToken } from "@/providers";
 import { usePaymentsStore } from "@/lib/realtime/paymentStore";
 import { EVENTS_API_URL } from "@/lib/constants";
 

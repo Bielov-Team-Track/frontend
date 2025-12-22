@@ -1,4 +1,4 @@
-import client from "../client";
+import client from "./client";
 import { Group, GroupSearchResult } from "../models/Group";
 
 const PREFIX = "/events";

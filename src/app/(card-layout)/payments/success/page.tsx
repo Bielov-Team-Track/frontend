@@ -3,7 +3,7 @@ import { Button } from "@/components";
 import Link from "next/link";
 import { FaCheckCircle, FaSpinner } from "react-icons/fa";
 import { redirect } from "next/navigation";
-import client from "@/lib/client";
+import client from "@/lib/api/client";
 
 type SuccessPageParams = {
 	searchParams: Promise<{

@@ -4,7 +4,7 @@ import { useEffect, useCallback } from "react";
 import signalr from "@/lib/realtime/signalrClient";
 import { usePositionStore } from "@/lib/realtime/positionStore";
 import { HubConnection, HubConnectionState } from "@microsoft/signalr";
-import { useAccessToken } from "@/lib/auth/authContext";
+import { useAccessToken } from "@/providers";
 import { Position } from "@/lib/models/Position";
 import { EVENTS_API_URL } from "@/lib/constants";
 

@@ -1,5 +1,5 @@
 import TeamsEditSection from "@/components/features/teams/components/TeamEditSection";
-import { loadEvent, loadEvents } from "@/lib/requests/events";
+import { loadEvent, loadEvents } from "@/lib/api/events";
 import moment from "moment";
 import { notFound } from "next/navigation";
 

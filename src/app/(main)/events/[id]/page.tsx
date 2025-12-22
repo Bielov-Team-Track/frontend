@@ -1,8 +1,8 @@
 import { ApprovalSection } from "@/components/features/events";
 import PositionsRealtimeClient from "@/components/features/teams/components/PositionsRealtimeClient";
-import { checkUserApproval } from "@/lib/requests/approvals";
-import { loadEvent } from "@/lib/requests/events";
-import { loadTeams } from "@/lib/requests/teams";
+import { checkUserApproval } from "@/lib/api/approvals";
+import { loadEvent } from "@/lib/api/events";
+import { loadTeams } from "@/lib/api/teams";
 import { getUserProfile } from "@/lib/server/auth";
 import { notFound } from "next/navigation";
 import { UserProfile } from "@/lib/models/User";

@@ -6,7 +6,7 @@ import { Button, Input, Loader } from "@/components/ui";
 import ImageCropper from "@/components/ui/image-cropper";
 import { User, Camera, ArrowRight } from "lucide-react";
 import Image from "next/image";
-import { updateProfileImage } from "@/lib/requests/user";
+import { updateProfileImage } from "@/lib/api/user";
 
 const schema = yup.object().shape({
 	name: yup

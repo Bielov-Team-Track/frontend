@@ -21,7 +21,7 @@ import {
 	deleteTeam,
 	addTeamMember,
 	removeTeamMember,
-} from "@/lib/requests/clubs";
+} from "@/lib/api/clubs";
 
 interface TeamsTabProps {
 	teams: Team[];

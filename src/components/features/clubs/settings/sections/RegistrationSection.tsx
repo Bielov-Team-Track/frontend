@@ -1,8 +1,8 @@
 import FormBuilderInline from "@/components/features/clubs/settings/forms/FormBuilderInline";
 import SettingsSidebar, { SettingsSection } from "@/components/features/clubs/settings/SettingsSidebar";
-import { Button, Checkbox } from "@/components/ui";
+import { Button, Checkbox, TextArea } from "@/components/ui";
 import { Club } from "@/lib/models/Club";
-import { getClubFormTemplates, updateClubSettings } from "@/lib/requests/clubs";
+import { getClubFormTemplates, updateClubSettings } from "@/lib/api/clubs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Save } from "lucide-react";
 import { useState } from "react";
@@ -19,6 +19,10 @@ interface FormValues {
 	requirePlayerProfile: boolean;
 	requireCoachProfile: boolean;
 	allowPublicRegistration: boolean;
+	welcomeMessage: string;
+	pendingMessage: string;
+	waitlistMessage: string;
+	declinedMessage: string;
 }
 
 export default function RegistrationSection({ club, onTabChange, activeTab }: RegistrationSectionProps) {
@@ -42,6 +46,10 @@ export default function RegistrationSection({ club, onTabChange, activeTab }: Re
 			requirePlayerProfile: club?.settings?.requirePlayerProfile || false,
 			requireCoachProfile: club?.settings?.requireCoachProfile || false,
 			allowPublicRegistration: club?.settings?.allowPublicRegistration || false,
+			welcomeMessage: club?.settings?.welcomeMessage || "",
+			pendingMessage: club?.settings?.pendingMessage || "",
+			waitlistMessage: club?.settings?.waitlistMessage || "",
+			declinedMessage: club?.settings?.declinedMessage || "",
 		},
 	});
 
@@ -51,6 +59,10 @@ export default function RegistrationSection({ club, onTabChange, activeTab }: Re
 				requirePlayerProfile: data.requirePlayerProfile,
 				requireCoachProfile: data.requireCoachProfile,
 				allowPublicRegistration: data.allowPublicRegistration,
+				welcomeMessage: data.welcomeMessage || undefined,
+				pendingMessage: data.pendingMessage || undefined,
+				waitlistMessage: data.waitlistMessage || undefined,
+				declinedMessage: data.declinedMessage || undefined,
 			});
 		},
 		onSuccess: () => {
@@ -110,7 +122,7 @@ export default function RegistrationSection({ club, onTabChange, activeTab }: Re
 						)}
 					</div>
 
-					<section className="space-y-4 flex-1">
+					<section className="space-y-6 flex-1">
 						<div className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-4">
 							<Controller
 								name="allowPublicRegistration"
@@ -151,6 +163,74 @@ export default function RegistrationSection({ club, onTabChange, activeTab }: Re
 									/>
 								)}
 							/>
+						</div>
+
+						{/* Custom Messages Section */}
+						<div className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-6">
+							<div>
+								<h3 className="text-sm font-semibold text-white mb-1">Custom Registration Messages</h3>
+								<p className="text-xs text-muted">
+									Customize the messages shown to users based on their registration status. Leave empty to use the default message.
+								</p>
+							</div>
+
+							<div className="space-y-4">
+								<Controller
+									name="welcomeMessage"
+									control={control}
+									render={({ field }) => (
+										<TextArea
+											{...field}
+											label="Welcome Message (Accepted)"
+											placeholder="Congratulations! Your registration has been accepted. You are now an official member of the team."
+											helperText="Shown when a registration is accepted"
+											rows={3}
+										/>
+									)}
+								/>
+
+								<Controller
+									name="pendingMessage"
+									control={control}
+									render={({ field }) => (
+										<TextArea
+											{...field}
+											label="Pending Message"
+											placeholder="Your registration is currently pending review. The club administrators will review your application shortly."
+											helperText="Shown when a registration is pending review"
+											rows={3}
+										/>
+									)}
+								/>
+
+								<Controller
+									name="waitlistMessage"
+									control={control}
+									render={({ field }) => (
+										<TextArea
+											{...field}
+											label="Waitlist Message"
+											placeholder="The club is currently full, but you have been added to the waitlist. We will notify you as soon as a spot becomes available."
+											helperText="Shown when a user is added to the waitlist"
+											rows={3}
+										/>
+									)}
+								/>
+
+								<Controller
+									name="declinedMessage"
+									control={control}
+									render={({ field }) => (
+										<TextArea
+											{...field}
+											label="Declined Message"
+											placeholder="We appreciate your interest. Unfortunately, we are unable to accept your registration at this time."
+											helperText="Shown when a registration is declined"
+											rows={3}
+										/>
+									)}
+								/>
+							</div>
 						</div>
 					</section>
 				</form>

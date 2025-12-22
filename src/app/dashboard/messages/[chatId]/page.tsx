@@ -2,7 +2,7 @@
 
 import { Loader } from "@/components";
 import { Chat } from "@/lib/models/Messages";
-import { loadConversationsForUser as loadChatsForUser } from "@/lib/requests/messages";
+import { loadConversationsForUser as loadChatsForUser } from "@/lib/api/messages";
 import { useEffect, useState } from "react";
 
 const MessagesPage = () => {

@@ -2,7 +2,7 @@
 
 import GameEngine, { GameState } from "@/lib/gameEngine";
 import React, { use, useEffect, useRef, useState } from "react";
-import { loadTeams } from "@/lib/requests/teams";
+import { loadTeams } from "@/lib/api/teams";
 import { Team } from "@/lib/models/Team";
 import { Team as GameTeam } from "@/lib/gameEngine";
 

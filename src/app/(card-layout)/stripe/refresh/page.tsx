@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader } from "@/components";
-import { getOnboardingLink } from "@/lib/requests/payments";
+import { getOnboardingLink } from "@/lib/api/payments";
 import { use, useEffect, useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 

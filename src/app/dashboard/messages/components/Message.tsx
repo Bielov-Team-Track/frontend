@@ -1,7 +1,7 @@
 import { ReactionPicker } from "@/components";
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 import { Message } from "@/lib/models/Messages";
-import { addReaction } from "@/lib/requests/messages";
+import { addReaction } from "@/lib/api/messages";
 import { stringToColor } from "@/lib/utils/color";
 import { getFormattedTime } from "@/lib/utils/date";
 import getUknownUser from "@/lib/utils/user";

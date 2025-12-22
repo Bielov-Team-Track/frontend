@@ -1,4 +1,4 @@
-import client from "../client";
+import client from "./client";
 import { Position } from "../models/Position";
 import { PositionType } from "../models/PositionType";
 

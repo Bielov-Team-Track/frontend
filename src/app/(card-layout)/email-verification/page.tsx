@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, Suspense } from "react";
-import { sendVerification } from "@/lib/requests/auth";
+import { sendVerification } from "@/lib/api/auth";
 import Loader from "@/components/ui/loader";
 import { Button } from "@/components";
 import { FaEnvelope } from "react-icons/fa6";

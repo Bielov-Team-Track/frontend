@@ -6,7 +6,7 @@ import {
 import { Avatar, Button } from "@/components";
 import { Event } from "@/lib/models/Event";
 import { useState } from "react";
-import { updateParticipantPaymentStatus } from "@/lib/requests/events";
+import { updateParticipantPaymentStatus } from "@/lib/api/events";
 
 type AuditParticipantListItemProps = {
 	participant: EventParticipant;

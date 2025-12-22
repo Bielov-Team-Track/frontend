@@ -1,7 +1,7 @@
 "use client";
 
 import UserMenu from "./UserMenu";
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 import { usePathname } from "next/navigation";
 import { getPageTitle } from "../shared/page-titles";
 import { Bell, Search, Menu } from "lucide-react";

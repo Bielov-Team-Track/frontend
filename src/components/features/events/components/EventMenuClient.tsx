@@ -1,6 +1,6 @@
 "use client";
 
-import { cancelEvent } from "@/lib/requests/events";
+import { cancelEvent } from "@/lib/api/events";
 
 export default function EventMenuClient({
 	eventId,

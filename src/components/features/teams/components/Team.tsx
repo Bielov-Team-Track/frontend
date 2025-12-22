@@ -8,7 +8,7 @@ import { Team as TeamModel } from "@/lib/models/Team";
 import { UserProfile } from "@/lib/models/User";
 import { usePositionStore } from "@/lib/realtime/positionStore";
 import signalr from "@/lib/realtime/signalrClient";
-import { addPosition } from "@/lib/requests/positions";
+import { addPosition } from "@/lib/api/positions";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {

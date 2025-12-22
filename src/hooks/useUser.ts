@@ -1,5 +1,5 @@
 import { UserProfile } from "@/lib/models/User";
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 
 interface UseUserReturn {
 	userProfile: UserProfile | null;

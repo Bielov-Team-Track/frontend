@@ -9,14 +9,14 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { UserProfile } from "../models/User";
+import { UserProfile } from "@/lib/models/User";
 import {
 	AuthResponse,
 	login as apiLogin,
 	logout as apiLogout,
 	refreshToken as apiRefreshToken,
 	getCurrentUserProfile,
-} from "../requests/auth";
+} from "@/lib/api/auth";
 
 interface AuthContextType {
 	userProfile: UserProfile | null;

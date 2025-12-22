@@ -1,7 +1,7 @@
 "use client";
 
 import { Team } from "@/lib/models/Club";
-import { getClub, getClubMembers, getTeam } from "@/lib/requests/clubs";
+import { getClub, getClubMembers, getTeam } from "@/lib/api/clubs";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, MessageSquare, Settings, Users } from "lucide-react";
 import Link from "next/link";

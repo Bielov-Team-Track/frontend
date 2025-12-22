@@ -18,6 +18,7 @@ export interface UserProfile {
 	name: string;
 	surname: string;
 	imageUrl: string;
+	dateOfBirth?: Date;
 }
 
 export interface Suspension {
@@ -26,21 +27,15 @@ export interface Suspension {
 }
 
 // Volleyball-specific player profile data
-export type VolleyballPosition =
-	| "setter"
-	| "outside_hitter"
-	| "opposite"
-	| "middle_blocker"
-	| "libero"
-	| "defensive_specialist";
+export type VolleyballPosition = "setter" | "outside_hitter" | "opposite" | "middle_blocker" | "libero" | "defensive_specialist";
 
 export interface SkillRatings {
-	serve: number;      // 0-100
-	attack: number;     // 0-100
-	defense: number;    // 0-100
-	setting: number;    // 0-100
-	blocking: number;   // 0-100
-	reception: number;  // 0-100
+	serve: number; // 0-100
+	attack: number; // 0-100
+	defense: number; // 0-100
+	setting: number; // 0-100
+	blocking: number; // 0-100
+	reception: number; // 0-100
 }
 
 export interface PlayerStats {
@@ -66,9 +61,9 @@ export interface Badge {
 
 export interface PlayerProfile extends UserProfile {
 	// Physical attributes
-	height?: number;        // in cm
-	verticalJump?: number;  // in cm
-	reach?: number;         // in cm
+	height?: number; // in cm
+	verticalJump?: number; // in cm
+	reach?: number; // in cm
 	dominantHand?: "left" | "right";
 
 	// Volleyball-specific

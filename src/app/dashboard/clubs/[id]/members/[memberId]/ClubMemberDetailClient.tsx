@@ -3,8 +3,8 @@
 import { Avatar, Button } from "@/components";
 import { Group, Team } from "@/lib/models/Club";
 import { FullProfileDto, getDominantHandLabel, getSkillLevelLabel, getVolleyballPositionLabel } from "@/lib/models/Profile";
-import { getClubMembers, getGroupsByClub, getTeamsByClub } from "@/lib/requests/clubs";
-import { getFullUserProfile } from "@/lib/requests/user";
+import { getClubMembers, getGroupsByClub, getTeamsByClub } from "@/lib/api/clubs";
+import { getFullUserProfile } from "@/lib/api/user";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, Dumbbell, History, Layers, Mail, Medal, Trophy, User, Users } from "lucide-react";
 import Link from "next/link";

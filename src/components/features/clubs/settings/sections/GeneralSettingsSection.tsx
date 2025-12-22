@@ -5,7 +5,7 @@ import SettingsSidebar, { SettingsSection } from "@/components/features/clubs/se
 import SocialLinksEditor from "@/components/features/clubs/settings/SocialLinksEditor";
 import { Button, ImageCropper, Input, Modal, TextArea } from "@/components/ui";
 import { Club, SocialPlatform } from "@/lib/models/Club";
-import { updateClub, updateClubSocialLinks, uploadClubImage } from "@/lib/requests/clubs";
+import { updateClub, updateClubSocialLinks, uploadClubImage } from "@/lib/api/clubs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Camera, ImageIcon, Save, Shield } from "lucide-react";
 import { useRef, useState } from "react";

@@ -1,5 +1,5 @@
 import { Button } from "@/components";
-import { useAuth } from "@/lib/auth/authContext";
+import { useAuth } from "@/providers";
 import { Chat, Message } from "@/lib/models/Messages";
 import { stringToColor } from "@/lib/utils/color";
 import { getFormattedDate } from "@/lib/utils/date";

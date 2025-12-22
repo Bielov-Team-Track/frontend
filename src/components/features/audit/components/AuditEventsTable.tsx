@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-table";
 import { Event } from "@/lib/models/Event";
 import { EventParticipant } from "@/lib/models/EventParticipant";
-import { loadParticipants } from "@/lib/requests/events";
+import { loadParticipants } from "@/lib/api/events";
 import { getFormattedDateWithDay } from "@/lib/utils/date";
 import { getFormatedCurrency } from "@/lib/utils/currency";
 import { Loader } from "@/components";

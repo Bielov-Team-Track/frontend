@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Modal from "@/components/ui/modal";
 import Button from "@/components/ui/button";
 import { ClubMember, ClubRole, SkillLevel } from "@/lib/models/Club";
-import { UpdateClubMemberRequest } from "@/lib/requests/clubs";
+import { UpdateClubMemberRequest } from "@/lib/api/clubs";
 
 interface EditMemberModalProps {
 	isOpen: boolean;

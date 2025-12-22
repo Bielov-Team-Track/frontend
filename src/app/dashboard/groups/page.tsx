@@ -1,5 +1,5 @@
 import { getUserProfile } from "@/lib/server/auth";
-import { loadGroupsByUser } from "@/lib/requests/groups";
+import { loadGroupsByUser } from "@/lib/api/groups";
 import { redirect } from "next/navigation";
 import React from "react";
 

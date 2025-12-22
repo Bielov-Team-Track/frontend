@@ -2,16 +2,7 @@
 
 import { EventsCalendar } from "@/components/ui/calendar/EventsCalendar";
 import { Event } from "@/lib/models/Event";
-import {
-	Calendar as CalendarIcon,
-	Clock,
-	Filter,
-	Grid,
-	List,
-	MapPin,
-	Plus,
-	Search,
-} from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Filter, Grid, List, MapPin, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -32,15 +23,11 @@ interface EventsPageClientProps {
 function EventsPageClient({ events }: EventsPageClientProps) {
 	const searchParams = useSearchParams();
 	const initialView = searchParams.get("view") as ViewType | null;
-	const [currentView, setCurrentView] = useState<ViewType>(
-		initialView ?? "calendar"
-	);
+	const [currentView, setCurrentView] = useState<ViewType>(initialView ?? "list");
 	const [searchQuery, setSearchQuery] = useState("");
 
 	// Filter logic placeholder
-	const filteredEvents = events.filter((e) =>
-		e.name.toLowerCase().includes(searchQuery.toLowerCase())
-	);
+	const filteredEvents = events.filter((e) => e.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
 	return (
 		<div className="h-full flex flex-col space-y-6">
@@ -49,10 +36,7 @@ function EventsPageClient({ events }: EventsPageClientProps) {
 				{/* Search & Filter */}
 				<div className="flex items-center gap-3 w-full sm:w-auto flex-1 max-w-lg">
 					<div className="relative flex-1 group">
-						<Search
-							size={18}
-							className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-hover:text-white transition-colors"
-						/>
+						<Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-hover:text-white transition-colors" />
 						<input
 							type="text"
 							placeholder="Find events..."
@@ -74,16 +58,10 @@ function EventsPageClient({ events }: EventsPageClientProps) {
 						{VIEWS.map((view) => (
 							<button
 								key={view.value}
-								onClick={() =>
-									setCurrentView(view.value as ViewType)
-								}
+								onClick={() => setCurrentView(view.value as ViewType)}
 								className={`
                                     p-2 rounded-lg transition-all
-                                    ${
-										currentView === view.value
-											? "bg-white/10 text-white shadow-sm"
-											: "text-muted hover:text-white hover:bg-white/5"
-									}
+                                    ${currentView === view.value ? "bg-white/10 text-white shadow-sm" : "text-muted hover:text-white hover:bg-white/5"}
                                 `}
 								title={view.label}>
 								<view.icon size={18} />
@@ -108,9 +86,7 @@ function EventsPageClient({ events }: EventsPageClientProps) {
 					</div>
 				)}
 
-				{currentView === "list" && (
-					<EventListView events={filteredEvents} />
-				)}
+				{currentView === "list" && <EventListView events={filteredEvents} />}
 
 				{currentView === "grid" && (
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -135,9 +111,7 @@ function EventGridCard({ event }: { event: Event }) {
 	const date = new Date(event.startTime);
 
 	return (
-		<Link
-			href={`/dashboard/events/${event.id}`}
-			className="group block h-full">
+		<Link href={`/dashboard/events/${event.id}`} className="group block h-full">
 			<div className="flex flex-col h-full rounded-2xl bg-white/5 border border-white/5 hover:border-accent/40 hover:bg-white/[0.07] hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-xl">
 				{/* Image / Header Placeholder */}
 				<div className="h-32 bg-background-light relative overflow-hidden rounded-t-2xl">
@@ -146,17 +120,14 @@ function EventGridCard({ event }: { event: Event }) {
 							{event.type}
 						</span>
 					</div>
-					{/* Gradient Overlay */}{" "}
-					<div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent" />
+					{/* Gradient Overlay */} <div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent" />
 				</div>
 
 				{/* Content */}
 				<div className="p-5 flex-1 flex flex-col">
 					<div className="flex gap-3 mb-2">
 						<div className="flex flex-col items-center justify-center w-10 h-12 rounded-lg bg-white/5 border border-white/10 shrink-0">
-							<span className="text-sm font-bold text-white leading-none">
-								{date.getDate()}
-							</span>
+							<span className="text-sm font-bold text-white leading-none">{date.getDate()}</span>
 							<span className="text-[9px] font-bold text-muted uppercase">
 								{date.toLocaleString("default", {
 									month: "short",
@@ -164,9 +135,7 @@ function EventGridCard({ event }: { event: Event }) {
 							</span>
 						</div>
 						<div className="min-w-0">
-							<h3 className="font-bold text-white leading-tight mb-1 truncate group-hover:text-accent transition-colors">
-								{event.name}
-							</h3>
+							<h3 className="font-bold text-white leading-tight mb-1 truncate group-hover:text-accent transition-colors">{event.name}</h3>
 							<div className="text-xs text-muted flex items-center gap-1">
 								<Clock size={10} />{" "}
 								{date.toLocaleTimeString([], {
@@ -180,9 +149,7 @@ function EventGridCard({ event }: { event: Event }) {
 					{event.location && (
 						<div className="mt-auto pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-muted">
 							<MapPin size={12} className="shrink-0" />
-							<span className="truncate">
-								{event.location.name}
-							</span>
+							<span className="truncate">{event.location.name}</span>
 						</div>
 					)}
 				</div>
@@ -197,16 +164,9 @@ function EmptyState() {
 			<div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 text-muted">
 				<CalendarIcon size={32} />
 			</div>
-			<h3 className="text-xl font-bold text-white mb-2">
-				No events found
-			</h3>
-			<p className="text-muted max-w-sm mb-6">
-				We couldn&apos;t find any events matching your filters. Try
-				adjusting them or create a new one.
-			</p>
-			<Link
-				href="/dashboard/events/create"
-				className="btn btn-outline text-white border-white/20 hover:bg-white hover:text-black">
+			<h3 className="text-xl font-bold text-white mb-2">No events found</h3>
+			<p className="text-muted max-w-sm mb-6">We couldn&apos;t find any events matching your filters. Try adjusting them or create a new one.</p>
+			<Link href="/dashboard/events/create" className="btn btn-outline text-white border-white/20 hover:bg-white hover:text-black">
 				Create Event
 			</Link>
 		</div>

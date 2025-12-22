@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components";
-import { createCheckoutSession } from "@/lib/requests/payments";
+import { createCheckoutSession } from "@/lib/api/payments";
 import { useState } from "react";
 import { FaCreditCard } from "react-icons/fa";
 

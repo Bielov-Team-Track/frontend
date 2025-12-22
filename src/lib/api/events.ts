@@ -1,4 +1,4 @@
-import client from "../client";
+import client from "./client";
 import { CreateEvent, Event, EventFilterRequest } from "../models/Event";
 import { EventParticipant } from "../models/EventParticipant";
 import { getParamsFromObject } from "../utils/request";

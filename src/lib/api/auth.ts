@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import client from "../client";
+import client from "./client";
 import { UserProfile } from "../models/User";
 
 export interface AuthResponse {

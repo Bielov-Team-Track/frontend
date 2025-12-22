@@ -1,4 +1,4 @@
-import client from "../client";
+import client from "./client";
 import { WaitlistEntry } from "../models/Position";
 
 const PREFIX = "/events/v1";

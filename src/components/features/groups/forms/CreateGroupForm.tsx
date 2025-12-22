@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 // import { useSession } from 'next-auth/react';
 // import { User } from 'next-auth';
-import { createGroup } from "@/lib/requests/groups"; // Assuming you have a createGroup function
+import { createGroup } from "@/lib/api/groups"; // Assuming you have a createGroup function
 import { Loader } from "@/components/ui";
 
 const schema = yup.object().shape({

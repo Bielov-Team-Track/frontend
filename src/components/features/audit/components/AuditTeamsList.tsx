@@ -1,6 +1,6 @@
 "use client";
 
-import { loadTeams } from "@/lib/requests/teams";
+import { loadTeams } from "@/lib/api/teams";
 import { Event } from "@/lib/models/Event";
 import { useEffect, useState } from "react";
 import { Loader } from "@/components/ui";

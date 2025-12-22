@@ -15,10 +15,8 @@ const inputVariants = cva(
 	{
 		variants: {
 			variant: {
-				default:
-					"bg-white/5 border border-white/10 focus:border-white/20 focus:bg-white/[0.07]",
-				bordered:
-					"bg-white/5 border border-white/10 focus:border-accent/50 focus:ring-0 focus:ring-accent/20",
+				default: "bg-white/5 border border-white/10 focus:border-white/20 focus:bg-white/[0.07]",
+				bordered: "bg-white/5 border border-white/10 focus:border-accent/50 focus:ring-0 focus:ring-accent/20",
 				ghost: "border-transparent bg-transparent focus:bg-white/5",
 			},
 			inputSize: {
@@ -44,9 +42,7 @@ const inputVariants = cva(
 	}
 );
 
-export interface InputProps
-	extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
-		VariantProps<typeof inputVariants> {
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">, VariantProps<typeof inputVariants> {
 	label?: string;
 	error?: string;
 	helperText?: string;
@@ -89,32 +85,17 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 			<div className={cn("form-control w-full", !fullWidth && "w-auto")}>
 				{/* Label */}
 				{label && (
-					<label
-						className={cn(
-							"block text-sm font-medium text-white mb-2",
-							error && "text-red-400",
-							disabled && "opacity-50"
-						)}>
+					<label className={cn("block text-sm font-medium text-white mb-2", error && "text-red-400", disabled && "opacity-50")}>
 						{label}
-						{required && (
-							<span className="text-red-400 ml-1">*</span>
-						)}
-						{optional && !required && (
-							<span className="text-muted ml-1.5 font-normal text-xs">
-								(optional)
-							</span>
-						)}
+						{required && <span className="text-red-400 ml-1">*</span>}
+						{optional && !required && <span className="text-muted ml-1.5 font-normal text-xs">(optional)</span>}
 					</label>
 				)}
 
 				{/* Input Container */}
 				<div className="relative">
 					{/* Left Icon */}
-					{leftIcon && (
-						<div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted">
-							{leftIcon}
-						</div>
-					)}
+					{leftIcon && <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted">{leftIcon}</div>}
 
 					<input
 						ref={ref}
@@ -140,17 +121,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 							{showToggle ? (
 								<button
 									type="button"
-									onClick={() =>
-										setShowPassword(!showPassword)
-									}
+									onClick={() => setShowPassword(!showPassword)}
 									className="text-muted hover:text-white focus:outline-none transition-colors"
 									tabIndex={-1}
 									disabled={disabled}>
-									{showPassword ? (
-										<EyeOff size={18} />
-									) : (
-										<Eye size={18} />
-									)}
+									{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
 								</button>
 							) : (
 								<span className="text-muted">{rightIcon}</span>
@@ -160,9 +135,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 				</div>
 
 				{/* Helper Text */}
-				{helperText && !error && (
-					<p className="mt-1.5 text-xs text-muted">{helperText}</p>
-				)}
+				{helperText && !error && <p className="mt-1.5 text-xs text-muted">{helperText}</p>}
 
 				{/* Error Message */}
 				{error && (

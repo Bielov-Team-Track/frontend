@@ -3,7 +3,7 @@
 import Loader from "@/components/ui/loader";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Group, GroupSearchResult } from "@/lib/models/Group";
-import { searchGroups } from "@/lib/requests/groups";
+import { searchGroups } from "@/lib/api/groups";
 import React, { useEffect, useState } from "react";
 
 function GroupSearchPage() {

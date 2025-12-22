@@ -7,7 +7,7 @@ import {
 	disapproveUser as disapproveUserRequest,
 	loadApprovalRequests,
 	resetApproval as resetApprovalRequest,
-} from "@/lib/requests/approvals";
+} from "@/lib/api/approvals";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { FiCheck, FiX } from "react-icons/fi";

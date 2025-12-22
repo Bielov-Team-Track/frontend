@@ -3,11 +3,11 @@
 import { Button } from "@/components";
 import { InvitationAcceptForm, InvitationPreview } from "@/components/features/clubs/invitations";
 import { Loader } from "@/components/ui";
-import { useAuth } from "@/lib/auth/AuthContext";
+import { useAuth } from "@/providers";
 import { FormFieldAnswerDto, InvitationStatus } from "@/lib/models/Club";
 import { CreateOrUpdateCoachProfileDto, CreateOrUpdatePlayerProfileDto } from "@/lib/models/Profile";
-import { acceptInvitation, declineInvitation, getInvitationByToken } from "@/lib/requests/clubs";
-import { getCoachProfile, getPlayerProfile, updateCoachProfile, updatePlayerProfile } from "@/lib/requests/profile";
+import { acceptInvitation, declineInvitation, getInvitationByToken } from "@/lib/api/clubs";
+import { getCoachProfile, getPlayerProfile, updateCoachProfile, updatePlayerProfile } from "@/lib/api/user";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AlertCircle, LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";

@@ -7,7 +7,7 @@ import Input from "@/components/ui/input";
 import Modal from "@/components/ui/modal";
 import TextArea from "@/components/ui/textarea";
 import { CreateClubRequest } from "@/lib/models/Club";
-import { createClub, updateClub, uploadClubImage } from "@/lib/requests/clubs";
+import { createClub, updateClub, uploadClubImage } from "@/lib/api/clubs";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Image as ImageIcon, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";

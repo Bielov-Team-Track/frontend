@@ -1,4 +1,3 @@
-import React from "react";
 import PaymentSettings from "../components/PaymentSettings";
 import { redirect } from "next/navigation";
 import { getUserProfile } from "@/lib/server/auth";
@@ -10,11 +9,7 @@ async function PaymentSettingsPage() {
 		redirect("/login");
 	}
 
-	return (
-		<div>
-			<PaymentSettings user={user} />
-		</div>
-	);
+	return <PaymentSettings user={user} />;
 }
 
 export default PaymentSettingsPage;

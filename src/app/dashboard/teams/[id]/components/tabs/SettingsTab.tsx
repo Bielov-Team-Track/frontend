@@ -6,7 +6,7 @@ import Button from "@/components/ui/button";
 import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
 import { TeamSettingsForm } from "@/components/features/teams";
 import { Team, UpdateTeamRequest } from "@/lib/models/Club";
-import { updateTeam, deleteTeam } from "@/lib/requests/clubs";
+import { updateTeam, deleteTeam } from "@/lib/api/clubs";
 import { useState } from "react";
 
 interface SettingsTabProps {
