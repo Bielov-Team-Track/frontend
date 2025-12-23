@@ -1,19 +1,10 @@
 "use client";
 
 import { Loader } from "@/components";
-import { Club } from "@/lib/models/Club";
 import { getClubs } from "@/lib/api/clubs";
+import { Club } from "@/lib/models/Club";
 import { useQuery } from "@tanstack/react-query";
-import {
-	Filter,
-	Grid,
-	List,
-	MapPin,
-	Plus,
-	Search,
-	Shield,
-	Users,
-} from "lucide-react";
+import { Filter, Grid, List, MapPin, Plus, Search, Shield, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -33,9 +24,7 @@ export default function ClubsPageClient() {
 		queryFn: getClubs,
 	});
 
-	const filteredClubs = clubs.filter((club) =>
-		club.name.toLowerCase().includes(searchQuery.toLowerCase())
-	);
+	const filteredClubs = clubs.filter((club) => club.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
 	return (
 		<div className="h-full flex flex-col space-y-6">
@@ -44,10 +33,7 @@ export default function ClubsPageClient() {
 				{/* Search & Filter */}
 				<div className="flex items-center gap-3 w-full sm:w-auto flex-1 max-w-lg">
 					<div className="relative flex-1 group">
-						<Search
-							size={18}
-							className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-hover:text-white transition-colors"
-						/>
+						<Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-hover:text-white transition-colors" />
 						<input
 							type="text"
 							placeholder="Find clubs..."
@@ -71,9 +57,7 @@ export default function ClubsPageClient() {
 								key={view.value}
 								onClick={() => setCurrentView(view.value)}
 								className={`p-2 rounded-lg transition-all ${
-									currentView === view.value
-										? "bg-white/10 text-white shadow-sm"
-										: "text-muted hover:text-white hover:bg-white/5"
+									currentView === view.value ? "bg-white/10 text-white shadow-sm" : "text-muted hover:text-white hover:bg-white/5"
 								}`}
 								title={view.label}>
 								<view.icon size={18} />
@@ -114,9 +98,7 @@ export default function ClubsPageClient() {
 
 function ClubGridCard({ club }: { club: Club }) {
 	return (
-		<Link
-			href={`/dashboard/clubs/${club.id}`}
-			className="group block h-full">
+		<Link href={`/dashboard/clubs/${club.id}`} className="group block h-full">
 			<div className="flex flex-col h-full rounded-2xl bg-white/5 border border-white/5 hover:border-accent/40 hover:bg-white/[0.07] hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-xl">
 				{/* Banner */}
 				<div className="h-24 bg-gradient-to-br from-accent/20 via-primary/10 to-transparent relative overflow-hidden rounded-t-2xl">
@@ -129,25 +111,15 @@ function ClubGridCard({ club }: { club: Club }) {
 					<div className="w-14 h-14 rounded-xl bg-background-light border-2 border-background flex items-center justify-center mb-3 overflow-hidden">
 						{club.logoUrl ? (
 							/* eslint-disable-next-line @next/next/no-img-element */
-							<img
-								src={club.logoUrl}
-								alt={club.name}
-								className="w-full h-full object-cover"
-							/>
+							<img src={club.logoUrl} alt={club.name} className="w-full h-full object-cover" />
 						) : (
 							<Shield className="text-muted/50 w-6 h-6" />
 						)}
 					</div>
 
-					<h3 className="font-bold text-white leading-tight mb-1 truncate group-hover:text-accent transition-colors">
-						{club.name}
-					</h3>
+					<h3 className="font-bold text-white leading-tight mb-1 truncate group-hover:text-accent transition-colors">{club.name}</h3>
 
-					{club.description && (
-						<p className="text-xs text-muted line-clamp-2 mb-3">
-							{club.description}
-						</p>
-					)}
+					{club.description && <p className="text-xs text-muted line-clamp-2 mb-3">{club.description}</p>}
 
 					<div className="mt-auto pt-3 border-t border-white/5 flex items-center gap-3 text-xs text-muted">
 						<span className="flex items-center gap-1">
@@ -183,11 +155,7 @@ function ClubListView({ clubs }: { clubs: Club[] }) {
 					<div className="w-12 h-12 rounded-xl bg-background-light border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
 						{club.logoUrl ? (
 							/* eslint-disable-next-line @next/next/no-img-element */
-							<img
-								src={club.logoUrl}
-								alt={club.name}
-								className="w-full h-full object-cover"
-							/>
+							<img src={club.logoUrl} alt={club.name} className="w-full h-full object-cover" />
 						) : (
 							<Shield className="text-muted/50 w-5 h-5" />
 						)}
@@ -195,9 +163,7 @@ function ClubListView({ clubs }: { clubs: Club[] }) {
 
 					{/* Info */}
 					<div className="flex-1 min-w-0">
-						<h3 className="font-bold text-white truncate group-hover:text-accent transition-colors">
-							{club.name}
-						</h3>
+						<h3 className="font-bold text-white truncate group-hover:text-accent transition-colors">{club.name}</h3>
 						<div className="flex items-center gap-3 text-xs text-muted mt-1">
 							<span className="flex items-center gap-1">
 								<Users size={12} />
@@ -223,23 +189,14 @@ function EmptyState() {
 			<div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 text-muted">
 				<Shield size={32} />
 			</div>
-			<h3 className="text-xl font-bold text-white mb-2">
-				No clubs found
-			</h3>
-			<p className="text-muted max-w-sm mb-6">
-				We couldn&apos;t find any clubs matching your search. Try
-				adjusting filters or create a new one.
-			</p>
+			<h3 className="text-xl font-bold text-white mb-2">No clubs found</h3>
+			<p className="text-muted max-w-sm mb-6">We couldn&apos;t find any clubs matching your search. Try adjusting filters or create a new one.</p>
 			<div className="flex gap-4">
-				<Link
-					href="/clubs"
-					className="btn btn-outline text-white border-white/20 hover:bg-white hover:text-black">
+				<Link href="/clubs" className="btn btn-outline text-white border-white/20 hover:bg-white hover:text-black">
 					<Search size={16} />
 					Find Club
 				</Link>
-				<Link
-					href="/clubs/create"
-					className="btn btn-outline text-white border-white/20 hover:bg-white hover:text-black">
+				<Link href="/clubs/create" className="btn btn-outline text-white border-white/20 hover:bg-white hover:text-black">
 					<Plus size={16} />
 					Create Club
 				</Link>
