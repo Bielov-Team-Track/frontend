@@ -1,6 +1,6 @@
 import TeamsEditSection from "@/components/features/teams/components/TeamEditSection";
 import { loadEvent, loadEvents } from "@/lib/api/events";
-import moment from "moment";
+import { format } from "date-fns";
 import { notFound } from "next/navigation";
 
 async function EventEditPage({ params }: Params) {
@@ -18,7 +18,7 @@ async function EventEditPage({ params }: Params) {
 	return (
 		<div className="flex flex-col w-full gap-4">
 			<h1 className="text-2xl text-muted-100 self-center">
-				{moment(event.startTime).format("DD MMMM, YYYY")}
+				{format(new Date(event.startTime), "dd MMMM, yyyy")}
 			</h1>
 			{/* <EventEditForm event={event} locations={locations}>
         <button className="btn w-full text-muted-100 btn-success">

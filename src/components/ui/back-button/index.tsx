@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import React from "react";
-import { FiArrowLeft as BackIcon } from "react-icons/fi";
+import { ArrowLeft as BackIcon } from "lucide-react";
 
 function BackButton() {
 	const router = useRouter();

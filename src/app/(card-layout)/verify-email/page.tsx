@@ -5,7 +5,7 @@ import { verifyEmail } from "@/lib/api/auth";
 import { useAuth } from "@/providers";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect } from "react";
-import { FaCheck } from "react-icons/fa6";
+import { Check } from "lucide-react";
 
 const VerifyEmailPageContent = () => {
 	const [error, setError] = React.useState<string | null>(null);
@@ -98,7 +98,7 @@ const VerifyEmailPageContent = () => {
 			) : (
 				<>
 					<div className="flex items-center justify-center gap-2">
-						<FaCheck size={"24px"} />
+						<Check size={24} />
 						<h2 className="">Your email is verified!</h2>
 					</div>
 					<p>

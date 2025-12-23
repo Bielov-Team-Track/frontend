@@ -4,11 +4,7 @@ import { Team as TeamModel } from "@/lib/models/Team";
 import { Avatar, Button, Loader } from "@/components/ui";
 import Link from "next/link";
 import { updateParticipantPaymentStatus } from "@/lib/api/events";
-import {
-	FaCheckCircle,
-	FaEllipsisH,
-	FaExclamationCircle,
-} from "react-icons/fa";
+import { CheckCircle, MoreHorizontal, AlertCircle } from "lucide-react";
 
 const AuditPostition = ({
 	position,
@@ -78,16 +74,16 @@ const AuditPostition = ({
 			<div className="flex gap-4 items-center">
 				{defaultPosition.eventParticipant?.payment?.status === "completed" ? (
 					<div className="tooltip" data-tip="Paid">
-						<FaCheckCircle className="text-success" />
+						<CheckCircle size={16} className="text-success" />
 					</div>
 				) : (
 					<div className="tooltip" data-tip="Pending">
-						<FaExclamationCircle className="text-warning" />
+						<AlertCircle size={16} className="text-warning" />
 					</div>
 				)}
 				<div className="dropdown dropdown-end z-50">
 					<div tabIndex={0} role="button" className="cursor-pointer">
-						<FaEllipsisH />
+						<MoreHorizontal size={16} />
 					</div>
 					<ul
 						tabIndex={0}

@@ -6,8 +6,7 @@ import { cancelEvent } from "@/lib/api/events";
 import { createEventChat } from "@/lib/api/messages";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
-import { FaExclamationTriangle } from "react-icons/fa";
-import { MessageCircle } from "lucide-react";
+import { AlertTriangle, MessageCircle } from "lucide-react";
 import { toast } from "react-toastify";
 
 type EventPageButtonsProps = {
@@ -90,7 +89,7 @@ const EventPageButtons = ({ event, participantIds = [] }: EventPageButtonsProps)
 				onClose={() => !isCancelling && setShowCancelModal(false)}
 				isLoading={isCancelling}>
 				<div className="flex flex-col items-center gap-4 p-6">
-					<FaExclamationTriangle className="text-warning text-4xl" />
+					<AlertTriangle className="text-warning" size={40} />
 					<h2 className="text-xl font-bold text-center">
 						Cancel Event
 					</h2>

@@ -9,11 +9,10 @@ import TextArea from "@/components/ui/textarea";
 import { CreateClubRequest } from "@/lib/models/Club";
 import { createClub, updateClub, uploadClubImage } from "@/lib/api/clubs";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Image as ImageIcon, Shield } from "lucide-react";
+import { Image as ImageIcon, Shield, ArrowLeft, ArrowRight, Check, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { FaArrowLeft, FaArrowRight, FaCheck, FaImage, FaTrash } from "react-icons/fa";
 import * as yup from "yup";
 
 // --- Toast Component ---
@@ -341,14 +340,14 @@ export default function CreateClubPage() {
 											setBannerPreview(null);
 										}}
 										className="btn btn-sm btn-ghost text-red-400 border border-white/20 hover:bg-red-500/10">
-										<FaTrash />
+										<Trash size={14} />
 									</button>
 								</div>
 							</div>
 						</>
 					) : (
 						<label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors">
-							<FaImage
+							<ImageIcon
 								size={32}
 								className={`mb-2 transition-colors ${isDraggingBanner ? "text-primary" : "text-muted group-hover:text-white"}`}
 							/>
@@ -511,7 +510,7 @@ export default function CreateClubPage() {
 			</div>
 
 			<div className="bg-primary/10 border border-primary/20 rounded-lg p-4 flex items-start gap-3">
-				<FaCheck className="text-primary mt-1 shrink-0" />
+				<Check className="text-primary mt-1 shrink-0" size={16} />
 				<p className="text-sm text-primary-content/80">
 					By clicking &quot;Create Club&quot;, you agree to our Terms of Service. You will automatically be assigned as the owner.
 				</p>
@@ -549,7 +548,7 @@ export default function CreateClubPage() {
 										: "border-white/20 bg-background-dark text-muted"
 								}
                             `}>
-									{isCompleted ? <FaCheck size={12} /> : step.id}
+									{isCompleted ? <Check size={12} /> : step.id}
 								</div>
 								<span className={`text-xs md:text-sm font-medium hidden sm:block ${isActive ? "text-primary" : "text-muted"}`}>
 									{step.title}
@@ -578,13 +577,13 @@ export default function CreateClubPage() {
 						variant="ghost"
 						onClick={handleBack}
 						disabled={currentStep === 1 || isSubmitting}
-						leftIcon={<FaArrowLeft />}
+						leftIcon={<ArrowLeft size={16} />}
 						className="text-muted hover:text-white">
 						Back
 					</Button>
 
 					{currentStep < STEPS.length ? (
-						<Button variant="solid" color="primary" onClick={handleNext} rightIcon={<FaArrowRight />} className="px-8 shadow-lg shadow-primary/20">
+						<Button variant="solid" color="primary" onClick={handleNext} rightIcon={<ArrowRight size={16} />} className="px-8 shadow-lg shadow-primary/20">
 							Next Step
 						</Button>
 					) : (
@@ -594,7 +593,7 @@ export default function CreateClubPage() {
 							onClick={handleSubmit(onSubmit)}
 							loading={isSubmitting}
 							className="px-8 bg-green-600 hover:bg-green-700 text-white border-none shadow-lg shadow-green-600/20"
-							rightIcon={!isSubmitting && <FaCheck />}>
+							rightIcon={!isSubmitting && <Check size={16} />}>
 							Create Club
 						</Button>
 					)}

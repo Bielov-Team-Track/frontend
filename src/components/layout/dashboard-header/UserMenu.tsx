@@ -3,15 +3,10 @@
 import { UserProfile } from "@/lib/models/User";
 import Link from "next/link";
 import React, { useEffect, useRef } from "react";
-import { FiLogIn as LoginIcon, FiLogOut as LogoutIcon } from "react-icons/fi";
-import {
-	FaUserCircle as UserIcon,
-	FaCog as SettingsIcon,
-} from "react-icons/fa";
+import { LogIn as LoginIcon, LogOut as LogoutIcon, CircleUser as UserIcon, Settings as SettingsIcon, LayoutDashboard } from "lucide-react";
 import { Avatar, Button, Loader } from "@/components/ui";
 import { useAuth } from "@/providers";
 import { useRouter } from "next/navigation";
-import { MdOutlineSpaceDashboard } from "react-icons/md";
 
 function UserMenu({ user, isLoading }: UserMenuProps) {
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -30,7 +25,7 @@ function UserMenu({ user, isLoading }: UserMenuProps) {
 		{
 			href: "/dashboard/events",
 			label: "Dashboard",
-			icon: MdOutlineSpaceDashboard,
+			icon: LayoutDashboard,
 		},
 		{ href: "/profile/" + user?.userId, label: "Profile", icon: UserIcon },
 		{ href: "/profile/settings", label: "Settings", icon: SettingsIcon },

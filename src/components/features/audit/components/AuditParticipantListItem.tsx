@@ -1,8 +1,5 @@
 import { EventParticipant } from "@/lib/models/EventParticipant";
-import {
-	FaCheck as CheckIcon,
-	FaExclamation as ExclamationIcon,
-} from "react-icons/fa";
+import { Check, AlertTriangle } from "lucide-react";
 import { Avatar, Button } from "@/components";
 import { Event } from "@/lib/models/Event";
 import { useState } from "react";
@@ -51,7 +48,7 @@ const PaidParticipantListItem = ({
 	return (
 		<div className="flex justify-between items-center /60 rounded-lg p-4">
 			<div className="flex gap-2 items-center">
-				<CheckIcon className="text-green-500" />
+				<Check size={16} className="text-green-500" />
 				<Avatar profile={participant.userProfile} />
 				<div>
 					{participant.userProfile.name} {participant.userProfile.surname}
@@ -74,7 +71,7 @@ const UnpaidParticipantListItem = ({
 	return (
 		<div className="flex justify-between items-center bg-warning/10 rounded-lg p-4 border border-warning/20">
 			<div className="flex gap-2 items-center">
-				<ExclamationIcon className="text-warning" />
+				<AlertTriangle size={16} className="text-warning" />
 				<Avatar profile={participant.userProfile} />
 				<div>
 					<div className="font-medium">

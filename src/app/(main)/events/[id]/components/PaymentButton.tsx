@@ -3,7 +3,7 @@
 import { Button } from "@/components";
 import { createCheckoutSession } from "@/lib/api/payments";
 import { useState } from "react";
-import { FaCreditCard } from "react-icons/fa";
+import { CreditCard } from "lucide-react";
 
 interface PaymentButtonProps {
 	participantId: string;
@@ -37,7 +37,7 @@ export default function PaymentButton({
 		<div className="flex flex-col gap-2">
 			{error && <div className="text-sm text-error">{error}</div>}
 			<Button
-				leftIcon={<FaCreditCard />}
+				leftIcon={<CreditCard size={16} />}
 				onClick={handlePayment}
 				loading={isLoading}
 				disabled={isLoading}

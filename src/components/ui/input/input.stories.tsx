@@ -1,13 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import Input from "./index";
-import {
-	FaUser,
-	FaEnvelope,
-	FaLock,
-	FaSearch,
-	FaPhone,
-	FaCalendarAlt,
-} from "react-icons/fa";
+import { User, Mail, Lock, Search, Phone, Calendar } from "lucide-react";
 
 const meta: Meta<typeof Input> = {
 	title: "UI/Input",
@@ -214,7 +207,7 @@ export const WithLeftIcon: Story = {
 	args: {
 		label: "Username",
 		placeholder: "Enter username",
-		leftIcon: <FaUser />,
+		leftIcon: <User size={16} />,
 	},
 };
 
@@ -222,7 +215,7 @@ export const WithRightIcon: Story = {
 	args: {
 		label: "Search",
 		placeholder: "Search...",
-		rightIcon: <FaSearch />,
+		rightIcon: <Search size={16} />,
 	},
 };
 
@@ -230,8 +223,8 @@ export const WithBothIcons: Story = {
 	args: {
 		label: "Email",
 		placeholder: "Enter email",
-		leftIcon: <FaEnvelope />,
-		rightIcon: <FaSearch />,
+		leftIcon: <Mail size={16} />,
+		rightIcon: <Search size={16} />,
 	},
 };
 
@@ -242,7 +235,7 @@ export const PasswordWithToggle: Story = {
 		type: "password",
 		placeholder: "Enter your password",
 		showPasswordToggle: true,
-		leftIcon: <FaLock />,
+		leftIcon: <Lock size={16} />,
 	},
 };
 
@@ -252,7 +245,7 @@ export const EmailInput: Story = {
 		label: "Email Address",
 		type: "email",
 		placeholder: "user@example.com",
-		leftIcon: <FaEnvelope />,
+		leftIcon: <Mail size={16} />,
 	},
 };
 
@@ -261,7 +254,7 @@ export const PhoneInput: Story = {
 		label: "Phone Number",
 		type: "tel",
 		placeholder: "+1 (555) 123-4567",
-		leftIcon: <FaPhone />,
+		leftIcon: <Phone size={16} />,
 	},
 };
 
@@ -280,7 +273,7 @@ export const SearchInput: Story = {
 		label: "Search",
 		type: "search",
 		placeholder: "Search events...",
-		leftIcon: <FaSearch />,
+		leftIcon: <Search size={16} />,
 	},
 };
 
@@ -336,14 +329,14 @@ export const LoginForm: Story = {
 				label="Email"
 				type="email"
 				placeholder="Enter your email"
-				leftIcon={<FaEnvelope />}
+				leftIcon={<Mail size={16} />}
 				required
 			/>
 			<Input
 				label="Password"
 				type="password"
 				placeholder="Enter your password"
-				leftIcon={<FaLock />}
+				leftIcon={<Lock size={16} />}
 				showPasswordToggle
 				required
 			/>
@@ -365,24 +358,24 @@ export const ProfileForm: Story = {
 			<Input
 				label="Full Name"
 				placeholder="Enter your full name"
-				leftIcon={<FaUser />}
+				leftIcon={<User size={16} />}
 				required
 			/>
 			<Input
 				label="Email Address"
 				type="email"
 				placeholder="user@example.com"
-				leftIcon={<FaEnvelope />}
+				leftIcon={<Mail size={16} />}
 				required
 			/>
 			<Input
 				label="Phone Number"
 				type="tel"
 				placeholder="+1 (555) 123-4567"
-				leftIcon={<FaPhone />}
+				leftIcon={<Phone size={16} />}
 				helperText="Include country code"
 			/>
-			<Input label="Date of Birth" type="date" leftIcon={<FaCalendarAlt />} />
+			<Input label="Date of Birth" type="date" leftIcon={<Calendar size={16} />} />
 		</div>
 	),
 	parameters: {
@@ -401,19 +394,19 @@ export const ValidationStates: Story = {
 			<Input
 				label="Valid Input"
 				value="john@example.com"
-				leftIcon={<FaEnvelope />}
+				leftIcon={<Mail size={16} />}
 				helperText="This email is available"
 			/>
 			<Input
 				label="Invalid Email"
 				value="invalid-email"
-				leftIcon={<FaEnvelope />}
+				leftIcon={<Mail size={16} />}
 				error="Please enter a valid email address"
 			/>
 			<Input
 				label="Required Field"
 				placeholder="This field is required"
-				leftIcon={<FaUser />}
+				leftIcon={<User size={16} />}
 				error="This field cannot be empty"
 				required
 			/>
@@ -461,7 +454,7 @@ export const InteractiveExamples: Story = {
 				<h3 className="text-lg font-semibold mb-4">Search with Icon</h3>
 				<Input
 					placeholder="Search events, players, teams..."
-					leftIcon={<FaSearch />}
+					leftIcon={<Search size={16} />}
 					variant="bordered"
 				/>
 			</div>
@@ -472,7 +465,7 @@ export const InteractiveExamples: Story = {
 					label="Password"
 					type="password"
 					placeholder="Enter secure password"
-					leftIcon={<FaLock />}
+					leftIcon={<Lock size={16} />}
 					showPasswordToggle
 					helperText="Click the eye icon to show/hide password"
 				/>
@@ -483,7 +476,7 @@ export const InteractiveExamples: Story = {
 				<Input
 					label="Username"
 					placeholder="Choose a unique username"
-					leftIcon={<FaUser />}
+					leftIcon={<User size={16} />}
 					required
 					helperText="Must be 3-20 characters long"
 				/>

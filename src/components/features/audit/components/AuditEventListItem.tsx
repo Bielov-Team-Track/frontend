@@ -2,10 +2,7 @@ import Link from "@/components/ui/link";
 import { Event } from "@/lib/models/Event";
 import { loadParticipants } from "@/lib/api/events";
 import { getFormattedDateWithDay } from "@/lib/utils/date";
-import {
-	FaCheck as CheckIcon,
-	FaExclamation as ExclamationIcon,
-} from "react-icons/fa";
+import { Check, AlertTriangle } from "lucide-react";
 
 type AuditEventItemProps = {
 	event: Event;
@@ -26,9 +23,9 @@ const AuditEventItem = async ({ event }: AuditEventItemProps) => {
 			<div className="flex items-center">
 				<div className="flex">
 					{isClosed ? (
-						<CheckIcon />
+						<Check size={16} />
 					) : (
-						<ExclamationIcon className="text-warning" />
+						<AlertTriangle size={16} className="text-warning" />
 					)}
 				</div>
 				<Link href={`/dashboard/events/${event.id}`} className="px-0">

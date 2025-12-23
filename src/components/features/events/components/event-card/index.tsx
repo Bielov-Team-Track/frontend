@@ -4,13 +4,10 @@ import {
 	getFormattedDateWithDay,
 	getFormattedTime,
 } from "@/lib/utils/date";
-import classNames from "classnames";
+import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
-import { FaCalendar as CalendarIcon } from "react-icons/fa";
-import { FaMap as MapIcon } from "react-icons/fa";
-import { FaClock as ClockIcon } from "react-icons/fa";
-import { FaVolleyballBall as VolleyballIcon } from "react-icons/fa";
+import { Calendar as CalendarIcon, Map as MapIcon, Clock as ClockIcon, Circle as VolleyballIcon } from "lucide-react";
 
 type EventCardProps = {
 	event: Event;
@@ -36,7 +33,7 @@ const EventCard = ({ event, variant = "horizontal" }: EventCardProps) => {
 	return (
 		<Link href={`/events/${event.id}`}>
 			<div
-				className={classNames(
+				className={clsx(
 					variantClasses[variant],
 					"rounded-lg relative bg-background-light shadow-md shadow-black/50 overflow-hidden cursor-pointer",
 					"transition-all duration-200 ease-in-out transform-gpu",
@@ -46,7 +43,7 @@ const EventCard = ({ event, variant = "horizontal" }: EventCardProps) => {
 			>
 				{
 					<div
-						className={classNames(
+						className={clsx(
 							imageVariantClasses[variant],
 							"aspect-square h-32 bg-secondary self-stretch grid place-items-center",
 						)}
@@ -65,7 +62,7 @@ const EventCard = ({ event, variant = "horizontal" }: EventCardProps) => {
 					</div>
 				}
 				<div
-					className={classNames(
+					className={clsx(
 						contentVariantClasses[variant],
 						"flex flex-col justify-between min-w-0 flex-1",
 					)}

@@ -1,12 +1,6 @@
-import classNames from "classnames";
+import clsx from "clsx";
 import React from "react";
-import {
-	FaInfoCircle,
-	FaExclamationTriangle,
-	FaTimesCircle,
-	FaCheckCircle,
-	FaCog,
-} from "react-icons/fa";
+import { Info, AlertTriangle, XCircle, CheckCircle } from "lucide-react";
 
 export type SectionVariant =
 	| "info"
@@ -54,13 +48,13 @@ const Section: React.FC<SectionProps> = ({
 	const getDefaultIcon = () => {
 		switch (variant) {
 			case "info":
-				return <FaInfoCircle className="text-info" />;
+				return <Info className="text-info" />;
 			case "warning":
-				return <FaExclamationTriangle className="text-warning" />;
+				return <AlertTriangle className="text-warning" />;
 			case "error":
-				return <FaTimesCircle className="text-error" />;
+				return <XCircle className="text-error" />;
 			case "success":
-				return <FaCheckCircle className="text-success" />;
+				return <CheckCircle className="text-success" />;
 		}
 	};
 
@@ -69,7 +63,7 @@ const Section: React.FC<SectionProps> = ({
 	const baseClasses = "p-4 pl-8 border-l-4 rounded-lg flex items-center gap-8";
 
 	return (
-		<div className={classNames(getVariantClasses(), baseClasses, className)}>
+		<div className={clsx(getVariantClasses(), baseClasses, className)}>
 			<div className="flex-1">
 				<div className="flex items-center gap-3 mb-1">
 					{displayIcon && (

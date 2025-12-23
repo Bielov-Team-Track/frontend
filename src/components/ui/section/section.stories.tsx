@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import Section from "./index";
-import { FaCreditCard, FaBell } from "react-icons/fa";
+import { CreditCard, Bell } from "lucide-react";
 
 const meta: Meta<typeof Section> = {
 	title: "UI/Section",
@@ -86,7 +86,7 @@ export const CustomIcon: Story = {
 		variant: "info",
 		title: "Payment Account",
 		description: "Manage your payment settings and account information.",
-		icon: <FaCreditCard className="text-primary text-xl" />,
+		icon: <CreditCard size={20} className="text-primary" />,
 		children: (
 			<div className="space-y-2">
 				<p>
@@ -126,7 +126,7 @@ export const PaymentSetup: Story = {
 		title: "Payment Account Setup Required",
 		description:
 			"To accept card payments for your events, you need to set up a payment account.",
-		icon: <FaCreditCard className="text-warning text-xl" />,
+		icon: <CreditCard size={20} className="text-warning" />,
 		children: (
 			<div className="space-y-3">
 				<p className="text-sm">Setting up a payment account allows you to:</p>
@@ -151,7 +151,7 @@ export const MultipleActions: Story = {
 		variant: "neutral",
 		title: "Event Management",
 		description: "Manage your volleyball events and settings.",
-		icon: <FaBell className="text-primary text-xl" />,
+		icon: <Bell size={20} className="text-primary" />,
 		children: (
 			<div className="stats stats-horizontal shadow-sm bg-base-100">
 				<div className="stat">

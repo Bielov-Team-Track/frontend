@@ -3,24 +3,6 @@ import type { Config } from "tailwindcss";
 const config: Config = {
 	darkMode: "class",
 	content: ["./src/pages/**/*.{js,ts,jsx,tsx,mdx}", "./src/components/**/*.{js,ts,jsx,tsx,mdx}", "./src/app/**/*.{js,ts,jsx,tsx,mdx}"],
-	plugins: [require("tailwindcss-animate"), require("daisyui")],
-	daisyui: {
-		themes: [
-			{
-				mainTheme: {
-					primary: "hsl(184 50% 32%)",
-					secondary: "hsl(11 69% 44%)",
-					accent: "hsl(29 100% 50%)",
-					neutral: "hsl(0 0% 70%)",
-					"base-100": "hsl(0 0% 13%)",
-					info: "hsl(199 89% 48%)",
-					success: "hsl(142 71% 45%)",
-					warning: "hsl(38 92% 50%)",
-					error: "hsl(11 69% 44%)",
-				},
-			},
-		],
-	},
 	theme: {
 		screens: {
 			xs: "475px",

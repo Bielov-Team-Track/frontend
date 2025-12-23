@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, ReactNode } from "react";
-import { FiLock } from "react-icons/fi";
+import { Lock } from "lucide-react";
 
 function BlockOverlay({
 	reason,
@@ -10,7 +10,7 @@ function BlockOverlay({
 		<div
 			className={`absolute inset-0 bg-black/75 flex flex-col justify-center gap-4 items-center z-40  ${className}`}
 		>
-			<FiLock size={24} />
+			<Lock size={24} />
 			<span>{reason}</span>
 			{children}
 		</div>

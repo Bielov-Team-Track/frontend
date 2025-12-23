@@ -4,7 +4,7 @@ import React, { useState, Suspense } from "react";
 import { sendVerification } from "@/lib/api/auth";
 import Loader from "@/components/ui/loader";
 import { Button } from "@/components";
-import { FaEnvelope } from "react-icons/fa6";
+import { Mail } from "lucide-react";
 import Link from "next/link";
 
 function EmailVerificationContent() {
@@ -32,7 +32,7 @@ function EmailVerificationContent() {
 		<>
 			<div className="flex flex-col gap-4 justify-center items-center text-center">
 				<div className="flex gap-2 items-center">
-					<FaEnvelope size={"24px"} />
+					<Mail size={24} />
 					<h1 className="text-2xl font-bold">Verification email sent</h1>
 				</div>
 				<p className="text-primary-content/70">

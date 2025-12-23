@@ -2,7 +2,7 @@
 
 import React from "react";
 import RadioButton, { RadioButtonProps } from "./index";
-import { FaExclamationCircle } from "react-icons/fa";
+import { AlertCircle } from "lucide-react";
 import { responsiveClasses } from "@/lib/utils/responsive";
 
 export interface RadioGroupOption {
@@ -122,7 +122,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
 			{/* Error Message */}
 			{error && (
 				<div className="flex items-center gap-1 mt-2 text-red-600">
-					<FaExclamationCircle size={12} />
+					<AlertCircle size={12} />
 					<span className={responsiveClasses.text.caption}>{error}</span>
 				</div>
 			)}

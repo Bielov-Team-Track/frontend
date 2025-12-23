@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components";
 import Link from "next/link";
-import { FaCheckCircle, FaSpinner } from "react-icons/fa";
+import { CheckCircle } from "lucide-react";
 import { redirect } from "next/navigation";
 import client from "@/lib/api/client";
 
@@ -40,7 +40,7 @@ async function PaymentSuccessPage({ searchParams }: SuccessPageParams) {
 			<div className="max-w-md w-full text-center">
 				<div className="mb-6 flex justify-center">
 					<div className="rounded-full bg-success/20 p-6">
-						<FaCheckCircle className="text-success text-6xl" />
+						<CheckCircle className="text-success" size={64} />
 					</div>
 				</div>
 

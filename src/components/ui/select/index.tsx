@@ -1,5 +1,5 @@
 import React, { forwardRef } from "react";
-import { FaChevronDown, FaExclamationCircle } from "react-icons/fa";
+import { AlertCircle } from "lucide-react";
 import { responsiveClasses } from "@/lib/utils/responsive";
 
 export interface SelectOption {
@@ -154,7 +154,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 				{/* Error Message */}
 				{error && (
 					<div className="flex items-center gap-1 mt-1 text-red-600">
-						<FaExclamationCircle size={12} />
+						<AlertCircle size={12} />
 						<span className={responsiveClasses.text.caption}>{error}</span>
 					</div>
 				)}

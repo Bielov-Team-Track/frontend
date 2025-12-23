@@ -4,16 +4,16 @@ import { Avatar, Button } from "@/components";
 import { PlayerProfile, VolleyballPosition } from "@/lib/models/User";
 import { cn } from "@/lib/utils";
 import {
-	FaBell,
-	FaEnvelope,
-	FaMapMarkerAlt,
-	FaCalendarAlt,
-	FaTrophy,
-	FaVolleyballBall,
-	FaRulerVertical,
-	FaArrowUp,
-	FaHandPaper,
-} from "react-icons/fa";
+	Bell,
+	Mail,
+	MapPin,
+	Calendar,
+	Trophy,
+	Circle,
+	Ruler,
+	ArrowUp,
+	Hand,
+} from "lucide-react";
 import SkillRatingBar from "./SkillRatingBar";
 import StatCard from "./StatCard";
 import { BadgeGrid } from "./BadgeDisplay";
@@ -87,13 +87,13 @@ const PlayerProfileCard = ({
 						<div className="flex flex-wrap gap-4 text-sm text-gray-400">
 							{player.location && (
 								<div className="flex items-center gap-1.5">
-									<FaMapMarkerAlt className="text-primary" />
+									<MapPin size={14} className="text-primary" />
 									<span>{player.location}</span>
 								</div>
 							)}
 							{player.memberSince && (
 								<div className="flex items-center gap-1.5">
-									<FaCalendarAlt className="text-primary" />
+									<Calendar size={14} className="text-primary" />
 									<span>
 										Joined{" "}
 										{new Date(player.memberSince).toLocaleDateString("en-US", {
@@ -105,7 +105,7 @@ const PlayerProfileCard = ({
 							)}
 							{player.yearsPlaying && (
 								<div className="flex items-center gap-1.5">
-									<FaVolleyballBall className="text-primary" />
+									<Circle size={14} className="text-primary" />
 									<span>{player.yearsPlaying} years playing</span>
 								</div>
 							)}
@@ -132,7 +132,7 @@ const PlayerProfileCard = ({
 					{!isOwnProfile && (
 						<div className="flex flex-col gap-2 w-full md:w-auto">
 							<Button
-								leftIcon={<FaEnvelope />}
+								leftIcon={<Mail size={16} />}
 								onClick={onMessage}
 								variant="solid"
 								color="primary">
@@ -140,7 +140,7 @@ const PlayerProfileCard = ({
 							</Button>
 							{player.isFollowing ? (
 								<Button
-									leftIcon={<FaBell />}
+									leftIcon={<Bell size={16} />}
 									onClick={onUnfollow}
 									variant="outline"
 									color="neutral">
@@ -148,7 +148,7 @@ const PlayerProfileCard = ({
 								</Button>
 							) : (
 								<Button
-									leftIcon={<FaBell />}
+									leftIcon={<Bell size={16} />}
 									onClick={onFollow}
 									variant="ghost"
 									color="primary">
@@ -164,13 +164,13 @@ const PlayerProfileCard = ({
 			{(player.height || player.verticalJump || player.reach) && (
 				<div className="bg-base-200 px-6 md:px-8 py-6 border-t border-base-300">
 					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-						<FaRulerVertical className="text-primary" />
+						<Ruler size={18} className="text-primary" />
 						Physical Attributes
 					</h2>
 					<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 						{player.height && (
 							<StatCard
-								icon={<FaRulerVertical />}
+								icon={<Ruler size={16} />}
 								label="Height"
 								value={`${player.height}`}
 								subValue="cm"
@@ -178,7 +178,7 @@ const PlayerProfileCard = ({
 						)}
 						{player.verticalJump && (
 							<StatCard
-								icon={<FaArrowUp />}
+								icon={<ArrowUp size={16} />}
 								label="Vertical Jump"
 								value={`${player.verticalJump}`}
 								subValue="cm"
@@ -186,7 +186,7 @@ const PlayerProfileCard = ({
 						)}
 						{player.reach && (
 							<StatCard
-								icon={<FaHandPaper />}
+								icon={<Hand size={16} />}
 								label="Reach"
 								value={`${player.reach}`}
 								subValue="cm"
@@ -206,7 +206,7 @@ const PlayerProfileCard = ({
 			{player.preferredPositions && player.preferredPositions.length > 0 && (
 				<div className="bg-base-200 px-6 md:px-8 py-6 border-t border-base-300">
 					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-						<FaVolleyballBall className="text-primary" />
+						<Circle size={18} className="text-primary" />
 						Preferred Positions
 					</h2>
 					<div className="flex flex-wrap gap-2">
@@ -271,7 +271,7 @@ const PlayerProfileCard = ({
 			{player.stats && (
 				<div className="bg-base-200 px-6 md:px-8 py-6 border-t border-base-300">
 					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-						<FaTrophy className="text-primary" />
+						<Trophy size={18} className="text-primary" />
 						Statistics
 					</h2>
 					<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">

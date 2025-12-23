@@ -8,7 +8,7 @@ import {
 	loadTeamPayments,
 	loadUserPaymentForEvent,
 } from "@/lib/api/payments";
-import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
+import { CheckCircle, AlertCircle } from "lucide-react";
 import PaymentButton from "./PaymentButton";
 
 type PaymentsSectionProps = {
@@ -56,14 +56,14 @@ const PaymentsSection = async ({
 		if (payment?.status === "completed") {
 			return (
 				<div className="text-green-500 flex gap-1 items-center">
-					<FaCheckCircle />
+					<CheckCircle size={14} />
 					{iconOnly ? "" : "Paid"}
 				</div>
 			);
 		} else {
 			return (
 				<div className="text-orange-500 flex gap-1 items-center">
-					<FaExclamationCircle /> {iconOnly ? "" : "Pending"}
+					<AlertCircle size={14} /> {iconOnly ? "" : "Pending"}
 				</div>
 			);
 		}

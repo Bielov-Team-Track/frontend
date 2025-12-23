@@ -1,5 +1,5 @@
 import { Chat as ChatModel } from "@/lib/models/Messages";
-import classNames from "classnames";
+import { clsx } from "clsx";
 import { MessageCircle } from "lucide-react";
 import Image from "next/image";
 
@@ -56,7 +56,7 @@ const Chat = ({ chat, active, onClick }: ChatProps) => {
 					)}
 				</div>
 				<span
-					className={classNames(
+					className={clsx(
 						"text-xs text-ellipsis overflow-hidden whitespace-nowrap",
 						chat.unreadCount > 0
 							? "text-white font-medium"

@@ -7,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
-import { FaLock } from "react-icons/fa6";
+import { Lock } from "lucide-react";
 
 const schema = yup.object().shape({
 	newPassword: yup.string().required("New password is required"),
@@ -68,7 +68,7 @@ function ResetPasswordForm({ onPasswordReset, token }: ResetPasswordFormProps) {
 							type="password"
 							className="input"
 							label="Password"
-							leftIcon={<FaLock />}
+							leftIcon={<Lock size={16} />}
 							showPasswordToggle
 							required={true}
 						/>
@@ -89,7 +89,7 @@ function ResetPasswordForm({ onPasswordReset, token }: ResetPasswordFormProps) {
 							type="password"
 							className="input"
 							label="Confirm Password"
-							leftIcon={<FaLock />}
+							leftIcon={<Lock size={16} />}
 							showPasswordToggle
 							required={true}
 						/>

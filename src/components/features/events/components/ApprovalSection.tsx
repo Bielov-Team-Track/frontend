@@ -1,7 +1,6 @@
 "use client";
 
-import { FiAlertCircle, FiXCircle } from "react-icons/fi";
-import { FaRegHourglassHalf } from "react-icons/fa6";
+import { AlertCircle, XCircle, Hourglass } from "lucide-react";
 import {
 	checkUserApproval,
 	requestApproval as requestApprovalRequest,
@@ -37,7 +36,7 @@ function ApprovalSection({
 			{isLoading && <Loader />}
 			{!approval ? (
 				<div className="flex flex-col items-center gap-4 text-center">
-					<FiAlertCircle size={48} />
+					<AlertCircle size={48} />
 					<span>
 						To access this event you need to ask orginizers for approval
 					</span>
@@ -47,13 +46,13 @@ function ApprovalSection({
 				</div>
 			) : approval.approved == null ? (
 				<div className="flex flex-col items-center gap-4 text-center">
-					<FaRegHourglassHalf size={48} />
+					<Hourglass size={48} />
 					<span>Your approval is pending</span>
 				</div>
 			) : (
 				!approval.approved && (
 					<div className="flex flex-col items-center gap-4 text-center">
-						<FiXCircle size={48} />
+						<XCircle size={48} />
 						<span>This event is unavailable to you</span>
 					</div>
 				)

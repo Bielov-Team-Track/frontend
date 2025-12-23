@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ChangeEvent, useState } from "react";
-import classNames from "classnames";
+import { clsx } from "clsx";
 import type { AxiosError } from "axios";
 
 // Temporary stub; replace with real component implementation
@@ -67,7 +67,7 @@ function ProfileCreate() {
 
 	return (
 		<div>
-			<div className={classNames({ hidden: step != 3 }, "flex flex-col gap-4")}>
+			<div className={clsx({ hidden: step != 3 }, "flex flex-col gap-4")}>
 				<div>
 					<label htmlFor="name">Name</label>
 					<input
@@ -96,7 +96,7 @@ function ProfileCreate() {
 				</button>
 			</div>
 
-			<div className={classNames({ hidden: step != 4 }, "flex flex-col gap-4")}>
+			<div className={clsx({ hidden: step != 4 }, "flex flex-col gap-4")}>
 				<div>
 					<label htmlFor="image">Image</label>
 					<input
@@ -118,7 +118,7 @@ function ProfileCreate() {
 					Skip
 				</button>
 				<button
-					className={classNames("btn btn-success text-muted-100", {
+					className={clsx("btn btn-success text-muted-100", {
 						disabled: !!imageFile,
 					})}
 					onClick={() => setStep(5)}

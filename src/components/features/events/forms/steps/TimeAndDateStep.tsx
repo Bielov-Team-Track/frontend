@@ -1,7 +1,6 @@
 import { Controller } from "react-hook-form";
 import { Input } from "@/components/ui";
-import { FaCalendar, FaClock } from "react-icons/fa";
-import { Clock } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import { getDuration } from "@/lib/utils/date";
 import { useEventFormContext } from "../context/EventFormContext";
 
@@ -31,7 +30,7 @@ export function TimeAndDateStep() {
 								{...field}
 								type="datetime-local"
 								label="Start Date & Time"
-								leftIcon={<FaCalendar />}
+								leftIcon={<Calendar size={16} />}
 								error={errors.startTime?.message}
 								helperText="Choose when your event begins"
 								value={
@@ -55,7 +54,7 @@ export function TimeAndDateStep() {
 								{...field}
 								type="datetime-local"
 								label="End Date & Time"
-								leftIcon={<FaClock />}
+								leftIcon={<Clock size={16} />}
 								error={errors.endTime?.message}
 								helperText="Choose when your event ends"
 								value={

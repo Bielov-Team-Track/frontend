@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ChangeEvent, useRef, useState } from "react";
-import { FaEnvelope, FaLock, FaUser } from "react-icons/fa6";
+import { Mail, Lock } from "lucide-react";
 import { register as registerUser } from "@/lib/api/auth";
 import { AxiosError } from "axios";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
@@ -97,7 +97,7 @@ function SignUpPage() {
 							type="email"
 							label="Email"
 							placeholder="Enter your email"
-							leftIcon={<FaEnvelope />}
+							leftIcon={<Mail size={16} />}
 							error={errors.email?.message}
 							required
 							onChange={(e) => {
@@ -117,7 +117,7 @@ function SignUpPage() {
 							type="password"
 							label="Password"
 							placeholder="Enter your password"
-							leftIcon={<FaLock />}
+							leftIcon={<Lock size={16} />}
 							showPasswordToggle
 							error={errors.password?.message}
 							required
@@ -138,7 +138,7 @@ function SignUpPage() {
 							type="password"
 							label="Confirm Password"
 							placeholder="Confirm your password"
-							leftIcon={<FaLock />}
+							leftIcon={<Lock size={16} />}
 							showPasswordToggle
 							error={errors.confirmPassword?.message}
 							required

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { FaMapMarkerAlt, FaTimes } from "react-icons/fa";
+import { MapPin, X } from "lucide-react";
 import { responsiveClasses } from "@/lib/utils/responsive";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
@@ -194,7 +194,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
 			<div className="relative">
 				<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-					<FaMapMarkerAlt className="/60" size={16} />
+					<MapPin className="opacity-60" size={16} />
 				</div>
 
 				<input
@@ -216,7 +216,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 						onClick={handleClearInput}
 						className="absolute inset-y-0 right-0 pr-3 flex items-center /60 hover: z-10"
 					>
-						<FaTimes size={12} />
+						<X size={12} />
 					</button>
 				)}
 
@@ -242,7 +242,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 							className="w-full text-left px-4 py-3 hover:bg-base-200 focus:bg-base-200 focus:outline-none border-b border-base-300 last:border-b-0"
 						>
 							<div className="flex items-start gap-3">
-								<FaMapMarkerAlt
+								<MapPin
 									className="text-primary mt-1 flex-shrink-0"
 									size={14}
 								/>

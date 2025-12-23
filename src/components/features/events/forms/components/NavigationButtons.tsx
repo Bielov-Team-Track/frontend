@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui";
-import { FaArrowLeft, FaArrowRight, FaCheck } from "react-icons/fa";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { useEventFormContext } from "../context/EventFormContext";
 
 export function NavigationButtons() {
@@ -15,7 +15,7 @@ export function NavigationButtons() {
 				onClick={prevStep}
 				color={"neutral"}
 				disabled={isFirstStep || isPending}
-				leftIcon={<FaArrowLeft />}
+				leftIcon={<ArrowLeft size={16} />}
 				className="text-muted hover:text-white">
 				Back
 			</Button>
@@ -26,7 +26,7 @@ export function NavigationButtons() {
 					variant="solid"
 					color="primary"
 					onClick={nextStep}
-					rightIcon={<FaArrowRight />}
+					rightIcon={<ArrowRight size={16} />}
 					className="px-8 shadow-lg shadow-primary/20">
 					Next Step
 				</Button>
@@ -39,7 +39,7 @@ export function NavigationButtons() {
 					loading={isPending}
 					onClick={handleSubmit(saveEvent)}
 					className="px-8 bg-green-600 hover:bg-green-700 text-white border-none shadow-lg shadow-green-600/20"
-					rightIcon={!isPending ? <FaCheck /> : undefined}>
+					rightIcon={!isPending ? <Check size={16} /> : undefined}>
 					{isPending ? "Creating..." : "Create Event"}
 				</Button>
 			)}

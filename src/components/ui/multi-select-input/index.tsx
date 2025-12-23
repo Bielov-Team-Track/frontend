@@ -2,7 +2,7 @@
 
 import { responsiveClasses } from "@/lib/utils/responsive";
 import React, { forwardRef, useState } from "react";
-import { FaExclamationCircle, FaTimes } from "react-icons/fa";
+import { AlertCircle, X } from "lucide-react";
 
 export interface MultiSelectInputProps<T> {
 	label?: string;
@@ -130,7 +130,7 @@ function MultiSelectInputInner<T>(
 								disabled={disabled}
 								className="hover:bg-primary/80 rounded-full p-0.5 transition-colors disabled:opacity-50"
 								aria-label={`Remove ${getItemLabel(item)}`}>
-								<FaTimes size={12} />
+								<X size={12} />
 							</button>
 						</div>
 					))}
@@ -176,7 +176,7 @@ function MultiSelectInputInner<T>(
 			{/* Error Message */}
 			{error && (
 				<div className="flex items-center gap-1 mt-1 text-red-600">
-					<FaExclamationCircle size={12} />
+					<AlertCircle size={12} />
 					<span className={responsiveClasses.text.caption}>
 						{error}
 					</span>

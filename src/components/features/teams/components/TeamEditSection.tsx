@@ -4,7 +4,7 @@ import { Event } from "@/lib/models/Event";
 import { Team } from "@/lib/models/Team";
 import { createTeam, loadTeams } from "@/lib/api/teams";
 import { useEffect, useState } from "react";
-import { FiPlus as PlusIcon } from "react-icons/fi";
+import { Plus as PlusIcon } from "lucide-react";
 import TeamsEditList from "./TeamsEditList";
 
 export default function TeamsEditSection({ event }: { event: Event }) {

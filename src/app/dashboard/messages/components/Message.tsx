@@ -6,7 +6,7 @@ import { stringToColor } from "@/lib/utils/color";
 import { getFormattedTime } from "@/lib/utils/date";
 import getUknownUser from "@/lib/utils/user";
 import { useQueryClient } from "@tanstack/react-query";
-import classNames from "classnames";
+import { clsx } from "clsx";
 import { Forward, Reply, SmilePlus } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
@@ -109,11 +109,11 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 	// Render deleted message
 	if (message?.isDeleted) {
 		return (
-			<div className={classNames("flex gap-2 p-4 items-start", currentUserMessage ? "flex-row-reverse" : "")}>
+			<div className={clsx("flex gap-2 p-4 items-start", currentUserMessage ? "flex-row-reverse" : "")}>
 				<div className="flex-grow-1 cursor-pointer">
 					<SenderAvatar />
 				</div>
-				<div className={classNames(currentUserMessage ? "text-right" : "text-left", "w-full")}>
+				<div className={clsx(currentUserMessage ? "text-right" : "text-left", "w-full")}>
 					<div className="inline-block p-2 rounded-lg max-w-[70%] bg-muted/5 italic text-muted">Message deleted</div>
 				</div>
 			</div>
@@ -121,11 +121,11 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 	}
 
 	return (
-		<div className={classNames("flex gap-2 p-4 items-start group", currentUserMessage ? "flex-row-reverse" : "")}>
+		<div className={clsx("flex gap-2 p-4 items-start group", currentUserMessage ? "flex-row-reverse" : "")}>
 			<div className="flex-grow-1 cursor-pointer">
 				<SenderAvatar />
 			</div>
-			<div className={classNames(currentUserMessage ? "text-right" : "text-left", "w-full")}>
+			<div className={clsx(currentUserMessage ? "text-right" : "text-left", "w-full")}>
 				{/* Reply indicator */}
 				{message.replyTo && (
 					<div className="text-xs text-muted bg-muted/10 p-2 rounded mb-1 max-w-[70%] inline-block">
@@ -144,7 +144,7 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 
 						{/* Reactions display */}
 						{message.reactions && message.reactions.length > 0 && (
-							<div className={classNames("flex gap-1 mt-1 flex-wrap", currentUserMessage ? "justify-end" : "justify-start")}>
+							<div className={clsx("flex gap-1 mt-1 flex-wrap", currentUserMessage ? "justify-end" : "justify-start")}>
 								{message.reactions.map((reaction) => (
 									<ReactionBadge
 										key={reaction.emoji}
@@ -161,13 +161,13 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 
 						{/* Reaction error */}
 						{reactionError && (
-							<div className={classNames("text-xs text-error mt-1", currentUserMessage ? "text-right" : "text-left")}>{reactionError}</div>
+							<div className={clsx("text-xs text-error mt-1", currentUserMessage ? "text-right" : "text-left")}>{reactionError}</div>
 						)}
 					</div>
 
 					{/* Message actions (reaction picker trigger, reply, forward) */}
 					<div
-						className={classNames(
+						className={clsx(
 							"absolute top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 bg-background/80 backdrop-blur-sm rounded-full border border-white/5 p-0.5 shadow-sm",
 							currentUserMessage ? "left-0 -translate-x-full mr-2" : "right-0 translate-x-full ml-2"
 						)}>

@@ -3,7 +3,7 @@
 import { Team } from "@/lib/models/Team";
 import React, { useEffect, useState } from "react";
 import { Position } from "@/lib/models/Position";
-import { FiPlus as PlusIcon, FiTrash2 as TrashIcon } from "react-icons/fi";
+import { Plus as PlusIcon, Trash2 as TrashIcon } from "lucide-react";
 import {
 	addPosition as addPositionRequest,
 	loadPositionTypes,

@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components";
 import Link from "next/link";
-import { FaTimesCircle } from "react-icons/fa";
+import { XCircle } from "lucide-react";
 
 async function PaymentCancelPage() {
 	return (
@@ -9,7 +9,7 @@ async function PaymentCancelPage() {
 			<div className="max-w-md w-full text-center">
 				<div className="mb-6 flex justify-center">
 					<div className="rounded-full bg-warning/20 p-6">
-						<FaTimesCircle className="text-warning text-6xl" />
+						<XCircle className="text-warning" size={64} />
 					</div>
 				</div>
 

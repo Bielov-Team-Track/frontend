@@ -3,7 +3,7 @@
 import { Loader } from "@/components";
 import { getOnboardingLink } from "@/lib/api/payments";
 import { use, useEffect, useState } from "react";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { AlertTriangle } from "lucide-react";
 
 const StripeRefreshPage = () => {
 	const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +31,7 @@ const StripeRefreshPage = () => {
 				{isLoading && <Loader />}
 				{error ? (
 					<div className="flex items-center gap-4">
-						<FaExclamationTriangle className="text-error" size={"36px"} />
+						<AlertTriangle className="text-error" size={36} />
 						<span className="text-error">{error}</span>
 					</div>
 				) : (

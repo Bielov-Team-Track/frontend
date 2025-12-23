@@ -1,5 +1,5 @@
 import { addReaction, removeReaction } from "@/lib/api/messages";
-import classNames from "classnames";
+import { clsx } from "clsx";
 import { useState } from "react";
 
 type ReactionBadgeProps = {
@@ -48,7 +48,7 @@ export const ReactionBadge = ({ messageId, emoji, userIds, currentUserId, onReac
 		<button
 			onClick={handleClick}
 			disabled={isLoading}
-			className={classNames(
+			className={clsx(
 				"text-xs px-2 py-0.5 rounded-full transition-all cursor-pointer min-w-[40px]",
 				hasError && "animate-shake border-error/60 bg-error/10",
 				!hasError && hasReacted && "bg-primary/20 outline outline-2 outline-primary/40",

@@ -1,4 +1,4 @@
-import { FaCheck } from "react-icons/fa";
+import { Check } from "lucide-react";
 import { STEP_CONFIG, getActiveSteps } from "../config/stepConfig";
 import { useEventFormContext } from "../context/EventFormContext";
 
@@ -36,7 +36,7 @@ export function ProgressIndicator() {
 									}
 								`}>
 								{isCompleted ? (
-									<FaCheck size={12} />
+									<Check size={12} />
 								) : (
 									stepNumber
 								)}

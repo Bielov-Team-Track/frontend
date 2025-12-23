@@ -10,7 +10,7 @@ import {
 } from "@/lib/api/approvals";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import { FiCheck, FiX } from "react-icons/fi";
+import { Check, X } from "lucide-react";
 
 export default function ApprovalRequestsSection({
 	eventId,
@@ -94,7 +94,7 @@ export default function ApprovalRequestsSection({
 																r.user.userId!
 															)
 														}>
-														<FiCheck></FiCheck>
+														<Check size={14} />
 													</button>
 													<button
 														className="btn btn-xs btn-error"
@@ -103,7 +103,7 @@ export default function ApprovalRequestsSection({
 																r.user.userId!
 															)
 														}>
-														<FiX></FiX>
+														<X size={14} />
 													</button>
 												</>
 											) : r.approved ? (
