@@ -1,13 +1,13 @@
 "use client";
 
 import ProfileHistory from "@/app/dashboard/profile/components/ProfileHistory";
+import { Button } from "@/components";
 import { BackButton, TextArea } from "@/components/ui";
-import Button from "@/components/ui/button";
 import EmptyState from "@/components/ui/empty-state";
-import { RegistrationStatus } from "@/lib/models/Club";
-import { getDominantHandLabel, getSkillLevelLabel, getVolleyballPositionLabel } from "@/lib/models/Profile";
 import { getClubRegistration, updateRegistrationStatus } from "@/lib/api/clubs";
 import { getFullUserProfile } from "@/lib/api/user";
+import { RegistrationStatus } from "@/lib/models/Club";
+import { getDominantHandLabel, getSkillLevelLabel, getVolleyballPositionLabel } from "@/lib/models/Profile";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Activity, Calendar, Check, Clock, FileText, GraduationCap, History, User, X } from "lucide-react";

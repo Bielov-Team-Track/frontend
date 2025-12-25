@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Button, Input } from "@/components";
 import Modal from "@/components/ui/modal";
-import Button from "@/components/ui/button";
-import Input from "@/components/ui/input";
-import { SkillLevel, Team, CreateTeamRequest, UpdateTeamRequest } from "@/lib/models/Club";
+import { CreateTeamRequest, SkillLevel, Team, UpdateTeamRequest } from "@/lib/models/Club";
+import { useEffect, useState } from "react";
 
 interface TeamFormModalProps {
 	isOpen: boolean;
@@ -15,14 +14,7 @@ interface TeamFormModalProps {
 	isLoading?: boolean;
 }
 
-export default function TeamFormModal({
-	isOpen,
-	team,
-	clubId,
-	onClose,
-	onSubmit,
-	isLoading = false,
-}: TeamFormModalProps) {
+export default function TeamFormModal({ isOpen, team, clubId, onClose, onSubmit, isLoading = false }: TeamFormModalProps) {
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [skillLevel, setSkillLevel] = useState<string>("");
@@ -62,24 +54,12 @@ export default function TeamFormModal({
 	};
 
 	return (
-		<Modal
-			isOpen={isOpen}
-			onClose={onClose}
-			title={isEditing ? "Edit Team" : "Create Team"}
-			size="md">
+		<Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit Team" : "Create Team"} size="md">
 			<form onSubmit={handleSubmit} className="space-y-4">
-				<Input
-					label="Team Name"
-					value={name}
-					onChange={(e) => setName(e.target.value)}
-					placeholder="Enter team name"
-					required
-				/>
+				<Input label="Team Name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter team name" required />
 
 				<div>
-					<label className="block text-sm font-medium text-white mb-2">
-						Description
-					</label>
+					<label className="block text-sm font-medium text-white mb-2">Description</label>
 					<textarea
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
@@ -90,9 +70,7 @@ export default function TeamFormModal({
 				</div>
 
 				<div>
-					<label className="block text-sm font-medium text-white mb-2">
-						Skill Level
-					</label>
+					<label className="block text-sm font-medium text-white mb-2">Skill Level</label>
 					<select
 						value={skillLevel}
 						onChange={(e) => setSkillLevel(e.target.value)}
@@ -107,21 +85,10 @@ export default function TeamFormModal({
 				</div>
 
 				<div className="flex gap-3 pt-4">
-					<Button
-						type="button"
-						variant="ghost"
-						color="neutral"
-						fullWidth
-						onClick={onClose}>
+					<Button type="button" variant="ghost" color="neutral" fullWidth onClick={onClose}>
 						Cancel
 					</Button>
-					<Button
-						type="submit"
-						variant="solid"
-						color="accent"
-						fullWidth
-						disabled={!name.trim()}
-						loading={isLoading}>
+					<Button type="submit" variant="solid" color="accent" fullWidth disabled={!name.trim()} loading={isLoading}>
 						{isEditing ? "Save Changes" : "Create Team"}
 					</Button>
 				</div>

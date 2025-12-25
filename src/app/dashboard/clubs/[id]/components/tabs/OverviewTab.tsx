@@ -1,8 +1,8 @@
 "use client";
 
-import { Mail, Phone, MapPin, UserPlus, Users, Layers } from "lucide-react";
-import Button from "@/components/ui/button";
-import { Club, ClubMember, ClubRole, Team, Group } from "@/lib/models/Club";
+import { Button } from "@/components";
+import { Club, ClubMember, ClubRole, Group, Team } from "@/lib/models/Club";
+import { Layers, Mail, MapPin, Phone, UserPlus, Users } from "lucide-react";
 
 interface OverviewTabProps {
 	club: Club;
@@ -12,25 +12,15 @@ interface OverviewTabProps {
 	onInvite: () => void;
 }
 
-export default function OverviewTab({
-	club,
-	members,
-	teams,
-	groups,
-	onInvite,
-}: OverviewTabProps) {
+export default function OverviewTab({ club, members, teams, groups, onInvite }: OverviewTabProps) {
 	return (
 		<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 			{/* Club Info Card */}
 			<div className="lg:col-span-2 space-y-6">
 				<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
-					<h3 className="text-lg font-bold text-white mb-4">
-						Club Information
-					</h3>
+					<h3 className="text-lg font-bold text-white mb-4">Club Information</h3>
 					<div className="space-y-4">
-						{club.description && (
-							<p className="text-muted text-sm">{club.description}</p>
-						)}
+						{club.description && <p className="text-muted text-sm">{club.description}</p>}
 						<div className="grid grid-cols-2 gap-4">
 							{club.contactEmail && (
 								<div className="flex items-center gap-3 text-sm">
@@ -68,29 +58,13 @@ export default function OverviewTab({
 				<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
 					<h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
 					<div className="space-y-2">
-						<Button
-							variant="ghost"
-							color="neutral"
-							fullWidth
-							onClick={onInvite}
-							leftIcon={<UserPlus size={16} />}
-							className="justify-start">
+						<Button variant="ghost" color="neutral" fullWidth onClick={onInvite} leftIcon={<UserPlus size={16} />} className="justify-start">
 							Invite Member
 						</Button>
-						<Button
-							variant="ghost"
-							color="neutral"
-							fullWidth
-							leftIcon={<Users size={16} />}
-							className="justify-start">
+						<Button variant="ghost" color="neutral" fullWidth leftIcon={<Users size={16} />} className="justify-start">
 							Create Team
 						</Button>
-						<Button
-							variant="ghost"
-							color="neutral"
-							fullWidth
-							leftIcon={<Layers size={16} />}
-							className="justify-start">
+						<Button variant="ghost" color="neutral" fullWidth leftIcon={<Layers size={16} />} className="justify-start">
 							Create Group
 						</Button>
 					</div>

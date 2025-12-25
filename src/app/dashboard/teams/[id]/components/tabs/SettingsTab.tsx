@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Button from "@/components/ui/button";
-import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
+import { Button } from "@/components";
 import { TeamSettingsForm } from "@/components/features/teams";
+import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
+import { deleteTeam, updateTeam } from "@/lib/api/clubs";
 import { Team, UpdateTeamRequest } from "@/lib/models/Club";
-import { updateTeam, deleteTeam } from "@/lib/api/clubs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface SettingsTabProps {
@@ -41,23 +41,14 @@ export default function SettingsTab({ team, clubId }: SettingsTabProps) {
 			{/* General Settings */}
 			<div className="space-y-6">
 				<h3 className="text-lg font-bold text-white">Team Settings</h3>
-				<TeamSettingsForm
-					team={team}
-					onSubmit={(data) => updateMutation.mutate(data)}
-					isLoading={updateMutation.isPending}
-				/>
+				<TeamSettingsForm team={team} onSubmit={(data) => updateMutation.mutate(data)} isLoading={updateMutation.isPending} />
 			</div>
 
 			{/* Danger Zone */}
 			<div className="rounded-2xl bg-red-500/10 border border-red-500/20 p-6">
 				<h3 className="text-lg font-bold text-red-400 mb-2">Danger Zone</h3>
-				<p className="text-muted text-sm mb-4">
-					Once you delete a team, there is no going back. Please be certain.
-				</p>
-				<Button
-					variant="solid"
-					color="error"
-					onClick={() => setShowDeleteModal(true)}>
+				<p className="text-muted text-sm mb-4">Once you delete a team, there is no going back. Please be certain.</p>
+				<Button variant="default" color="error" onClick={() => setShowDeleteModal(true)}>
 					Delete Team
 				</Button>
 			</div>

@@ -1,7 +1,7 @@
+import { Button } from "@/components";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useRef } from "react";
 import ConfirmationModal from "./index";
-import Button from "../button";
 
 const meta: Meta<typeof ConfirmationModal> = {
 	title: "UI/ConfirmationModal",
@@ -10,8 +10,7 @@ const meta: Meta<typeof ConfirmationModal> = {
 		layout: "centered",
 		docs: {
 			description: {
-				component:
-					"A confirmation modal component that displays a question with confirm/decline buttons. Uses HTML dialog element.",
+				component: "A confirmation modal component that displays a question with confirm/decline buttons. Uses HTML dialog element.",
 			},
 		},
 	},
@@ -76,8 +75,7 @@ export const Default: Story = {
 export const DeleteConfirmation: Story = {
 	render: InteractiveTemplate,
 	args: {
-		question:
-			"Are you sure you want to delete this item? This action cannot be undone.",
+		question: "Are you sure you want to delete this item? This action cannot be undone.",
 		confirmText: "Delete",
 		declineText: "Cancel",
 	},
@@ -120,12 +118,8 @@ export const StaticView: Story = {
 					<p className="pt-4 text-center">{args.question}</p>
 					<div className="modal-action">
 						<div className="w-full flex justify-around">
-							<button className="btn btn-success w-16 text-muted-50">
-								{args.confirmText || "Yes"}
-							</button>
-							<button className="btn btn-error w-16 text-muted-50">
-								{args.declineText || "No"}
-							</button>
+							<button className="btn btn-success w-16 text-muted-50">{args.confirmText || "Yes"}</button>
+							<button className="btn btn-error w-16 text-muted-50">{args.declineText || "No"}</button>
 						</div>
 					</div>
 				</div>

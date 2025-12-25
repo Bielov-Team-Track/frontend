@@ -84,7 +84,7 @@ function LoginContent() {
 				<Link href={"/forgot-password"} className="link text-sm">
 					Forgot your password?
 				</Link>
-				<Button loading={isLoading}>Login</Button>
+				<Button type="submit" loading={isLoading}>Login</Button>
 			</form>
 			{/* <div className="divider">OR</div>
         <div className="flex flex-col gap-4">

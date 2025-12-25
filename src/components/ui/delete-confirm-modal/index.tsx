@@ -1,8 +1,7 @@
 "use client";
 
+import { Button, Modal } from "@/components";
 import { AlertTriangle } from "lucide-react";
-import Modal from "../modal";
-import Button from "../button";
 
 interface DeleteConfirmModalProps {
 	isOpen: boolean;
@@ -37,28 +36,16 @@ export default function DeleteConfirmModal({
 				<p className="text-sm text-muted mb-6">
 					{description || (
 						<>
-							Are you sure you want to delete{" "}
-							<span className="font-medium text-white">{itemName}</span>?
-							This action cannot be undone.
+							Are you sure you want to delete <span className="font-medium text-white">{itemName}</span>? This action cannot be undone.
 						</>
 					)}
 				</p>
-				<div className="flex gap-3">
-					<Button
-						variant="ghost"
-						color="neutral"
-						fullWidth
-						onClick={onClose}
-						disabled={isLoading}>
-						{cancelText}
-					</Button>
-					<Button
-						variant="solid"
-						color="error"
-						fullWidth
-						onClick={onConfirm}
-						loading={isLoading}>
+				<div className="flex gap-12 justify-center">
+					<Button variant="destructive" onClick={onConfirm} loading={isLoading}>
 						{confirmText}
+					</Button>
+					<Button variant="secondary" onClick={onClose} disabled={isLoading}>
+						{cancelText}
 					</Button>
 				</div>
 			</div>

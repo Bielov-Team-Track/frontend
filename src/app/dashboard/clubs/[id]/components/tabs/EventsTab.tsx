@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Calendar, Clock, MapPin, Plus, Users } from "lucide-react";
-import Button from "@/components/ui/button";
+import { Button } from "@/components";
+import ClubEventFormModal, { ClubEvent } from "@/components/features/clubs/forms/ClubEventFormModal";
 import EmptyState from "@/components/ui/empty-state";
-import ClubEventFormModal, {
-	ClubEvent,
-} from "@/components/features/clubs/forms/ClubEventFormModal";
-import { Team, Group } from "@/lib/models/Club";
+import { Group, Team } from "@/lib/models/Club";
+import { Calendar, Clock, MapPin, Plus, Users } from "lucide-react";
+import { useState } from "react";
 
 interface EventsTabProps {
 	clubId: string;
@@ -42,15 +40,11 @@ export default function EventsTab({ clubId, teams, groups }: EventsTabProps) {
 	const getTargetLabel = (event: ClubEvent) => {
 		if (event.targetType === "all") return "All Members";
 		if (event.targetType === "teams") {
-			const targetTeams = teams.filter((t) =>
-				event.targetTeamIds?.includes(t.id)
-			);
+			const targetTeams = teams.filter((t) => event.targetTeamIds?.includes(t.id));
 			return targetTeams.map((t) => t.name).join(", ") || "Selected Teams";
 		}
 		if (event.targetType === "groups") {
-			const targetGroups = groups.filter((g) =>
-				event.targetGroupIds?.includes(g.id)
-			);
+			const targetGroups = groups.filter((g) => event.targetGroupIds?.includes(g.id));
 			return targetGroups.map((g) => g.name).join(", ") || "Selected Groups";
 		}
 		return "Custom Selection";
@@ -61,11 +55,7 @@ export default function EventsTab({ clubId, teams, groups }: EventsTabProps) {
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<h3 className="text-lg font-bold text-white">Club Events</h3>
-				<Button
-					variant="solid"
-					color="accent"
-					onClick={() => setShowCreateModal(true)}
-					leftIcon={<Plus size={16} />}>
+				<Button variant="default" color="accent" onClick={() => setShowCreateModal(true)} leftIcon={<Plus size={16} />}>
 					Create Event
 				</Button>
 			</div>
@@ -85,19 +75,11 @@ export default function EventsTab({ clubId, teams, groups }: EventsTabProps) {
 			) : (
 				<div className="space-y-3">
 					{events.map((event) => (
-						<div
-							key={event.id}
-							className="rounded-xl bg-white/5 border border-white/10 p-4 hover:border-accent/30 transition-colors">
+						<div key={event.id} className="rounded-xl bg-white/5 border border-white/10 p-4 hover:border-accent/30 transition-colors">
 							<div className="flex items-start justify-between gap-4">
 								<div className="flex-1 min-w-0">
-									<h4 className="font-bold text-white truncate">
-										{event.name}
-									</h4>
-									{event.description && (
-										<p className="text-sm text-muted line-clamp-2 mt-1">
-											{event.description}
-										</p>
-									)}
+									<h4 className="font-bold text-white truncate">{event.name}</h4>
+									{event.description && <p className="text-sm text-muted line-clamp-2 mt-1">{event.description}</p>}
 									<div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted">
 										<div className="flex items-center gap-1.5">
 											<Clock size={14} />
@@ -124,13 +106,7 @@ export default function EventsTab({ clubId, teams, groups }: EventsTabProps) {
 			)}
 
 			{/* Create Event Modal */}
-			<ClubEventFormModal
-				isOpen={showCreateModal}
-				teams={teams}
-				groups={groups}
-				onClose={() => setShowCreateModal(false)}
-				onSubmit={handleCreateEvent}
-			/>
+			<ClubEventFormModal isOpen={showCreateModal} teams={teams} groups={groups} onClose={() => setShowCreateModal(false)} onSubmit={handleCreateEvent} />
 		</div>
 	);
 }

@@ -1,83 +1,39 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import type { VariantProps } from "class-variance-authority";
+import { Loader2 } from "lucide-react";
 import React, { forwardRef } from "react";
+import { Button as ButtonPrimitive, buttonVariants } from "../button";
 
-type ButtonVariant = "solid" | "outline" | "ghost" | "link" | "soft";
-type ButtonColor = "primary" | "secondary" | "accent" | "neutral" | "info" | "success" | "warning" | "error";
-type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
-
-export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color"> {
-	variant?: ButtonVariant;
-	color?: ButtonColor;
-	size?: ButtonSize;
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
 	fullWidth?: boolean;
-	square?: boolean;
-	circle?: boolean;
 	leftIcon?: React.ReactNode;
 	rightIcon?: React.ReactNode;
 	loading?: boolean;
+	asChild?: boolean;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-	(
-		{
-			variant = "solid",
-			color = "primary",
-			size = "md",
-			fullWidth = false,
-			square = false,
-			circle = false,
-			leftIcon,
-			rightIcon,
-			loading = false,
-			disabled,
-			className,
-			children,
-			...props
-		},
-		ref
-	) => {
-		// Map variant to DaisyUI style class
-		const variantClass = {
-			solid: "",
-			outline: "btn-outline",
-			ghost: "btn-ghost",
-			link: "btn-link",
-			soft: "btn-soft",
-		}[variant];
-
-		// Map color to DaisyUI color class
-		const colorClass = `btn-${color}`;
-
-		// Map size to DaisyUI size class
-		const sizeClass = `btn-${size}`;
-
+	({ variant, size, fullWidth = false, leftIcon, rightIcon, loading = false, disabled, className, children, ...props }, ref) => {
 		return (
-			<button
-				ref={ref}
-				className={cn(
-					"btn",
-					colorClass,
-					variantClass,
-					sizeClass,
-					fullWidth && "btn-block",
-					square && "btn-square",
-					circle && "btn-circle",
-					className
-				)}
+			<ButtonPrimitive
+				itemRef={ref}
+				variant={variant}
+				size={size}
+				className={cn(fullWidth && "w-full", loading && "cursor-wait", className)}
 				disabled={disabled || loading}
-				{...props}
-			>
-				{loading && <span className="loading loading-spinner loading-sm" />}
+				{...props}>
+				{loading && <Loader2 className="size-4 animate-spin" />}
 				{!loading && leftIcon && <span className="shrink-0">{leftIcon}</span>}
 				{children}
 				{!loading && rightIcon && <span className="shrink-0">{rightIcon}</span>}
-			</button>
+			</ButtonPrimitive>
 		);
 	}
 );
 
 Button.displayName = "Button";
 
+export { Button, buttonVariants };
 export default Button;

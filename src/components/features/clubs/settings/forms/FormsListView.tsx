@@ -1,9 +1,9 @@
 // frontend/src/components/features/clubs/settings/FormsListView.tsx
 "use client";
 
-import { Button, DeleteConfirmModal, Dropdown, EmptyState, Input, Loader } from "@/components/ui";
-import { FormTemplate } from "@/lib/models/Club";
+import { Button, DeleteConfirmModal, Dropdown, EmptyState, Input, Loader } from "@/components";
 import { deleteFormTemplate, duplicateFormTemplate, updateClubSettings, updateFormTemplate } from "@/lib/api/clubs";
+import { FormTemplate } from "@/lib/models/Club";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FileText, Plus, Search } from "lucide-react";
 import { useState } from "react";
@@ -110,7 +110,7 @@ export default function FormsListView({ clubId, forms, isLoading, onCreate, onEd
 		<div className="space-y-6 flex-1">
 			<div className="flex items-center justify-between">
 				<h2 className="text-lg font-bold text-white">Registration Forms</h2>
-				<Button variant="solid" color="accent" size={"sm"} onClick={onCreate} leftIcon={<Plus size={16} />}>
+				<Button variant="default" color="accent" size={"sm"} onClick={onCreate} leftIcon={<Plus size={16} />}>
 					New Form
 				</Button>
 			</div>

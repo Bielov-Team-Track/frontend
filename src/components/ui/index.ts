@@ -1,10 +1,10 @@
 // UI Components - Reusable, design system components
 export { default as Avatar } from "./avatar";
 export { default as BackButton } from "./back-button";
-export { default as Badge } from "./badge";
+export { Badge } from "./badge";
 export { default as BlockOverlay } from "./block-overlay";
-export { default as Button } from "./button";
-export { Card, CardBody, CardTitle, CardActions, CardFigure } from "./card";
+export { default as Button } from "./button/index";
+export { Card, CardTitle } from "./card";
 export { default as Checkbox } from "./checkbox";
 export { default as ConfirmationModal } from "./confirmation-modal";
 export { default as DelayWrapper } from "./delay-wrapper";
@@ -14,7 +14,7 @@ export { default as Dropdown } from "./dropdown";
 export { default as EmptyState } from "./empty-state";
 export { default as FilterDropdown } from "./filter-dropdown";
 export { default as ImageCropper } from "./image-cropper";
-export { default as Input } from "./input";
+export { default as Input } from "./input/index";
 export { default as Link } from "./link";
 export { default as Loader } from "./loader";
 export { default as Modal } from "./modal";
@@ -26,22 +26,16 @@ export { default as RadioCards } from "./radio-cards";
 export { default as ReactionPicker } from "./reaction-picker";
 export { default as ResizableContainer } from "./resizable-container";
 export { default as Section } from "./section";
-export { default as Select } from "./select";
+export { Select } from "./select";
 export { default as Slider } from "./slider";
-export { default as TextArea } from "./textarea";
+export { default as TextArea } from "./textarea/index";
 export { default as ThemeSwitcher } from "./theme-switcher";
 
 // Re-export types
-export type { BadgeProps } from "./badge";
-export type { ButtonProps } from "./button";
-export type { CardProps, CardBodyProps, CardTitleProps, CardActionsProps, CardFigureProps } from "./card";
 export type { CheckboxProps } from "./checkbox";
 export type { DropdownOption, DropdownProps } from "./dropdown";
-export type { FilterOption, FilterDropdownProps } from "./filter-dropdown";
-export type { InputProps } from "./input";
+export type { FilterDropdownProps, FilterOption } from "./filter-dropdown";
 export type { MultiSelectPillsOption, MultiSelectPillsProps } from "./multi-select-pills";
 export type { RadioButtonProps } from "./radio-button";
 export type { RadioGroupOption, RadioGroupProps } from "./radio-button/RadioGroup";
 export type { RadioCardOption, RadioCardsProps } from "./radio-cards";
-export type { SelectOption, SelectProps } from "./select";
-export type { TextAreaProps } from "./textarea";

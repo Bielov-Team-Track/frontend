@@ -2,10 +2,10 @@
 
 import { RegistrationForm } from "@/components/features/clubs/registrations/RegistrationForm";
 import { Button, Loader } from "@/components/ui";
-import { useAuth } from "@/providers";
-import { ClubRegistration, FormFieldAnswerDto, RegistrationStatus } from "@/lib/models/Club";
 import { createRegistration, getClub, getClubSettings, getFormTemplate, getMyRegistration } from "@/lib/api/clubs";
 import { createOrUpdateCoachProfile, createOrUpdatePlayerProfile, getCoachProfile, getPlayerProfile } from "@/lib/api/user";
+import { ClubRegistration, FormFieldAnswerDto, RegistrationStatus } from "@/lib/models/Club";
+import { useAuth } from "@/providers";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Clock, ImageOff, MapPin, PartyPopper, Shield, Users, XCircle } from "lucide-react";
@@ -274,7 +274,7 @@ function RegistrationStatusView({ registration, clubName, clubId, settings }: Re
 						</Button>
 					</Link>
 					<Link href={`/clubs/${clubId}`}>
-						<Button variant="solid" color="primary">
+						<Button variant="default" color="primary">
 							View Club Page
 						</Button>
 					</Link>

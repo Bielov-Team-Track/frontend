@@ -1,27 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Users, Layers } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Button from "@/components/ui/button";
-import EmptyState from "@/components/ui/empty-state";
-import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
+import { Button } from "@/components";
+import ManageMembersModal from "@/components/features/clubs/components/ManageMembersModal";
 import TeamCard from "@/components/features/clubs/components/TeamCard";
 import TeamFormModal from "@/components/features/clubs/forms/TeamFormModal";
-import ManageMembersModal from "@/components/features/clubs/components/ManageMembersModal";
-import {
-	Team,
-	ClubMember,
-	CreateTeamRequest,
-	UpdateTeamRequest,
-} from "@/lib/models/Club";
-import {
-	createTeam,
-	updateTeam,
-	deleteTeam,
-	addTeamMember,
-	removeTeamMember,
-} from "@/lib/api/clubs";
+import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
+import EmptyState from "@/components/ui/empty-state";
+import { addTeamMember, createTeam, deleteTeam, removeTeamMember, updateTeam } from "@/lib/api/clubs";
+import { ClubMember, CreateTeamRequest, Team, UpdateTeamRequest } from "@/lib/models/Club";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Plus, Users } from "lucide-react";
+import { useState } from "react";
 
 interface TeamsTabProps {
 	teams: Team[];
@@ -45,13 +34,7 @@ export default function TeamsTab({ teams, clubId, clubMembers }: TeamsTabProps) 
 	});
 
 	const updateMutation = useMutation({
-		mutationFn: ({
-			teamId,
-			data,
-		}: {
-			teamId: string;
-			data: UpdateTeamRequest;
-		}) => updateTeam(teamId, data),
+		mutationFn: ({ teamId, data }: { teamId: string; data: UpdateTeamRequest }) => updateTeam(teamId, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["club-teams", clubId] });
 			setEditingTeam(null);
@@ -67,35 +50,27 @@ export default function TeamsTab({ teams, clubId, clubMembers }: TeamsTabProps) 
 	});
 
 	const addMemberMutation = useMutation({
-		mutationFn: ({ teamId, userId }: { teamId: string; userId: string }) =>
-			addTeamMember(teamId, userId),
+		mutationFn: ({ teamId, userId }: { teamId: string; userId: string }) => addTeamMember(teamId, userId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["club-teams", clubId] });
 		},
 	});
 
 	const removeMemberMutation = useMutation({
-		mutationFn: ({ teamId, userId }: { teamId: string; userId: string }) =>
-			removeTeamMember(teamId, userId),
+		mutationFn: ({ teamId, userId }: { teamId: string; userId: string }) => removeTeamMember(teamId, userId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["club-teams", clubId] });
 		},
 	});
 
-	const teamMemberUserIds = managingTeam
-		? new Set(managingTeam.members?.map((m) => m.userId) || [])
-		: new Set<string>();
+	const teamMemberUserIds = managingTeam ? new Set(managingTeam.members?.map((m) => m.userId) || []) : new Set<string>();
 
 	return (
 		<div className="space-y-4">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<h3 className="text-lg font-bold text-white">Teams ({teams.length})</h3>
-				<Button
-					variant="solid"
-					color="accent"
-					onClick={() => setShowCreateModal(true)}
-					leftIcon={<Plus size={16} />}>
+				<Button variant="default" color="accent" onClick={() => setShowCreateModal(true)} leftIcon={<Plus size={16} />}>
 					Create Team
 				</Button>
 			</div>
@@ -171,15 +146,9 @@ export default function TeamsTab({ teams, clubId, clubMembers }: TeamsTabProps) 
 					currentMemberIds={teamMemberUserIds}
 					getMemberId={(member) => member.userId}
 					onClose={() => setManagingTeam(null)}
-					onAddMember={(userId) =>
-						addMemberMutation.mutate({ teamId: managingTeam.id, userId })
-					}
-					onRemoveMember={(userId) =>
-						removeMemberMutation.mutate({ teamId: managingTeam.id, userId })
-					}
-					isLoading={
-						addMemberMutation.isPending || removeMemberMutation.isPending
-					}
+					onAddMember={(userId) => addMemberMutation.mutate({ teamId: managingTeam.id, userId })}
+					onRemoveMember={(userId) => removeMemberMutation.mutate({ teamId: managingTeam.id, userId })}
+					isLoading={addMemberMutation.isPending || removeMemberMutation.isPending}
 					memberCount={managingTeam.members?.length || 0}
 				/>
 			)}

@@ -30,13 +30,23 @@ export default async function RootLayout({
 						<ClubProvider>
 							<QueryProvider>
 								{/* Main Layout Container */}
+
+								{/* <div className="grid">
+									<div>
+										<DashboardHeader />
+									</div>
+									<div>
+										<Sidebar />
+									</div>
+									<div>
+										<main className="flex-1 w-full relative min-h-0 overflow-y-auto bg-base-200 rounded-2xl">{children}</main>
+									</div>
+								</div> */}
+
 								<div className="flex h-screen sm:p-4 gap-6 overflow-hidden">
-									{/* Sidebar (Sticky) */}
 									<div className="hidden sm:block w-auto shrink-0 z-40">
 										<Sidebar />
 									</div>
-
-									{/* Main Content Area */}
 									<div className="flex-1 flex flex-col min-w-0 min-h-0">
 										<DashboardHeader />
 										<main className="flex-1 w-full relative min-h-0 overflow-y-auto bg-base-200 rounded-2xl">{children}</main>

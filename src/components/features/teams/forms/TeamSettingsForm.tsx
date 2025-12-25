@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import Button from "@/components/ui/button";
+import { Button } from "@/components";
 import { SkillLevel, Team, UpdateTeamRequest } from "@/lib/models/Club";
+import { useState } from "react";
 
 interface TeamSettingsFormProps {
 	team: Team;
@@ -10,11 +10,7 @@ interface TeamSettingsFormProps {
 	isLoading?: boolean;
 }
 
-export default function TeamSettingsForm({
-	team,
-	onSubmit,
-	isLoading = false,
-}: TeamSettingsFormProps) {
+export default function TeamSettingsForm({ team, onSubmit, isLoading = false }: TeamSettingsFormProps) {
 	const [name, setName] = useState(team.name);
 	const [description, setDescription] = useState(team.description || "");
 	const [skillLevel, setSkillLevel] = useState<string>(team.skillLevel || "");
@@ -31,15 +27,11 @@ export default function TeamSettingsForm({
 	};
 
 	return (
-		<form
-			onSubmit={handleSubmit}
-			className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-6">
+		<form onSubmit={handleSubmit} className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-6">
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<div className="space-y-4">
 					<div>
-						<label className="block text-sm font-medium text-muted mb-2">
-							Team Name
-						</label>
+						<label className="block text-sm font-medium text-muted mb-2">Team Name</label>
 						<input
 							type="text"
 							value={name}
@@ -48,9 +40,7 @@ export default function TeamSettingsForm({
 						/>
 					</div>
 					<div>
-						<label className="block text-sm font-medium text-muted mb-2">
-							Description
-						</label>
+						<label className="block text-sm font-medium text-muted mb-2">Description</label>
 						<textarea
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
@@ -61,9 +51,7 @@ export default function TeamSettingsForm({
 				</div>
 				<div className="space-y-4">
 					<div>
-						<label className="block text-sm font-medium text-muted mb-2">
-							Skill Level
-						</label>
+						<label className="block text-sm font-medium text-muted mb-2">Skill Level</label>
 						<select
 							value={skillLevel}
 							onChange={(e) => setSkillLevel(e.target.value)}
@@ -79,11 +67,7 @@ export default function TeamSettingsForm({
 				</div>
 			</div>
 			<div className="flex justify-end pt-4 border-t border-white/10">
-				<Button
-					type="submit"
-					variant="solid"
-					color="accent"
-					loading={isLoading}>
+				<Button type="submit" variant="solid" color="accent" loading={isLoading}>
 					Save Changes
 				</Button>
 			</div>

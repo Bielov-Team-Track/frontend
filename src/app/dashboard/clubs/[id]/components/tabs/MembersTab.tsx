@@ -4,7 +4,6 @@ import { EditMemberModal, MemberRow } from "@/components/features/clubs";
 import { Avatar, Button, Dropdown, EmptyState, Input } from "@/components/ui";
 import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
 import Skeleton, { SkeletonAvatar } from "@/components/ui/skeleton";
-import { ClubMember, ClubRegistration, ClubRole, RegistrationSortBy, RegistrationStatus, SortDirection } from "@/lib/models/Club";
 import {
 	getClubRegistrationsPaged,
 	getRegistrationStatusCounts,
@@ -13,6 +12,7 @@ import {
 	UpdateClubMemberRequest,
 	updateRegistrationStatus,
 } from "@/lib/api/clubs";
+import { ClubMember, ClubRegistration, ClubRole, RegistrationSortBy, RegistrationStatus, SortDirection } from "@/lib/models/Club";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
@@ -206,7 +206,7 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
 				<h3 className="text-lg font-bold text-white">Club Members</h3>
-				<Button variant="solid" color="accent" size={"sm"} onClick={onInvite} leftIcon={<Plus size={16} />}>
+				<Button variant="default" color="accent" size={"sm"} onClick={onInvite} leftIcon={<Plus size={16} />}>
 					Invite Member
 				</Button>
 			</div>

@@ -1,27 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Layers } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Button from "@/components/ui/button";
-import EmptyState from "@/components/ui/empty-state";
-import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
+import { Button } from "@/components";
 import GroupCard from "@/components/features/clubs/components/GroupCard";
-import GroupFormModal from "@/components/features/clubs/forms/GroupFormModal";
 import ManageMembersModal from "@/components/features/clubs/components/ManageMembersModal";
-import {
-	Group,
-	ClubMember,
-	CreateGroupRequest,
-	UpdateGroupRequest,
-} from "@/lib/models/Club";
-import {
-	createGroup,
-	updateGroup,
-	deleteGroup,
-	addGroupMember,
-	removeGroupMember,
-} from "@/lib/api/clubs";
+import GroupFormModal from "@/components/features/clubs/forms/GroupFormModal";
+import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
+import EmptyState from "@/components/ui/empty-state";
+import { addGroupMember, createGroup, deleteGroup, removeGroupMember, updateGroup } from "@/lib/api/clubs";
+import { ClubMember, CreateGroupRequest, Group, UpdateGroupRequest } from "@/lib/models/Club";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Layers, Plus } from "lucide-react";
+import { useState } from "react";
 
 interface GroupsTabProps {
 	groups: Group[];
@@ -29,11 +18,7 @@ interface GroupsTabProps {
 	clubMembers: ClubMember[];
 }
 
-export default function GroupsTab({
-	groups,
-	clubId,
-	clubMembers,
-}: GroupsTabProps) {
+export default function GroupsTab({ groups, clubId, clubMembers }: GroupsTabProps) {
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [editingGroup, setEditingGroup] = useState<Group | null>(null);
 	const [managingGroup, setManagingGroup] = useState<Group | null>(null);
@@ -49,13 +34,7 @@ export default function GroupsTab({
 	});
 
 	const updateMutation = useMutation({
-		mutationFn: ({
-			groupId,
-			data,
-		}: {
-			groupId: string;
-			data: UpdateGroupRequest;
-		}) => updateGroup(groupId, data),
+		mutationFn: ({ groupId, data }: { groupId: string; data: UpdateGroupRequest }) => updateGroup(groupId, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["club-groups", clubId] });
 			setEditingGroup(null);
@@ -71,37 +50,27 @@ export default function GroupsTab({
 	});
 
 	const addMemberMutation = useMutation({
-		mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
-			addGroupMember(groupId, userId),
+		mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) => addGroupMember(groupId, userId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["club-groups", clubId] });
 		},
 	});
 
 	const removeMemberMutation = useMutation({
-		mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
-			removeGroupMember(groupId, userId),
+		mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) => removeGroupMember(groupId, userId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["club-groups", clubId] });
 		},
 	});
 
-	const groupMemberClubMemberIds = managingGroup
-		? new Set(managingGroup.members?.map((m) => m.clubMemberId) || [])
-		: new Set<string>();
+	const groupMemberClubMemberIds = managingGroup ? new Set(managingGroup.members?.map((m) => m.clubMemberId) || []) : new Set<string>();
 
 	return (
 		<div className="space-y-4">
 			{/* Header */}
 			<div className="flex items-center justify-between">
-				<h3 className="text-lg font-bold text-white">
-					Groups ({groups.length})
-				</h3>
-				<Button
-					variant="solid"
-					color="accent"
-					onClick={() => setShowCreateModal(true)}
-					leftIcon={<Plus size={16} />}>
+				<h3 className="text-lg font-bold text-white">Groups ({groups.length})</h3>
+				<Button variant="default" color="accent" onClick={() => setShowCreateModal(true)} leftIcon={<Plus size={16} />}>
 					Create Group
 				</Button>
 			</div>
@@ -163,9 +132,7 @@ export default function GroupsTab({
 				title="Delete Group"
 				itemName={deletingGroup?.name || ""}
 				onClose={() => setDeletingGroup(null)}
-				onConfirm={() =>
-					deletingGroup && deleteMutation.mutate(deletingGroup.id)
-				}
+				onConfirm={() => deletingGroup && deleteMutation.mutate(deletingGroup.id)}
 				isLoading={deleteMutation.isPending}
 			/>
 
@@ -188,15 +155,9 @@ export default function GroupsTab({
 					currentMemberIds={groupMemberClubMemberIds}
 					getMemberId={(member) => member.id}
 					onClose={() => setManagingGroup(null)}
-					onAddMember={(userId) =>
-						addMemberMutation.mutate({ groupId: managingGroup.id, userId })
-					}
-					onRemoveMember={(userId) =>
-						removeMemberMutation.mutate({ groupId: managingGroup.id, userId })
-					}
-					isLoading={
-						addMemberMutation.isPending || removeMemberMutation.isPending
-					}
+					onAddMember={(userId) => addMemberMutation.mutate({ groupId: managingGroup.id, userId })}
+					onRemoveMember={(userId) => removeMemberMutation.mutate({ groupId: managingGroup.id, userId })}
+					isLoading={addMemberMutation.isPending || removeMemberMutation.isPending}
 					memberCount={managingGroup.members?.length || 0}
 					accentColor={managingGroup.color || "#6B7280"}
 				/>

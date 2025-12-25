@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Search, UserMinus, UserPlus, Users, Layers } from "lucide-react";
+import { Button } from "@/components";
 import Modal from "@/components/ui/modal";
-import Button from "@/components/ui/button";
 import { ClubMember } from "@/lib/models/Club";
+import { Search, UserMinus, UserPlus, Users } from "lucide-react";
+import { useState } from "react";
 
 interface ManageMembersModalProps {
 	isOpen: boolean;
@@ -40,9 +40,7 @@ export default function ManageMembersModal({
 	const [searchQuery, setSearchQuery] = useState("");
 
 	const filteredMembers = members.filter((member) => {
-		const name = `${member.userProfile?.name || ""} ${
-			member.userProfile?.surname || ""
-		}`.toLowerCase();
+		const name = `${member.userProfile?.name || ""} ${member.userProfile?.surname || ""}`.toLowerCase();
 		const email = member.userProfile?.email?.toLowerCase() || "";
 		const query = searchQuery.toLowerCase();
 		return name.includes(query) || email.includes(query);
@@ -65,10 +63,7 @@ export default function ManageMembersModal({
 
 				{/* Search */}
 				<div className="relative">
-					<Search
-						className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-						size={18}
-					/>
+					<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
 					<input
 						type="text"
 						value={searchQuery}
@@ -92,9 +87,7 @@ export default function ManageMembersModal({
 								<div
 									key={member.id}
 									className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${
-										isIncluded
-											? "bg-accent/10 border-accent/30"
-											: "bg-white/5 border-white/10 hover:border-white/20"
+										isIncluded ? "bg-accent/10 border-accent/30" : "bg-white/5 border-white/10 hover:border-white/20"
 									}`}>
 									<div className="flex items-center gap-3">
 										<div className="w-10 h-10 rounded-full bg-background-dark flex items-center justify-center text-sm font-bold text-muted">
@@ -102,31 +95,18 @@ export default function ManageMembersModal({
 										</div>
 										<div>
 											<div className="text-sm font-medium text-white">
-												{member.userProfile?.name}{" "}
-												{member.userProfile?.surname}
+												{member.userProfile?.name} {member.userProfile?.surname}
 											</div>
-											<div className="text-xs text-muted">
-												{member.role}
-											</div>
+											<div className="text-xs text-muted">{member.role}</div>
 										</div>
 									</div>
 									<button
-										onClick={() =>
-											isIncluded
-												? onRemoveMember(getMemberId(member))
-												: onAddMember(getMemberId(member))
-										}
+										onClick={() => (isIncluded ? onRemoveMember(getMemberId(member)) : onAddMember(getMemberId(member)))}
 										disabled={isLoading}
 										className={`p-2 rounded-lg transition-colors ${
-											isIncluded
-												? "bg-red-500/20 hover:bg-red-500/30 text-red-400"
-												: "bg-accent/20 hover:bg-accent/30 text-accent"
+											isIncluded ? "bg-red-500/20 hover:bg-red-500/30 text-red-400" : "bg-accent/20 hover:bg-accent/30 text-accent"
 										}`}>
-										{isIncluded ? (
-											<UserMinus size={18} />
-										) : (
-											<UserPlus size={18} />
-										)}
+										{isIncluded ? <UserMinus size={18} /> : <UserPlus size={18} />}
 									</button>
 								</div>
 							);
@@ -137,12 +117,7 @@ export default function ManageMembersModal({
 				{/* Footer */}
 				<div className="flex items-center justify-between text-sm pt-2 border-t border-white/10">
 					<div className="flex items-center gap-2">
-						{accentColor && (
-							<div
-								className="w-3 h-3 rounded-full"
-								style={{ backgroundColor: accentColor }}
-							/>
-						)}
+						{accentColor && <div className="w-3 h-3 rounded-full" style={{ backgroundColor: accentColor }} />}
 						<span className="text-muted">{memberCount} members selected</span>
 					</div>
 					<Button variant="ghost" color="neutral" onClick={onClose}>

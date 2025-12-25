@@ -1,9 +1,8 @@
 "use client";
 
-import Button from "@/components/ui/button";
+import { Button, Input } from "@/components";
 import Checkbox from "@/components/ui/checkbox";
 import ImageCropper from "@/components/ui/image-cropper";
-import Input from "@/components/ui/input";
 import Modal from "@/components/ui/modal";
 import Steps from "@/components/ui/steps";
 import TextArea from "@/components/ui/textarea";

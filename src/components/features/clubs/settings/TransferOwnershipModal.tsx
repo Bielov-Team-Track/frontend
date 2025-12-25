@@ -2,8 +2,8 @@
 "use client";
 
 import { Button, Dropdown, Input, Modal } from "@/components/ui";
-import { ClubRole } from "@/lib/models/Club";
 import { getClubMembers } from "@/lib/api/clubs";
+import { ClubRole } from "@/lib/models/Club";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -68,7 +68,7 @@ export default function TransferOwnershipModal({ isOpen, clubId, clubName, onClo
 					<Button variant="ghost" fullWidth onClick={handleClose} disabled={isLoading}>
 						Cancel
 					</Button>
-					<Button variant="solid" color="warning" fullWidth onClick={handleConfirm} disabled={!isValid} loading={isLoading}>
+					<Button variant="default" color="warning" fullWidth onClick={handleConfirm} disabled={!isValid} loading={isLoading}>
 						Transfer Ownership
 					</Button>
 				</div>

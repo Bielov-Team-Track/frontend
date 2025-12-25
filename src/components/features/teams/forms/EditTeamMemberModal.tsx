@@ -1,31 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Button, MultiSelectPills } from "@/components";
 import Modal from "@/components/ui/modal";
-import Button from "@/components/ui/button";
-import { MultiSelectPills } from "@/components";
 import { TeamMember, VolleyballPosition } from "@/lib/models/Club";
+import { useEffect, useState } from "react";
 import { VOLLEYBALL_POSITIONS_OPTIONS } from "../constants";
 
 interface EditTeamMemberModalProps {
 	isOpen: boolean;
 	member: TeamMember | null;
 	onClose: () => void;
-	onSave: (data: {
-		memberId: string;
-		positions: VolleyballPosition[];
-		jerseyNumber?: string;
-	}) => void;
+	onSave: (data: { memberId: string; positions: VolleyballPosition[]; jerseyNumber?: string }) => void;
 	isLoading?: boolean;
 }
 
-export default function EditTeamMemberModal({
-	isOpen,
-	member,
-	onClose,
-	onSave,
-	isLoading = false,
-}: EditTeamMemberModalProps) {
+export default function EditTeamMemberModal({ isOpen, member, onClose, onSave, isLoading = false }: EditTeamMemberModalProps) {
 	const [positions, setPositions] = useState<VolleyballPosition[]>([]);
 	const [jerseyNumber, setJerseyNumber] = useState<string>("");
 
@@ -67,9 +56,7 @@ export default function EditTeamMemberModal({
 					</div>
 					<div>
 						<div className="text-base font-medium text-white">{memberName}</div>
-						{member.jerseyNumber && (
-							<div className="text-sm text-muted">#{member.jerseyNumber}</div>
-						)}
+						{member.jerseyNumber && <div className="text-sm text-muted">#{member.jerseyNumber}</div>}
 					</div>
 				</div>
 
@@ -79,16 +66,12 @@ export default function EditTeamMemberModal({
 					optional
 					options={VOLLEYBALL_POSITIONS_OPTIONS}
 					selectedItems={positions}
-					onSelectedItemsChange={(items) =>
-						setPositions(items as VolleyballPosition[])
-					}
+					onSelectedItemsChange={(items) => setPositions(items as VolleyballPosition[])}
 				/>
 
 				{/* Jersey Number */}
 				<div>
-					<label className="block text-sm font-medium text-white mb-2">
-						Jersey Number (Optional)
-					</label>
+					<label className="block text-sm font-medium text-white mb-2">Jersey Number (Optional)</label>
 					<input
 						type="text"
 						value={jerseyNumber}
@@ -100,21 +83,10 @@ export default function EditTeamMemberModal({
 
 				{/* Actions */}
 				<div className="flex gap-3 pt-4">
-					<Button
-						variant="ghost"
-						color="neutral"
-						fullWidth
-						onClick={handleClose}
-					>
+					<Button variant="ghost" color="neutral" fullWidth onClick={handleClose}>
 						Cancel
 					</Button>
-					<Button
-						variant="solid"
-						color="accent"
-						fullWidth
-						onClick={handleSubmit}
-						loading={isLoading}
-					>
+					<Button variant="default" color="accent" fullWidth onClick={handleSubmit} loading={isLoading}>
 						Save Changes
 					</Button>
 				</div>

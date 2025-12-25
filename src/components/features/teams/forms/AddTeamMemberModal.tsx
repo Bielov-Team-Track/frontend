@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { Button, MultiSelectPills } from "@/components";
 import Modal from "@/components/ui/modal";
-import Button from "@/components/ui/button";
-import { MultiSelectPills } from "@/components";
 import { ClubMember, VolleyballPosition } from "@/lib/models/Club";
+import { Plus, Search } from "lucide-react";
+import { useState } from "react";
 import { VOLLEYBALL_POSITIONS_OPTIONS } from "../constants";
 
 interface AddTeamMemberModalProps {
@@ -13,22 +12,11 @@ interface AddTeamMemberModalProps {
 	clubMembers: ClubMember[];
 	currentMemberIds: string[];
 	onClose: () => void;
-	onAdd: (data: {
-		userId: string;
-		positions: string[];
-		jerseyNumber?: string;
-	}) => void;
+	onAdd: (data: { userId: string; positions: string[]; jerseyNumber?: string }) => void;
 	isLoading?: boolean;
 }
 
-export default function AddTeamMemberModal({
-	isOpen,
-	clubMembers,
-	currentMemberIds,
-	onClose,
-	onAdd,
-	isLoading = false,
-}: AddTeamMemberModalProps) {
+export default function AddTeamMemberModal({ isOpen, clubMembers, currentMemberIds, onClose, onAdd, isLoading = false }: AddTeamMemberModalProps) {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 	const [positions, setPositions] = useState<VolleyballPosition[]>([]);
@@ -37,9 +25,7 @@ export default function AddTeamMemberModal({
 	const filteredMembers = clubMembers
 		.filter((member) => !currentMemberIds.includes(member.id))
 		.filter((member) => {
-			const name = `${member.userProfile?.name || ""} ${
-				member.userProfile?.surname || ""
-			}`.toLowerCase();
+			const name = `${member.userProfile?.name || ""} ${member.userProfile?.surname || ""}`.toLowerCase();
 			return name.includes(searchQuery.toLowerCase());
 		});
 
@@ -67,10 +53,7 @@ export default function AddTeamMemberModal({
 				<div className="space-y-4">
 					{/* Search */}
 					<div className="relative">
-						<Search
-							className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-							size={18}
-						/>
+						<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
 						<input
 							type="text"
 							value={searchQuery}
@@ -99,8 +82,7 @@ export default function AddTeamMemberModal({
 										</div>
 										<div className="text-left">
 											<div className="text-sm font-medium text-white">
-												{member.userProfile?.name}{" "}
-												{member.userProfile?.surname}
+												{member.userProfile?.name} {member.userProfile?.surname}
 											</div>
 											<div className="text-xs text-muted">{member.role}</div>
 										</div>
@@ -118,15 +100,11 @@ export default function AddTeamMemberModal({
 						optional
 						options={VOLLEYBALL_POSITIONS_OPTIONS}
 						selectedItems={positions}
-						onSelectedItemsChange={(items) =>
-							setPositions(items as VolleyballPosition[])
-						}
+						onSelectedItemsChange={(items) => setPositions(items as VolleyballPosition[])}
 					/>
 
 					<div>
-						<label className="block text-sm font-medium text-white mb-2">
-							Jersey Number (Optional)
-						</label>
+						<label className="block text-sm font-medium text-white mb-2">Jersey Number (Optional)</label>
 						<input
 							type="text"
 							value={jerseyNumber}
@@ -137,19 +115,10 @@ export default function AddTeamMemberModal({
 					</div>
 
 					<div className="flex gap-3 pt-4">
-						<Button
-							variant="ghost"
-							color="neutral"
-							fullWidth
-							onClick={() => setSelectedUserId(null)}>
+						<Button variant="ghost" color="neutral" fullWidth onClick={() => setSelectedUserId(null)}>
 							Back
 						</Button>
-						<Button
-							variant="solid"
-							color="accent"
-							fullWidth
-							onClick={handleSubmit}
-							loading={isLoading}>
+						<Button variant="default" color="accent" fullWidth onClick={handleSubmit} loading={isLoading}>
 							Add Player
 						</Button>
 					</div>

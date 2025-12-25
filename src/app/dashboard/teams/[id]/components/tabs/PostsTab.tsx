@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { MessageSquare } from "lucide-react";
-import Button from "@/components/ui/button";
-import EmptyState from "@/components/ui/empty-state";
+import { Button } from "@/components";
 import { TeamPost } from "@/components/features/teams/types";
+import EmptyState from "@/components/ui/empty-state";
+import { MessageSquare } from "lucide-react";
+import { useState } from "react";
 
 export default function PostsTab() {
 	const [posts, setPosts] = useState<TeamPost[]>([]);
@@ -39,12 +39,7 @@ export default function PostsTab() {
 						className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent resize-none"
 					/>
 					<div className="flex justify-end">
-						<Button
-							type="submit"
-							variant="solid"
-							color="accent"
-							size="sm"
-							disabled={!newPostContent.trim()}>
+						<Button type="submit" variant="solid" color="accent" size="sm" disabled={!newPostContent.trim()}>
 							Post
 						</Button>
 					</div>
@@ -53,17 +48,11 @@ export default function PostsTab() {
 
 			{/* Posts Feed */}
 			{posts.length === 0 ? (
-				<EmptyState
-					icon={MessageSquare}
-					title="No posts yet"
-					description="Be the first to post in this team"
-				/>
+				<EmptyState icon={MessageSquare} title="No posts yet" description="Be the first to post in this team" />
 			) : (
 				<div className="space-y-4">
 					{posts.map((post) => (
-						<div
-							key={post.id}
-							className="rounded-2xl bg-white/5 border border-white/10 p-6">
+						<div key={post.id} className="rounded-2xl bg-white/5 border border-white/10 p-6">
 							<div className="flex items-center gap-3 mb-4">
 								<div className="w-10 h-10 rounded-full bg-background-light flex items-center justify-center text-sm font-bold text-muted">
 									{post.authorName[0]}

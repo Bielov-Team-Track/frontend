@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Calendar, Clock, MapPin, Plus } from "lucide-react";
-import Button from "@/components/ui/button";
-import EmptyState from "@/components/ui/empty-state";
+import { Button } from "@/components";
 import { TeamEventFormModal } from "@/components/features/teams";
 import { TeamEvent } from "@/components/features/teams/types";
+import EmptyState from "@/components/ui/empty-state";
+import { Calendar, Clock, MapPin, Plus } from "lucide-react";
+import { useState } from "react";
 
 export default function EventsTab() {
 	const [showCreateModal, setShowCreateModal] = useState(false);
@@ -36,11 +36,7 @@ export default function EventsTab() {
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<h3 className="text-lg font-bold text-white">Team Events</h3>
-				<Button
-					variant="solid"
-					color="accent"
-					onClick={() => setShowCreateModal(true)}
-					leftIcon={<Plus size={16} />}>
+				<Button variant="default" color="accent" onClick={() => setShowCreateModal(true)} leftIcon={<Plus size={16} />}>
 					Create Event
 				</Button>
 			</div>
@@ -60,19 +56,11 @@ export default function EventsTab() {
 			) : (
 				<div className="space-y-3">
 					{events.map((event) => (
-						<div
-							key={event.id}
-							className="rounded-xl bg-white/5 border border-white/10 p-4 hover:border-accent/30 transition-colors">
+						<div key={event.id} className="rounded-xl bg-white/5 border border-white/10 p-4 hover:border-accent/30 transition-colors">
 							<div className="flex items-start justify-between gap-4">
 								<div className="flex-1 min-w-0">
-									<h4 className="font-bold text-white truncate">
-										{event.name}
-									</h4>
-									{event.description && (
-										<p className="text-sm text-muted line-clamp-2 mt-1">
-											{event.description}
-										</p>
-									)}
+									<h4 className="font-bold text-white truncate">{event.name}</h4>
+									{event.description && <p className="text-sm text-muted line-clamp-2 mt-1">{event.description}</p>}
 									<div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted">
 										<div className="flex items-center gap-1.5">
 											<Clock size={14} />
@@ -93,11 +81,7 @@ export default function EventsTab() {
 			)}
 
 			{/* Create Event Modal */}
-			<TeamEventFormModal
-				isOpen={showCreateModal}
-				onClose={() => setShowCreateModal(false)}
-				onSubmit={handleCreateEvent}
-			/>
+			<TeamEventFormModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} onSubmit={handleCreateEvent} />
 		</div>
 	);
 }

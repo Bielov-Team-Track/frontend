@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Check } from "lucide-react";
+import { Button, Input } from "@/components";
 import Modal from "@/components/ui/modal";
-import Button from "@/components/ui/button";
-import Input from "@/components/ui/input";
-import { SkillLevel, Group, CreateGroupRequest, UpdateGroupRequest } from "@/lib/models/Club";
+import { CreateGroupRequest, Group, SkillLevel, UpdateGroupRequest } from "@/lib/models/Club";
+import { Check } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const GROUP_COLORS = [
 	"#FF6B6B",
@@ -34,14 +33,7 @@ interface GroupFormModalProps {
 	isLoading?: boolean;
 }
 
-export default function GroupFormModal({
-	isOpen,
-	group,
-	clubId,
-	onClose,
-	onSubmit,
-	isLoading = false,
-}: GroupFormModalProps) {
+export default function GroupFormModal({ isOpen, group, clubId, onClose, onSubmit, isLoading = false }: GroupFormModalProps) {
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [color, setColor] = useState(GROUP_COLORS[0]);
@@ -86,24 +78,12 @@ export default function GroupFormModal({
 	};
 
 	return (
-		<Modal
-			isOpen={isOpen}
-			onClose={onClose}
-			title={isEditing ? "Edit Group" : "Create Group"}
-			size="md">
+		<Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit Group" : "Create Group"} size="md">
 			<form onSubmit={handleSubmit} className="space-y-4">
-				<Input
-					label="Group Name"
-					value={name}
-					onChange={(e) => setName(e.target.value)}
-					placeholder="Enter group name"
-					required
-				/>
+				<Input label="Group Name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter group name" required />
 
 				<div>
-					<label className="block text-sm font-medium text-white mb-2">
-						Description
-					</label>
+					<label className="block text-sm font-medium text-white mb-2">Description</label>
 					<textarea
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
@@ -114,9 +94,7 @@ export default function GroupFormModal({
 				</div>
 
 				<div>
-					<label className="block text-sm font-medium text-white mb-2">
-						Group Color
-					</label>
+					<label className="block text-sm font-medium text-white mb-2">Group Color</label>
 					<div className="flex flex-wrap gap-2">
 						{GROUP_COLORS.map((c) => (
 							<button
@@ -124,23 +102,17 @@ export default function GroupFormModal({
 								type="button"
 								onClick={() => setColor(c)}
 								className={`w-8 h-8 rounded-lg transition-all ${
-									color === c
-										? "ring-2 ring-white ring-offset-2 ring-offset-[#1e1e1e] scale-110"
-										: "hover:scale-105"
+									color === c ? "ring-2 ring-white ring-offset-2 ring-offset-[#1e1e1e] scale-110" : "hover:scale-105"
 								}`}
 								style={{ backgroundColor: c }}>
-								{color === c && (
-									<Check size={16} className="text-white mx-auto" />
-								)}
+								{color === c && <Check size={16} className="text-white mx-auto" />}
 							</button>
 						))}
 					</div>
 				</div>
 
 				<div>
-					<label className="block text-sm font-medium text-white mb-2">
-						Skill Level
-					</label>
+					<label className="block text-sm font-medium text-white mb-2">Skill Level</label>
 					<select
 						value={skillLevel}
 						onChange={(e) => setSkillLevel(e.target.value)}
@@ -155,21 +127,10 @@ export default function GroupFormModal({
 				</div>
 
 				<div className="flex gap-3 pt-4">
-					<Button
-						type="button"
-						variant="ghost"
-						color="neutral"
-						fullWidth
-						onClick={onClose}>
+					<Button type="button" variant="ghost" color="neutral" fullWidth onClick={onClose}>
 						Cancel
 					</Button>
-					<Button
-						type="submit"
-						variant="solid"
-						color="accent"
-						fullWidth
-						disabled={!name.trim()}
-						loading={isLoading}>
+					<Button type="submit" variant="solid" color="accent" fullWidth disabled={!name.trim()} loading={isLoading}>
 						{isEditing ? "Save Changes" : "Create Group"}
 					</Button>
 				</div>

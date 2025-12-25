@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import Button from "./index";
+import { Button } from "./index";
+import { Plus, ArrowRight, Download, Trash2, Save, Share, Edit, Loader2 } from "lucide-react";
 
 const meta: Meta<typeof Button> = {
 	title: "UI/Button",
@@ -9,7 +10,7 @@ const meta: Meta<typeof Button> = {
 		docs: {
 			description: {
 				component:
-					"A versatile button component with multiple variants, sizes, and features including loading states and icons. Built with responsive design and custom styling.",
+					"A composite button component built on shadcn primitives with support for loading states, icons, and multiple variants. Includes proper accessibility features and consistent styling.",
 			},
 		},
 	},
@@ -17,40 +18,23 @@ const meta: Meta<typeof Button> = {
 	argTypes: {
 		variant: {
 			control: { type: "select" },
-			options: ["solid", "outline-solid", "ghost", "link", "icon"],
+			options: ["default", "secondary", "destructive", "outline", "ghost", "link"],
 			description: "The visual style variant of the button",
 			table: {
-				defaultValue: { summary: "solid" },
-			},
-		},
-		color: {
-			control: { type: "select" },
-			options: [
-				"primary",
-				"secondary",
-				"accent",
-				"neutral",
-				"success",
-				"warning",
-				"error",
-			],
-			description: "The color scheme of the button",
-			table: {
-				defaultValue: { summary: "primary" },
+				defaultValue: { summary: "default" },
 			},
 		},
 		size: {
 			control: { type: "select" },
-			options: ["sm", "md", "lg", "xl"],
+			options: ["default", "xs", "sm", "lg", "icon", "icon-sm", "icon-xs"],
 			description: "The size of the button",
 			table: {
-				defaultValue: { summary: "md" },
+				defaultValue: { summary: "default" },
 			},
 		},
 		fullWidth: {
 			control: { type: "boolean" },
-			description:
-				"Whether the button should take the full width of its container",
+			description: "Whether the button should take the full width of its container",
 			table: {
 				defaultValue: { summary: "false" },
 			},
@@ -83,17 +67,28 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
 	args: {
 		children: "Button",
-		variant: "solid",
-		size: "md",
 	},
 };
 
 // Variant stories
-export const Solid: Story = {
+export const Primary: Story = {
 	args: {
-		children: "Solid Button",
-		variant: "solid",
-		color: "primary",
+		children: "Primary Button",
+		variant: "default",
+	},
+};
+
+export const Secondary: Story = {
+	args: {
+		children: "Secondary Button",
+		variant: "secondary",
+	},
+};
+
+export const Destructive: Story = {
+	args: {
+		children: "Delete",
+		variant: "destructive",
 	},
 };
 
@@ -101,7 +96,6 @@ export const Outline: Story = {
 	args: {
 		children: "Outline Button",
 		variant: "outline",
-		color: "primary",
 	},
 };
 
@@ -109,7 +103,6 @@ export const Ghost: Story = {
 	args: {
 		children: "Ghost Button",
 		variant: "ghost",
-		color: "primary",
 	},
 };
 
@@ -117,115 +110,42 @@ export const Link: Story = {
 	args: {
 		children: "Link Button",
 		variant: "link",
-		color: "primary",
-	},
-};
-
-export const Icon: Story = {
-	args: {
-		variant: "icon",
-		color: "primary",
-		children: (
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				strokeWidth={1.5}
-				stroke="currentColor"
-				className="w-5 h-5">
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					d="M12 4.5v15m7.5-7.5h-15"
-				/>
-			</svg>
-		),
-	},
-};
-
-// Color stories
-export const PrimaryColor: Story = {
-	args: {
-		children: "Primary",
-		variant: "solid",
-		color: "primary",
-	},
-};
-
-export const SecondaryColor: Story = {
-	args: {
-		children: "Secondary",
-		variant: "solid",
-		color: "secondary",
-	},
-};
-
-export const AccentColor: Story = {
-	args: {
-		children: "Accent",
-		variant: "solid",
-		color: "accent",
-	},
-};
-
-export const NeutralColor: Story = {
-	args: {
-		children: "Neutral",
-		variant: "solid",
-		color: "neutral",
-	},
-};
-
-export const SuccessColor: Story = {
-	args: {
-		children: "Success",
-		variant: "solid",
-		color: "success",
-	},
-};
-
-export const WarningColor: Story = {
-	args: {
-		children: "Warning",
-		variant: "solid",
-		color: "warning",
-	},
-};
-
-export const ErrorColor: Story = {
-	args: {
-		children: "Error",
-		variant: "solid",
-		color: "error",
 	},
 };
 
 // Size stories
-export const Small: Story = {
+export const SizeXS: Story = {
 	args: {
-		children: "Small Button",
+		children: "Extra Small",
+		size: "xs",
+	},
+};
+
+export const SizeSM: Story = {
+	args: {
+		children: "Small",
 		size: "sm",
 	},
 };
 
-export const Medium: Story = {
+export const SizeDefault: Story = {
 	args: {
-		children: "Medium Button",
-		size: "md",
+		children: "Default",
+		size: "default",
 	},
 };
 
-export const Large: Story = {
+export const SizeLG: Story = {
 	args: {
-		children: "Large Button",
+		children: "Large",
 		size: "lg",
 	},
 };
 
-export const ExtraLarge: Story = {
+export const IconButton: Story = {
 	args: {
-		children: "Extra Large Button",
-		size: "xl",
+		size: "icon",
+		children: <Plus className="size-4" />,
 	},
 };
 
@@ -244,17 +164,121 @@ export const Loading: Story = {
 	},
 };
 
-export const LoadingWithVariants: Story = {
+export const FullWidth: Story = {
+	args: {
+		children: "Full Width Button",
+		fullWidth: true,
+	},
+	decorators: [
+		(Story) => (
+			<div className="w-80">
+				<Story />
+			</div>
+		),
+	],
+};
+
+// Icon examples
+export const WithLeftIcon: Story = {
+	args: {
+		children: "Add Item",
+		leftIcon: <Plus className="size-4" />,
+	},
+};
+
+export const WithRightIcon: Story = {
+	args: {
+		children: "Continue",
+		variant: "outline",
+		rightIcon: <ArrowRight className="size-4" />,
+	},
+};
+
+export const WithBothIcons: Story = {
+	args: {
+		children: "Download",
+		leftIcon: <Download className="size-4" />,
+		rightIcon: <ArrowRight className="size-4" />,
+	},
+};
+
+// Showcase all variants
+export const AllVariants: Story = {
 	render: () => (
 		<div className="flex flex-wrap gap-4">
-			<Button variant="solid" color="primary" loading>
-				Saving...
+			<Button variant="default">Default</Button>
+			<Button variant="secondary">Secondary</Button>
+			<Button variant="destructive">Destructive</Button>
+			<Button variant="outline">Outline</Button>
+			<Button variant="ghost">Ghost</Button>
+			<Button variant="link">Link</Button>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: "All available button variants displayed together.",
+			},
+		},
+	},
+};
+
+// Showcase all sizes
+export const AllSizes: Story = {
+	render: () => (
+		<div className="flex items-center gap-4">
+			<Button size="xs">Extra Small</Button>
+			<Button size="sm">Small</Button>
+			<Button size="default">Default</Button>
+			<Button size="lg">Large</Button>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: "All available button sizes displayed together.",
+			},
+		},
+	},
+};
+
+// Icon button sizes
+export const IconButtonSizes: Story = {
+	render: () => (
+		<div className="flex items-center gap-4">
+			<Button size="icon-xs" variant="outline">
+				<Plus className="size-3" />
 			</Button>
-			<Button variant="outline" color="secondary" loading>
+			<Button size="icon-sm" variant="outline">
+				<Plus className="size-3.5" />
+			</Button>
+			<Button size="icon" variant="outline">
+				<Plus className="size-4" />
+			</Button>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: "Icon button sizes for toolbar actions.",
+			},
+		},
+	},
+};
+
+// Loading states
+export const LoadingStates: Story = {
+	render: () => (
+		<div className="flex flex-wrap gap-4">
+			<Button loading>Saving...</Button>
+			<Button variant="secondary" loading>
 				Processing...
 			</Button>
-			<Button variant="ghost" color="accent" loading>
+			<Button variant="outline" loading>
 				Loading...
+			</Button>
+			<Button variant="destructive" loading>
+				Deleting...
 			</Button>
 		</div>
 	),
@@ -267,491 +291,20 @@ export const LoadingWithVariants: Story = {
 	},
 };
 
-export const FullWidth: Story = {
-	args: {
-		children: "Full Width Button",
-		fullWidth: true,
-	},
-	parameters: {
-		layout: "padded",
-	},
-};
-
-// Showcase all variants
-export const AllVariants: Story = {
-	render: () => (
-		<div className="flex flex-wrap gap-4">
-			<Button variant="solid" color="primary">
-				Solid
-			</Button>
-			<Button variant="outline" color="primary">
-				Outline
-			</Button>
-			<Button variant="ghost" color="primary">
-				Ghost
-			</Button>
-			<Button variant="link" color="primary">
-				Link
-			</Button>
-			<Button variant="icon" color="primary">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					strokeWidth={1.5}
-					stroke="currentColor"
-					className="w-5 h-5">
-					<path
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						d="M12 4.5v15m7.5-7.5h-15"
-					/>
-				</svg>
-			</Button>
-		</div>
-	),
-	parameters: {
-		docs: {
-			description: {
-				story: "All available button variants displayed together.",
-			},
-		},
-	},
-};
-
-// Showcase all colors
-export const AllColors: Story = {
-	render: () => (
-		<div className="flex flex-wrap gap-4">
-			<Button variant="solid" color="primary">
-				Primary
-			</Button>
-			<Button variant="solid" color="secondary">
-				Secondary
-			</Button>
-			<Button variant="solid" color="accent">
-				Accent
-			</Button>
-			<Button variant="solid" color="neutral">
-				Neutral
-			</Button>
-			<Button variant="solid" color="success">
-				Success
-			</Button>
-			<Button variant="solid" color="warning">
-				Warning
-			</Button>
-			<Button variant="solid" color="error">
-				Error
-			</Button>
-		</div>
-	),
-	parameters: {
-		docs: {
-			description: {
-				story: "All available button colors displayed together.",
-			},
-		},
-	},
-};
-
-// Comprehensive showcase: All variants with all colors
-export const CompleteShowcase: Story = {
-	render: () => (
-		<div className="space-y-8">
-			<div>
-				<h3 className="text-lg font-semibold mb-4">Solid Variant</h3>
-				<div className="flex flex-wrap gap-4">
-					<Button variant="solid" color="primary">
-						Primary
-					</Button>
-					<Button variant="solid" color="secondary">
-						Secondary
-					</Button>
-					<Button variant="solid" color="accent">
-						Accent
-					</Button>
-					<Button variant="solid" color="neutral">
-						Neutral
-					</Button>
-					<Button variant="solid" color="success">
-						Success
-					</Button>
-					<Button variant="solid" color="warning">
-						Warning
-					</Button>
-					<Button variant="solid" color="error">
-						Error
-					</Button>
-				</div>
-			</div>
-
-			<div>
-				<h3 className="text-lg font-semibold mb-4">Outline Variant</h3>
-				<div className="flex flex-wrap gap-4">
-					<Button variant="outline" color="primary">
-						Primary
-					</Button>
-					<Button variant="outline" color="secondary">
-						Secondary
-					</Button>
-					<Button variant="outline" color="accent">
-						Accent
-					</Button>
-					<Button variant="outline" color="neutral">
-						Neutral
-					</Button>
-					<Button variant="outline" color="success">
-						Success
-					</Button>
-					<Button variant="outline" color="warning">
-						Warning
-					</Button>
-					<Button variant="outline" color="error">
-						Error
-					</Button>
-				</div>
-			</div>
-
-			<div>
-				<h3 className="text-lg font-semibold mb-4">Ghost Variant</h3>
-				<div className="flex flex-wrap gap-4">
-					<Button variant="ghost" color="primary">
-						Primary
-					</Button>
-					<Button variant="ghost" color="secondary">
-						Secondary
-					</Button>
-					<Button variant="ghost" color="accent">
-						Accent
-					</Button>
-					<Button variant="ghost" color="neutral">
-						Neutral
-					</Button>
-					<Button variant="ghost" color="success">
-						Success
-					</Button>
-					<Button variant="ghost" color="warning">
-						Warning
-					</Button>
-					<Button variant="ghost" color="error">
-						Error
-					</Button>
-				</div>
-			</div>
-
-			<div>
-				<h3 className="text-lg font-semibold mb-4">Link Variant</h3>
-				<div className="flex flex-wrap gap-4">
-					<Button variant="link" color="primary">
-						Primary
-					</Button>
-					<Button variant="link" color="secondary">
-						Secondary
-					</Button>
-					<Button variant="link" color="accent">
-						Accent
-					</Button>
-					<Button variant="link" color="neutral">
-						Neutral
-					</Button>
-					<Button variant="link" color="success">
-						Success
-					</Button>
-					<Button variant="link" color="warning">
-						Warning
-					</Button>
-					<Button variant="link" color="error">
-						Error
-					</Button>
-				</div>
-			</div>
-
-			<div>
-				<h3 className="text-lg font-semibold mb-4">Icon Variant</h3>
-				<div className="flex flex-wrap gap-4">
-					<Button variant="icon" color="primary">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={1.5}
-							stroke="currentColor"
-							className="w-5 h-5">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M12 4.5v15m7.5-7.5h-15"
-							/>
-						</svg>
-					</Button>
-					<Button variant="icon" color="secondary">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={1.5}
-							stroke="currentColor"
-							className="w-5 h-5">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M12 4.5v15m7.5-7.5h-15"
-							/>
-						</svg>
-					</Button>
-					<Button variant="icon" color="accent">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={1.5}
-							stroke="currentColor"
-							className="w-5 h-5">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M12 4.5v15m7.5-7.5h-15"
-							/>
-						</svg>
-					</Button>
-					<Button variant="icon" color="neutral">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={1.5}
-							stroke="currentColor"
-							className="w-5 h-5">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M12 4.5v15m7.5-7.5h-15"
-							/>
-						</svg>
-					</Button>
-					<Button variant="icon" color="success">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={1.5}
-							stroke="currentColor"
-							className="w-5 h-5">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M12 4.5v15m7.5-7.5h-15"
-							/>
-						</svg>
-					</Button>
-					<Button variant="icon" color="warning">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={1.5}
-							stroke="currentColor"
-							className="w-5 h-5">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M12 4.5v15m7.5-7.5h-15"
-							/>
-						</svg>
-					</Button>
-					<Button variant="icon" color="error">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={1.5}
-							stroke="currentColor"
-							className="w-5 h-5">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M12 4.5v15m7.5-7.5h-15"
-							/>
-						</svg>
-					</Button>
-				</div>
-			</div>
-		</div>
-	),
-	parameters: {
-		docs: {
-			description: {
-				story: "Comprehensive showcase of all variants combined with all color options.",
-			},
-		},
-	},
-};
-
-// Showcase all sizes
-export const AllSizes: Story = {
-	render: () => (
-		<div className="flex items-center gap-4">
-			<Button size="sm">Small</Button>
-			<Button size="md">Medium</Button>
-			<Button size="lg">Large</Button>
-			<Button size="xl">Extra Large</Button>
-		</div>
-	),
-	parameters: {
-		docs: {
-			description: {
-				story: "All available button sizes displayed together.",
-			},
-		},
-	},
-};
-
-// Icon examples using leftIcon and rightIcon props
-export const WithLeftIcon: Story = {
-	args: {
-		children: "Add Item",
-		leftIcon: (
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				strokeWidth={1.5}
-				stroke="currentColor"
-				className="w-4 h-4">
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					d="M12 4.5v15m7.5-7.5h-15"
-				/>
-			</svg>
-		),
-	},
-};
-
-export const WithRightIcon: Story = {
-	args: {
-		children: "Continue",
-		variant: "outline",
-		rightIcon: (
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				strokeWidth={1.5}
-				stroke="currentColor"
-				className="w-4 h-4">
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-				/>
-			</svg>
-		),
-	},
-};
-
-export const WithBothIcons: Story = {
-	args: {
-		children: "Download",
-		variant: "solid",
-		leftIcon: (
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				strokeWidth={1.5}
-				stroke="currentColor"
-				className="w-4 h-4">
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-				/>
-			</svg>
-		),
-		rightIcon: (
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				strokeWidth={1.5}
-				stroke="currentColor"
-				className="w-4 h-4">
-				<path
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-				/>
-			</svg>
-		),
-	},
-};
-
-// Interactive examples
+// Icon examples
 export const IconExamples: Story = {
 	render: () => (
-		<div className="space-y-4">
-			<div className="flex flex-wrap gap-4">
-				<Button
-					leftIcon={
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={1.5}
-							stroke="currentColor"
-							className="w-4 h-4">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M12 4.5v15m7.5-7.5h-15"
-							/>
-						</svg>
-					}>
-					Create New
-				</Button>
-
-				<Button
-					variant="outline"
-					rightIcon={
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={1.5}
-							stroke="currentColor"
-							className="w-4 h-4">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"
-							/>
-						</svg>
-					}>
-					Save
-				</Button>
-
-				<Button
-					variant="solid"
-					leftIcon={
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={1.5}
-							stroke="currentColor"
-							className="w-4 h-4">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-							/>
-						</svg>
-					}>
-					Delete
-				</Button>
-			</div>
+		<div className="flex flex-wrap gap-4">
+			<Button leftIcon={<Plus className="size-4" />}>Create New</Button>
+			<Button variant="outline" rightIcon={<Save className="size-4" />}>
+				Save
+			</Button>
+			<Button variant="destructive" leftIcon={<Trash2 className="size-4" />}>
+				Delete
+			</Button>
+			<Button variant="secondary" leftIcon={<Edit className="size-4" />}>
+				Edit
+			</Button>
 		</div>
 	),
 	parameters: {
@@ -763,35 +316,52 @@ export const IconExamples: Story = {
 	},
 };
 
-// Responsive showcase
-export const ResponsiveShowcase: Story = {
+// Full width examples
+export const FullWidthExamples: Story = {
 	render: () => (
-		<div className="space-y-8">
+		<div className="space-y-2 w-80">
+			<Button fullWidth>Full Width Primary</Button>
+			<Button fullWidth variant="secondary">
+				Full Width Secondary
+			</Button>
+			<Button fullWidth variant="outline">
+				Full Width Outline
+			</Button>
+			<Button fullWidth variant="ghost">
+				Full Width Ghost
+			</Button>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: "Full-width button examples for form actions.",
+			},
+		},
+	},
+};
+
+// Button states
+export const ButtonStates: Story = {
+	render: () => (
+		<div className="space-y-4">
 			<div>
-				<h3 className="text-lg font-semibold mb-4">
-					Responsive Typography
-				</h3>
-				<div className="space-y-4">
-					<div className="flex flex-wrap gap-4">
-						<Button size="sm">Small (Responsive)</Button>
-						<Button size="md">Medium (Responsive)</Button>
-						<Button size="lg">Large (Responsive)</Button>
-						<Button size="xl">Extra Large (Responsive)</Button>
-					</div>
+				<h3 className="text-sm font-semibold mb-3">Normal States</h3>
+				<div className="flex flex-wrap gap-4">
+					<Button>Normal</Button>
+					<Button disabled>Disabled</Button>
+					<Button loading>Loading</Button>
 				</div>
 			</div>
-
 			<div>
-				<h3 className="text-lg font-semibold mb-4">
-					Full Width Examples
-				</h3>
-				<div className="space-y-2 max-w-md">
-					<Button fullWidth>Full Width Primary</Button>
-					<Button fullWidth variant="outline">
-						Full Width Outline
+				<h3 className="text-sm font-semibold mb-3">Destructive States</h3>
+				<div className="flex flex-wrap gap-4">
+					<Button variant="destructive">Normal</Button>
+					<Button variant="destructive" disabled>
+						Disabled
 					</Button>
-					<Button fullWidth variant="ghost">
-						Full Width Ghost
+					<Button variant="destructive" loading>
+						Loading
 					</Button>
 				</div>
 			</div>
@@ -800,18 +370,56 @@ export const ResponsiveShowcase: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: "Demonstrates responsive typography and full-width button options.",
+				story: "Different button states: normal, disabled, and loading.",
 			},
 		},
 	},
 };
 
-// Playground story for testing
+// Real-world examples
+export const ActionButtons: Story = {
+	render: () => (
+		<div className="space-y-6">
+			<div>
+				<h3 className="text-sm font-semibold mb-3">Form Actions</h3>
+				<div className="flex gap-3">
+					<Button variant="ghost">Cancel</Button>
+					<Button>Save Changes</Button>
+				</div>
+			</div>
+			<div>
+				<h3 className="text-sm font-semibold mb-3">Destructive Actions</h3>
+				<div className="flex gap-3">
+					<Button variant="outline">Cancel</Button>
+					<Button variant="destructive" leftIcon={<Trash2 className="size-4" />}>
+						Delete Account
+					</Button>
+				</div>
+			</div>
+			<div>
+				<h3 className="text-sm font-semibold mb-3">Navigation</h3>
+				<div className="flex gap-3">
+					<Button variant="outline">Back</Button>
+					<Button rightIcon={<ArrowRight className="size-4" />}>Continue</Button>
+				</div>
+			</div>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: "Real-world examples showing common button use cases.",
+			},
+		},
+	},
+};
+
+// Playground for testing
 export const Playground: Story = {
 	args: {
 		children: "Playground Button",
-		variant: "solid",
-		size: "md",
+		variant: "default",
+		size: "default",
 		disabled: false,
 		loading: false,
 		fullWidth: false,
@@ -820,91 +428,6 @@ export const Playground: Story = {
 		docs: {
 			description: {
 				story: "Use this story to test different combinations of props.",
-			},
-		},
-	},
-};
-
-// Complex interaction examples
-export const InteractionExamples: Story = {
-	render: () => (
-		<div className="space-y-6">
-			<div>
-				<h3 className="text-lg font-semibold mb-4">Button States</h3>
-				<div className="flex flex-wrap gap-4">
-					<Button>Normal</Button>
-					<Button disabled>Disabled</Button>
-					<Button loading>Loading</Button>
-				</div>
-			</div>
-
-			<div>
-				<h3 className="text-lg font-semibold mb-4">Action Buttons</h3>
-				<div className="flex flex-wrap gap-4">
-					<Button
-						variant="solid"
-						leftIcon={
-							<svg
-								className="w-4 h-4"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24">
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-								/>
-							</svg>
-						}>
-						Create Event
-					</Button>
-
-					<Button
-						variant="solid"
-						leftIcon={
-							<svg
-								className="w-4 h-4"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24">
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-								/>
-							</svg>
-						}>
-						Edit Profile
-					</Button>
-
-					<Button
-						variant="outline"
-						rightIcon={
-							<svg
-								className="w-4 h-4"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24">
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-								/>
-							</svg>
-						}>
-						Share
-					</Button>
-				</div>
-			</div>
-		</div>
-	),
-	parameters: {
-		docs: {
-			description: {
-				story: "Real-world examples showing common button use cases with icons and various states.",
 			},
 		},
 	},

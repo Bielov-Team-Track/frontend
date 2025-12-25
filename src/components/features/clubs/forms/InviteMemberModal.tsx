@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Search } from "lucide-react";
-import { Avatar } from "@/components";
+import { Avatar, Button } from "@/components";
 import Modal from "@/components/ui/modal";
-import Button from "@/components/ui/button";
+import { searchUsers } from "@/lib/api/user";
 import { ClubRole } from "@/lib/models/Club";
 import { UserProfile } from "@/lib/models/User";
-import { searchUsers } from "@/lib/api/user";
+import { Search } from "lucide-react";
+import { useState } from "react";
 
 interface InviteMemberModalProps {
 	isOpen: boolean;
@@ -16,12 +15,7 @@ interface InviteMemberModalProps {
 	isLoading?: boolean;
 }
 
-export default function InviteMemberModal({
-	isOpen,
-	onClose,
-	onInvite,
-	isLoading = false,
-}: InviteMemberModalProps) {
+export default function InviteMemberModal({ isOpen, onClose, onInvite, isLoading = false }: InviteMemberModalProps) {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
@@ -62,10 +56,7 @@ export default function InviteMemberModal({
 						{/* Search Input */}
 						<div className="flex gap-2">
 							<div className="relative flex-1">
-								<Search
-									className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-									size={18}
-								/>
+								<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
 								<input
 									type="text"
 									value={searchQuery}
@@ -75,12 +66,7 @@ export default function InviteMemberModal({
 									className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
 								/>
 							</div>
-							<Button
-								variant="ghost"
-								color="neutral"
-								onClick={handleSearch}
-								disabled={isSearching || !searchQuery.trim()}
-								loading={isSearching}>
+							<Button variant="ghost" color="neutral" onClick={handleSearch} disabled={isSearching || !searchQuery.trim()} loading={isSearching}>
 								Search
 							</Button>
 						</div>
@@ -120,26 +106,20 @@ export default function InviteMemberModal({
 								</div>
 								<div className="text-sm text-muted">{selectedUser.email}</div>
 							</div>
-							<button
-								onClick={() => setSelectedUser(null)}
-								className="text-xs text-accent hover:underline">
+							<button onClick={() => setSelectedUser(null)} className="text-xs text-accent hover:underline">
 								Change
 							</button>
 						</div>
 
 						{/* Role Selection */}
 						<div>
-							<label className="block text-sm font-medium text-white mb-2">
-								Select Role
-							</label>
+							<label className="block text-sm font-medium text-white mb-2">Select Role</label>
 							<div className="space-y-2">
 								{Object.values(ClubRole).map((r) => (
 									<label
 										key={r}
 										className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${
-											role === r
-												? "bg-accent/20 border-accent"
-												: "bg-white/5 border-white/10 hover:border-white/20"
+											role === r ? "bg-accent/20 border-accent" : "bg-white/5 border-white/10 hover:border-white/20"
 										}`}>
 										<div className="flex items-center gap-3">
 											<input
@@ -161,20 +141,10 @@ export default function InviteMemberModal({
 
 				{/* Actions */}
 				<div className="flex gap-3 pt-2">
-					<Button
-						variant="ghost"
-						color="neutral"
-						fullWidth
-						onClick={handleClose}>
+					<Button variant="ghost" color="neutral" fullWidth onClick={handleClose}>
 						Cancel
 					</Button>
-					<Button
-						variant="solid"
-						color="accent"
-						fullWidth
-						onClick={handleInvite}
-						disabled={!selectedUser}
-						loading={isLoading}>
+					<Button variant="default" color="accent" fullWidth onClick={handleInvite} disabled={!selectedUser} loading={isLoading}>
 						Invite Member
 					</Button>
 				</div>

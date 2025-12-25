@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Button, Input } from "@/components";
 import Modal from "@/components/ui/modal";
-import Button from "@/components/ui/button";
-import Input from "@/components/ui/input";
+import { useState } from "react";
 import { TeamEvent } from "../types";
 
 interface TeamEventFormModalProps {
@@ -12,11 +11,7 @@ interface TeamEventFormModalProps {
 	onSubmit: (event: Omit<TeamEvent, "id" | "createdAt">) => void;
 }
 
-export default function TeamEventFormModal({
-	isOpen,
-	onClose,
-	onSubmit,
-}: TeamEventFormModalProps) {
+export default function TeamEventFormModal({ isOpen, onClose, onSubmit }: TeamEventFormModalProps) {
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [startTime, setStartTime] = useState("");
@@ -46,17 +41,10 @@ export default function TeamEventFormModal({
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} title="Create Event" size="md">
 			<form onSubmit={handleSubmit} className="space-y-4">
-				<Input
-					label="Event Name"
-					value={name}
-					onChange={(e) => setName(e.target.value)}
-					required
-				/>
+				<Input label="Event Name" value={name} onChange={(e) => setName(e.target.value)} required />
 
 				<div>
-					<label className="block text-sm font-medium text-white mb-2">
-						Description
-					</label>
+					<label className="block text-sm font-medium text-white mb-2">Description</label>
 					<textarea
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
@@ -92,19 +80,10 @@ export default function TeamEventFormModal({
 					</div>
 				</div>
 
-				<Input
-					label="Location"
-					value={location}
-					onChange={(e) => setLocation(e.target.value)}
-				/>
+				<Input label="Location" value={location} onChange={(e) => setLocation(e.target.value)} />
 
 				<div className="flex gap-3 pt-4">
-					<Button
-						type="button"
-						variant="ghost"
-						color="neutral"
-						fullWidth
-						onClick={onClose}>
+					<Button type="button" variant="ghost" color="neutral" fullWidth onClick={onClose}>
 						Cancel
 					</Button>
 					<Button type="submit" variant="solid" color="accent" fullWidth>

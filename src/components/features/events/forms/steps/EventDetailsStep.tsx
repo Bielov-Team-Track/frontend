@@ -1,8 +1,8 @@
-import { Controller } from "react-hook-form";
-import { Input, TextArea, RadioCards } from "@/components/ui";
-import { Gamepad2, Trophy, Warehouse, Trees, Waves } from "lucide-react";
-import { useEventFormContext } from "../context/EventFormContext";
+import { Input, RadioCards, TextArea } from "@/components";
 import { EventType, PlayingSurface } from "@/lib/models/Event";
+import { Gamepad2, Trees, Trophy, Warehouse, Waves } from "lucide-react";
+import { Controller } from "react-hook-form";
+import { useEventFormContext } from "../context/EventFormContext";
 
 const eventTypeCards = [
 	{
@@ -51,9 +51,7 @@ export function EventDetailsStep() {
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
 			<div>
 				<h2 className="text-xl font-bold text-white mb-1">Event Details</h2>
-				<p className="text-muted text-sm">
-					Let&apos;s start with the basic information about your event.
-				</p>
+				<p className="text-muted text-sm">Let&apos;s start with the basic information about your event.</p>
 			</div>
 
 			<div className="space-y-6">
@@ -63,7 +61,6 @@ export function EventDetailsStep() {
 					render={({ field }) => (
 						<Input
 							{...field}
-							label="Event Name"
 							placeholder="e.g., Sunday Beach Volleyball Tournament"
 							error={errors.name?.message}
 							helperText="Give your event a catchy and descriptive name"

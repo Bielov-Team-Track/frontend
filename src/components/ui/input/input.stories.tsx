@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import Input from "./index";
+import { Input } from "./index";
 import { User, Mail, Lock, Search, Phone, Calendar } from "lucide-react";
 
 const meta: Meta<typeof Input> = {
@@ -10,7 +10,7 @@ const meta: Meta<typeof Input> = {
 		docs: {
 			description: {
 				component:
-					"A versatile input component with support for labels, validation, icons, password visibility toggle, and various styling variants. Built with responsive typography and accessibility features.",
+					"A composite input component built on shadcn primitives with support for labels, validation, icons, and password visibility toggle. Includes proper accessibility features and consistent styling.",
 			},
 		},
 	},
@@ -26,32 +26,7 @@ const meta: Meta<typeof Input> = {
 		},
 		helperText: {
 			control: { type: "text" },
-			description:
-				"Helper text displayed below the input when no error is present",
-		},
-		variant: {
-			control: { type: "select" },
-			options: ["default", "bordered", "ghost"],
-			description: "The visual style variant of the input",
-			table: {
-				defaultValue: { summary: "bordered" },
-			},
-		},
-		size: {
-			control: { type: "select" },
-			options: ["xs", "sm", "md", "lg", "xl"],
-			description: "The size of the input field",
-			table: {
-				defaultValue: { summary: "md" },
-			},
-		},
-		fullWidth: {
-			control: { type: "boolean" },
-			description:
-				"Whether the input should take the full width of its container",
-			table: {
-				defaultValue: { summary: "true" },
-			},
+			description: "Helper text displayed below the input when no error is present",
 		},
 		disabled: {
 			control: { type: "boolean" },
@@ -60,6 +35,10 @@ const meta: Meta<typeof Input> = {
 		required: {
 			control: { type: "boolean" },
 			description: "Whether the input is required (shows asterisk in label)",
+		},
+		optional: {
+			control: { type: "boolean" },
+			description: "Whether to show (optional) text in label",
 		},
 		showPasswordToggle: {
 			control: { type: "boolean" },
@@ -84,6 +63,13 @@ const meta: Meta<typeof Input> = {
 	args: {
 		onChange: () => {},
 	},
+	decorators: [
+		(Story) => (
+			<div className="w-80">
+				<Story />
+			</div>
+		),
+	],
 };
 
 export default meta;
@@ -114,6 +100,15 @@ export const Required: Story = {
 	},
 };
 
+// Optional field
+export const Optional: Story = {
+	args: {
+		label: "Nickname",
+		placeholder: "Enter nickname",
+		optional: true,
+	},
+};
+
 // With helper text
 export const WithHelperText: Story = {
 	args: {
@@ -129,58 +124,8 @@ export const WithError: Story = {
 	args: {
 		label: "Email",
 		type: "email",
-		value: "invalid-email",
+		defaultValue: "invalid-email",
 		error: "Please enter a valid email address",
-	},
-};
-
-// Variant stories
-export const Bordered: Story = {
-	args: {
-		label: "Bordered Input",
-		variant: "bordered",
-		placeholder: "Bordered variant",
-	},
-};
-
-export const Ghost: Story = {
-	args: {
-		label: "Ghost Input",
-		variant: "ghost",
-		placeholder: "Ghost variant",
-	},
-};
-
-export const DefaultVariant: Story = {
-	args: {
-		label: "Default Input",
-		variant: "default",
-		placeholder: "Default variant",
-	},
-};
-
-// Size stories
-export const Small: Story = {
-	args: {
-		label: "Small Input",
-		size: "sm",
-		placeholder: "Small size",
-	},
-};
-
-export const Medium: Story = {
-	args: {
-		label: "Medium Input",
-		size: "md",
-		placeholder: "Medium size",
-	},
-};
-
-export const Large: Story = {
-	args: {
-		label: "Large Input",
-		size: "lg",
-		placeholder: "Large size",
 	},
 };
 
@@ -190,15 +135,7 @@ export const Disabled: Story = {
 		label: "Disabled Input",
 		placeholder: "This input is disabled",
 		disabled: true,
-		value: "Disabled value",
-	},
-};
-
-export const Focused: Story = {
-	args: {
-		label: "Focused Input",
-		placeholder: "Click to focus",
-		autoFocus: true,
+		defaultValue: "Disabled value",
 	},
 };
 
@@ -277,50 +214,6 @@ export const SearchInput: Story = {
 	},
 };
 
-// Showcase all variants
-export const AllVariants: Story = {
-	render: () => (
-		<div className="space-y-4 w-80">
-			<Input
-				label="Bordered Input"
-				variant="bordered"
-				placeholder="Bordered variant"
-			/>
-			<Input label="Ghost Input" variant="ghost" placeholder="Ghost variant" />
-			<Input
-				label="Default Input"
-				variant="default"
-				placeholder="Default variant"
-			/>
-		</div>
-	),
-	parameters: {
-		docs: {
-			description: {
-				story: "All available input variants displayed together.",
-			},
-		},
-	},
-};
-
-// Showcase all sizes
-export const AllSizes: Story = {
-	render: () => (
-		<div className="space-y-4 w-80">
-			<Input label="Small Input" size="sm" placeholder="Small size" />
-			<Input label="Medium Input" size="md" placeholder="Medium size" />
-			<Input label="Large Input" size="lg" placeholder="Large size" />
-		</div>
-	),
-	parameters: {
-		docs: {
-			description: {
-				story: "All available input sizes displayed together.",
-			},
-		},
-	},
-};
-
 // Form examples
 export const LoginForm: Story = {
 	render: () => (
@@ -345,8 +238,7 @@ export const LoginForm: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story:
-					"Example login form using input components with icons and password toggle.",
+				story: "Example login form using input components with icons and password toggle.",
 			},
 		},
 	},
@@ -374,8 +266,14 @@ export const ProfileForm: Story = {
 				placeholder="+1 (555) 123-4567"
 				leftIcon={<Phone size={16} />}
 				helperText="Include country code"
+				optional
 			/>
-			<Input label="Date of Birth" type="date" leftIcon={<Calendar size={16} />} />
+			<Input
+				label="Date of Birth"
+				type="date"
+				leftIcon={<Calendar size={16} />}
+				optional
+			/>
 		</div>
 	),
 	parameters: {
@@ -393,13 +291,13 @@ export const ValidationStates: Story = {
 		<div className="space-y-4 w-80">
 			<Input
 				label="Valid Input"
-				value="john@example.com"
+				defaultValue="john@example.com"
 				leftIcon={<Mail size={16} />}
 				helperText="This email is available"
 			/>
 			<Input
 				label="Invalid Email"
-				value="invalid-email"
+				defaultValue="invalid-email"
 				leftIcon={<Mail size={16} />}
 				error="Please enter a valid email address"
 			/>
@@ -415,32 +313,7 @@ export const ValidationStates: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story:
-					"Different validation states showing helper text and error messages.",
-			},
-		},
-	},
-};
-
-// Width variations
-export const WidthVariations: Story = {
-	render: () => (
-		<div className="space-y-4">
-			<div>
-				<h3 className="text-lg font-semibold mb-2">Full Width (Default)</h3>
-				<Input placeholder="Full width input" fullWidth />
-			</div>
-			<div>
-				<h3 className="text-lg font-semibold mb-2">Auto Width</h3>
-				<Input placeholder="Auto width input" fullWidth={false} />
-			</div>
-		</div>
-	),
-	parameters: {
-		layout: "padded",
-		docs: {
-			description: {
-				story: "Demonstrates full width vs auto width input variations.",
+				story: "Different validation states showing helper text and error messages.",
 			},
 		},
 	},
@@ -451,16 +324,15 @@ export const InteractiveExamples: Story = {
 	render: () => (
 		<div className="space-y-6 w-80">
 			<div>
-				<h3 className="text-lg font-semibold mb-4">Search with Icon</h3>
+				<h3 className="text-sm font-semibold mb-3">Search with Icon</h3>
 				<Input
 					placeholder="Search events, players, teams..."
 					leftIcon={<Search size={16} />}
-					variant="bordered"
 				/>
 			</div>
 
 			<div>
-				<h3 className="text-lg font-semibold mb-4">Password with Toggle</h3>
+				<h3 className="text-sm font-semibold mb-3">Password with Toggle</h3>
 				<Input
 					label="Password"
 					type="password"
@@ -472,7 +344,7 @@ export const InteractiveExamples: Story = {
 			</div>
 
 			<div>
-				<h3 className="text-lg font-semibold mb-4">Required Field</h3>
+				<h3 className="text-sm font-semibold mb-3">Required Field</h3>
 				<Input
 					label="Username"
 					placeholder="Choose a unique username"
@@ -497,11 +369,9 @@ export const Playground: Story = {
 	args: {
 		label: "Playground Input",
 		placeholder: "Test different props...",
-		variant: "bordered",
-		size: "md",
-		fullWidth: true,
 		disabled: false,
 		required: false,
+		optional: false,
 		showPasswordToggle: false,
 		type: "text",
 	},

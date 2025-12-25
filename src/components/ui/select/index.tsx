@@ -1,16 +1,15 @@
-import React, { forwardRef } from "react";
-import { AlertCircle } from "lucide-react";
+"use client";
+
+import React, { forwardRef, useId } from "react";
+import { AlertCircle, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Label } from "../label";
 
 export interface SelectOption {
 	value: string | number;
 	label: string;
-	icon?: React.ReactNode;
 	disabled?: boolean;
 }
-
-type SelectSize = "xs" | "sm" | "md" | "lg" | "xl";
-type SelectVariant = "default" | "bordered" | "ghost";
 
 export interface SelectProps
 	extends Omit<
@@ -20,9 +19,6 @@ export interface SelectProps
 	label?: string;
 	error?: string;
 	helperText?: string;
-	variant?: SelectVariant;
-	selectSize?: SelectSize;
-	fullWidth?: boolean;
 	options: SelectOption[];
 	placeholder?: string;
 	leftIcon?: React.ReactNode;
@@ -38,42 +34,25 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 			label,
 			error,
 			helperText,
-			variant = "bordered",
-			selectSize = "md",
-			fullWidth = true,
 			options,
 			placeholder,
 			leftIcon,
-			className = "",
+			className,
 			disabled,
 			value,
 			onChange,
 			clearable = false,
 			optional,
+			id: providedId,
 			...props
 		},
-		ref,
+		ref
 	) => {
-		// DaisyUI size classes
-		const sizeClass = {
-			xs: "select-xs",
-			sm: "select-sm",
-			md: "select-md",
-			lg: "select-lg",
-			xl: "select-xl",
-		}[selectSize];
+		const generatedId = useId();
+		const id = providedId || generatedId;
+		const hasError = Boolean(error);
+		const displayValue = value ?? "";
 
-		// DaisyUI variant classes
-		const variantClass = {
-			default: "",
-			bordered: "",
-			ghost: "select-ghost",
-		}[variant];
-
-		// DaisyUI error state
-		const errorClass = error ? "select-error" : "";
-
-		// Handle change event
 		const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 			const newValue = e.target.value;
 			if (onChange) {
@@ -81,47 +60,63 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 			}
 		};
 
-		const displayValue = value ?? "";
-
 		return (
-			<div className={cn("form-control", fullWidth ? "w-full" : "w-auto")}>
+			<div className="flex flex-col gap-1.5 w-full" data-disabled={disabled}>
+				{/* Label */}
 				{label && (
-					<label className={cn("label", disabled && "opacity-50")}>
-						<span className={cn("label-text", error && "text-error")}>
-							{label}
-							{props.required && <span className="text-error ml-1">*</span>}
-							{optional && !props.required && <span className="text-base-content/50 ml-1.5 font-normal text-xs">(optional)</span>}
-						</span>
-					</label>
+					<Label
+						htmlFor={id}
+						className={cn(hasError && "text-destructive")}
+					>
+						{label}
+						{props.required && (
+							<span className="text-destructive ml-1">*</span>
+						)}
+						{optional && !props.required && (
+							<span className="text-muted-foreground ml-1.5 font-normal text-xs">
+								(optional)
+							</span>
+						)}
+					</Label>
 				)}
 
 				<div className="relative">
 					{leftIcon && (
-						<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10 text-base-content/50">
+						<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
 							{leftIcon}
 						</div>
 					)}
 
 					<select
 						ref={ref}
-						className={cn(
-							"select",
-							sizeClass,
-							variantClass,
-							errorClass,
-							fullWidth && "w-full",
-							leftIcon && "pl-10",
-							className
-						)}
+						id={id}
 						disabled={disabled}
 						value={displayValue}
 						onChange={handleChange}
+						aria-invalid={hasError}
+						aria-describedby={
+							error ? `${id}-error` : helperText ? `${id}-helper` : undefined
+						}
+						className={cn(
+							// Base styles matching Input
+							"flex h-9 w-full rounded-lg border bg-transparent px-3 py-1 text-base transition-colors md:text-sm appearance-none cursor-pointer",
+							// Border & focus
+							"border-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+							// Disabled
+							"disabled:cursor-not-allowed disabled:opacity-50",
+							// Error state
+							hasError && "border-destructive focus-visible:ring-destructive/30",
+							// Icon padding
+							leftIcon && "pl-10",
+							// Right padding for chevron
+							"pr-10",
+							className
+						)}
 						{...props}
 					>
 						<option value="" disabled>
 							{placeholder || (clearable ? "-- Clear --" : "-- Select --")}
 						</option>
-
 						{options.map((option) => (
 							<option
 								key={option.value}
@@ -132,21 +127,37 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 							</option>
 						))}
 					</select>
+
+					{/* Chevron icon */}
+					<div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-muted-foreground">
+						<ChevronDown size={16} />
+					</div>
 				</div>
 
-				{helperText && !error && <p className="mt-1.5 text-xs text-base-content/50">{helperText}</p>}
+				{/* Helper Text */}
+				{helperText && !error && (
+					<p id={`${id}-helper`} className="text-xs text-muted-foreground">
+						{helperText}
+					</p>
+				)}
 
+				{/* Error Message */}
 				{error && (
-					<div className="flex items-center gap-1.5 mt-1.5 text-error animate-in slide-in-from-top-1 fade-in duration-200">
-						<AlertCircle size={14} />
+					<div
+						id={`${id}-error`}
+						role="alert"
+						className="flex items-center gap-1.5 text-destructive"
+					>
+						<AlertCircle size={14} className="shrink-0" />
 						<span className="text-xs">{error}</span>
 					</div>
 				)}
 			</div>
 		);
-	},
+	}
 );
 
 Select.displayName = "Select";
 
+export { Select };
 export default Select;

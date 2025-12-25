@@ -59,7 +59,7 @@ export default function DeleteClubModal({ isOpen, clubName, onClose, onConfirm, 
 					<Button variant="ghost" fullWidth onClick={handleClose} disabled={isLoading}>
 						Cancel
 					</Button>
-					<Button variant="solid" color="error" fullWidth onClick={onConfirm} disabled={!isValid} loading={isLoading}>
+					<Button variant="default" color="error" fullWidth onClick={onConfirm} disabled={!isValid} loading={isLoading}>
 						Delete Club Forever
 					</Button>
 				</div>

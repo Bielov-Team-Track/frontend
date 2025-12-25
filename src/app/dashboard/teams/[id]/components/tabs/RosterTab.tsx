@@ -1,14 +1,14 @@
 "use client";
 
+import { Button } from "@/components";
 import { AddTeamMemberModal, EditTeamMemberModal, RosterSidebar, VolleyballCourt } from "@/components/features/teams";
-import { PlayerDragOverlay, groupMembersByPosition, POSITION_ORDER } from "@/components/features/teams/components/RosterSidebar";
-import Button from "@/components/ui/button";
-import { ClubMember, Team, TeamMember, VolleyballPosition, PositionAssignment } from "@/lib/models/Club";
+import { PlayerDragOverlay } from "@/components/features/teams/components/RosterSidebar";
 import { addTeamMember, updateTeamMember } from "@/lib/api/clubs";
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors, DragOverEvent, rectIntersection } from "@dnd-kit/core";
+import { ClubMember, PositionAssignment, Team, TeamMember, VolleyballPosition } from "@/lib/models/Club";
+import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, PointerSensor, rectIntersection, useSensor, useSensors } from "@dnd-kit/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserPlus } from "lucide-react";
-import { useState, useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 interface RosterTabProps {
 	team: Team;
@@ -18,13 +18,13 @@ interface RosterTabProps {
 
 // Map court position IDs to VolleyballPosition enum
 const COURT_TO_POSITION: Record<string, VolleyballPosition> = {
-	"P1": VolleyballPosition.Setter,
-	"P2": VolleyballPosition.OppositeHitter,
-	"P3": VolleyballPosition.MiddleBlocker,
-	"P4": VolleyballPosition.OutsideHitter,
-	"P5": VolleyballPosition.OutsideHitter,
-	"P6": VolleyballPosition.MiddleBlocker,
-	"Libero": VolleyballPosition.Libero,
+	P1: VolleyballPosition.Setter,
+	P2: VolleyballPosition.OppositeHitter,
+	P3: VolleyballPosition.MiddleBlocker,
+	P4: VolleyballPosition.OutsideHitter,
+	P5: VolleyballPosition.OutsideHitter,
+	P6: VolleyballPosition.MiddleBlocker,
+	Libero: VolleyballPosition.Libero,
 };
 
 export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps) {
@@ -80,11 +80,12 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 	});
 
 	// Get member IDs array from assignments for a position (for compatibility with VolleyballCourt)
-	const getAssignmentMemberIds = useCallback((positionId: string): string[] => {
-		return (courtAssignments[positionId] || [])
-			.sort((a, b) => a.priority - b.priority)
-			.map(a => a.memberId);
-	}, [courtAssignments]);
+	const getAssignmentMemberIds = useCallback(
+		(positionId: string): string[] => {
+			return (courtAssignments[positionId] || []).sort((a, b) => a.priority - b.priority).map((a) => a.memberId);
+		},
+		[courtAssignments]
+	);
 
 	// Convert assignments to the format VolleyballCourt expects
 	const courtAssignmentsForCourt = useMemo(() => {
@@ -94,56 +95,59 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 		}, {} as Record<string, string[]>);
 	}, [courtAssignments, getAssignmentMemberIds]);
 
-	const togglePlayerAssignment = useCallback((memberId: string) => {
-		if (!assigningPosition) return;
+	const togglePlayerAssignment = useCallback(
+		(memberId: string) => {
+			if (!assigningPosition) return;
 
-		const member = team.members?.find(m => m.id === memberId);
-		if (!member) return;
+			const member = team.members?.find((m) => m.id === memberId);
+			if (!member) return;
 
-		setCourtAssignments((prev) => {
-			const current = prev[assigningPosition] || [];
-			const existingIdx = current.findIndex(a => a.memberId === memberId);
+			setCourtAssignments((prev) => {
+				const current = prev[assigningPosition] || [];
+				const existingIdx = current.findIndex((a) => a.memberId === memberId);
 
-			if (existingIdx >= 0) {
-				// Remove from position
-				const newAssignments = current.filter(a => a.memberId !== memberId);
-				// Update priorities
-				const reindexed = newAssignments.map((a, idx) => ({ ...a, priority: idx }));
+				if (existingIdx >= 0) {
+					// Remove from position
+					const newAssignments = current.filter((a) => a.memberId !== memberId);
+					// Update priorities
+					const reindexed = newAssignments.map((a, idx) => ({ ...a, priority: idx }));
 
-				// Also remove this position from member's positions
-				const positionToRemove = COURT_TO_POSITION[assigningPosition];
-				if (positionToRemove && member.positions?.includes(positionToRemove)) {
-					const newPositions = member.positions.filter(p => p !== positionToRemove);
-					updatePositionMutation.mutate({ memberId, positions: newPositions });
-				}
-
-				return {
-					...prev,
-					[assigningPosition]: reindexed,
-				};
-			} else {
-				// Add to position at the end (lowest priority)
-				const newPriority = current.length;
-
-				// Add this position to member's positions
-				const positionToAdd = COURT_TO_POSITION[assigningPosition];
-				if (positionToAdd) {
-					const currentPositions = member.positions || [];
-					if (!currentPositions.includes(positionToAdd)) {
-						updatePositionMutation.mutate({
-							memberId,
-							positions: [...currentPositions, positionToAdd]
-						});
+					// Also remove this position from member's positions
+					const positionToRemove = COURT_TO_POSITION[assigningPosition];
+					if (positionToRemove && member.positions?.includes(positionToRemove)) {
+						const newPositions = member.positions.filter((p) => p !== positionToRemove);
+						updatePositionMutation.mutate({ memberId, positions: newPositions });
 					}
-				}
 
-				return {
-					...prev,
-					[assigningPosition]: [...current, { memberId, priority: newPriority }],
-				};
-			}
-		});
-	}, [assigningPosition, team.members, updatePositionMutation]);
+					return {
+						...prev,
+						[assigningPosition]: reindexed,
+					};
+				} else {
+					// Add to position at the end (lowest priority)
+					const newPriority = current.length;
+
+					// Add this position to member's positions
+					const positionToAdd = COURT_TO_POSITION[assigningPosition];
+					if (positionToAdd) {
+						const currentPositions = member.positions || [];
+						if (!currentPositions.includes(positionToAdd)) {
+							updatePositionMutation.mutate({
+								memberId,
+								positions: [...currentPositions, positionToAdd],
+							});
+						}
+					}
+
+					return {
+						...prev,
+						[assigningPosition]: [...current, { memberId, priority: newPriority }],
+					};
+				}
+			});
+		},
+		[assigningPosition, team.members, updatePositionMutation]
+	);
 
 	const handleDragStart = (event: DragStartEvent) => {
 		const { active } = event;
@@ -184,7 +188,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 			// Add player to the court position
 			setCourtAssignments((prev) => {
 				const current = prev[positionId] || [];
-				const existingIdx = current.findIndex(a => a.memberId === draggedMemberId);
+				const existingIdx = current.findIndex((a) => a.memberId === draggedMemberId);
 
 				// Already in this position
 				if (existingIdx >= 0) return prev;
@@ -199,7 +203,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 					if (!currentPositions.includes(positionToAdd)) {
 						updatePositionMutation.mutate({
 							memberId: draggedMemberId,
-							positions: [...currentPositions, positionToAdd]
+							positions: [...currentPositions, positionToAdd],
 						});
 					}
 				}
@@ -262,68 +266,77 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 	}, []);
 
 	// Reorder players within a sidebar position section
-	const handleReorderInSidebarPosition = useCallback((position: VolleyballPosition | "Unassigned", oldIndex: number, newIndex: number) => {
-		// Get current members for this position
-		const positionMembers = (team.members || []).filter((member) => {
-			if (position === "Unassigned") {
-				return !member.positions || member.positions.length === 0;
-			}
-			return member.positions?.includes(position);
-		});
+	const handleReorderInSidebarPosition = useCallback(
+		(position: VolleyballPosition | "Unassigned", oldIndex: number, newIndex: number) => {
+			// Get current members for this position
+			const positionMembers = (team.members || []).filter((member) => {
+				if (position === "Unassigned") {
+					return !member.positions || member.positions.length === 0;
+				}
+				return member.positions?.includes(position);
+			});
 
-		// Get current priority order or create default from members
-		const currentOrder = sidebarPriorities[position] || positionMembers.map(m => m.id);
+			// Get current priority order or create default from members
+			const currentOrder = sidebarPriorities[position] || positionMembers.map((m) => m.id);
 
-		// Reorder
-		const newOrder = [...currentOrder];
-		const [moved] = newOrder.splice(oldIndex, 1);
-		newOrder.splice(newIndex, 0, moved);
+			// Reorder
+			const newOrder = [...currentOrder];
+			const [moved] = newOrder.splice(oldIndex, 1);
+			newOrder.splice(newIndex, 0, moved);
 
-		setSidebarPriorities(prev => ({
-			...prev,
-			[position]: newOrder,
-		}));
+			setSidebarPriorities((prev) => ({
+				...prev,
+				[position]: newOrder,
+			}));
 
-		// TODO: Optionally persist this order to the backend
-	}, [team.members, sidebarPriorities]);
+			// TODO: Optionally persist this order to the backend
+		},
+		[team.members, sidebarPriorities]
+	);
 
 	// Remove a player from a court position (used by VolleyballCourt)
-	const handleRemoveFromCourtPosition = useCallback((positionId: string, memberId: string) => {
-		const member = team.members?.find(m => m.id === memberId);
+	const handleRemoveFromCourtPosition = useCallback(
+		(positionId: string, memberId: string) => {
+			const member = team.members?.find((m) => m.id === memberId);
 
-		setCourtAssignments((prev) => {
-			const current = prev[positionId] || [];
-			const filtered = current.filter(a => a.memberId !== memberId);
-			const reindexed = filtered.map((a, idx) => ({ ...a, priority: idx }));
+			setCourtAssignments((prev) => {
+				const current = prev[positionId] || [];
+				const filtered = current.filter((a) => a.memberId !== memberId);
+				const reindexed = filtered.map((a, idx) => ({ ...a, priority: idx }));
 
-			return {
-				...prev,
-				[positionId]: reindexed,
-			};
-		});
+				return {
+					...prev,
+					[positionId]: reindexed,
+				};
+			});
 
-		// Remove this position from member's positions
-		if (member) {
-			const positionToRemove = COURT_TO_POSITION[positionId];
-			if (positionToRemove && member.positions?.includes(positionToRemove)) {
-				const newPositions = member.positions.filter(p => p !== positionToRemove);
-				updatePositionMutation.mutate({ memberId, positions: newPositions });
+			// Remove this position from member's positions
+			if (member) {
+				const positionToRemove = COURT_TO_POSITION[positionId];
+				if (positionToRemove && member.positions?.includes(positionToRemove)) {
+					const newPositions = member.positions.filter((p) => p !== positionToRemove);
+					updatePositionMutation.mutate({ memberId, positions: newPositions });
+				}
 			}
-		}
-	}, [team.members, updatePositionMutation]);
+		},
+		[team.members, updatePositionMutation]
+	);
 
 	// Remove a player from a position (used by RosterSidebar)
-	const handleRemoveFromSidebarPosition = useCallback((member: TeamMember, position: VolleyballPosition | "Unassigned") => {
-		if (position === "Unassigned") return;
+	const handleRemoveFromSidebarPosition = useCallback(
+		(member: TeamMember, position: VolleyballPosition | "Unassigned") => {
+			if (position === "Unassigned") return;
 
-		const currentPositions = member.positions || [];
-		const newPositions = currentPositions.filter(p => p !== position);
+			const currentPositions = member.positions || [];
+			const newPositions = currentPositions.filter((p) => p !== position);
 
-		updatePositionMutation.mutate({
-			memberId: member.id,
-			positions: newPositions,
-		});
-	}, [updatePositionMutation]);
+			updatePositionMutation.mutate({
+				memberId: member.id,
+				positions: newPositions,
+			});
+		},
+		[updatePositionMutation]
+	);
 
 	return (
 		<DndContext
@@ -332,15 +345,14 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 			onDragStart={handleDragStart}
 			onDragOver={handleDragOver}
 			onDragEnd={handleDragEnd}
-			onDragCancel={handleDragCancel}
-		>
+			onDragCancel={handleDragCancel}>
 			<div className="space-y-6">
 				{/* Action Header */}
 				<div className="flex items-center justify-between lg:justify-end">
 					{/* Mobile Title */}
 					<h3 className="lg:hidden text-lg font-bold text-white">Team Roster</h3>
 
-					<Button variant="solid" color="accent" onClick={() => setShowAddModal(true)} leftIcon={<UserPlus size={16} />}>
+					<Button variant="default" color="accent" onClick={() => setShowAddModal(true)} leftIcon={<UserPlus size={16} />}>
 						Add Member
 					</Button>
 				</div>
@@ -398,9 +410,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 			</div>
 
 			{/* Drag Overlay - Shows dragged player */}
-			<DragOverlay dropAnimation={null}>
-				{activeDragMember && <PlayerDragOverlay member={activeDragMember} />}
-			</DragOverlay>
+			<DragOverlay dropAnimation={null}>{activeDragMember && <PlayerDragOverlay member={activeDragMember} />}</DragOverlay>
 		</DndContext>
 	);
 }
