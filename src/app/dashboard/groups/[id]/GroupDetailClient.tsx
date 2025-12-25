@@ -187,7 +187,7 @@ export default function GroupDetailClient({ groupId }: Props) {
 						backgroundColor: group.color || "#6B7280",
 						opacity: 0.8,
 					}}>
-					<div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+					<div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
 				</div>
 
 				{/* Info Row */}
@@ -395,7 +395,7 @@ function PostsTab() {
 						onChange={(e) => setNewPostContent(e.target.value)}
 						placeholder="Share something with the group..."
 						rows={3}
-						className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:border-accent resize-none"
+						className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent resize-none"
 					/>
 					<div className="flex justify-end">
 						<button
@@ -677,7 +677,7 @@ function CreateGroupEventModal({
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
 			<div
-				className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+				className="absolute inset-0 bg-black/60 backdrop-blur-xs"
 				onClick={onClose}
 			/>
 			<div className="relative w-full max-w-md rounded-2xl bg-background-light border border-white/10 shadow-2xl">
@@ -699,7 +699,7 @@ function CreateGroupEventModal({
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							required
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 					<div>
@@ -710,7 +710,7 @@ function CreateGroupEventModal({
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
 							rows={2}
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent resize-none"
+							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent resize-none"
 						/>
 					</div>
 					<div className="grid grid-cols-2 gap-4">
@@ -723,7 +723,7 @@ function CreateGroupEventModal({
 								value={startTime}
 								onChange={(e) => setStartTime(e.target.value)}
 								required
-								className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent"
+								className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 							/>
 						</div>
 						<div>
@@ -735,7 +735,7 @@ function CreateGroupEventModal({
 								value={endTime}
 								onChange={(e) => setEndTime(e.target.value)}
 								required
-								className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent"
+								className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 							/>
 						</div>
 					</div>
@@ -747,7 +747,7 @@ function CreateGroupEventModal({
 							type="text"
 							value={location}
 							onChange={(e) => setLocation(e.target.value)}
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 					<div className="flex gap-3 pt-4">
@@ -796,7 +796,7 @@ function AddGroupMemberModal({
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
 			<div
-				className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+				className="absolute inset-0 bg-black/60 backdrop-blur-xs"
 				onClick={onClose}
 			/>
 			<div className="relative w-full max-w-lg rounded-2xl bg-background-light border border-white/10 shadow-2xl max-h-[80vh] flex flex-col">
@@ -819,7 +819,7 @@ function AddGroupMemberModal({
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
 							placeholder="Search club members..."
-							className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:border-accent"
+							className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 				</div>
@@ -905,7 +905,7 @@ function GroupSettingsForm({
 							type="text"
 							value={name}
 							onChange={(e) => setName(e.target.value)}
-							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-none focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 					<div>
@@ -916,7 +916,7 @@ function GroupSettingsForm({
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
 							rows={3}
-							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-none focus:border-accent resize-none"
+							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-hidden focus:border-accent resize-none"
 						/>
 					</div>
 				</div>
@@ -928,7 +928,7 @@ function GroupSettingsForm({
 						<select
 							value={skillLevel}
 							onChange={(e) => setSkillLevel(e.target.value)}
-							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-none focus:border-accent">
+							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-hidden focus:border-accent">
 							<option value="">Select skill level</option>
 							{Object.values(SkillLevel).map((level) => (
 								<option key={level} value={level}>

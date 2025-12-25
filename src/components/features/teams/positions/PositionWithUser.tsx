@@ -93,14 +93,14 @@ function PositionWithUser({
 					className="flex gap-3 items-center group flex-1 min-w-0"
                     onClick={(e) => e.stopPropagation()} // Prevent expansion when clicking profile
 				>
-					<Avatar profile={userProfile!} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors flex-shrink-0" />
+					<Avatar profile={userProfile!} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors shrink-0" />
 					<div className="flex flex-col min-w-0">
 						<div className="flex items-center gap-1.5">
 							<span className="whitespace-nowrap font-bold text-sm text-white group-hover:text-accent transition-colors truncate">
 								{userProfile?.name} {userProfile?.surname}
 							</span>
 							{team.captain?.userId === userProfile?.userId && (
-								<Crown size={12} className="text-accent flex-shrink-0 fill-accent" />
+								<Crown size={12} className="text-accent shrink-0 fill-accent" />
 							)}
 						</div>
 						<span className="text-muted text-[10px] uppercase font-bold tracking-wider truncate">{position.name}</span>

@@ -123,7 +123,7 @@ function Team({
 	return (
 		<div className="bg-[#1E1E1E] border border-white/5 relative max-w-sm flex flex-col rounded-2xl w-full sm:w-80 shadow-lg hover:border-white/10 transition-all overflow-hidden group">
             {/* Team Header */}
-			<div className="p-4 border-b border-white/5 bg-white/[0.02]">
+			<div className="p-4 border-b border-white/5 bg-white/2">
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-between w-full">
 						<div className="flex gap-2 justify-between w-full items-center">
@@ -255,7 +255,7 @@ const AddNewPosition = ({ teamId, onPositionAdded }: AddNewPositionProps) => {
 				<input
 					type="text"
 					placeholder="Position name (e.g. Setter)"
-					className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent/50 transition-colors"
+					className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-hidden focus:border-accent/50 transition-colors"
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
 							handleAddNewPosition();

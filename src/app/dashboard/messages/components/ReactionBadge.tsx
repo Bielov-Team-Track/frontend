@@ -51,7 +51,7 @@ export const ReactionBadge = ({ messageId, emoji, userIds, currentUserId, onReac
 			className={clsx(
 				"text-xs px-2 py-0.5 rounded-full transition-all cursor-pointer min-w-[40px]",
 				hasError && "animate-shake border-error/60 bg-error/10",
-				!hasError && hasReacted && "bg-primary/20 outline outline-2 outline-primary/40",
+				!hasError && hasReacted && "bg-primary/20 outline-solid outline-2 outline-primary/40",
 				!hasError && !hasReacted && "bg-muted/10 hover:bg-muted/20",
 				isLoading && "opacity-70"
 			)}

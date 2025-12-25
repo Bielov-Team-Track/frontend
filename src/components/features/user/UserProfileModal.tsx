@@ -50,7 +50,7 @@ export default function UserProfileModal({ user, isOpen, onClose, onChatCreated 
 			<div className="flex flex-col gap-6">
 				{/* Header / Cover */}
 				<div className="relative">
-					<div className="h-24 w-full bg-gradient-to-r from-blue-900 to-purple-900 rounded-xl overflow-hidden opacity-80" />
+					<div className="h-24 w-full bg-linear-to-r from-blue-900 to-purple-900 rounded-xl overflow-hidden opacity-80" />
 					<div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
 						<div 
 							className="w-20 h-20 rounded-full border-4 border-[#141414] flex items-center justify-center overflow-hidden bg-[#141414]"

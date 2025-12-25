@@ -67,7 +67,7 @@ const Section: React.FC<SectionProps> = ({
 			<div className="flex-1">
 				<div className="flex items-center gap-3 mb-1">
 					{displayIcon && (
-						<div className="flex-shrink-0 text-xl">{displayIcon}</div>
+						<div className="shrink-0 text-xl">{displayIcon}</div>
 					)}
 					{title && <h3 className="font-semibold text-xl mb-1">{title}</h3>}
 				</div>
@@ -79,7 +79,7 @@ const Section: React.FC<SectionProps> = ({
 				{children && <div className="mt-2">{children}</div>}
 			</div>
 
-			{actions && <div className="flex-shrink-0">{actions}</div>}
+			{actions && <div className="shrink-0">{actions}</div>}
 		</div>
 	);
 };

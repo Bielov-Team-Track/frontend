@@ -38,7 +38,7 @@ const BadgeDisplay = ({
 		<div className="group relative">
 			<div
 				className={cn(
-					"rounded-full bg-gradient-to-br border-2 flex items-center justify-center",
+					"rounded-full bg-linear-to-br border-2 flex items-center justify-center",
 					"transition-transform hover:scale-110",
 					sizeClasses[size],
 					rarityColors[badge.rarity],

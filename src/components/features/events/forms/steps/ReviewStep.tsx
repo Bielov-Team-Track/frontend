@@ -83,8 +83,8 @@ export function ReviewStep() {
 			{/* Event Preview Card */}
 			<div className="relative w-full rounded-2xl overflow-hidden bg-background-light border border-white/10 shadow-xl">
 				{/* Header Banner */}
-				<div className="h-24 w-full bg-gradient-to-br from-accent/30 via-accent/10 to-transparent relative">
-					<div className="absolute inset-0 bg-gradient-to-t from-background-light via-transparent to-transparent" />
+				<div className="h-24 w-full bg-linear-to-br from-accent/30 via-accent/10 to-transparent relative">
+					<div className="absolute inset-0 bg-linear-to-t from-background-light via-transparent to-transparent" />
 					<button
 						onClick={() => goToStep(1)}
 						className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-lg text-white/80 hover:text-white transition-all"

@@ -183,7 +183,7 @@ function WeekNavigation({
 	onNext: () => void;
 }) {
 	return (
-		<div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/[0.02]">
+		<div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/2">
 			<h2 className="text-2xl font-bold text-white tracking-tight">
 				{start.getMonth() != end.getMonth()
 					? format(start, "MMMM") + " - " + format(end, "MMMM yyyy")
@@ -199,7 +199,7 @@ function WeekNavigation({
 					<ChevronLeft size={16} />
 				</Button>
 
-				<div className="w-[1px] h-4 bg-white/10 mx-1"></div>
+				<div className="w-px h-4 bg-white/10 mx-1"></div>
 				<Button
 					onClick={onNext}
 					variant="ghost"
@@ -216,7 +216,7 @@ function WeekNavigation({
 function DaysHeader({ days }: { days: Date[] }) {
 	return (
 		<div className="flex mb-2 pr-4 border-b border-white/5 pb-2 pt-2 bg-white/5">
-			<div className="w-16 flex-shrink-0" />
+			<div className="w-16 shrink-0" />
 			<div className="flex-1 grid grid-cols-7">
 				{days.map((day) => (
 					<div
@@ -289,7 +289,7 @@ function HoursColumn({
 	hourHeight: number;
 }) {
 	return (
-		<div className="w-16 flex-shrink-0 border-r border-white/5 bg-white/[0.02]">
+		<div className="w-16 shrink-0 border-r border-white/5 bg-white/2">
 			{hours.map((hour) => (
 				<div
 					key={hour}
@@ -355,7 +355,7 @@ function DaysGrid({
 							<div
 								key={`${day.toISOString()}-${hour}`}
 								style={{ height: hourHeight }}
-								className="border-b border-white/5 hover:bg-white/[0.02] transition-colors cursor-pointer"
+								className="border-b border-white/5 hover:bg-white/2 transition-colors cursor-pointer"
 							/>
 						))}
 
@@ -375,7 +375,7 @@ function DaysGrid({
 							<div
 								className="absolute left-0 right-0 z-10 pointer-events-none"
 								style={{ top: `${currentTime.position}px` }}>
-								<div className="absolute -left-1.5 -top-1.5 w-3 h-3 rounded-full bg-accent border-2 border-background shadow-sm" />
+								<div className="absolute -left-1.5 -top-1.5 w-3 h-3 rounded-full bg-accent border-2 border-background shadow-xs" />
 								<div className="h-[2px] bg-accent w-full shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
 							</div>
 						)}
@@ -442,7 +442,7 @@ function EventBlock({
 				{/* Compact: time + name inline */}
 				{isCompact ? (
 					<div className="flex items-center gap-2">
-						<span className="text-[11px] font-medium text-white/50 flex-shrink-0">
+						<span className="text-[11px] font-medium text-white/50 shrink-0">
 							{format(new Date(event.startTime), "H:mm")}
 						</span>
 						<span className="text-[11px] font-medium text-white truncate">
@@ -474,7 +474,7 @@ function EventBlock({
 						{/* Location - only on large sizes */}
 						{isLarge && event.location && (
 							<div className="flex items-center gap-1.5 mt-1">
-								<MapPin size={11} className="text-white/40 flex-shrink-0" />
+								<MapPin size={11} className="text-white/40 shrink-0" />
 								<span className="text-[11px] text-white/40 truncate">
 									{event.location.name}
 								</span>

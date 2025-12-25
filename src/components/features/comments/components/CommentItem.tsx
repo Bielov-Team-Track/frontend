@@ -62,7 +62,7 @@ const CommentItem = ({ comment, isAuthor = false }: CommentItemProps) => {
 	return (
 		<div className="flex gap-4 group">
             {/* Avatar Column */}
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
 			    <Avatar profile={comment.user} className="w-10 h-10 border-2 border-transparent group-hover:border-white/10 transition-colors" />
             </div>
 
@@ -88,7 +88,7 @@ const CommentItem = ({ comment, isAuthor = false }: CommentItemProps) => {
                             </label>
                             <ul
                                 tabIndex={0}
-                                className="dropdown-content z-[1] menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-48 mt-1"
+                                className="dropdown-content z-1 menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-48 mt-1"
                             >
                                 {!showDeleteConfirm ? (
                                     <>
@@ -143,7 +143,7 @@ const CommentItem = ({ comment, isAuthor = false }: CommentItemProps) => {
                     )}
                 </div>
 
-                <div className="text-sm text-gray-200 leading-relaxed break-words bg-white/5 p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl border border-white/5">
+                <div className="text-sm text-gray-200 leading-relaxed wrap-break-word bg-white/5 p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl border border-white/5">
                     {comment.content}
                 </div>
 

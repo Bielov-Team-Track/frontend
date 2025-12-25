@@ -94,7 +94,7 @@ export default function EditTeamMemberModal({
 						value={jerseyNumber}
 						onChange={(e) => setJerseyNumber(e.target.value)}
 						placeholder="e.g. 10"
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent"
+						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 					/>
 				</div>
 

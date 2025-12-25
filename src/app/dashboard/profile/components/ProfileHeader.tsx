@@ -24,7 +24,7 @@ const ProfileHeader = ({ profile, onFollow, isOwnProfile }: ProfileHeaderProps) 
 	return (
 		<div className="flex flex-col gap-6">
 			{/* Cover Image Placeholder - could be real if backend supported it */}
-			<div className="h-48 w-full bg-gradient-to-r from-blue-900 to-purple-900 rounded-2xl relative overflow-hidden">
+			<div className="h-48 w-full bg-linear-to-r from-blue-900 to-purple-900 rounded-2xl relative overflow-hidden">
 				<div className="absolute inset-0 bg-black/20" />
 			</div>
 

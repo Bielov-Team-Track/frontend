@@ -143,7 +143,7 @@ const AvailablePosition = ({
 
 				<ul
 					tabIndex={0}
-					className="dropdown-content z-[1] menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-52 mt-1"
+					className="dropdown-content z-1 menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-52 mt-1"
 				>
 					{!showRemoveConfirm ? (
 						<>

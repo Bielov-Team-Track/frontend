@@ -69,7 +69,7 @@ export default function SocialLinksEditor({ value, onChange }: SocialLinksEditor
 								/>
 							</div>
 							<div className="flex-1">
-								<Input value={link.url} onChange={(e) => updateLink(index, { url: e.target.value })} placeholder="https://..." inputSize="sm" />
+								<Input value={link.url} onChange={(e) => updateLink(index, { url: e.target.value })} placeholder="https://..." size="sm" />
 							</div>
 							<button type="button" onClick={() => removeLink(index)} className="p-2 text-muted hover:text-red-400 transition-colors">
 								<Trash2 size={16} />

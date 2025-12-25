@@ -221,7 +221,7 @@ export default function ClaudeRosterSidebarV2({
 									{/* Position Header */}
 									<button
 										onClick={() => togglePosition(position)}
-										className={`w-full flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r ${colors.bg} border ${colors.border} transition-all hover:scale-[1.01] group`}
+										className={`w-full flex items-center gap-3 p-3 rounded-xl bg-linear-to-r ${colors.bg} border ${colors.border} transition-all hover:scale-[1.01] group`}
 									>
 										<div className={`w-10 h-10 rounded-lg bg-black/30 flex items-center justify-center ${colors.text}`}>
 											<Icon size={20} />
@@ -429,13 +429,13 @@ function ClaudeDraggableMemberRow({
 			}`}>
 				{/* Starter indicator line */}
 				{isStarter && (
-					<div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-yellow-400 to-yellow-600" />
+					<div className="absolute left-0 top-0 bottom-0 w-1 bg-linear-to-b from-yellow-400 to-yellow-600" />
 				)}
 
 				{/* Priority Badge */}
-				<div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-display font-bold flex-shrink-0 ${
+				<div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-display font-bold shrink-0 ${
 					isStarter
-						? "bg-gradient-to-br from-yellow-400 to-yellow-600 text-black shadow-lg shadow-yellow-500/30"
+						? "bg-linear-to-br from-yellow-400 to-yellow-600 text-black shadow-lg shadow-yellow-500/30"
 						: "bg-white/10 text-muted border border-white/10"
 				}`}>
 					{isStarter ? <Crown size={14} /> : index + 1}
@@ -444,7 +444,7 @@ function ClaudeDraggableMemberRow({
 				{/* Avatar */}
 				<Link
 					href={`/dashboard/clubs/${clubId}/members/${member.userId}`}
-					className="relative z-10 flex-shrink-0"
+					className="relative z-10 shrink-0"
 					onClick={(e) => isDragging && e.preventDefault()}
 				>
 					<div className="relative">
@@ -454,7 +454,7 @@ function ClaudeDraggableMemberRow({
 							{member.userProfile && <Avatar profile={member.userProfile} size="small" />}
 						</div>
 						{member.jerseyNumber && (
-							<div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-md bg-accent text-black text-[10px] font-display font-bold flex items-center justify-center border-2 border-[var(--broadcast-dark)] shadow-sm">
+							<div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-md bg-accent text-black text-[10px] font-display font-bold flex items-center justify-center border-2 border-(--broadcast-dark) shadow-xs">
 								{member.jerseyNumber}
 							</div>
 						)}
@@ -521,13 +521,13 @@ function ClaudeDraggableMemberRow({
 // Drag overlay export
 export function ClaudePlayerDragOverlay({ member }: { member: TeamMember }) {
 	return (
-		<div className="flex items-center gap-3 p-4 rounded-xl bg-[var(--broadcast-dark)] border-2 border-accent shadow-2xl shadow-accent/30 min-w-[220px]">
+		<div className="flex items-center gap-3 p-4 rounded-xl bg-(--broadcast-dark) border-2 border-accent shadow-2xl shadow-accent/30 min-w-[220px]">
 			<div className="relative">
 				<div className="rounded-xl overflow-hidden ring-2 ring-accent">
 					{member.userProfile && <Avatar profile={member.userProfile} size="small" />}
 				</div>
 				{member.jerseyNumber && (
-					<div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-md bg-accent text-black text-[10px] font-display font-bold flex items-center justify-center border-2 border-[var(--broadcast-dark)]">
+					<div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-md bg-accent text-black text-[10px] font-display font-bold flex items-center justify-center border-2 border-(--broadcast-dark)">
 						{member.jerseyNumber}
 					</div>
 				)}

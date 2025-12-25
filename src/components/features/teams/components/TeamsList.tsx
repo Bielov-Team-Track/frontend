@@ -24,7 +24,7 @@ function TeamsList({
 		teams.length > 0 && (
 			<div className="flex flex-col sm:flex-row gap-4">
 				{teams.map((t) => (
-					<div key={t.id} className="flex-shrink-0 flex-1 items-center">
+					<div key={t.id} className="shrink-0 flex-1 items-center">
 						<TeamComponent
 							team={t}
 							open={registrationType == Unit.Individual && !t.captain}

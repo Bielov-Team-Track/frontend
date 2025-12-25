@@ -52,7 +52,7 @@ export default function TimeRangeSelector({
                                 customEndDate || new Date()
                             )
                         }
-                        className="h-9 px-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-white/20 focus:bg-white/[0.07] transition-all"
+                        className="h-9 px-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-hidden focus:border-white/20 focus:bg-white/[0.07] transition-all"
                     />
                     <span className="text-muted text-sm">to</span>
                     <input
@@ -64,7 +64,7 @@ export default function TimeRangeSelector({
                                 new Date(e.target.value)
                             )
                         }
-                        className="h-9 px-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-white/20 focus:bg-white/[0.07] transition-all"
+                        className="h-9 px-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-hidden focus:border-white/20 focus:bg-white/[0.07] transition-all"
                     />
                 </div>
             )}

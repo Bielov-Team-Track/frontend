@@ -153,7 +153,7 @@ export const MultipleActions: Story = {
 		description: "Manage your volleyball events and settings.",
 		icon: <Bell size={20} className="text-primary" />,
 		children: (
-			<div className="stats stats-horizontal shadow-sm bg-base-100">
+			<div className="stats stats-horizontal shadow-xs bg-base-100">
 				<div className="stat">
 					<div className="stat-title text-xs">Active Events</div>
 					<div className="stat-value text-lg">3</div>
@@ -171,7 +171,7 @@ export const MultipleActions: Story = {
 				</div>
 				<ul
 					tabIndex={0}
-					className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+					className="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box w-52"
 				>
 					<li>
 						<a>View All Events</a>

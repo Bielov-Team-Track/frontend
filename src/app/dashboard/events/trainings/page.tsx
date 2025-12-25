@@ -261,7 +261,7 @@ export default function TrainingSessionPage() {
 
 					{/* 2. Recommendations List */}
 					<div className="bg-background rounded-2xl border border-white/5 overflow-hidden flex flex-col h-[500px]">
-						<div className="p-4 border-b border-white/5 bg-white/[0.02]">
+						<div className="p-4 border-b border-white/5 bg-white/2">
 							<h3 className="font-bold text-white">
 								Recommended Drills
 							</h3>

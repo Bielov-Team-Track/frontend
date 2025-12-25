@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import { AlertCircle } from "lucide-react";
-import { responsiveClasses } from "@/lib/utils/responsive";
+import { cn } from "@/lib/utils";
 
 export interface SelectOption {
 	value: string | number;
@@ -8,6 +8,9 @@ export interface SelectOption {
 	icon?: React.ReactNode;
 	disabled?: boolean;
 }
+
+type SelectSize = "xs" | "sm" | "md" | "lg" | "xl";
+type SelectVariant = "default" | "bordered" | "ghost";
 
 export interface SelectProps
 	extends Omit<
@@ -17,8 +20,8 @@ export interface SelectProps
 	label?: string;
 	error?: string;
 	helperText?: string;
-	variant?: "default" | "bordered" | "ghost";
-	selectSize?: "sm" | "md" | "lg";
+	variant?: SelectVariant;
+	selectSize?: SelectSize;
 	fullWidth?: boolean;
 	options: SelectOption[];
 	placeholder?: string;
@@ -26,6 +29,7 @@ export interface SelectProps
 	value?: string | number;
 	onChange?: (value: string | number | undefined) => void;
 	clearable?: boolean;
+	optional?: boolean;
 }
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
@@ -45,96 +49,75 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 			value,
 			onChange,
 			clearable = false,
+			optional,
 			...props
 		},
 		ref,
 	) => {
-		// Build CSS classes
-		const baseClasses =
-			"select w-full transition-colors duration-200 appearance-none bg-[#141414]";
+		// DaisyUI size classes
+		const sizeClass = {
+			xs: "select-xs",
+			sm: "select-sm",
+			md: "select-md",
+			lg: "select-lg",
+			xl: "select-xl",
+		}[selectSize];
 
-		const variantClasses = {
-			default: "select-ghost",
-			bordered: "select-bordered",
+		// DaisyUI variant classes
+		const variantClass = {
+			default: "",
+			bordered: "",
 			ghost: "select-ghost",
-		};
+		}[variant];
 
-		const sizeClasses = {
-			sm: "select-sm text-mobile-sm sm:text-mobile-base",
-			md: "select-md text-mobile-base sm:text-tablet-base lg:text-desktop-base",
-			lg: "select-lg text-mobile-base sm:text-tablet-base lg:text-desktop-lg",
-		};
-
-		const stateClasses = {
-			error: "select-error border-red-500 focus:border-red-500",
-			disabled: "select-disabled opacity-60 cursor-not-allowed",
-		};
-
-		const selectClasses = [
-			baseClasses,
-			variantClasses[variant],
-			sizeClasses[selectSize],
-			error ? stateClasses.error : "",
-			disabled ? stateClasses.disabled : "",
-			!fullWidth ? "w-auto" : "",
-			leftIcon ? "!pl-10" : "",
-			className,
-		]
-			.filter(Boolean)
-			.join(" ");
-
-		const labelClasses = [
-			"block font-medium mb-2",
-			responsiveClasses.text.label,
-			error ? "text-red-600" : "",
-			disabled ? "opacity-60" : "",
-		]
-			.filter(Boolean)
-			.join(" ");
-
-		const iconClasses = [disabled ? "opacity-60" : ""]
-			.filter(Boolean)
-			.join(" ");
+		// DaisyUI error state
+		const errorClass = error ? "select-error" : "";
 
 		// Handle change event
 		const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 			const newValue = e.target.value;
 			if (onChange) {
-				// If empty string (placeholder selected), pass undefined
 				onChange(newValue === "" ? undefined : newValue);
 			}
 		};
 
-		// Determine the display value
 		const displayValue = value ?? "";
 
 		return (
-			<div className={`form-control ${fullWidth ? "w-full" : "w-auto"}`}>
+			<div className={cn("form-control", fullWidth ? "w-full" : "w-auto")}>
 				{label && (
-					<label className={labelClasses}>
-						{label}
-						{props.required && <span className="text-red-500 ml-1">*</span>}
+					<label className={cn("label", disabled && "opacity-50")}>
+						<span className={cn("label-text", error && "text-error")}>
+							{label}
+							{props.required && <span className="text-error ml-1">*</span>}
+							{optional && !props.required && <span className="text-base-content/50 ml-1.5 font-normal text-xs">(optional)</span>}
+						</span>
 					</label>
 				)}
 
 				<div className="relative">
-					{/* Left Icon */}
 					{leftIcon && (
-						<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-							<span className={`/60 ${iconClasses}`}>{leftIcon}</span>
+						<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10 text-base-content/50">
+							{leftIcon}
 						</div>
 					)}
 
-					{/* Select Field */}
 					<select
 						ref={ref}
-						className={selectClasses}
+						className={cn(
+							"select",
+							sizeClass,
+							variantClass,
+							errorClass,
+							fullWidth && "w-full",
+							leftIcon && "pl-10",
+							className
+						)}
 						disabled={disabled}
 						value={displayValue}
 						onChange={handleChange}
 						{...props}
 					>
-						{/* Placeholder or Clear option */}
 						<option value="" disabled>
 							{placeholder || (clearable ? "-- Clear --" : "-- Select --")}
 						</option>
@@ -151,20 +134,12 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 					</select>
 				</div>
 
-				{/* Error Message */}
-				{error && (
-					<div className="flex items-center gap-1 mt-1 text-red-600">
-						<AlertCircle size={12} />
-						<span className={responsiveClasses.text.caption}>{error}</span>
-					</div>
-				)}
+				{helperText && !error && <p className="mt-1.5 text-xs text-base-content/50">{helperText}</p>}
 
-				{/* Helper Text */}
-				{helperText && !error && (
-					<div className="mt-1">
-						<span className={`${responsiveClasses.text.caption} /70`}>
-							{helperText}
-						</span>
+				{error && (
+					<div className="flex items-center gap-1.5 mt-1.5 text-error animate-in slide-in-from-top-1 fade-in duration-200">
+						<AlertCircle size={14} />
+						<span className="text-xs">{error}</span>
 					</div>
 				)}
 			</div>

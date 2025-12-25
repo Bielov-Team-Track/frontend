@@ -44,7 +44,7 @@ export default function TeamSettingsForm({
 							type="text"
 							value={name}
 							onChange={(e) => setName(e.target.value)}
-							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-none focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 					<div>
@@ -55,7 +55,7 @@ export default function TeamSettingsForm({
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
 							rows={3}
-							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-none focus:border-accent resize-none"
+							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-hidden focus:border-accent resize-none"
 						/>
 					</div>
 				</div>
@@ -67,7 +67,7 @@ export default function TeamSettingsForm({
 						<select
 							value={skillLevel}
 							onChange={(e) => setSkillLevel(e.target.value)}
-							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-none focus:border-accent">
+							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-hidden focus:border-accent">
 							<option value="">Select skill level</option>
 							{Object.values(SkillLevel).map((level) => (
 								<option key={level} value={level}>

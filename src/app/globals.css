@@ -1,64 +1,240 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "daisyui";
 
-@layer utilities {
-	.text-balance {
-		text-wrap: balance;
+/* Light theme - based on your existing colors with inverted backgrounds */
+@plugin "daisyui/theme" {
+	name: "volleylight";
+	default: true;
+	color-scheme: light;
+
+	/* Elevation system: 100=lightest (cards), 200=middle (page bg), 300=darkest (deep) */
+	--color-base-100: #ffffff; /* Cards, Modals */
+	--color-base-200: #f3f4f6; /* Sidebar, Nav */
+	--color-base-300: #e5e7eb; /* Page Background, Inputs */
+	--color-base-content: oklch(20% 0 0);
+
+	--color-primary: oklch(45% 0.1 195);
+	--color-primary-content: oklch(98% 0 0);
+
+	--color-secondary: oklch(50% 0.15 25);
+	--color-secondary-content: oklch(98% 0 0);
+
+	--color-accent: oklch(70% 0.18 55);
+	--color-accent-content: oklch(20% 0 0);
+
+	--color-neutral: oklch(30% 0.02 240);
+	--color-neutral-content: oklch(98% 0 0);
+
+	--color-info: oklch(50% 0.15 240);
+	--color-info-content: oklch(98% 0 0);
+
+	--color-success: oklch(50% 0.14 145);
+	--color-success-content: oklch(98% 0 0);
+
+	--color-warning: oklch(70% 0.18 55);
+	--color-warning-content: oklch(20% 0 0);
+
+	--color-error: oklch(55% 0.2 25);
+	--color-error-content: oklch(98% 0 0);
+
+	--radius-selector: 0.5rem;
+	--radius-field: 0.5rem;
+	--radius-box: 0.5rem;
+}
+
+/* Dark theme - based on your existing :root colors */
+@plugin "daisyui/theme" {
+	name: "volleydark";
+	default: false;
+	prefersdark: true;
+	color-scheme: dark;
+
+	/* Elevation system: 100=lightest (cards), 200=middle (page bg), 300=darkest (deep) */
+	--color-base-100: oklch(28% 0 0); /* Cards, Modals */
+	--color-base-200: #18181b; /* Sidebar, Nav */
+	--color-base-300: #09090b; /* Page Background, Inputs */
+	--color-base-content: oklch(95% 0 0);
+
+	--color-primary: oklch(45% 0.1 195);
+	--color-primary-content: oklch(98% 0 0);
+
+	--color-secondary: oklch(50% 0.15 25);
+	--color-secondary-content: oklch(98% 0 0);
+
+	--color-accent: oklch(70% 0.18 55);
+	--color-accent-content: oklch(20% 0 0);
+
+	--color-neutral: oklch(35% 0.02 0);
+	--color-neutral-content: oklch(90% 0 0);
+
+	--color-info: oklch(50% 0.15 240);
+	--color-info-content: oklch(98% 0 0);
+
+	--color-success: oklch(50% 0.14 145);
+	--color-success-content: oklch(98% 0 0);
+
+	--color-warning: oklch(75% 0.15 330);
+	--color-warning-content: oklch(20% 0 0);
+
+	--color-error: oklch(55% 0.2 25);
+	--color-error-content: oklch(98% 0 0);
+
+	--radius-selector: 0.5rem;
+	--radius-field: 0.5rem;
+	--radius-box: 0.5rem;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+	--breakpoint-*: initial;
+	--breakpoint-xs: 475px;
+	--breakpoint-sm: 640px;
+	--breakpoint-md: 768px;
+	--breakpoint-lg: 1024px;
+	--breakpoint-xl: 1280px;
+	--breakpoint-2xl: 1536px;
+	--breakpoint-mobile-s: 320px;
+	--breakpoint-mobile-m: 375px;
+	--breakpoint-mobile-l: 425px;
+	--breakpoint-tablet: 768px;
+	--breakpoint-desktop: 1024px;
+	--breakpoint-desktop-l: 1440px;
+
+	--text-xs: 0.75rem;
+	--text-xs--line-height: 1rem;
+	--text-sm: 0.875rem;
+	--text-sm--line-height: 1.25rem;
+	--text-base: 0.875rem;
+	--text-base--line-height: 1.375rem;
+	--text-lg: 1rem;
+	--text-lg--line-height: 1.5rem;
+	--text-xl: 1.125rem;
+	--text-xl--line-height: 1.75rem;
+	--text-2xl: 1.25rem;
+	--text-2xl--line-height: 1.875rem;
+	--text-3xl: 1.5rem;
+	--text-3xl--line-height: 2rem;
+	--text-4xl: 1.75rem;
+	--text-4xl--line-height: 2.25rem;
+	--text-5xl: 2rem;
+	--text-5xl--line-height: 2.5rem;
+	--text-mobile-xs: 0.75rem;
+	--text-mobile-xs--line-height: 1rem;
+	--text-mobile-sm: 0.8125rem;
+	--text-mobile-sm--line-height: 1.125rem;
+	--text-mobile-base: 0.875rem;
+	--text-mobile-base--line-height: 1.375rem;
+	--text-mobile-lg: 0.9375rem;
+	--text-mobile-lg--line-height: 1.4375rem;
+	--text-tablet-base: 1rem;
+	--text-tablet-base--line-height: 1.5rem;
+	--text-tablet-lg: 1.125rem;
+	--text-tablet-lg--line-height: 1.625rem;
+	--text-desktop-base: 1.0625rem;
+	--text-desktop-base--line-height: 1.5625rem;
+	--text-desktop-lg: 1.1875rem;
+	--text-desktop-lg--line-height: 1.6875rem;
+
+	--spacing-safe-top: env(safe-area-inset-top);
+	--spacing-safe-bottom: env(safe-area-inset-bottom);
+	--spacing-safe-left: env(safe-area-inset-left);
+	--spacing-safe-right: env(safe-area-inset-right);
+
+	--min-height-screen-safe: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+
+	--container-mobile: 480px;
+	--container-tablet: 768px;
+	--container-desktop: 1200px;
+
+	--radius-lg: var(--radius);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-sm: calc(var(--radius) - 4px);
+
+	--color-primary: hsl(var(--primary));
+	--color-secondary: hsl(var(--secondary));
+
+	--color-accent: hsl(var(--accent));
+	--color-accent-content: hsl(var(--accent-content));
+
+	--color-muted: hsl(var(--muted));
+
+	--color-background: hsl(var(--background));
+	--color-background-dark: hsl(var(--background-dark));
+	--color-background-light: hsl(var(--background-light));
+
+	--color-error: hsl(var(--error));
+	--color-warning: hsl(var(--warning));
+	--color-success: hsl(var(--success));
+	--color-info: hsl(var(--info));
+
+	--text-color: hsl(0 0% 95%);
+
+	--animate-shake: shake 0.5s ease-in-out;
+
+	@keyframes shake {
+		0%,
+		100% {
+			transform: translateX(0);
+		}
+		25% {
+			transform: translateX(-2px);
+		}
+		75% {
+			transform: translateX(2px);
+		}
 	}
 }
 
-.form {
-	@apply flex flex-col gap-4;
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentcolor);
+	}
 }
 
-h2 {
-	@apply text-2xl font-bold;
+@utility text-balance {
+	text-wrap: balance;
 }
 
-.team-positions {
-	display: grid;
-	grid-template:
-		"4 3 2"
-		"5 6 1";
+@layer utilities {
+	.form {
+		@apply flex flex-col gap-4;
+	}
+
+	h2 {
+		@apply text-2xl font-bold;
+	}
+
+	.team-positions {
+		display: grid;
+		grid-template:
+			"4 3 2"
+			"5 6 1";
+	}
 }
 
 @layer base {
 	:root {
-		--primary: 184 50% 32%;
-		--secondary: 11 69% 44%;
-		--accent: 29 100% 50%;
-		--accent-content: 0 0% 100%;
 		--muted: 0 0% 70%;
-
-		--background: 0 0% 13%;
-		--background-dark: 0 0% 10%;
-		--background-light: 0 0% 15%;
-
-		--error: 11 69% 44%;
-		--warning: 329 100% 55%;
-		--success: hsla(114, 27%, 37%, 1);
-		--info: hsla(210, 49%, 36%, 1);
-
-		--radius: 0.5rem;
 	}
 
-	body {
-		color: hsl(0 0% 95%);
-	}
 	.dark {
-		--primary: 220 90% 56%;
-		--secondary: 240 4% 46%;
-		--accent: 280 80% 60%;
 		--muted: 220 9% 46%;
-
-		--background: 220 13% 0%;
-		--background-dark: 220 13% 0%;
-		--background-light: 220 13% 0%;
-
-		--error: 0 84% 60%;
-		--warning: 38 92% 50%;
-		--success: 142 71% 45%;
-		--info: 199 89% 48%;
 	}
 }
+
+/* ============================================
+   Animated Steps Component
+   ============================================ */

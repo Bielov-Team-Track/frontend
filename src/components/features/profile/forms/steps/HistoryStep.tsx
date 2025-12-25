@@ -332,7 +332,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 			className="px-4 py-2 hover:bg-white/5 cursor-pointer flex items-center gap-3"
 			onMouseDown={() => onSelect(item)}>
 			{item.logoUrl ? (
-				<div className="relative w-6 h-6 rounded-full overflow-hidden flex-shrink-0 bg-white/10">
+				<div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0 bg-white/10">
 					<Image
 						src={item.logoUrl}
 						alt={item.name}
@@ -341,7 +341,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 					/>
 				</div>
 			) : (
-				<div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 text-muted">
+				<div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-muted">
 					<Shield size={14} />
 				</div>
 			)}
@@ -511,7 +511,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 												className="flex flex-col gap-2 ml-1">
 												<div className="flex items-center gap-2 border-b border-white/5 pb-1 mb-1">
 													{firstEntry.clubLogoUrl ? (
-														<div className="relative w-6 h-6 rounded-full overflow-hidden bg-white/10 flex-shrink-0">
+														<div className="relative w-6 h-6 rounded-full overflow-hidden bg-white/10 shrink-0">
 															<Image
 																src={
 																	firstEntry.clubLogoUrl
@@ -524,7 +524,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 															/>
 														</div>
 													) : (
-														<div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-muted flex-shrink-0">
+														<div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-muted shrink-0">
 															<Shield size={14} />
 														</div>
 													)}
@@ -543,7 +543,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 																	{entry.teamName && (
 																		<div className="flex items-center gap-2 mb-1">
 																			{entry.teamLogoUrl && (
-																				<div className="relative w-4 h-4 rounded-full overflow-hidden bg-white/10 flex-shrink-0">
+																				<div className="relative w-4 h-4 rounded-full overflow-hidden bg-white/10 shrink-0">
 																					<Image
 																						src={
 																							entry.teamLogoUrl

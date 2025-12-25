@@ -5,11 +5,12 @@ import Checkbox from "@/components/ui/checkbox";
 import ImageCropper from "@/components/ui/image-cropper";
 import Input from "@/components/ui/input";
 import Modal from "@/components/ui/modal";
+import Steps from "@/components/ui/steps";
 import TextArea from "@/components/ui/textarea";
-import { CreateClubRequest } from "@/lib/models/Club";
 import { createClub, updateClub, uploadClubImage } from "@/lib/api/clubs";
+import { CreateClubRequest } from "@/lib/models/Club";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Image as ImageIcon, Shield, ArrowLeft, ArrowRight, Check, Trash } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Image as ImageIcon, Shield, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -288,7 +289,7 @@ export default function CreateClubPage() {
 					className="bg-black/20"
 					{...register("description")}
 				/>
-				<div className="p-4 rounded-lg bg-black/10 border border-white/5">
+				<div className="p-4 rounded-2xl bg-black/10 border border-white/5">
 					<Controller
 						name="is_public"
 						control={control}
@@ -471,7 +472,7 @@ export default function CreateClubPage() {
 							<ImageIcon className="text-white/10" size={48} />
 						</div>
 					)}
-					<div className="absolute inset-0 bg-gradient-to-t from-background-light via-transparent to-transparent" />
+					<div className="absolute inset-0 bg-linear-to-t from-background-light via-transparent to-transparent" />
 				</div>
 
 				<div className="px-6 pb-6 relative">
@@ -528,39 +529,11 @@ export default function CreateClubPage() {
 
 			{/* Stepper */}
 			<div className="mb-12">
-				<div className="flex items-center justify-between relative">
-					{/* Connector Line */}
-					<div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-white/10 -z-10"></div>
-
-					{STEPS.map((step) => {
-						const isActive = step.id === currentStep;
-						const isCompleted = step.id < currentStep;
-
-						return (
-							<div key={step.id} className="flex flex-col items-center gap-2 bg-background-dark px-2">
-								<div
-									className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300
-                                ${
-									isActive
-										? "border-primary bg-primary text-white scale-110 shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]"
-										: isCompleted
-										? "border-primary bg-primary text-white"
-										: "border-white/20 bg-background-dark text-muted"
-								}
-                            `}>
-									{isCompleted ? <Check size={12} /> : step.id}
-								</div>
-								<span className={`text-xs md:text-sm font-medium hidden sm:block ${isActive ? "text-primary" : "text-muted"}`}>
-									{step.title}
-								</span>
-							</div>
-						);
-					})}
-				</div>
+				<Steps steps={STEPS} currentStep={currentStep} />
 			</div>
 
 			{/* Form Content */}
-			<div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-sm min-h-[450px] flex flex-col justify-between relative overflow-hidden">
+			<div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xs flex flex-col justify-between relative overflow-hidden">
 				{/* Decorative Gradient Blob */}
 				<div className="absolute -top-20 -right-20 w-60 h-60 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
 
@@ -583,7 +556,12 @@ export default function CreateClubPage() {
 					</Button>
 
 					{currentStep < STEPS.length ? (
-						<Button variant="solid" color="primary" onClick={handleNext} rightIcon={<ArrowRight size={16} />} className="px-8 shadow-lg shadow-primary/20">
+						<Button
+							variant="solid"
+							color="primary"
+							onClick={handleNext}
+							rightIcon={<ArrowRight size={16} />}
+							className="px-8 shadow-lg shadow-primary/20">
 							Next Step
 						</Button>
 					) : (

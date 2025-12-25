@@ -130,7 +130,7 @@ const ImageCropper = ({
 	return (
 		<div className={cn("flex flex-col rounded-2xl bg-[#141414] border border-white/10 overflow-hidden", className)}>
 			{/* Cropper Area */}
-            <div className="relative w-full aspect-[4/3] bg-black/50">
+            <div className="relative w-full aspect-4/3 bg-black/50">
 				{image ? (
 					<Cropper
 						image={image}
@@ -150,7 +150,7 @@ const ImageCropper = ({
                     </div>
                 )}
 				{isSaving && (
-                    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
+                    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-xs">
 					    <Loader />
                         <span className="mt-3 text-sm font-medium text-white">Saving...</span>
                     </div>

@@ -37,9 +37,9 @@ const meta: Meta<typeof Input> = {
 				defaultValue: { summary: "bordered" },
 			},
 		},
-		inputSize: {
+		size: {
 			control: { type: "select" },
-			options: ["sm", "md", "lg"],
+			options: ["xs", "sm", "md", "lg", "xl"],
 			description: "The size of the input field",
 			table: {
 				defaultValue: { summary: "md" },
@@ -163,7 +163,7 @@ export const DefaultVariant: Story = {
 export const Small: Story = {
 	args: {
 		label: "Small Input",
-		inputSize: "sm",
+		size: "sm",
 		placeholder: "Small size",
 	},
 };
@@ -171,7 +171,7 @@ export const Small: Story = {
 export const Medium: Story = {
 	args: {
 		label: "Medium Input",
-		inputSize: "md",
+		size: "md",
 		placeholder: "Medium size",
 	},
 };
@@ -179,7 +179,7 @@ export const Medium: Story = {
 export const Large: Story = {
 	args: {
 		label: "Large Input",
-		inputSize: "lg",
+		size: "lg",
 		placeholder: "Large size",
 	},
 };
@@ -307,9 +307,9 @@ export const AllVariants: Story = {
 export const AllSizes: Story = {
 	render: () => (
 		<div className="space-y-4 w-80">
-			<Input label="Small Input" inputSize="sm" placeholder="Small size" />
-			<Input label="Medium Input" inputSize="md" placeholder="Medium size" />
-			<Input label="Large Input" inputSize="lg" placeholder="Large size" />
+			<Input label="Small Input" size="sm" placeholder="Small size" />
+			<Input label="Medium Input" size="md" placeholder="Medium size" />
+			<Input label="Large Input" size="lg" placeholder="Large size" />
 		</div>
 	),
 	parameters: {
@@ -498,7 +498,7 @@ export const Playground: Story = {
 		label: "Playground Input",
 		placeholder: "Test different props...",
 		variant: "bordered",
-		inputSize: "md",
+		size: "md",
 		fullWidth: true,
 		disabled: false,
 		required: false,

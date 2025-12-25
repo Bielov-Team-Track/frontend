@@ -411,10 +411,10 @@ export default function ClaudeRosterTabV2({ team, clubMembers, teamId }: ClaudeR
 							{/* Title Section */}
 							<div className="flex items-center gap-4">
 								<div className="relative">
-									<div className="w-14 h-14 rounded-xl bg-gradient-to-br from-accent to-orange-600 flex items-center justify-center shadow-lg animate-pulse-glow">
+									<div className="w-14 h-14 rounded-xl bg-linear-to-br from-accent to-orange-600 flex items-center justify-center shadow-lg animate-pulse-glow">
 										<Users className="w-7 h-7 text-white" />
 									</div>
-									<div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-[var(--broadcast-dark)] flex items-center justify-center">
+									<div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-(--broadcast-dark) flex items-center justify-center">
 										<span className="text-[8px] font-bold text-white">{totalMembers}</span>
 									</div>
 								</div>

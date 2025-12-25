@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Loader from "../loader";
+
+type ModalSize = "sm" | "md" | "lg" | "xl" | "full";
+type ModalPosition = "top" | "middle" | "bottom";
 
 interface ModalProps {
     isOpen: boolean;
@@ -13,7 +14,8 @@ interface ModalProps {
     title?: string;
     description?: string;
     children: React.ReactNode;
-    size?: "sm" | "md" | "lg" | "xl" | "full";
+    size?: ModalSize;
+    position?: ModalPosition;
     isLoading?: boolean;
     className?: string;
     showCloseButton?: boolean;
@@ -26,112 +28,96 @@ export default function Modal({
     description,
     children,
     size = "md",
+    position = "middle",
     isLoading = false,
     className,
     showCloseButton = true,
 }: ModalProps) {
-    const [mounted, setMounted] = useState(false);
+    const dialogRef = useRef<HTMLDialogElement>(null);
 
     useEffect(() => {
-        setMounted(true);
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+
         if (isOpen) {
-            document.body.style.overflow = "hidden";
+            dialog.showModal();
+        } else {
+            dialog.close();
         }
-        return () => {
-            document.body.style.overflow = "unset";
-        };
     }, [isOpen]);
 
-    // Handle Escape key
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose();
-        };
-        if (isOpen) {
-            window.addEventListener("keydown", handleKeyDown);
+    // Handle backdrop click
+    const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
+        if (e.target === dialogRef.current) {
+            onClose();
         }
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [isOpen, onClose]);
+    };
 
-    if (!mounted) return null;
-
+    // DaisyUI modal size classes
     const sizeClasses = {
         sm: "max-w-md",
         md: "max-w-lg",
         lg: "max-w-2xl",
         xl: "max-w-4xl",
-        full: "max-w-[calc(100vw-2rem)] h-[calc(100vh-2rem)]",
+        full: "max-w-[calc(100vw-2rem)] min-h-[calc(100vh-2rem)]",
     };
 
-    const modalContent = (
-        <AnimatePresence>
-            {isOpen && (
-                <>
-                    {/* Backdrop */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-                        onClick={onClose}
-                    />
+    // DaisyUI modal position classes
+    const positionClass = {
+        top: "modal-top",
+        middle: "modal-middle",
+        bottom: "modal-bottom",
+    }[position];
 
-                    {/* Modal Container */}
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                            transition={{ duration: 0.2 }}
-                            className={cn(
-                                "relative w-full bg-[#1e1e1e] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto max-h-[90vh]",
-                                sizeClasses[size],
-                                className
-                            )}
-                        >
-                            {/* Loading Overlay */}
-                            {isLoading && (
-                                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[2px]">
-                                    <Loader />
-                                </div>
-                            )}
-
-                            {/* Header */}
-                            {(title || showCloseButton) && (
-                                <div className="flex items-start justify-between p-6 pb-4 border-b border-white/5 shrink-0">
-                                    <div className="space-y-1 pr-8">
-                                        {title && (
-                                            <h2 className="text-xl font-semibold text-white tracking-tight">
-                                                {title}
-                                            </h2>
-                                        )}
-                                        {description && (
-                                            <p className="text-sm text-muted">
-                                                {description}
-                                            </p>
-                                        )}
-                                    </div>
-                                    {showCloseButton && (
-                                        <button
-                                            onClick={onClose}
-                                            className="absolute right-4 top-4 p-2 text-muted hover:text-white hover:bg-white/10 rounded-full transition-colors"
-                                        >
-                                            <X size={20} />
-                                        </button>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* Content */}
-                            <div className="p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                                {children}
-                            </div>
-                        </motion.div>
+    return (
+        <dialog
+            ref={dialogRef}
+            className={cn("modal", positionClass)}
+            onClick={handleBackdropClick}
+            onClose={onClose}
+        >
+            <div className={cn("modal-box", sizeClasses[size], className)}>
+                {/* Loading Overlay */}
+                {isLoading && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center bg-base-100/80 backdrop-blur-sm">
+                        <Loader />
                     </div>
-                </>
-            )}
-        </AnimatePresence>
-    );
+                )}
 
-    return createPortal(modalContent, document.body);
+                {/* Close Button */}
+                {showCloseButton && (
+                    <form method="dialog">
+                        <button
+                            className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
+                            onClick={onClose}
+                        >
+                            <X size={20} />
+                        </button>
+                    </form>
+                )}
+
+                {/* Header */}
+                {(title || description) && (
+                    <div className="mb-4 pr-8">
+                        {title && (
+                            <h3 className="font-semibold text-lg">{title}</h3>
+                        )}
+                        {description && (
+                            <p className="text-sm text-base-content/60 mt-1">
+                                {description}
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                {/* Content */}
+                <div>{children}</div>
+            </div>
+
+            {/* Backdrop */}
+            <form method="dialog" className="modal-backdrop">
+                <button onClick={onClose}>close</button>
+            </form>
+        </dialog>
+    );
 }

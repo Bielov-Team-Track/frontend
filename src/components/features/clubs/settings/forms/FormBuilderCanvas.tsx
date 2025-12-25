@@ -88,7 +88,7 @@ function SortableField({ field, index, isSelected, onSelect, onUpdate, onDelete 
 								onSelect();
 							}}
 							placeholder="Untitled Field"
-							className="bg-transparent font-medium text-white w-full outline-none border-b border-transparent focus:border-accent transition-colors p-0 placeholder:text-muted/50"
+							className="bg-transparent font-medium text-white w-full outline-hidden border-b border-transparent focus:border-accent transition-colors p-0 placeholder:text-muted/50"
 						/>
 						{field.isRequired && <span className="text-red-400 text-xs">*</span>}
 					</div>

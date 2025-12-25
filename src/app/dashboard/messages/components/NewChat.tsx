@@ -153,7 +153,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 							value={groupName}
 							onChange={(e) => setGroupName(e.target.value)}
 							placeholder="Group Name"
-							className="flex-1 bg-transparent border-b border-white/10 py-2 text-white placeholder-muted focus:outline-none focus:border-accent transition-colors"
+							className="flex-1 bg-transparent border-b border-white/10 py-2 text-white placeholder-muted focus:outline-hidden focus:border-accent transition-colors"
 						/>
 					</div>
 

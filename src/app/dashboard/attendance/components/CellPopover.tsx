@@ -81,7 +81,7 @@ export default function CellPopover({
                 {/* Member info */}
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
                     <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold text-background-dark flex-shrink-0"
+                        className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold text-background-dark shrink-0"
                         style={{ backgroundColor: bgColor }}
                     >
                         {member.avatarUrl ? (
@@ -136,7 +136,7 @@ export default function CellPopover({
                             value={declineNote}
                             onChange={(e) => setDeclineNote(e.target.value)}
                             placeholder="Why are they declining?"
-                            className="w-full px-3 py-2 rounded-lg bg-[#141414] border border-white/10 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors resize-none"
+                            className="w-full px-3 py-2 rounded-lg bg-[#141414] border border-white/10 text-white text-sm placeholder:text-muted focus:outline-hidden focus:border-primary/50 transition-colors resize-none"
                             rows={2}
                         />
                         {requireDeclineReason && !declineNote.trim() && (

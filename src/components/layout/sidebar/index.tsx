@@ -69,7 +69,7 @@ const NavItem = ({
 				<div
 					className={`
 						group relative flex items-center justify-center xl:justify-start px-3 py-3 rounded-xl cursor-pointer transition-all duration-200
-						${active ? "bg-gradient-to-r from-accent/20 to-transparent text-accent" : "text-muted hover:text-white hover:bg-white/5"}
+						${active ? "bg-linear-to-r from-accent/20 to-transparent text-accent" : "text-muted hover:text-white hover:bg-white/5"}
 					`}>
 					{active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-accent rounded-r-full" />}
 
@@ -84,7 +84,7 @@ const NavItem = ({
 								<span className="hidden xl:block flex-1 ml-4 font-medium text-sm">{item.name}</span>
 							</Link>
 							{badgeValue && badgeValue > 0 && (
-								<span className="hidden xl:flex items-center justify-center h-5 min-w-[20px] px-1.5 text-[10px] font-bold text-white bg-error rounded-full shadow-sm">
+								<span className="hidden xl:flex items-center justify-center h-5 min-w-[20px] px-1.5 text-[10px] font-bold text-white bg-error rounded-full shadow-xs">
 									{badgeValue > 99 ? "99+" : badgeValue}
 								</span>
 							)}
@@ -113,7 +113,7 @@ const NavItem = ({
 							</div>
 							<span className="hidden xl:block flex-1 ml-4 font-medium text-sm">{item.name}</span>
 							{badgeValue && badgeValue > 0 && (
-								<span className="hidden xl:flex items-center justify-center h-5 min-w-[20px] px-1.5 text-[10px] font-bold text-white bg-error rounded-full shadow-sm">
+								<span className="hidden xl:flex items-center justify-center h-5 min-w-[20px] px-1.5 text-[10px] font-bold text-white bg-error rounded-full shadow-xs">
 									{badgeValue > 99 ? "99+" : badgeValue}
 								</span>
 							)}
@@ -202,11 +202,11 @@ const Sidebar = () => {
 	const navigationItems = getNavigationItems(unreadMessageCount, clubs);
 
 	return (
-		<aside className="w-20 xl:w-72 h-[calc(100vh-2rem)] sticky top-4 z-40 flex flex-col bg-background/50 backdrop-blur-xl border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+		<aside className="w-20 xl:w-72 h-[calc(100vh-2rem)] sticky top-4 z-40 flex flex-col bg-base-200 backdrop-blur-xl border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
 			{/* --- Logo Area --- */}
 			<div className="h-24 flex items-center justify-center xl:justify-start xl:px-8 border-b border-white/5">
 				<div className="flex items-center gap-3">
-					<div className="w-10 h-10 bg-gradient-to-tr from-accent to-primary rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 text-white">
+					<div className="w-10 h-10 bg-linear-to-tr from-accent to-primary rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 text-white">
 						<Volleyball size={20} />
 					</div>
 					<span className="hidden xl:block text-2xl font-bold text-white tracking-tight">Volleyer</span>

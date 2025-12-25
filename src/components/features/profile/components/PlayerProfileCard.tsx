@@ -57,7 +57,7 @@ const PlayerProfileCard = ({
 	return (
 		<div className="w-full">
 			{/* Header Section */}
-			<div className="bg-gradient-to-br from-primary/20 via-base-200 to-base-200 rounded-t-2xl p-6 md:p-8">
+			<div className="bg-linear-to-br from-primary/20 via-base-200 to-base-200 rounded-t-2xl p-6 md:p-8">
 				<div className="flex flex-col md:flex-row gap-6 items-start">
 					{/* Avatar */}
 					<div className="relative">

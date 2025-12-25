@@ -66,7 +66,7 @@ function MonthView({
 	return (
 		<div className="w-full h-full flex flex-col border border-white/5 rounded-2xl backdrop-blur-xl overflow-hidden shadow-2xl">
 			{/* Header */}
-			<div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/[0.02]">
+			<div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/2">
 				<h2 className="text-2xl font-bold text-white tracking-tight">
 					{format(currentDate, "MMMM yyyy")}
 				</h2>
@@ -79,7 +79,7 @@ function MonthView({
 						className="h-8 w-8 p-0 hover:bg-white/10 hover:text-white rounded-md">
 						<ChevronLeft size={16} />
 					</Button>
-					<div className="w-[1px] h-4 bg-white/10 mx-1"></div>
+					<div className="w-px h-4 bg-white/10 mx-1"></div>
 					<Button
 						onClick={handleNextMonth}
 						variant="ghost"
@@ -93,7 +93,7 @@ function MonthView({
 
 			<div className="flex-1 flex flex-col min-h-0">
 				{/* Weekday headers */}
-				<div className="grid grid-cols-7 border-b border-white/5 bg-white/[0.02]">
+				<div className="grid grid-cols-7 border-b border-white/5 bg-white/2">
 					{weekDays.map((day) => (
 						<div
 							key={day}
@@ -174,8 +174,8 @@ function DayCell({
 			onClick={handleDayClick}
 			className={`
                 p-2 flex flex-col cursor-pointer border-r border-white/5 last:border-r-0 relative transition-all duration-200 group
-                ${!isCurrentMonth ? "bg-white/[0.01]" : "bg-transparent"}
-                ${isToday ? "bg-accent/[0.08]" : "hover:bg-white/[0.03]"}
+                ${!isCurrentMonth ? "bg-white/1" : "bg-transparent"}
+                ${isToday ? "bg-accent/8" : "hover:bg-white/3"}
             `}>
 			{/* Top Bar for Today */}
 			{isToday && (

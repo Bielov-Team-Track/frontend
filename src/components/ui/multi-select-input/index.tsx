@@ -10,7 +10,7 @@ export interface MultiSelectInputProps<T> {
 	helperText?: string;
 	placeholder?: string;
 	variant?: "default" | "bordered" | "ghost";
-	inputSize?: "sm" | "md" | "lg";
+	size?: "xs" | "sm" | "md" | "lg" | "xl";
 	fullWidth?: boolean;
 	disabled?: boolean;
 	required?: boolean;
@@ -39,7 +39,7 @@ function MultiSelectInputInner<T>(
 		helperText,
 		placeholder = "Search...",
 		variant = "bordered",
-		inputSize = "md",
+		size = "md",
 		fullWidth = true,
 		disabled = false,
 		required = false,
@@ -58,7 +58,7 @@ function MultiSelectInputInner<T>(
 
 	// Build CSS classes
 	const baseClasses =
-		"input w-full transition-colors duration-200 focus:outline-none " +
+		"input w-full transition-colors duration-200 focus:outline-hidden " +
 		"focus:ring-1 focus:ring-offset-1 focus:ring-muted rounded-md outline-1 " +
 		"bg-background-light text-muted placeholder:text-muted focus:placeholder:text ";
 
@@ -68,11 +68,8 @@ function MultiSelectInputInner<T>(
 		ghost: "input-ghost",
 	};
 
-	const sizeClasses = {
-		sm: "input-sm text-mobile-sm sm:text-mobile-base min-h-8",
-		md: "input-md text-mobile-base sm:text-tablet-base lg:text-desktop-base min-h-10",
-		lg: "input-lg text-mobile-base sm:text-tablet-base lg:text-desktop-lg min-h-12",
-	};
+	// Map size to DaisyUI size class
+	const sizeClass = `input-${size}`;
 
 	const stateClasses = {
 		error: "input-error border-red-500 focus:border-red-500",

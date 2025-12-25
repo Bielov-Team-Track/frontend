@@ -145,7 +145,7 @@ export default function PlayerPage() {
                             <ImageOff size={48} />
                         </div>
                     )}
-					<div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/60 to-transparent" />
+					<div className="absolute inset-0 bg-linear-to-t from-background-dark via-background-dark/60 to-transparent" />
 				</div>
 
 				{/* Player Info Header */}
@@ -216,7 +216,7 @@ export default function PlayerPage() {
 							{PLAYER.stats.map((stat, i) => (
 								<div
 									key={i}
-									className="bg-white/5 border border-white/10 rounded-xl p-3 text-center backdrop-blur-sm hover:bg-white/10 transition-colors">
+									className="bg-white/5 border border-white/10 rounded-xl p-3 text-center backdrop-blur-xs hover:bg-white/10 transition-colors">
 									<div className="text-xl md:text-3xl font-bold text-white">
 										{stat.value}
 									</div>
@@ -267,7 +267,7 @@ export default function PlayerPage() {
 										<div
 											className={`w-10 h-10 rounded-xl p-0.5 flex items-center justify-center overflow-hidden ${
 												club.current
-													? "bg-gradient-to-br from-accent to-primary"
+													? "bg-linear-to-br from-accent to-primary"
 													: "bg-gray-700"
 											}`}>
                                             <div className="w-full h-full bg-background-dark rounded-lg flex items-center justify-center">
@@ -356,7 +356,7 @@ export default function PlayerPage() {
 										key={ach.id}
 										className="group p-6 rounded-2xl bg-background border border-white/5 flex flex-col items-center text-center hover:border-accent/30 transition-all hover:-translate-y-1">
 										<div
-											className={`mb-4 p-3 rounded-full bg-gradient-to-br ${ach.color} bg-opacity-10`}>
+											className={`mb-4 p-3 rounded-full bg-linear-to-br ${ach.color} bg-opacity-10`}>
 											<ach.icon
 												size={32}
 												className="text-white drop-shadow-lg"

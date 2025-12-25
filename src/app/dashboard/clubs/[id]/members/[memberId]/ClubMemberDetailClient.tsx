@@ -139,7 +139,7 @@ function MemberBannerCard({ profile, clubMember, activeTab, onTabChange, teamsCo
 	return (
 		<div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
 			{/* Banner Area */}
-			<div className="h-32 relative bg-gradient-to-r from-accent/20 to-primary/20">
+			<div className="h-32 relative bg-linear-to-r from-accent/20 to-primary/20">
 				<div className="absolute inset-0 bg-black/10" />
 			</div>
 
@@ -326,13 +326,13 @@ function HistoryTab({ history }: { history: any[] }) {
 			</h3>
 			<div className="space-y-8 relative pl-4 md:pl-0">
 				{/* Vertical Line */}
-				<div className="absolute left-4 md:left-[120px] top-2 bottom-2 w-px bg-gradient-to-b from-accent/50 to-transparent" />
+				<div className="absolute left-4 md:left-[120px] top-2 bottom-2 w-px bg-linear-to-b from-accent/50 to-transparent" />
 
 				{sortedHistory.map((entry) => (
 					<div key={entry.id} className="relative flex flex-col md:flex-row gap-6 md:items-start group">
 						{/* Year Badge */}
-						<div className="md:w-[120px] md:text-right flex-shrink-0 relative z-10 pl-8 md:pl-0">
-							<span className="inline-block px-3 py-1 rounded-full bg-background-dark border border-accent/30 text-accent font-bold shadow-sm group-hover:scale-105 transition-transform">
+						<div className="md:w-[120px] md:text-right shrink-0 relative z-10 pl-8 md:pl-0">
+							<span className="inline-block px-3 py-1 rounded-full bg-background-dark border border-accent/30 text-accent font-bold shadow-xs group-hover:scale-105 transition-transform">
 								{entry.year}
 							</span>
 							{/* Dot on line */}

@@ -65,15 +65,15 @@ export const Default: Story = {
 					to open the drawer.
 				</p>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-					<div className="bg-base-100 p-6 rounded-lg shadow">
+					<div className="bg-base-100 p-6 rounded-lg shadow-sm">
 						<h3 className="font-bold text-lg mb-2">Card 1</h3>
 						<p>Some content for the first card.</p>
 					</div>
-					<div className="bg-base-100 p-6 rounded-lg shadow">
+					<div className="bg-base-100 p-6 rounded-lg shadow-sm">
 						<h3 className="font-bold text-lg mb-2">Card 2</h3>
 						<p>Some content for the second card.</p>
 					</div>
-					<div className="bg-base-100 p-6 rounded-lg shadow">
+					<div className="bg-base-100 p-6 rounded-lg shadow-sm">
 						<h3 className="font-bold text-lg mb-2">Card 3</h3>
 						<p>Some content for the third card.</p>
 					</div>
@@ -89,7 +89,7 @@ export const WithEventsPage: Story = {
 			<main className="p-8">
 				<h1 className="text-3xl font-bold mb-6">Events</h1>
 				<div className="grid gap-4">
-					<div className="bg-base-100 p-6 rounded-lg shadow border-l-4 border-primary">
+					<div className="bg-base-100 p-6 rounded-lg shadow-sm border-l-4 border-primary">
 						<h3 className="font-bold text-xl mb-2">Volleyball Tournament</h3>
 						<p className="/70 mb-2">
 							Beach volleyball tournament at Santa Monica
@@ -99,7 +99,7 @@ export const WithEventsPage: Story = {
 							<button className="btn btn-primary btn-sm">Join Event</button>
 						</div>
 					</div>
-					<div className="bg-base-100 p-6 rounded-lg shadow border-l-4 border-secondary">
+					<div className="bg-base-100 p-6 rounded-lg shadow-sm border-l-4 border-secondary">
 						<h3 className="font-bold text-xl mb-2">Training Session</h3>
 						<p className="/70 mb-2">Weekly training at Indoor Sports Center</p>
 						<div className="flex justify-between items-center">
@@ -136,7 +136,7 @@ export const WithAdminPage: Story = {
 						<p>Active Events</p>
 					</div>
 				</div>
-				<div className="bg-base-100 p-6 rounded-lg shadow">
+				<div className="bg-base-100 p-6 rounded-lg shadow-sm">
 					<h2 className="font-bold text-xl mb-4">Recent Activity</h2>
 					<p>Admin controls and recent activity would be displayed here.</p>
 				</div>

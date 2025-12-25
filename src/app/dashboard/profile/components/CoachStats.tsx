@@ -62,7 +62,7 @@ const CoachStats = ({ coachProfile }: CoachStatsProps) => {
                         {coachProfile.qualifications.map((qual) => (
                             <div key={qual.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent flex-shrink-0">
+                                    <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent shrink-0">
                                         <Award size={16} />
                                     </div>
                                     <span className="text-white font-medium">{qual.name}</span>

@@ -152,7 +152,7 @@ export default function AttendanceTable({
                                     key={member.userId}
                                     className={`
                                         group transition-colors
-                                        ${member.highlightWarning ? "bg-warning/5" : "hover:bg-white/[0.02]"}
+                                        ${member.highlightWarning ? "bg-warning/5" : "hover:bg-white/2"}
                                         ${idx !== data.members.length - 1 ? "border-b border-white/5" : ""}
                                     `}
                                 >
@@ -166,7 +166,7 @@ export default function AttendanceTable({
 
                                             {/* Avatar */}
                                             <div
-                                                className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold text-background-dark flex-shrink-0"
+                                                className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold text-background-dark shrink-0"
                                                 style={{ backgroundColor: bgColor }}
                                             >
                                                 {member.avatarUrl ? (

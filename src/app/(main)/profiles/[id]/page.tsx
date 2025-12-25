@@ -22,7 +22,7 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 	return (
 		<div className="bg-base-200 rounded-2xl overflow-hidden">
 			{/* Header */}
-			<div className="bg-gradient-to-r from-accent/20 to-purple-500/20 p-6 md:p-8">
+			<div className="bg-linear-to-r from-accent/20 to-purple-500/20 p-6 md:p-8">
 				<div className="flex flex-col md:flex-row items-center gap-6">
 					<div className="relative">
 						{profile.imageUrl ? (

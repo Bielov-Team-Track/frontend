@@ -17,7 +17,7 @@ type EventCardProps = {
 const EventCard = ({ event, variant = "horizontal" }: EventCardProps) => {
 	const variantClasses = {
 		vertical: "flex flex-col max-w-60",
-		horizontal: "flex flex-row max-w-96 h-32 flex-grow",
+		horizontal: "flex flex-row max-w-96 h-32 grow",
 	};
 
 	const imageVariantClasses = {

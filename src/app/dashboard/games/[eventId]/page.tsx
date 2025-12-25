@@ -42,7 +42,7 @@ function GamesPage({ params }: { params: Promise<{ eventId: string }> }) {
 					Start Games
 				</button>
 			</div>
-			<div ref={maindiv} className="w-[100vw] h-[100vh]">
+			<div ref={maindiv} className="w-screen h-screen">
 				{gameEngine && <Score gameEngine={gameEngine} />}
 			</div>
 		</div>

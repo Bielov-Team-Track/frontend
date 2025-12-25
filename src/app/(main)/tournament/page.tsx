@@ -257,7 +257,7 @@ export default function TournamentPage() {
 								key={group.name}
 								className="bg-[#1E1E1E] rounded-2xl border border-white/5 overflow-hidden">
 								{/* Header */}
-								<div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+								<div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/2">
 									<h3 className="font-bold text-white">
 										{group.name}
 									</h3>
@@ -299,7 +299,7 @@ export default function TournamentPage() {
                             border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors
                             ${
 								index < 2
-									? "bg-gradient-to-r from-success/5 to-transparent"
+									? "bg-linear-to-r from-success/5 to-transparent"
 									: ""
 							} 
                           `}>
@@ -450,7 +450,7 @@ function BracketMatch({ match, isAdmin, isFinal }: any) {
           flex justify-between items-center p-3 border-b border-white/5
           ${
 				match.t1.score > match.t2.score
-					? "bg-gradient-to-r from-success/10 to-transparent"
+					? "bg-linear-to-r from-success/10 to-transparent"
 					: ""
 			}
         `}>
@@ -483,7 +483,7 @@ function BracketMatch({ match, isAdmin, isFinal }: any) {
           flex justify-between items-center p-3
           ${
 				match.t2.score > match.t1.score
-					? "bg-gradient-to-r from-success/10 to-transparent"
+					? "bg-linear-to-r from-success/10 to-transparent"
 					: ""
 			}
         `}>

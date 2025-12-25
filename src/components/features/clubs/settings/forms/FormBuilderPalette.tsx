@@ -113,7 +113,7 @@ export default function FormBuilderPalette({ selectedField, onUpdateField }: For
 								<label className="text-sm font-medium text-white">Options</label>
 								{selectedField.options?.map((option, index) => (
 									<div key={index} className="flex items-center gap-2">
-										<Input value={option} onChange={(e) => updateOption(index, e.target.value)} inputSize="sm" />
+										<Input value={option} onChange={(e) => updateOption(index, e.target.value)} size="sm" />
 										<button type="button" onClick={() => removeOption(index)} className="p-1 text-muted hover:text-red-400">
 											×
 										</button>

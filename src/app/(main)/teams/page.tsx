@@ -135,7 +135,7 @@ export default function TeamPage() {
 					<div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
 						<div className="flex items-center gap-5">
 							{/* Team Identity */}
-							<div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-gray-800 to-black border border-white/10 p-2 flex items-center justify-center shadow-2xl">
+							<div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-linear-to-br from-gray-800 to-black border border-white/10 p-2 flex items-center justify-center shadow-2xl">
 								<span className="text-3xl font-bold text-gray-600">
 									FA
 								</span>
@@ -256,8 +256,8 @@ export default function TeamPage() {
 				{/* --- RIGHT COLUMN: INFO & FIXTURES (5 cols) --- */}
 				<div className="lg:col-span-5 space-y-8">
 					{/* NEXT MATCH CARD (Hero of the sidebar) */}
-					<div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#2A2A2A] to-[#1E1E1E] border border-white/10 shadow-2xl">
-						<div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent to-transparent"></div>
+					<div className="relative overflow-hidden rounded-2xl bg-linear-to-b from-[#2A2A2A] to-[#1E1E1E] border border-white/10 shadow-2xl">
+						<div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-accent to-transparent"></div>
 
 						<div className="p-6 text-center">
 							<div className="text-xs font-bold text-accent uppercase tracking-widest mb-4 flex items-center justify-center gap-2">

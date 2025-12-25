@@ -149,7 +149,7 @@ export default function RegistrationDetailClient() {
 					{/* User Info */}
 					<Section title="User Information" icon={User}>
 						<div className="flex items-start gap-4">
-							<div className="w-20 h-20 rounded-full bg-white/10 overflow-hidden flex-shrink-0">
+							<div className="w-20 h-20 rounded-full bg-white/10 overflow-hidden shrink-0">
 								{user?.imageUrl ? (
 									// eslint-disable-next-line @next/next/no-img-element
 									<img src={user.imageUrl} alt={user.name} className="w-full h-full object-cover" />
@@ -268,7 +268,7 @@ export default function RegistrationDetailClient() {
 									value={privateNote}
 									onChange={(e) => setPrivateNote(e.target.value)}
 									placeholder="Add internal notes about this applicant..."
-									className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-accent min-h-[100px]"
+									className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-hidden focus:border-accent min-h-[100px]"
 								/>
 							</div>
 							<div>
@@ -279,7 +279,7 @@ export default function RegistrationDetailClient() {
 									value={publicNote}
 									onChange={(e) => setPublicNote(e.target.value)}
 									placeholder="Message to the applicant..."
-									className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-accent min-h-[100px]"
+									className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-hidden focus:border-accent min-h-[100px]"
 								/>
 							</div>
 							<div className="flex justify-end">
@@ -322,7 +322,7 @@ function DetailItem({ label, value }: { label: string; value?: string | number |
 	return (
 		<div>
 			<label className="text-xs text-muted block mb-0.5">{label}</label>
-			<div className="text-sm text-white font-medium break-words">{value || "—"}</div>
+			<div className="text-sm text-white font-medium wrap-break-word">{value || "—"}</div>
 		</div>
 	);
 }

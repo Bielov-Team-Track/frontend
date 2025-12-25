@@ -187,7 +187,7 @@ export default function EvaluationPage() {
 
 			{/* --- 2. MAIN: DRILL LIST --- */}
 			<div className="flex-1 flex flex-col bg-background relative overflow-hidden">
-				<div className="h-16 border-b border-white/5 flex items-center justify-between px-4 lg:px-8 bg-background/95 backdrop-blur z-10 shrink-0">
+				<div className="h-16 border-b border-white/5 flex items-center justify-between px-4 lg:px-8 bg-background/95 backdrop-blur-sm z-10 shrink-0">
 					<h2 className="text-base lg:text-lg font-bold text-white truncate mr-4">
 						Drills & Assessments
 					</h2>
@@ -301,7 +301,7 @@ export default function EvaluationPage() {
 
 			{/* --- 3. RIGHT: LIVE STAT BREAKDOWN --- */}
 			<div className="hidden xl:flex w-80 bg-[#1E1E1E] border-l border-white/5 flex-col shadow-2xl z-20 shrink-0">
-				<div className="p-6 border-b border-white/5 bg-gradient-to-b from-white/5 to-transparent">
+				<div className="p-6 border-b border-white/5 bg-linear-to-b from-white/5 to-transparent">
 					<h2 className="text-xl font-bold text-white mb-1">
 						Live Analysis
 					</h2>
@@ -342,7 +342,7 @@ export default function EvaluationPage() {
 					/>
 
 					{/* Total Weighted Score */}
-					<div className="mt-8 p-6 rounded-2xl bg-gradient-to-br from-gray-800 to-black border border-white/10 text-center shadow-lg">
+					<div className="mt-8 p-6 rounded-2xl bg-linear-to-br from-gray-800 to-black border border-white/10 text-center shadow-lg">
 						<div className="text-xs text-muted uppercase font-bold tracking-widest mb-2">
 							Estimated OVR
 						</div>

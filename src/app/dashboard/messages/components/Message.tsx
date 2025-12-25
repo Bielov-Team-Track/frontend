@@ -110,7 +110,7 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 	if (message?.isDeleted) {
 		return (
 			<div className={clsx("flex gap-2 p-4 items-start", currentUserMessage ? "flex-row-reverse" : "")}>
-				<div className="flex-grow-1 cursor-pointer">
+				<div className="grow cursor-pointer">
 					<SenderAvatar />
 				</div>
 				<div className={clsx(currentUserMessage ? "text-right" : "text-left", "w-full")}>
@@ -122,7 +122,7 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 
 	return (
 		<div className={clsx("flex gap-2 p-4 items-start group", currentUserMessage ? "flex-row-reverse" : "")}>
-			<div className="flex-grow-1 cursor-pointer">
+			<div className="grow cursor-pointer">
 				<SenderAvatar />
 			</div>
 			<div className={clsx(currentUserMessage ? "text-right" : "text-left", "w-full")}>
@@ -168,7 +168,7 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 					{/* Message actions (reaction picker trigger, reply, forward) */}
 					<div
 						className={clsx(
-							"absolute top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 bg-background/80 backdrop-blur-sm rounded-full border border-white/5 p-0.5 shadow-sm",
+							"absolute top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 bg-background/80 backdrop-blur-xs rounded-full border border-white/5 p-0.5 shadow-xs",
 							currentUserMessage ? "left-0 -translate-x-full mr-2" : "right-0 translate-x-full ml-2"
 						)}>
 						<button

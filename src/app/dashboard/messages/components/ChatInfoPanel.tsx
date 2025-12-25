@@ -222,7 +222,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 													value={participantSearchQuery}
 													onChange={(e) => setParticipantSearchQuery(e.target.value)}
 													placeholder="Search list..."
-													className="w-full bg-white/5 border border-white/10 rounded-lg py-1.5 pl-3 pr-8 text-xs text-white placeholder:text-muted focus:outline-none focus:border-accent/50"
+													className="w-full bg-white/5 border border-white/10 rounded-lg py-1.5 pl-3 pr-8 text-xs text-white placeholder:text-muted focus:outline-hidden focus:border-accent/50"
 												/>
 												<button
 													onClick={() => {

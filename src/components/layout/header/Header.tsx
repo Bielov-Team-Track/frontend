@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/providers";
+import { ThemeSwitcher } from "@/components/ui";
 import UserMenu from "../dashboard-header/UserMenu";
 import Link from "next/link";
 
@@ -21,7 +22,10 @@ const Header = () => {
 					</Link>
 				</nav>
 
-				<UserMenu user={auth.userProfile} isLoading={auth.isLoading} />
+				<div className="flex items-center gap-2">
+					<ThemeSwitcher />
+					<UserMenu user={auth.userProfile} isLoading={auth.isLoading} />
+				</div>
 			</div>
 		</header>
 	);

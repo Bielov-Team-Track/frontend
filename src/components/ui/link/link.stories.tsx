@@ -17,7 +17,7 @@ const meta: Meta<typeof Link> = {
 	argTypes: {
 		variant: {
 			control: { type: "select" },
-			options: ["primary", "secondary", "accent", "ghost", "outline"],
+			options: ["primary", "secondary", "accent", "ghost", "outline-solid"],
 			description: "The visual style variant of the Link",
 			table: {
 				defaultValue: { summary: "primary" },

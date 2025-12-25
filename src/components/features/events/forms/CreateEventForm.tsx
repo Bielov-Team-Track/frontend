@@ -55,7 +55,7 @@ function CreateEventForm({ locations, event }: CreateEventFormProps) {
 				<ProgressIndicator />
 
 				{/* Form Card */}
-				<div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-sm min-h-[500px] flex flex-col relative overflow-hidden">
+				<div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xs min-h-[500px] flex flex-col relative overflow-hidden">
 					{/* Decorative Gradient Blob */}
 					<div className="absolute -top-20 -right-20 w-60 h-60 bg-accent/15 rounded-full blur-[100px] pointer-events-none" />
 

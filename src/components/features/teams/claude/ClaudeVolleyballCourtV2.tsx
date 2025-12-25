@@ -90,7 +90,7 @@ export default function ClaudeVolleyballCourtV2({
 				onClick={() => onPositionClick(null)}
 			>
 				{/* Court Background with gradient and texture */}
-				<div className="absolute inset-0 bg-gradient-to-b from-orange-600/30 via-orange-500/20 to-orange-600/30" />
+				<div className="absolute inset-0 bg-linear-to-b from-orange-600/30 via-orange-500/20 to-orange-600/30" />
 
 				{/* Court texture overlay */}
 				<div className="absolute inset-0 opacity-30" style={{
@@ -144,7 +144,7 @@ export default function ClaudeVolleyballCourtV2({
 				})}
 
 				{/* Position legend */}
-				<div className="absolute bottom-2 right-2 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-lg px-3 py-1.5">
+				<div className="absolute bottom-2 right-2 flex items-center gap-2 bg-black/50 backdrop-blur-xs rounded-lg px-3 py-1.5">
 					<span className="font-condensed text-[10px] text-white/50 uppercase">Front Row</span>
 					<ChevronRight size={12} className="text-white/30" />
 					<span className="font-condensed text-[10px] text-white/50 uppercase">Back Row</span>
@@ -252,7 +252,7 @@ function ClaudeDroppableCourtPosition({
 									className="object-cover"
 								/>
 							) : (
-								<div className={`w-full h-full bg-gradient-to-br ${styles.gradient} flex items-center justify-center`}>
+								<div className={`w-full h-full bg-linear-to-br ${styles.gradient} flex items-center justify-center`}>
 									<span className="font-display text-xl font-bold text-white">
 										{starter.userProfile?.name?.[0]}
 									</span>
@@ -294,7 +294,7 @@ function ClaudeDroppableCourtPosition({
 
 						{/* Name label */}
 						<div className="mt-2 text-center">
-							<span className="font-body text-xs font-semibold text-white bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-md truncate max-w-[80px] block">
+							<span className="font-body text-xs font-semibold text-white bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded-md truncate max-w-[80px] block">
 								{starter.userProfile?.name}
 							</span>
 						</div>
@@ -306,7 +306,7 @@ function ClaudeDroppableCourtPosition({
 							isOver
 								? `bg-accent/30 border-accent ${styles.glow} shadow-lg scale-105`
 								: isSelecting
-								? `bg-gradient-to-br ${styles.gradient} ${styles.border} border-solid`
+								? `bg-linear-to-br ${styles.gradient} ${styles.border} border-solid`
 								: "bg-white/5 border-white/30 hover:bg-white/10 hover:border-white/50"
 						}`}>
 							<Plus size={20} className={isOver || isSelecting ? "text-white" : "text-white/50"} />
@@ -383,7 +383,7 @@ function ClaudeDroppableRolePosition({
 					isOver
 						? "bg-accent/20 border-accent ring-2 ring-accent/30 shadow-lg shadow-accent/20"
 						: isSelecting
-						? `bg-gradient-to-r ${styles.gradient}/20 ${styles.border} ring-1 ring-current`
+						? `bg-linear-to-r ${styles.gradient}/20 ${styles.border} ring-1 ring-current`
 						: "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"
 				}`}
 			>
@@ -392,7 +392,7 @@ function ClaudeDroppableRolePosition({
 					isOver
 						? "bg-accent"
 						: assignedMembers.length > 0
-						? `bg-gradient-to-br ${styles.gradient}`
+						? `bg-linear-to-br ${styles.gradient}`
 						: "bg-white/10"
 				}`}>
 					{assignedMembers.length > 0 ? (
@@ -436,7 +436,7 @@ function ClaudeDroppableRolePosition({
 				{/* Status badge */}
 				<div className={`px-2 py-1 rounded-lg font-condensed text-xs uppercase tracking-wider ${
 					assignedMembers.length > 0
-						? `bg-gradient-to-r ${styles.gradient} text-white`
+						? `bg-linear-to-r ${styles.gradient} text-white`
 						: "bg-white/5 text-muted"
 				}`}>
 					{styles.label}

@@ -273,7 +273,7 @@ export function EventListView({ events }: EventListViewProps) {
 						{/* Year Header */}
 						<div
 							id={`year-${yearGroup.year}`}
-							className="sticky top-0 z-20 backdrop-blur-sm py-2">
+							className="sticky top-0 z-20 backdrop-blur-xs py-2">
 							<h2 className="text-2xl font-bold text-white">
 								{yearGroup.year}
 							</h2>
@@ -284,7 +284,7 @@ export function EventListView({ events }: EventListViewProps) {
 								{/* Month Header */}
 								<div
 									id={`month-${yearGroup.year}-${monthGroup.month}`}
-									className="sticky top-12 z-10 backdrop-blur-sm py-2">
+									className="sticky top-12 z-10 backdrop-blur-xs py-2">
 									<h3 className="text-lg font-semibold">
 										{monthGroup.monthName}
 									</h3>
@@ -361,7 +361,7 @@ function EventListItem({ event }: { event: Event }) {
 			<div
 				className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${
 					isPastEvent
-						? "bg-white/[0.02] border-white/5 opacity-60 hover:opacity-100"
+						? "bg-white/2 border-white/5 opacity-60 hover:opacity-100"
 						: isTodayEvent
 						? "bg-accent/5 border-accent/20 hover:border-accent/40"
 						: "bg-white/5 border-white/5 hover:border-accent/30 hover:bg-white/[0.07]"
@@ -430,7 +430,7 @@ function EventListItem({ event }: { event: Event }) {
 
 function EmptyState() {
 	return (
-		<div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02]">
+		<div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/2">
 			<div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 text-muted">
 				<Calendar size={32} />
 			</div>

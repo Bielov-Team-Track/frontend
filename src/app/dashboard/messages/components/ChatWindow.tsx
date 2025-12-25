@@ -140,7 +140,7 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdat
 						color="neutral"
 						leftIcon={<Info size={20} />}
 						onClick={() => setShowInfoPanel(!showInfoPanel)}
-						className={showInfoPanel ? "bg-accent/10 !text-accent" : ""}
+						className={showInfoPanel ? "bg-accent/10 text-accent!" : ""}
 						title="Chat details"
 					/>
 				</div>
@@ -159,7 +159,7 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdat
 					groupedMessages.map((group) => (
 						<div key={group.date} className="space-y-4">
 							<div className="flex justify-center sticky top-0 z-0">
-								<span className="bg-background/80 backdrop-blur-sm border border-white/5 text-xs font-medium px-3 py-1 rounded-full text-muted shadow-sm">
+								<span className="bg-background/80 backdrop-blur-xs border border-white/5 text-xs font-medium px-3 py-1 rounded-full text-muted shadow-xs">
 									{group.date}
 								</span>
 							</div>
@@ -185,7 +185,7 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdat
 
 			{/* Input Area */}
 			<div className="shrink-0 p-4 bg-background/50 backdrop-blur-md border-t border-white/5 z-10">
-				<div className="max-w-4xl mx-auto flex items-center gap-2 bg-white/5 p-2 rounded-3xl border border-white/10 focus-within:border-accent/50 focus-within:ring-1 focus-within:ring-accent/50 transition-all shadow-sm">
+				<div className="max-w-4xl mx-auto flex items-center gap-2 bg-white/5 p-2 rounded-3xl border border-white/10 focus-within:border-accent/50 focus-within:ring-1 focus-within:ring-accent/50 transition-all shadow-xs">
 					<button className="p-2.5 rounded-full text-muted hover:text-white hover:bg-white/10 transition-colors">
 						<Paperclip size={20} />
 					</button>
@@ -196,7 +196,7 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdat
 						onChange={handleTextChange}
 						onKeyDown={handleKeyDown}
 						placeholder="Type a message..."
-						className="flex-1 bg-transparent border-0 focus:ring-0 text-sm text-white placeholder:text-muted resize-none py-2.5 max-h-32 min-h-[40px] leading-relaxed outline-none"
+						className="flex-1 bg-transparent border-0 focus:ring-0 text-sm text-white placeholder:text-muted resize-none py-2.5 max-h-32 min-h-[40px] leading-relaxed outline-hidden"
 						rows={1}
 						disabled={isSending}
 					/>

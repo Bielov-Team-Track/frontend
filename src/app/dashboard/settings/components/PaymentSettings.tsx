@@ -265,30 +265,30 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
             {/* Info Section */}
             <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-6">
                 <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0">
                         <Info size={18} />
                     </div>
                     <div className="flex flex-col gap-2">
                         <h3 className="font-semibold text-white">How Payment Accounts Work</h3>
                         <ul className="space-y-2 text-sm text-muted">
                             <li className="flex items-start gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 flex-shrink-0"></span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 shrink-0"></span>
                                 Create a Stripe Connect account to receive payments from your events.
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 flex-shrink-0"></span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 shrink-0"></span>
                                 Complete the onboarding process to verify your identity.
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 flex-shrink-0"></span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 shrink-0"></span>
                                 Once verified, you can accept card payments for your volleyball events.
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 flex-shrink-0"></span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 shrink-0"></span>
                                 Payments are processed securely through Stripe.
                             </li>
                              <li className="flex items-start gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 flex-shrink-0"></span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 shrink-0"></span>
                                 You can always accept cash payments without a payment account.
                             </li>
                         </ul>

@@ -25,7 +25,7 @@ The frontend codebase is functional and feature-rich, utilizing Next.js 15 (App 
 *   **Cards:** `TeamCard`, `GroupCard`, and `EventCard` share 80% of their structure (Image, Title, Badge, Action Button).
     *   *Recommendation:* Create a generic `Card`, `CardHeader`, `CardContent`, `CardFooter` composite component to standardize shadows, borders, and padding.
 *   **Badges/Tags:** Skill levels (`Beginner`, `Advanced`) and Statuses (`Pending`, `Accepted`) are rendered with manual CSS classes in many places.
-    *   *Recommendation:* Create a `Badge` component with variants (`success`, `warning`, `outline`).
+    *   *Recommendation:* Create a `Badge` component with variants (`success`, `warning`, `outline-solid`).
 
 ### 3.2 Composite Patterns
 *   **Search & Filter Bars:** `ClubsPageClient`, `EventsPageClient`, and `AttendanceFilters` all implement their own search inputs and filter toggles.

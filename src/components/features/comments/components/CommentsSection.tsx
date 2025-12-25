@@ -69,7 +69,7 @@ const CommentsSection = ({ eventId }: CommentsSectionProps) => {
 	return (
 		<div className="bg-[#1A1A1A] border border-white/5 rounded-2xl overflow-hidden">
             {/* Header */}
-            <div className="p-4 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+            <div className="p-4 border-b border-white/5 bg-white/2 flex items-center justify-between">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                     <MessageCircle size={16} className="text-accent" />
                     Discussion ({comments.length})
@@ -80,7 +80,7 @@ const CommentsSection = ({ eventId }: CommentsSectionProps) => {
 			<div className="p-4 md:p-6 space-y-6">
                 {/* Input Area */}
                 <div className="flex gap-4 mb-8">
-                    <div className="flex-shrink-0 hidden sm:block">
+                    <div className="shrink-0 hidden sm:block">
                         {isAuthenticated && userProfile ? (
                             <Avatar profile={userProfile} className="w-10 h-10" />
                         ) : (
@@ -98,7 +98,7 @@ const CommentsSection = ({ eventId }: CommentsSectionProps) => {
                                         placeholder="Add to the discussion..."
                                         rows={3}
                                         maxLength={2000}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white placeholder:text-muted focus:outline-none focus:border-accent/50 focus:bg-white/10 transition-all resize-none pr-12"
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white placeholder:text-muted focus:outline-hidden focus:border-accent/50 focus:bg-white/10 transition-all resize-none pr-12"
                                         required
                                     />
                                     <button
@@ -140,7 +140,7 @@ const CommentsSection = ({ eventId }: CommentsSectionProps) => {
 						))}
 					</div>
 				) : (
-					<div className="text-center py-12 px-4 rounded-xl border border-white/5 border-dashed bg-white/[0.02]">
+					<div className="text-center py-12 px-4 rounded-xl border border-white/5 border-dashed bg-white/2">
                         <MessageCircle size={32} className="mx-auto text-muted/30 mb-3" />
 						<p className="text-muted text-sm font-medium">No comments yet.</p>
                         <p className="text-xs text-muted/50 mt-1">Be the first to share your thoughts!</p>

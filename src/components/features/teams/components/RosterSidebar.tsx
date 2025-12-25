@@ -94,7 +94,7 @@ export default function RosterSidebar({
 
 	return (
 		<div className="rounded-2xl bg-white/5 border border-white/10 flex flex-col h-[600px] overflow-hidden">
-			<div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-sm">
+			<div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-xs">
 				<div className="flex items-center justify-between">
 					<h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
 						<span>Team Roster</span>
@@ -125,7 +125,7 @@ export default function RosterSidebar({
 							return (
 								<div key={position}>
 									{/* Position Header */}
-									<div className="flex items-center gap-2 mb-3 sticky top-0 py-1 z-1000 backdrop-blur-sm bg-white/5">
+									<div className="flex items-center gap-2 mb-3 sticky top-0 py-1 z-1000 backdrop-blur-xs bg-white/5">
 										<div className="text-xs font-bold text-muted uppercase tracking-wider">{getPositionLabel(position)}</div>
 										<div className="flex-1 h-px bg-white/10" />
 										<span className="text-[10px] font-medium text-muted bg-white/5 px-1.5 py-0.5 rounded">{positionMembers.length}</span>
@@ -320,7 +320,7 @@ function DraggableMemberRow({
 				{/* Priority number badge */}
 				{position !== "Unassigned" && (
 					<div
-						className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 z-10 ${
+						className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 z-10 ${
 							index === 0 ? "bg-yellow-500 text-black" : "bg-white/10 text-muted"
 						}`}>
 						{index + 1}
@@ -330,14 +330,14 @@ function DraggableMemberRow({
 				{/* Avatar - clickable link to member page */}
 				<Link
 					href={`/dashboard/clubs/${clubId}/members/${member.userId}`}
-					className="relative z-10 flex-shrink-0"
+					className="relative z-10 shrink-0"
 					onClick={(e) => isDragging && e.preventDefault()}>
 					<div className="relative">
 						<div className="rounded-lg overflow-hidden ring-1 ring-white/10 hover:ring-accent/50 transition-all">
 							{member.userProfile && <Avatar profile={member.userProfile} size="small" />}
 						</div>
 						{member.jerseyNumber && (
-							<div className="absolute -bottom-1.5 -right-1.5 w-5 h-5 rounded-full bg-accent text-background-dark text-[10px] font-bold flex items-center justify-center border-2 border-background-dark shadow-sm">
+							<div className="absolute -bottom-1.5 -right-1.5 w-5 h-5 rounded-full bg-accent text-background-dark text-[10px] font-bold flex items-center justify-center border-2 border-background-dark shadow-xs">
 								{member.jerseyNumber}
 							</div>
 						)}
@@ -352,7 +352,7 @@ function DraggableMemberRow({
 					<div className="text-sm font-medium text-white hover:text-accent transition-colors truncate flex items-center gap-1.5">
 						{member.userProfile?.name} {member.userProfile?.surname}
 						{/* Star icon next to name for starter */}
-						{index === 0 && position !== "Unassigned" && <Star size={12} className="text-yellow-500 fill-yellow-500 flex-shrink-0" />}
+						{index === 0 && position !== "Unassigned" && <Star size={12} className="text-yellow-500 fill-yellow-500 shrink-0" />}
 					</div>
 					<div className="text-xs text-muted/70 truncate flex items-center gap-1">
 						{index === 0 && position !== "Unassigned" && <span className="text-yellow-500/80">Starter</span>}
@@ -401,7 +401,7 @@ export function PlayerDragOverlay({ member }: { member: TeamMember }) {
 					{member.userProfile && <Avatar profile={member.userProfile} size="small" />}
 				</div>
 				{member.jerseyNumber && (
-					<div className="absolute -bottom-1.5 -right-1.5 w-5 h-5 rounded-full bg-accent text-background-dark text-[10px] font-bold flex items-center justify-center border-2 border-background-dark shadow-sm">
+					<div className="absolute -bottom-1.5 -right-1.5 w-5 h-5 rounded-full bg-accent text-background-dark text-[10px] font-bold flex items-center justify-center border-2 border-background-dark shadow-xs">
 						{member.jerseyNumber}
 					</div>
 				)}

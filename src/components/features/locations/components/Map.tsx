@@ -108,7 +108,7 @@ function MapComponent({
 			{readonly && position && (
 				<button
 					onClick={handleCenterOnMarker}
-					className="absolute top-2 right-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 flex items-center gap-1.5 z-10"
+					className="absolute top-2 right-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 shadow-xs transition-colors duration-200 flex items-center gap-1.5 z-10"
 					type="button">
 					<svg
 						className="w-4 h-4"

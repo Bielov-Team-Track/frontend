@@ -155,14 +155,14 @@ function TabButton({ active, onClick, icon: Icon, label, count }: TabButtonProps
 			role="tab"
 			aria-selected={active}
 			aria-controls={`${label.toLowerCase()}-panel`}
-			className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
+			className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
 				active ? "bg-accent text-white shadow-md shadow-accent/20" : "text-muted hover:text-white hover:bg-white/5"
 			}`}>
 			<Icon size={16} className={active ? "text-white" : "text-muted"} />
 			<span>{label}</span>
 			{count !== undefined && (
 				<span
-					className={`min-w-[1.25rem] h-5 flex items-center justify-center text-xs rounded-full px-1.5 ${
+					className={`min-w-5 h-5 flex items-center justify-center text-xs rounded-full px-1.5 ${
 						active ? "bg-white/20 text-white" : "bg-white/10 text-muted"
 					}`}>
 					{count}
@@ -391,7 +391,7 @@ function RegistrationsList({ clubId, status }: RegistrationsListProps) {
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
 							leftIcon={<Search size={16} />}
-							inputSize="sm"
+							size="sm"
 							aria-label="Search registrations"
 						/>
 					</div>
@@ -441,7 +441,7 @@ function RegistrationsList({ clubId, status }: RegistrationsListProps) {
 								value={dateFrom}
 								onChange={(e) => setDateFrom(e.target.value)}
 								leftIcon={<Calendar size={16} />}
-								inputSize="sm"
+								size="sm"
 							/>
 
 							{/* Date To */}
@@ -451,7 +451,7 @@ function RegistrationsList({ clubId, status }: RegistrationsListProps) {
 								value={dateTo}
 								onChange={(e) => setDateTo(e.target.value)}
 								leftIcon={<Calendar size={16} />}
-								inputSize="sm"
+								size="sm"
 							/>
 
 							{/* Sort By */}
@@ -589,11 +589,11 @@ function RegistrationCard({
 			onClick={handleCardClick}>
 			<div className="flex items-center gap-4">
 				{/* Avatar */}
-				<div className="flex-shrink-0">
+				<div className="shrink-0">
 					{userProfile ? (
 						<Avatar profile={userProfile} size="small" />
 					) : (
-						<div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent/30 to-primary/30 flex items-center justify-center text-sm font-bold text-white border border-white/10">
+						<div className="w-10 h-10 rounded-lg bg-linear-to-br from-accent/30 to-primary/30 flex items-center justify-center text-sm font-bold text-white border border-white/10">
 							{initials}
 						</div>
 					)}
@@ -606,7 +606,7 @@ function RegistrationCard({
 						{userEmail && <span className="text-xs text-muted truncate hidden sm:inline">({userEmail})</span>}
 					</div>
 					<div className="flex items-center gap-2 mt-1 text-sm text-muted">
-						<Clock size={12} className="flex-shrink-0" />
+						<Clock size={12} className="shrink-0" />
 						<span className="truncate">{formatDistanceToNow(new Date(registration.submittedAt), { addSuffix: true })}</span>
 						<span className="text-white/20">•</span>
 						<span className="truncate">{formName}</span>
@@ -614,7 +614,7 @@ function RegistrationCard({
 				</div>
 
 				{/* Action Buttons */}
-				<div className="flex items-center gap-2 flex-shrink-0">
+				<div className="flex items-center gap-2 shrink-0">
 					{registration.status === RegistrationStatus.Pending && (
 						<>
 							<Button

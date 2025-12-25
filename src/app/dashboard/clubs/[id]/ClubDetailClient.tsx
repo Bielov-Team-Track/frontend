@@ -195,7 +195,7 @@ function ClubBannerCard({
 	return (
 		<div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
 			{/* Banner */}
-			<div className="h-60 relative bg-gradient-to-r from-accent/20 to-primary/20">
+			<div className="h-60 relative bg-linear-to-r from-accent/20 to-primary/20">
 				{club.bannerUrl && !bannerError ? (
 					<>
 						{/* eslint-disable-next-line @next/next/no-img-element */}

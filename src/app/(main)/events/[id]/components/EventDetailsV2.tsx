@@ -71,8 +71,8 @@ export default function EventDetailsV2({
 				{/* Banner & Gradient */}
 				<div className="h-56 md:h-80 w-full relative overflow-hidden bg-background-light">
 					{/* Placeholder Gradient if no image (Event model doesn't seem to have bannerUrl yet) */}
-					<div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background-dark to-accent/10" />
-					<div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/60 to-transparent" />
+					<div className="absolute inset-0 bg-linear-to-br from-primary/20 via-background-dark to-accent/10" />
+					<div className="absolute inset-0 bg-linear-to-t from-background-dark via-background-dark/60 to-transparent" />
 				</div>
 
 				{/* Event Header Content */}

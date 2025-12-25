@@ -145,7 +145,7 @@ export default function GeneralSettingsSection({ club, onTabChange, activeTab }:
 						<h2 className="text-lg font-bold text-white">Club Branding</h2>
 						<div className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
 							{/* Banner */}
-							<div className="relative h-32 bg-gradient-to-r from-accent/20 to-primary/20 group">
+							<div className="relative h-32 bg-linear-to-r from-accent/20 to-primary/20 group">
 								{bannerPreview ? (
 									<img src={bannerPreview} alt="Club banner" className="w-full h-full object-cover" />
 								) : (

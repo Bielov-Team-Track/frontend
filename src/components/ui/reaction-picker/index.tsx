@@ -96,7 +96,7 @@ export default function ReactionPicker({
 				left: position.left,
 				opacity: isVisible ? 1 : 0,
 			}}
-			className={`fixed z-[9999] bg-background/80 backdrop-blur-md border border-white/10 shadow-2xl transition-opacity duration-200 ${
+			className={`fixed z-9999 bg-background/80 backdrop-blur-md border border-white/10 shadow-2xl transition-opacity duration-200 ${
 				showFullPicker ? "rounded-2xl p-0 overflow-hidden" : "rounded-full p-1.5 flex gap-1"
 			}`}
 		>
@@ -127,7 +127,7 @@ export default function ReactionPicker({
 							{emoji}
 						</button>
 					))}
-					<div className="w-[1px] h-6 bg-white/10 my-auto mx-1" />
+					<div className="w-px h-6 bg-white/10 my-auto mx-1" />
 					<button
 						onClick={(e) => {
 							e.stopPropagation();

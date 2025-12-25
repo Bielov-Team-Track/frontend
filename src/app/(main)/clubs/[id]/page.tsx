@@ -86,11 +86,11 @@ export default function ClubPage() {
 						/* eslint-disable-next-line @next/next/no-img-element */
 						<img src={club.bannerUrl} alt="Club Banner" className="w-full h-full object-cover opacity-80" onError={() => setBannerError(true)} />
 					) : (
-						<div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-accent/20 to-primary/20">
+						<div className="w-full h-full flex items-center justify-center bg-linear-to-r from-accent/20 to-primary/20">
 							<ImageOff size={48} className="text-white/20" />
 						</div>
 					)}
-					<div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent" />
+					<div className="absolute inset-0 bg-linear-to-t from-background-dark via-background-dark/40 to-transparent" />
 				</div>
 
 				{/* Club Header Content */}
@@ -157,7 +157,7 @@ export default function ClubPage() {
 				{/* --- LEFT SIDEBAR (Context) --- */}
 				<div className="lg:col-span-4 space-y-6">
 					{/* About Card */}
-					<div className="p-6 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-sm">
+					<div className="p-6 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-xs">
 						<h3 className="text-lg font-bold text-white mb-3">About</h3>
 						<p className="text-muted text-sm leading-relaxed mb-4">{club.description || "No description available."}</p>
 						{club.contactEmail && <div className="text-xs text-muted mb-2">Contact: {club.contactEmail}</div>}
@@ -313,7 +313,7 @@ export default function ClubPage() {
 									{/* Post Header */}
 									<div className="flex items-center justify-between mb-3">
 										<div className="flex items-center gap-3">
-											<div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-secondary p-[2px]">
+											<div className="w-10 h-10 rounded-full bg-linear-to-br from-accent to-secondary p-[2px]">
 												<div className="w-full h-full rounded-full bg-background-dark overflow-hidden flex items-center justify-center">
 													{club.logoUrl && !logoError ? (
 														/* eslint-disable-next-line @next/next/no-img-element */

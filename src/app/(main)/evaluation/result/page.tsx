@@ -177,7 +177,7 @@ export default function PlayerReportCard() {
 										</div>
 										<div className="h-2 bg-background-light rounded-full overflow-hidden">
 											<div
-												className="h-full bg-gradient-to-r from-accent/80 to-accent transition-all duration-1000 ease-out"
+												className="h-full bg-linear-to-r from-accent/80 to-accent transition-all duration-1000 ease-out"
 												style={{
 													width: `${value * 10}%`,
 												}}></div>

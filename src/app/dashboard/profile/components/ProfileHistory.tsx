@@ -58,7 +58,7 @@ const ProfileHistory = ({ historyEntries }: ProfileHistoryProps) => {
 													className="rounded-lg object-cover"
 												/>
 											) : (
-												<div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-muted flex-shrink-0">
+												<div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-muted shrink-0">
 													<Shield size={20} />
 												</div>
 											)}

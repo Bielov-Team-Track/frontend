@@ -87,7 +87,7 @@ export default function AttendanceCell({
                         w-4 h-4 rounded-full
                         flex items-center justify-center
                         text-white text-[9px] font-bold
-                        shadow-sm
+                        shadow-xs
                         ${isPaid ? "bg-success" : "bg-error"}
                     `}
                 >

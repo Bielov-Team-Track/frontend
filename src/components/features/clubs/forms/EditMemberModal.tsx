@@ -97,7 +97,7 @@ export default function EditMemberModal({
 					<select
 						value={skillLevel}
 						onChange={(e) => setSkillLevel(e.target.value)}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent">
+						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent">
 						<option value="">Not specified</option>
 						{Object.values(SkillLevel).map((level) => (
 							<option key={level} value={level}>
@@ -122,7 +122,7 @@ export default function EditMemberModal({
 							onChange={(e) => setIsActive(e.target.checked)}
 							className="sr-only peer"
 						/>
-						<div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+						<div className="w-11 h-6 bg-white/10 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:rtl:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
 					</label>
 				</div>
 

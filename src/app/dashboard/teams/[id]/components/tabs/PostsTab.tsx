@@ -36,7 +36,7 @@ export default function PostsTab() {
 						onChange={(e) => setNewPostContent(e.target.value)}
 						placeholder="Share something with the team..."
 						rows={3}
-						className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:border-accent resize-none"
+						className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent resize-none"
 					/>
 					<div className="flex justify-end">
 						<Button

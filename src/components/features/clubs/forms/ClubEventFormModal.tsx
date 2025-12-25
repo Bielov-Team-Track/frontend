@@ -129,7 +129,7 @@ export default function ClubEventFormModal({
 						onChange={(e) => setDescription(e.target.value)}
 						placeholder="Describe your event..."
 						rows={3}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:border-accent resize-none"
+						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent resize-none"
 					/>
 				</div>
 
@@ -149,7 +149,7 @@ export default function ClubEventFormModal({
 							type="date"
 							value={startDate}
 							onChange={(e) => setStartDate(e.target.value)}
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 							required
 						/>
 					</div>
@@ -161,7 +161,7 @@ export default function ClubEventFormModal({
 							type="time"
 							value={startTime}
 							onChange={(e) => setStartTime(e.target.value)}
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 							required
 						/>
 					</div>
@@ -173,7 +173,7 @@ export default function ClubEventFormModal({
 							type="date"
 							value={endDate}
 							onChange={(e) => setEndDate(e.target.value)}
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 					<div>
@@ -184,7 +184,7 @@ export default function ClubEventFormModal({
 							type="time"
 							value={endTime}
 							onChange={(e) => setEndTime(e.target.value)}
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 				</div>

@@ -31,13 +31,13 @@ export default function ClubsPageClient() {
 			{/* Toolbar */}
 			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-background/50 backdrop-blur-md p-4 rounded-2xl border border-white/5">
 				{/* Search & Filter */}
-				<div className="flex items-center gap-3 w-full sm:w-auto flex-1 max-w-lg">
+				<div className="join">
 					<div className="relative flex-1 group">
 						<Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-hover:text-white transition-colors" />
 						<input
 							type="text"
 							placeholder="Find clubs..."
-							className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent/50 transition-all"
+							className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-hidden focus:ring-1 focus:ring-accent/50 transition-all"
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
 						/>
@@ -57,7 +57,7 @@ export default function ClubsPageClient() {
 								key={view.value}
 								onClick={() => setCurrentView(view.value)}
 								className={`p-2 rounded-lg transition-all ${
-									currentView === view.value ? "bg-white/10 text-white shadow-sm" : "text-muted hover:text-white hover:bg-white/5"
+									currentView === view.value ? "bg-white/10 text-white shadow-xs" : "text-muted hover:text-white hover:bg-white/5"
 								}`}
 								title={view.label}>
 								<view.icon size={18} />
@@ -99,10 +99,10 @@ export default function ClubsPageClient() {
 function ClubGridCard({ club }: { club: Club }) {
 	return (
 		<Link href={`/dashboard/clubs/${club.id}`} className="group block h-full">
-			<div className="flex flex-col h-full rounded-2xl bg-white/5 border border-white/5 hover:border-accent/40 hover:bg-white/[0.07] hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-xl">
+			<div className="flex flex-col h-full rounded-2xl bg-white/5 border border-white/5 hover:border-accent/40 hover:bg-white/[0.07] hover:-translate-y-1 transition-all duration-300 shadow-xs hover:shadow-xl">
 				{/* Banner */}
-				<div className="h-24 bg-gradient-to-br from-accent/20 via-primary/10 to-transparent relative overflow-hidden rounded-t-2xl">
-					<div className="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent" />
+				<div className="h-24 bg-linear-to-br from-accent/20 via-primary/10 to-transparent relative overflow-hidden rounded-t-2xl">
+					<div className="absolute inset-0 bg-linear-to-t from-background-dark/80 to-transparent" />
 				</div>
 
 				{/* Content */}
@@ -185,7 +185,7 @@ function ClubListView({ clubs }: { clubs: Club[] }) {
 
 function EmptyState() {
 	return (
-		<div className="col-span-full flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02]">
+		<div className="col-span-full flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/2">
 			<div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 text-muted">
 				<Shield size={32} />
 			</div>

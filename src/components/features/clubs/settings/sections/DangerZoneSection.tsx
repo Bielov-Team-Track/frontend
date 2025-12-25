@@ -36,7 +36,7 @@ function ActionCard({ icon, title, description, buttonText, buttonColor = "neutr
 				<div className="flex-1">
 					<h3 className={`font-medium mb-1 ${danger ? "text-red-400" : "text-white"}`}>{title}</h3>
 					<p className="text-sm text-muted mb-4">{description}</p>
-					<Button variant={danger ? "solid" : "outline"} color={buttonColor} size="sm" onClick={onClick} loading={isLoading}>
+					<Button variant={danger ? "solid" : "outline-solid"} color={buttonColor} size="sm" onClick={onClick} loading={isLoading}>
 						{buttonText}
 					</Button>
 				</div>

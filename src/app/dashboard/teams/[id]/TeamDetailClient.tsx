@@ -121,7 +121,7 @@ function TeamBannerCard({ team, logoError, onLogoError, activeTab, onTabChange }
 	return (
 		<div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
 			{/* Banner Area */}
-			<div className="h-32 relative bg-gradient-to-r from-blue-900/50 to-indigo-900/50">
+			<div className="h-32 relative bg-linear-to-r from-blue-900/50 to-indigo-900/50">
 				<div className="absolute inset-0 bg-black/30" />
 			</div>
 

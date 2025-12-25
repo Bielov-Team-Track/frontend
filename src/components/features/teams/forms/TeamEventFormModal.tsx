@@ -61,7 +61,7 @@ export default function TeamEventFormModal({
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
 						rows={2}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent resize-none"
+						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent resize-none"
 					/>
 				</div>
 
@@ -75,7 +75,7 @@ export default function TeamEventFormModal({
 							value={startTime}
 							onChange={(e) => setStartTime(e.target.value)}
 							required
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 					<div>
@@ -87,7 +87,7 @@ export default function TeamEventFormModal({
 							value={endTime}
 							onChange={(e) => setEndTime(e.target.value)}
 							required
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 				</div>

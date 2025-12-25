@@ -126,7 +126,7 @@ export default function MessagesPage() {
 						<input
 							type="text"
 							placeholder="Search chats..."
-							className="w-full bg-white/5 border border-white/5 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-white/20 focus:bg-white/10 transition-all"
+							className="w-full bg-white/5 border border-white/5 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-hidden focus:border-white/20 focus:bg-white/10 transition-all"
 						/>
 					</div>
 				</div>
@@ -165,7 +165,7 @@ export default function MessagesPage() {
                 px-5 py-4 cursor-pointer transition-all border-l-2 hover:bg-white/5
                 ${
 					selectedChatId === chat.id
-						? "bg-white/[0.03] border-accent"
+						? "bg-white/3 border-accent"
 						: "border-transparent"
 				}
               `}>
@@ -238,11 +238,11 @@ export default function MessagesPage() {
 			{/* --- MAIN CHAT AREA --- */}
 			<div className="flex-1 flex flex-col bg-[#1E1E1E] relative">
 				{/* Chat Header */}
-				<header className="h-20 px-6 flex items-center justify-between border-b border-white/5 bg-[#1E1E1E]/95 backdrop-blur z-10">
+				<header className="h-20 px-6 flex items-center justify-between border-b border-white/5 bg-[#1E1E1E]/95 backdrop-blur-sm z-10">
 					<div
 						className="flex items-center gap-4 cursor-pointer"
 						onClick={() => setShowInfoPanel(true)}>
-						<div className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-br from-gray-700 to-gray-800 text-white font-bold text-sm">
+						<div className="w-10 h-10 flex items-center justify-center rounded-full bg-linear-to-br from-gray-700 to-gray-800 text-white font-bold text-sm">
 							{activeChat.type === "group" ? (
 								<Users size={18} />
 							) : (
@@ -272,7 +272,7 @@ export default function MessagesPage() {
 						<button className="p-2 hover:bg-white/5 rounded-full hover:text-white transition-colors">
 							<Video size={20} />
 						</button>
-						<div className="h-6 w-[1px] bg-white/10 mx-1"></div>
+						<div className="h-6 w-px bg-white/10 mx-1"></div>
 						<button
 							onClick={() => setShowInfoPanel(!showInfoPanel)}
 							className={`p-2 rounded-full transition-colors ${
@@ -326,7 +326,7 @@ export default function MessagesPage() {
 
 									<div
 										className={`
-                     px-4 py-3 text-sm leading-relaxed shadow-sm
+                     px-4 py-3 text-sm leading-relaxed shadow-xs
                      ${
 							isMe
 								? "bg-accent text-white rounded-2xl rounded-tr-sm"
@@ -367,7 +367,7 @@ export default function MessagesPage() {
 							value={messageInput}
 							onChange={(e) => setMessageInput(e.target.value)}
 							placeholder="Type a message..."
-							className="flex-1 bg-transparent text-white text-sm placeholder-gray-500 resize-none outline-none py-2 max-h-32"
+							className="flex-1 bg-transparent text-white text-sm placeholder-gray-500 resize-none outline-hidden py-2 max-h-32"
 							rows={1}
 						/>
 						<div className="flex items-center gap-1">

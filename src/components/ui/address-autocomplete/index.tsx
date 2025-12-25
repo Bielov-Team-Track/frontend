@@ -239,11 +239,11 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 							key={suggestion.placeId}
 							type="button"
 							onClick={() => handleSuggestionClick(suggestion)}
-							className="w-full text-left px-4 py-3 hover:bg-base-200 focus:bg-base-200 focus:outline-none border-b border-base-300 last:border-b-0"
+							className="w-full text-left px-4 py-3 hover:bg-base-200 focus:bg-base-200 focus:outline-hidden border-b border-base-300 last:border-b-0"
 						>
 							<div className="flex items-start gap-3">
 								<MapPin
-									className="text-primary mt-1 flex-shrink-0"
+									className="text-primary mt-1 shrink-0"
 									size={14}
 								/>
 								<div className="flex-1 min-w-0">

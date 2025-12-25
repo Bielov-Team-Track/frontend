@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import React from "react";
 
 interface SkeletonProps {
@@ -5,7 +6,6 @@ interface SkeletonProps {
 	width?: string | number;
 	height?: string | number;
 	rounded?: "sm" | "md" | "lg" | "full" | "none";
-	animate?: boolean;
 }
 
 const Skeleton = ({
@@ -13,7 +13,6 @@ const Skeleton = ({
 	width,
 	height,
 	rounded = "md",
-	animate = true,
 }: SkeletonProps) => {
 	const roundedClasses = {
 		none: "",
@@ -23,17 +22,17 @@ const Skeleton = ({
 		full: "rounded-full",
 	};
 
-	const baseClasses = `bg-base-300 ${animate ? "animate-pulse" : ""}`;
-	const classes = [baseClasses, roundedClasses[rounded], className]
-		.filter(Boolean)
-		.join(" ");
-
 	const style = {
 		...(width && { width }),
 		...(height && { height }),
 	};
 
-	return <div className={classes} style={style} />;
+	return (
+		<div
+			className={cn("skeleton", roundedClasses[rounded], className)}
+			style={style}
+		/>
+	);
 };
 
 // Specialized skeleton components
@@ -46,13 +45,12 @@ export const SkeletonText = ({
 	className?: string;
 	lastLineWidth?: string;
 }) => (
-	<div className={`space-y-2 ${className}`}>
+	<div className={cn("space-y-2", className)}>
 		{Array.from({ length: lines }).map((_, index) => (
-			<Skeleton
+			<div
 				key={index}
-				height="0.875rem"
-				width={index === lines - 1 ? lastLineWidth : "100%"}
-				className="block"
+				className="skeleton h-4"
+				style={{ width: index === lines - 1 ? lastLineWidth : "100%" }}
 			/>
 		))}
 	</div>
@@ -71,7 +69,7 @@ export const SkeletonAvatar = ({
 		lg: "w-16 h-16",
 	};
 
-	return <Skeleton className={`${sizes[size]} ${className}`} rounded="full" />;
+	return <div className={cn("skeleton rounded-full", sizes[size], className)} />;
 };
 
 export const SkeletonCard = ({
@@ -83,28 +81,28 @@ export const SkeletonCard = ({
 	hasImage?: boolean;
 	hasAvatar?: boolean;
 }) => (
-	<div className={` rounded-lg p-4 ${className}`}>
+	<div className={cn("rounded-lg p-4", className)}>
 		<div className="flex gap-4">
 			{hasImage && (
-				<Skeleton className="aspect-square h-28 flex-shrink-0" rounded="md" />
+				<div className="skeleton aspect-square h-28 shrink-0 rounded-md" />
 			)}
 			<div className="flex-1 space-y-3">
 				<div className="flex items-center gap-2">
 					{hasAvatar && <SkeletonAvatar size="sm" />}
-					<Skeleton height="1.25rem" width="60%" />
+					<div className="skeleton h-5 w-3/5" />
 				</div>
 				<div className="space-y-2">
 					<div className="flex items-center gap-2">
-						<Skeleton width="1rem" height="1rem" rounded="sm" />
-						<Skeleton height="0.875rem" width="40%" />
+						<div className="skeleton w-4 h-4 rounded-sm" />
+						<div className="skeleton h-4 w-2/5" />
 					</div>
 					<div className="flex items-center gap-2">
-						<Skeleton width="1rem" height="1rem" rounded="sm" />
-						<Skeleton height="0.875rem" width="35%" />
+						<div className="skeleton w-4 h-4 rounded-sm" />
+						<div className="skeleton h-4 w-1/3" />
 					</div>
 					<div className="flex items-center gap-2">
-						<Skeleton width="1rem" height="1rem" rounded="sm" />
-						<Skeleton height="0.875rem" width="50%" />
+						<div className="skeleton w-4 h-4 rounded-sm" />
+						<div className="skeleton h-4 w-1/2" />
 					</div>
 				</div>
 			</div>

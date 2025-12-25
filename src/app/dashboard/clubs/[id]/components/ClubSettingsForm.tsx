@@ -118,7 +118,7 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
             {/* Banner Section */}
             <div className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
-                <div className="relative h-32 bg-gradient-to-r from-accent/20 to-primary/20 group">
+                <div className="relative h-32 bg-linear-to-r from-accent/20 to-primary/20 group">
                     {bannerPreview ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -199,7 +199,7 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
                     <input
                         type="text"
                         {...register("name", { required: "Club name is required" })}
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:border-accent"
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
                     />
                     {errors.name && (
                         <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>
@@ -213,7 +213,7 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
                     <textarea
                         {...register("description")}
                         rows={3}
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:border-accent resize-none"
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent resize-none"
                     />
                 </div>
 
@@ -225,7 +225,7 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
                         <input
                             type="email"
                             {...register("contactEmail")}
-                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:border-accent"
+                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
                         />
                     </div>
                     <div>
@@ -235,7 +235,7 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
                         <input
                             type="tel"
                             {...register("contactPhone")}
-                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:border-accent"
+                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
                         />
                     </div>
                 </div>

@@ -65,7 +65,7 @@ function YearView({
 	return (
 		<div className="w-full h-full flex flex-col border border-white/5 rounded-2xl backdrop-blur-xl overflow-hidden shadow-2xl">
 			{/* Header - consistent with MonthView/WeekView */}
-			<div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/[0.02]">
+			<div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/2">
 				<h2 className="text-2xl font-bold text-white tracking-tight">
 					{year}
 				</h2>
@@ -78,7 +78,7 @@ function YearView({
 						className="h-8 w-8 p-0 hover:bg-white/10 hover:text-white rounded-md">
 						<ChevronLeft size={16} />
 					</Button>
-					<div className="w-[1px] h-4 bg-white/10 mx-1" />
+					<div className="w-px h-4 bg-white/10 mx-1" />
 					<Button
 						size="sm"
 						variant="ghost"
@@ -109,7 +109,7 @@ function YearView({
 				</div>
 
 				{/* Agenda Sidebar */}
-				<div className="w-full lg:w-80 xl:w-96 border-t lg:border-t-0 lg:border-l border-white/5 flex flex-col bg-white/[0.02]">
+				<div className="w-full lg:w-80 xl:w-96 border-t lg:border-t-0 lg:border-l border-white/5 flex flex-col bg-white/2">
 					<YearAgendaSidebar
 						events={yearEvents}
 						year={year}
@@ -152,7 +152,7 @@ function MonthCard({
 	const monthHasEvents = daysInMonth.some(day => getEventsForDate(day).length > 0);
 
 	return (
-		<div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 hover:bg-white/[0.04] hover:border-white/10 transition-all duration-200">
+		<div className="bg-white/2 border border-white/5 rounded-xl p-4 hover:bg-white/4 hover:border-white/10 transition-all duration-200">
 			{/* Month Header */}
 			<button
 				onClick={handleMonthClick}
@@ -334,7 +334,7 @@ function YearAgendaSidebar({
 								{index === firstUpcomingIndex && (
 									<div
 										ref={todayMarkerRef}
-										className="sticky top-0 z-10 py-3 -mx-4 px-4 bg-gradient-to-b from-[#1a1a1a] via-[#1a1a1a] to-transparent">
+										className="sticky top-0 z-10 py-3 -mx-4 px-4 bg-linear-to-b from-[#1a1a1a] via-[#1a1a1a] to-transparent">
 										<div className="flex items-center gap-3">
 											<div className="h-px flex-1 bg-accent/30" />
 											<span className="text-xs font-bold text-accent uppercase tracking-wider">
@@ -444,7 +444,7 @@ function CompactEventCard({
 			`}>
 			<div className="flex items-start gap-3">
 				{/* Time */}
-				<span className={`text-xs font-medium min-w-[3rem] ${isPast ? "text-muted/60" : "text-white/50"}`}>
+				<span className={`text-xs font-medium min-w-12 ${isPast ? "text-muted/60" : "text-white/50"}`}>
 					{format(new Date(event.startTime), "HH:mm")}
 				</span>
 

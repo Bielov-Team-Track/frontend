@@ -1,9 +1,9 @@
 import { DashboardHeader } from "@/components/layout";
 import { Sidebar } from "@/components/layout/";
-import { AuthProvider, ClubProvider, QueryProvider } from "@/providers";
+import { ThemeScript } from "@/components/ui/theme-script";
+import { AuthProvider, ClubProvider, QueryProvider, ThemeProvider } from "@/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Head from "next/head";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,30 +19,33 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" data-theme="mainTheme" className="min-h-screen relative bg-background-dark text-background-content font-sans">
-			<Head>
-				<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"></meta>
-			</Head>
-			<body className={`${inter.className} min-h-screen flex flex-col antialiased selection:bg-accent/30 selection:text-white`}>
-				<AuthProvider>
-					<ClubProvider>
-						<QueryProvider>
-							{/* Main Layout Container */}
-							<div className="flex h-screen sm:p-4 gap-6 overflow-hidden">
-								{/* Sidebar (Sticky) */}
-								<div className="hidden sm:block w-auto shrink-0 z-40">
-									<Sidebar />
-								</div>
+		<html lang="en" suppressHydrationWarning className="min-h-screen relative font-sans bg-base-300">
+			<head>
+				<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+				<ThemeScript />
+			</head>
+			<body className={`${inter.className} min-h-screen flex flex-col antialiased selection:bg-accent/30 selection:text-white text-base-content`}>
+				<ThemeProvider>
+					<AuthProvider>
+						<ClubProvider>
+							<QueryProvider>
+								{/* Main Layout Container */}
+								<div className="flex h-screen sm:p-4 gap-6 overflow-hidden">
+									{/* Sidebar (Sticky) */}
+									<div className="hidden sm:block w-auto shrink-0 z-40">
+										<Sidebar />
+									</div>
 
-								{/* Main Content Area */}
-								<div className="flex-1 flex flex-col min-w-0 min-h-0">
-									<DashboardHeader />
-									<main className="flex-1 w-full relative min-h-0 overflow-y-auto">{children}</main>
+									{/* Main Content Area */}
+									<div className="flex-1 flex flex-col min-w-0 min-h-0">
+										<DashboardHeader />
+										<main className="flex-1 w-full relative min-h-0 overflow-y-auto bg-base-200 rounded-2xl">{children}</main>
+									</div>
 								</div>
-							</div>
-						</QueryProvider>
-					</ClubProvider>
-				</AuthProvider>
+							</QueryProvider>
+						</ClubProvider>
+					</AuthProvider>
+				</ThemeProvider>
 			</body>
 		</html>
 	);
