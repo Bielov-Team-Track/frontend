@@ -1,11 +1,9 @@
 "use client";
 
-import { Button, Input } from "@/components";
-import Checkbox from "@/components/ui/checkbox";
+import { Button, Checkbox, Input, TextArea } from "@/components";
 import ImageCropper from "@/components/ui/image-cropper";
 import Modal from "@/components/ui/modal";
 import Steps from "@/components/ui/steps";
-import TextArea from "@/components/ui/textarea";
 import { createClub, updateClub, uploadClubImage } from "@/lib/api/clubs";
 import { CreateClubRequest } from "@/lib/models/Club";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -70,12 +68,12 @@ const clubSchema = yup.object().shape({
 const STEPS = [
 	{
 		id: 1,
-		title: "Basic Info",
+		label: "Basic Info",
 		fields: ["name", "description", "is_public"],
 	},
-	{ id: 2, title: "Branding", fields: ["logo", "banner"] },
-	{ id: 3, title: "Contact", fields: ["contact_email", "contact_phone"] },
-	{ id: 4, title: "Review", fields: [] },
+	{ id: 2, label: "Branding", fields: ["logo", "banner"] },
+	{ id: 3, label: "Contact", fields: ["contact_email", "contact_phone"] },
+	{ id: 4, label: "Review", fields: [] },
 ];
 
 export default function CreateClubPage() {
@@ -275,7 +273,6 @@ export default function CreateClubPage() {
 					placeholder="e.g. Spikers United"
 					error={errors.name?.message}
 					required
-					variant="bordered"
 					className="bg-black/20"
 					{...register("name")}
 				/>
@@ -284,7 +281,6 @@ export default function CreateClubPage() {
 					placeholder="Describe your club's mission, skill levels, etc..."
 					error={errors.description?.message}
 					rows={4}
-					variant="bordered"
 					className="bg-black/20"
 					{...register("description")}
 				/>
@@ -292,9 +288,8 @@ export default function CreateClubPage() {
 					<Controller
 						name="is_public"
 						control={control}
-						render={({ field: { value, onChange, ref } }) => (
+						render={({ field: { value, onChange } }) => (
 							<Checkbox
-								ref={ref}
 								checked={value}
 								onChange={onChange}
 								label="Make this club public"
@@ -477,7 +472,7 @@ export default function CreateClubPage() {
 				<div className="px-6 pb-6 relative">
 					<div className="flex justify-between items-end -mt-10 mb-4">
 						{/* Logo Preview */}
-						<div className="w-20 h-20 rounded-2xl border-4 border-background-light bg-background-dark overflow-hidden shadow-lg flex items-center justify-center">
+						<div className="w-20 h-20 rounded-2xl border-4 border-background-light bg-background overflow-hidden shadow-lg flex items-center justify-center">
 							{logoPreview ? (
 								/* eslint-disable-next-line @next/next/no-img-element */
 								<img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
@@ -527,7 +522,7 @@ export default function CreateClubPage() {
 			</div>
 
 			{/* Stepper */}
-			<div className="mb-12">
+			<div className="mb-12 max-w-xl mx-auto">
 				<Steps steps={STEPS} currentStep={currentStep} />
 			</div>
 
@@ -555,17 +550,11 @@ export default function CreateClubPage() {
 					</Button>
 
 					{currentStep < STEPS.length ? (
-						<Button
-							variant="solid"
-							color="primary"
-							onClick={handleNext}
-							rightIcon={<ArrowRight size={16} />}
-							className="px-8 shadow-lg shadow-primary/20">
+						<Button color="primary" onClick={handleNext} rightIcon={<ArrowRight size={16} />} className="px-8 shadow-lg shadow-primary/20">
 							Next Step
 						</Button>
 					) : (
 						<Button
-							variant="solid"
 							color="primary"
 							onClick={handleSubmit(onSubmit)}
 							loading={isSubmitting}

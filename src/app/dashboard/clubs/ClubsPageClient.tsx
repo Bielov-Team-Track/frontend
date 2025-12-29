@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader } from "@/components";
+import { Avatar, Button, Input, Loader } from "@/components";
 import { getClubs } from "@/lib/api/clubs";
 import { Club } from "@/lib/models/Club";
 import { useQuery } from "@tanstack/react-query";
@@ -29,23 +29,13 @@ export default function ClubsPageClient() {
 	return (
 		<div className="h-full flex flex-col space-y-6">
 			{/* Toolbar */}
-			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-background/50 backdrop-blur-md p-4 rounded-2xl border border-white/5">
+			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-neutral-900 backdrop-blur-md p-4 rounded-2xl border border-white/5">
 				{/* Search & Filter */}
-				<div className="join">
-					<div className="relative flex-1 group">
-						<Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-hover:text-white transition-colors" />
-						<input
-							type="text"
-							placeholder="Find clubs..."
-							className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-hidden focus:ring-1 focus:ring-accent/50 transition-all"
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-						/>
-					</div>
-					<button className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-muted hover:text-white hover:bg-white/10 transition-colors">
-						<Filter size={18} />
+				<div className="flex gap-4">
+					<Input placeholder="Find clubs..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} leftIcon={<Search />} />
+					<Button variant={"outline"} leftIcon={<Filter />}>
 						<span className="hidden sm:inline">Filters</span>
-					</button>
+					</Button>
 				</div>
 
 				{/* View Toggles & Action */}
@@ -108,14 +98,7 @@ function ClubGridCard({ club }: { club: Club }) {
 				{/* Content */}
 				<div className="p-5 flex-1 flex flex-col -mt-8 relative">
 					{/* Logo */}
-					<div className="w-14 h-14 rounded-xl bg-background-light border-2 border-background flex items-center justify-center mb-3 overflow-hidden">
-						{club.logoUrl ? (
-							/* eslint-disable-next-line @next/next/no-img-element */
-							<img src={club.logoUrl} alt={club.name} className="w-full h-full object-cover" />
-						) : (
-							<Shield className="text-muted/50 w-6 h-6" />
-						)}
-					</div>
+					<Avatar src={club.logoUrl || undefined} name={club.name} size="lg" className="mb-4" />
 
 					<h3 className="font-bold text-white leading-tight mb-1 truncate group-hover:text-accent transition-colors">{club.name}</h3>
 
@@ -152,14 +135,7 @@ function ClubListView({ clubs }: { clubs: Club[] }) {
 					href={`/dashboard/clubs/${club.id}`}
 					className="group flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-accent/30 hover:bg-white/[0.07] transition-all">
 					{/* Logo */}
-					<div className="w-12 h-12 rounded-xl bg-background-light border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
-						{club.logoUrl ? (
-							/* eslint-disable-next-line @next/next/no-img-element */
-							<img src={club.logoUrl} alt={club.name} className="w-full h-full object-cover" />
-						) : (
-							<Shield className="text-muted/50 w-5 h-5" />
-						)}
-					</div>
+					<Avatar src={club.logoUrl || undefined} name={club.name} size="md" />
 
 					{/* Info */}
 					<div className="flex-1 min-w-0">
@@ -192,14 +168,14 @@ function EmptyState() {
 			<h3 className="text-xl font-bold text-white mb-2">No clubs found</h3>
 			<p className="text-muted max-w-sm mb-6">We couldn&apos;t find any clubs matching your search. Try adjusting filters or create a new one.</p>
 			<div className="flex gap-4">
-				<Link href="/clubs" className="btn btn-outline text-white border-white/20 hover:bg-white hover:text-black">
+				<Button asChild variant={"outline"}>
 					<Search size={16} />
-					Find Club
-				</Link>
-				<Link href="/clubs/create" className="btn btn-outline text-white border-white/20 hover:bg-white hover:text-black">
+					<Link href="/clubs">Find Club</Link>
+				</Button>
+				<Button asChild variant={"outline"}>
 					<Plus size={16} />
-					Create Club
-				</Link>
+					<Link href="/clubs/create">Create Club</Link>
+				</Button>
 			</div>
 		</div>
 	);

@@ -42,7 +42,6 @@ export const RegistrationForm = ({
 	const needsPlayerProfile = settings.requirePlayerProfile && !hasPlayerProfile;
 	const needsCoachProfile = settings.requireCoachProfile && !hasCoachProfile;
 	const isFormRequired = formTemplate && formTemplate.fields.length > 0;
-	// If form is present, it must be valid. If not present, it's valid.
 	const isFormValid = isFormRequired ? isValid : true;
 
 	const canSubmit = !needsPlayerProfile && !needsCoachProfile && isFormValid;
@@ -65,10 +64,17 @@ export const RegistrationForm = ({
 	return (
 		<FormProvider {...methods}>
 			<div className="flex flex-col gap-6">
-				<div className="flex flex-col gap-2">
-					<h2 className="text-xl font-semibold text-white">Join {club.name}</h2>
-					<p className="text-sm text-muted">Complete the requirements below to request membership.</p>
-				</div>
+				{settings.requirePlayerProfile === false && settings.requireCoachProfile === false && (!formTemplate || formTemplate.fields.length === 0) ? (
+					<div className="flex flex-col gap-2">
+						<h2 className="text-xl font-semibold text-white">Join {club.name}</h2>
+						<p className="text-sm text-muted">No specific requirements in plce for {club.name}. You can join right now!</p>
+					</div>
+				) : (
+					<div className="flex flex-col gap-2">
+						<h2 className="text-xl font-semibold text-white">Join {club.name}</h2>
+						<p className="text-sm text-muted">Complete the requirements below to request membership.</p>
+					</div>
+				)}
 
 				<ProfileRequirementsSection
 					requirePlayerProfile={settings.requirePlayerProfile}
@@ -87,13 +93,12 @@ export const RegistrationForm = ({
 				)}
 
 				<Button
-					variant="solid"
-					color="primary"
+					variant="outline"
 					onClick={handleSubmit(onValidSubmit)}
 					disabled={!canSubmit || isSubmitting}
 					loading={isSubmitting}
 					leftIcon={<Send size={16} />}
-					className="w-full">
+					className="self-center">
 					Submit Registration Request
 				</Button>
 			</div>

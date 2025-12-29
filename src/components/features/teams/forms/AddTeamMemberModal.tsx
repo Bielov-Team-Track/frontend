@@ -77,7 +77,7 @@ export default function AddTeamMemberModal({ isOpen, clubMembers, currentMemberI
 									onClick={() => setSelectedUserId(member.userId)}
 									className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-accent hover:bg-accent/10 transition-colors">
 									<div className="flex items-center gap-3">
-										<div className="w-10 h-10 rounded-full bg-background-dark flex items-center justify-center text-sm font-bold text-muted">
+										<div className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-sm font-bold text-muted">
 											{member.userProfile?.name?.[0] || "?"}
 										</div>
 										<div className="text-left">

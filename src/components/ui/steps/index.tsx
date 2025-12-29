@@ -1,66 +1,102 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
+import { Check } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 export interface Step {
 	id: number | string;
-	title: string;
+	label: string;
+	icon?: React.ReactNode;
 }
 
-export interface StepsProps {
+export interface StepsProps extends VariantProps<typeof stepCircleVariants> {
 	steps: Step[];
 	currentStep: number;
 	className?: string;
-	vertical?: boolean;
-	size?: "xs" | "sm" | "md" | "lg";
+	orientation?: "horizontal" | "vertical";
 	onStepClick?: (stepIndex: number) => void;
 }
 
-const Steps: React.FC<StepsProps> = ({
-	steps,
-	currentStep,
-	className,
-	vertical = false,
-	size = "md",
-	onStepClick,
-}) => {
+const stepCircleVariants = cva("flex items-center justify-center rounded-full transition-all duration-300 shrink-0", {
+	variants: {
+		size: {
+			sm: "size-6 text-xs",
+			md: "size-8 text-sm",
+			lg: "size-10 text-base",
+		},
+		state: {
+			completed: "bg-primary text-primary-foreground",
+			current: "bg-primary text-primary-foreground",
+			future: "bg-neutral-800 text-muted-foreground",
+		},
+	},
+	defaultVariants: {
+		size: "md",
+		state: "future",
+	},
+});
+
+const stepLabelVariants = cva("transition-all duration-300", {
+	variants: {
+		size: {
+			sm: "text-xs",
+			md: "text-sm",
+			lg: "text-base",
+		},
+		state: {
+			completed: "font-semibold text-foreground",
+			current: "font-semibold text-foreground",
+			future: "font-normal text-muted-foreground",
+		},
+	},
+	compoundVariants: [
+		{ size: "sm", state: "current", className: "text-sm" },
+		{ size: "md", state: "current", className: "text-base" },
+		{ size: "lg", state: "current", className: "text-lg" },
+	],
+	defaultVariants: {
+		size: "md",
+		state: "future",
+	},
+});
+
+const connectorHeightMap = {
+	sm: "h-0.5",
+	md: "h-0.5",
+	lg: "h-[3px]",
+} as const;
+
+const connectorWidthMap = {
+	sm: "w-0.5",
+	md: "w-0.5",
+	lg: "w-[3px]",
+} as const;
+
+const iconSizeMap = {
+	sm: "size-3.5",
+	md: "size-4",
+	lg: "size-5",
+} as const;
+
+const Steps: React.FC<StepsProps> = ({ steps, currentStep, className, orientation = "horizontal", size = "md", onStepClick }) => {
 	const [previousStep, setPreviousStep] = useState(currentStep);
 	const [isAnimating, setIsAnimating] = useState(false);
-	const [animatingSteps, setAnimatingSteps] = useState<Set<number>>(new Set());
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
 		if (currentStep !== previousStep) {
-			const isForward = currentStep > previousStep;
 			setIsAnimating(true);
 
-			// Determine which steps need animation
-			const stepsToAnimate = new Set<number>();
-			if (isForward) {
-				// Forward: animate steps from previousStep+1 to currentStep
-				for (let i = previousStep + 1; i <= currentStep; i++) {
-					stepsToAnimate.add(i);
-				}
-			} else {
-				// Backward: animate steps from previousStep down to currentStep+1
-				for (let i = previousStep; i > currentStep; i--) {
-					stepsToAnimate.add(i);
-				}
-			}
-			setAnimatingSteps(stepsToAnimate);
-
-			// Clear any existing timeout
 			if (timeoutRef.current) {
 				clearTimeout(timeoutRef.current);
 			}
 
-			// Animation duration: line (300ms) + step (200ms) + buffer
 			timeoutRef.current = setTimeout(() => {
 				setIsAnimating(false);
-				setAnimatingSteps(new Set());
 				setPreviousStep(currentStep);
-			}, 550);
+			}, 300);
 		}
 
 		return () => {
@@ -72,61 +108,151 @@ const Steps: React.FC<StepsProps> = ({
 
 	const isForward = currentStep > previousStep;
 
-	const sizeClass = {
-		xs: "steps-xs",
-		sm: "steps-sm",
-		md: "",
-		lg: "steps-lg",
-	}[size];
+	const getStepState = (stepNumber: number): "completed" | "current" | "future" => {
+		if (stepNumber < currentStep) return "completed";
+		if (stepNumber === currentStep) return "current";
+		return "future";
+	};
 
+	const getConnectorFillScale = (connectorIndex: number): number => {
+		const stepAfterConnector = connectorIndex + 2;
+
+		if (isAnimating) {
+			if (isForward) {
+				if (stepAfterConnector <= previousStep) return 1;
+				if (stepAfterConnector <= currentStep) return 1;
+				return 0;
+			} else {
+				if (stepAfterConnector <= currentStep) return 1;
+				if (stepAfterConnector <= previousStep) return 0;
+				return 0;
+			}
+		}
+
+		return stepAfterConnector <= currentStep ? 1 : 0;
+	};
+
+	const renderStepContent = (step: Step, stepNumber: number, state: "completed" | "current" | "future") => {
+		const iconClass = iconSizeMap[size || "md"];
+
+		if (state === "completed") {
+			return <Check className={iconClass} strokeWidth={3} />;
+		}
+
+		if (step.icon) {
+			return <span className={iconClass}>{step.icon}</span>;
+		}
+
+		return stepNumber;
+	};
+
+	const isHorizontal = orientation === "horizontal";
+	const sizeKey = size || "md";
+
+	if (isHorizontal) {
+		return (
+			<div className={cn("flex flex-col w-full", className)}>
+				{/* Circles and connectors row */}
+				<div className="flex items-center w-full">
+					{steps.map((step, index) => {
+						const stepNumber = index + 1;
+						const state = getStepState(stepNumber);
+						const isLast = index === steps.length - 1;
+
+						return (
+							<React.Fragment key={step.id}>
+								{/* Circle */}
+								<div
+									className={cn(stepCircleVariants({ size, state }), onStepClick && "cursor-pointer")}
+									onClick={() => onStepClick?.(stepNumber)}>
+									{renderStepContent(step, stepNumber, state)}
+								</div>
+
+								{/* Connector */}
+								{!isLast && (
+									<div className={cn("flex-1 mx-2 relative bg-neutral-800", connectorHeightMap[sizeKey])}>
+										<div
+											className={cn("absolute inset-0 bg-primary transition-transform duration-300 ease-out origin-left")}
+											style={{
+												transform: `scaleX(${getConnectorFillScale(index)})`,
+											}}
+										/>
+									</div>
+								)}
+							</React.Fragment>
+						);
+					})}
+				</div>
+
+				{/* Labels row */}
+				<div className="flex w-full mt-2">
+					{steps.map((step, index) => {
+						const stepNumber = index + 1;
+						const state = getStepState(stepNumber);
+						const isLast = index === steps.length - 1;
+
+						return (
+							<React.Fragment key={`label-${step.id}`}>
+								{/* Label container - same width as circle */}
+								<div
+									className={cn("hidden sm:flex justify-center", onStepClick && "cursor-pointer", currentStep === stepNumber && "flex")}
+									style={{
+										width: sizeKey === "sm" ? "24px" : sizeKey === "lg" ? "40px" : "32px",
+									}}
+									onClick={() => onStepClick?.(stepNumber)}>
+									<span className={cn(stepLabelVariants({ size, state }), "text-center whitespace-nowrap")}>{step.label}</span>
+								</div>
+
+								{/* Spacer matching connector */}
+								{!isLast && <div className="flex-1 mx-2" />}
+							</React.Fragment>
+						);
+					})}
+				</div>
+			</div>
+		);
+	}
+
+	// Vertical layout
 	return (
-		<ul
-			className={cn(
-				"steps steps-animated w-full",
-				vertical && "steps-vertical",
-				sizeClass,
-				className
-			)}
-		>
+		<div className={cn("flex flex-col", className)}>
 			{steps.map((step, index) => {
 				const stepNumber = index + 1;
-				const isCompleted = stepNumber <= currentStep;
-				const isCurrent = stepNumber === currentStep;
-				const isStepAnimating = animatingSteps.has(stepNumber);
-
-				// Determine animation class
-				let animationClass = "";
-				if (isAnimating && isStepAnimating) {
-					if (isForward) {
-						animationClass = "step-animate-forward";
-					} else {
-						animationClass = "step-animate-backward";
-					}
-				}
+				const state = getStepState(stepNumber);
+				const isLast = index === steps.length - 1;
 
 				return (
-					<li
-						key={step.id}
-						className={cn(
-							"step",
-							isCompleted && "step-primary",
-							animationClass
+					<React.Fragment key={step.id}>
+						{/* Step row */}
+						<div className={cn("flex items-center gap-3", onStepClick && "cursor-pointer")} onClick={() => onStepClick?.(stepNumber)}>
+							{/* Circle */}
+							<div className={cn(stepCircleVariants({ size, state }))}>{renderStepContent(step, stepNumber, state)}</div>
+
+							{/* Label */}
+							<span className={cn(stepLabelVariants({ size, state }))}>{step.label}</span>
+						</div>
+
+						{/* Connector */}
+						{!isLast && (
+							<div
+								className="flex justify-center"
+								style={{
+									width: sizeKey === "sm" ? "24px" : sizeKey === "lg" ? "40px" : "32px",
+								}}>
+								<div className={cn("my-2 relative bg-neutral-800 min-h-6", connectorWidthMap[sizeKey])}>
+									<div
+										className={cn("absolute inset-0 bg-primary transition-transform duration-300 ease-out origin-top")}
+										style={{
+											transform: `scaleY(${getConnectorFillScale(index)})`,
+										}}
+									/>
+								</div>
+							</div>
 						)}
-						onClick={() => onStepClick?.(stepNumber)}
-						style={{ cursor: onStepClick ? "pointer" : "default" }}
-					>
-						<span
-							className={cn(
-								"transition-all duration-300",
-								isCurrent ? "font-semibold" : "text-muted"
-							)}
-						>
-							{step.title}
-						</span>
-					</li>
+					</React.Fragment>
 				);
 			})}
-		</ul>
+		</div>
 	);
 };
 

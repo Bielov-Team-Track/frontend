@@ -1,8 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { Check, ChevronDown, LucideIcon } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { LucideIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../select";
 
 export interface FilterOption {
 	value: string;
@@ -21,16 +21,7 @@ export interface FilterDropdownProps {
 	className?: string;
 }
 
-const FilterDropdown = ({
-	label,
-	icon: Icon,
-	options,
-	selected,
-	onChange,
-	onClear,
-	multiSelect = true,
-	className,
-}: FilterDropdownProps) => {
+const FilterDropdown = ({ label, icon: Icon, options, selected, onChange, onClear, multiSelect = true, className }: FilterDropdownProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const count = selected.length;
@@ -63,79 +54,30 @@ const FilterDropdown = ({
 	};
 
 	return (
-		<div ref={containerRef} className={cn("dropdown", isOpen && "dropdown-open", className)}>
+		<Select>
 			{/* Trigger Button */}
-			<button
-				type="button"
-				tabIndex={0}
-				onClick={() => setIsOpen(!isOpen)}
-				className={cn(
-					"btn btn-sm gap-2",
-					count > 0 || isOpen
-						? "btn-soft btn-accent"
-						: "btn-ghost border border-base-content/10"
-				)}
-			>
-				{Icon && <Icon size={14} />}
-				<span>{label}</span>
-				{count > 0 && (
-					<span className="badge badge-xs badge-accent">{count}</span>
-				)}
-				<ChevronDown
-					size={14}
-					className={cn("transition-transform duration-200", isOpen && "rotate-180")}
-				/>
-			</button>
+			<SelectTrigger>
+				<SelectValue>
+					{Icon && <Icon size={14} />}
+					<span>{label}</span>
+					{count > 0 && <span className="badge badge-xs badge-accent">{count}</span>}
+				</SelectValue>
+			</SelectTrigger>
 
 			{/* Dropdown Content */}
-			{isOpen && (
-				<>
-					{/* Backdrop for mobile */}
-					<div
-						className="fixed inset-0 z-30 lg:hidden"
-						onClick={() => setIsOpen(false)}
-					/>
-
-					<div
-						tabIndex={0}
-						className="dropdown-content menu bg-base-200 rounded-box z-40 w-56 p-1 shadow-xl border border-base-content/10 mt-2"
-					>
-						{options.map((option) => {
-							const isSelected = selected.includes(option.value);
-							return (
-								<li key={option.value}>
-									<button
-										type="button"
-										onClick={() => toggleOption(option.value)}
-										disabled={option.disabled}
-										className={cn(
-											"flex items-center justify-between",
-											isSelected && "active"
-										)}
-									>
-										<span>{option.label}</span>
-										{isSelected && <Check size={14} />}
-									</button>
-								</li>
-							);
-						})}
-
-						{/* Clear Action */}
-						{count > 0 && (
-							<li className="border-t border-base-content/10 mt-1 pt-1">
-								<button
-									type="button"
-									onClick={handleClear}
-									className="text-base-content/60 text-xs justify-center"
-								>
-									Clear {label}
-								</button>
-							</li>
-						)}
-					</div>
-				</>
-			)}
-		</div>
+			<SelectContent>
+				<SelectGroup>
+					<SelectLabel>{label}</SelectLabel>
+					{options.map((option) => {
+						return (
+							<SelectItem key={option.value} value={option.value}>
+								{option.label}
+							</SelectItem>
+						);
+					})}
+				</SelectGroup>
+			</SelectContent>
+		</Select>
 	);
 };
 

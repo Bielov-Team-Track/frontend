@@ -1,7 +1,7 @@
 "use client";
 
-import { Team } from "@/lib/models/Club";
 import { getClub, getClubMembers, getTeam } from "@/lib/api/clubs";
+import { Team } from "@/lib/models/Club";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, MessageSquare, Settings, Users } from "lucide-react";
 import Link from "next/link";
@@ -128,7 +128,7 @@ function TeamBannerCard({ team, logoError, onLogoError, activeTab, onTabChange }
 			{/* Info Row */}
 			<div className="p-6 flex items-center gap-6">
 				{/* Logo */}
-				<div className="w-24 h-24 rounded-xl bg-background-dark border-4 border-background-light overflow-hidden -mt-12 relative z-10 flex items-center justify-center">
+				<div className="w-24 h-24 rounded-xl bg-background border-4 border-background-light overflow-hidden -mt-12 relative z-10 flex items-center justify-center">
 					{team.logoUrl && !logoError ? (
 						// eslint-disable-next-line @next/next/no-img-element
 						<img src={team.logoUrl} alt="" className="w-full h-full object-cover" onError={onLogoError} />

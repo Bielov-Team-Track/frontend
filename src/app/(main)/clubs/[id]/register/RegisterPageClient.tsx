@@ -1,7 +1,7 @@
 "use client";
 
 import { RegistrationForm } from "@/components/features/clubs/registrations/RegistrationForm";
-import { Button, Loader } from "@/components/ui";
+import { Avatar, Button, Loader } from "@/components/ui";
 import { createRegistration, getClub, getClubSettings, getFormTemplate, getMyRegistration } from "@/lib/api/clubs";
 import { createOrUpdateCoachProfile, createOrUpdatePlayerProfile, getCoachProfile, getPlayerProfile } from "@/lib/api/user";
 import { ClubRegistration, FormFieldAnswerDto, RegistrationStatus } from "@/lib/models/Club";
@@ -21,7 +21,8 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 	const router = useRouter();
 	const { userProfile } = useAuth();
 	const [bannerError, setBannerError] = useState(false);
-	const [logoError, setLogoError] = useState(false);
+
+	console.log("Club ID:", clubId);
 
 	const { data: club, isLoading: isLoadingClub } = useQuery({
 		queryKey: ["club", clubId],
@@ -75,7 +76,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 
 	if (isLoadingClub || isLoadingSettings || isLoadingRegistration) {
 		return (
-			<div className="flex justify-center items-center min-h-screen bg-background-dark">
+			<div className="flex justify-center items-center min-h-screen bg-background">
 				<Loader size="lg" />
 			</div>
 		);
@@ -83,7 +84,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 
 	if (!club) {
 		return (
-			<div className="flex flex-col items-center justify-center min-h-screen bg-background-dark text-white p-4 text-center">
+			<div className="flex flex-col items-center justify-center min-h-screen bg-background text-white p-4 text-center">
 				<Shield className="w-20 h-20 text-muted/50 mb-6" />
 				<h1 className="text-3xl font-bold mb-3">Club Not Found</h1>
 				<p className="text-muted mb-8 max-w-md">The club you&apos;re looking for doesn&apos;t exist or may have been removed.</p>
@@ -97,7 +98,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 	}
 
 	return (
-		<div className="min-h-screen bg-background-dark pb-20">
+		<div className="min-h-screen bg-background pb-20">
 			{/* --- HERO SECTION --- */}
 			<div className="relative w-full">
 				<div className="h-64 md:h-80 w-full relative overflow-hidden bg-background-light">
@@ -139,14 +140,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 					transition={{ delay: 0.2 }}
 					className="flex flex-col items-center text-center mb-10">
 					<div className="relative group shrink-0 mb-6">
-						<div className="h-40 w-40 rounded-3xl border-4 border-background-dark bg-background-light overflow-hidden shadow-2xl flex items-center justify-center relative z-20">
-							{club.logoUrl && !logoError ? (
-								// eslint-disable-next-line @next/next/no-img-element
-								<img src={club.logoUrl} alt="Logo" className="w-full h-full object-cover" onError={() => setLogoError(true)} />
-							) : (
-								<Shield className="text-muted/30 w-16 h-16" />
-							)}
-						</div>
+						<Avatar src={club.logoUrl} size="2xl" variant="club" />
 					</div>
 
 					<div>
@@ -177,7 +171,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 							<h2 className="text-2xl font-bold text-white mb-3">Join {club.name}</h2>
 							<p className="text-muted mb-8">Sign in or create an account to start your registration.</p>
 							<Button
-								variant="solid"
+								variant="outline"
 								color="primary"
 								size="lg"
 								className="w-full"

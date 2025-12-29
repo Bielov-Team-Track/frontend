@@ -1,10 +1,12 @@
-import ClubDetailClient from "./ClubDetailClient";
+"use client";
 
-interface Props {
-	params: Promise<{ id: string }>;
-}
+import { OverviewTab } from "./components/tabs";
+import { useClubContext } from "./layout";
 
-export default async function ClubDetailPage({ params }: Props) {
-	const { id } = await params;
-	return <ClubDetailClient clubId={id} />;
+export default function ClubOverviewPage() {
+	const { club, members, teams, groups, showInviteModal } = useClubContext();
+
+	if (!club) return null;
+
+	return <OverviewTab club={club} members={members} teams={teams} groups={groups} onInvite={showInviteModal} />;
 }

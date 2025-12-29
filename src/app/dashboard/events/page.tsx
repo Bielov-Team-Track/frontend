@@ -1,7 +1,6 @@
-import React from "react";
 import { loadEventsByFilter } from "@/lib/api/events";
-import { redirect } from "next/navigation";
 import { getUserProfile } from "@/lib/server/auth";
+import { redirect } from "next/navigation";
 import EventsPageClient from "./EventsPageClient";
 
 async function EventsPage() {

@@ -1,7 +1,7 @@
-import { DashboardHeader } from "@/components/layout";
-import { Sidebar } from "@/components/layout/";
+import { DashboardShell } from "@/components/layout";
 import { ThemeScript } from "@/components/ui/theme-script";
 import { AuthProvider, ClubProvider, QueryProvider, ThemeProvider } from "@/providers";
+import { NotificationProvider } from "@/providers/NotificationProvider";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
@@ -9,7 +9,7 @@ import "../globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-	title: "Volleyer",
+	title: "Spike",
 	description: "",
 };
 
@@ -29,29 +29,9 @@ export default async function RootLayout({
 					<AuthProvider>
 						<ClubProvider>
 							<QueryProvider>
-								{/* Main Layout Container */}
-
-								{/* <div className="grid">
-									<div>
-										<DashboardHeader />
-									</div>
-									<div>
-										<Sidebar />
-									</div>
-									<div>
-										<main className="flex-1 w-full relative min-h-0 overflow-y-auto bg-base-200 rounded-2xl">{children}</main>
-									</div>
-								</div> */}
-
-								<div className="flex h-screen sm:p-4 gap-6 overflow-hidden">
-									<div className="hidden sm:block w-auto shrink-0 z-40">
-										<Sidebar />
-									</div>
-									<div className="flex-1 flex flex-col min-w-0 min-h-0">
-										<DashboardHeader />
-										<main className="flex-1 w-full relative min-h-0 overflow-y-auto bg-base-200 rounded-2xl">{children}</main>
-									</div>
-								</div>
+								<NotificationProvider>
+									<DashboardShell>{children}</DashboardShell>
+								</NotificationProvider>
 							</QueryProvider>
 						</ClubProvider>
 					</AuthProvider>

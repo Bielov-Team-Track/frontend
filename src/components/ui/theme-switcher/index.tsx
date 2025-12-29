@@ -8,7 +8,7 @@ const ThemeSwitcher = () => {
 
 	if (!mounted) {
 		return (
-			<button className="p-2 text-muted rounded-full" aria-label="Toggle theme">
+			<button className="p-2 text-muted-foreground rounded-full" aria-label="Toggle theme">
 				<Sun size={20} />
 			</button>
 		);
@@ -17,11 +17,11 @@ const ThemeSwitcher = () => {
 	return (
 		<button
 			onClick={toggleTheme}
-			className="p-2 text-muted hover:text-white transition-colors hover:bg-white/5 rounded-full"
-			aria-label={`Switch to ${theme === "volleydark" ? "light" : "dark"} mode`}
-			title={`Switch to ${theme === "volleydark" ? "light" : "dark"} mode`}
+			className="p-2 text-muted-foreground hover:text-foreground transition-colors hover:bg-muted rounded-full"
+			aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+			title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
 		>
-			{theme === "volleydark" ? <Sun size={20} /> : <Moon size={20} />}
+			{theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
 		</button>
 	);
 };

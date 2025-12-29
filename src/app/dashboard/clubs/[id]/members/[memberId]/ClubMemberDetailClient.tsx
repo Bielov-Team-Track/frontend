@@ -1,10 +1,10 @@
 "use client";
 
 import { Avatar, Button } from "@/components";
-import { Group, Team } from "@/lib/models/Club";
-import { FullProfileDto, getDominantHandLabel, getSkillLevelLabel, getVolleyballPositionLabel } from "@/lib/models/Profile";
 import { getClubMembers, getGroupsByClub, getTeamsByClub } from "@/lib/api/clubs";
 import { getFullUserProfile } from "@/lib/api/user";
+import { Group, Team } from "@/lib/models/Club";
+import { FullProfileDto, getDominantHandLabel, getSkillLevelLabel, getVolleyballPositionLabel } from "@/lib/models/Profile";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, Dumbbell, History, Layers, Mail, Medal, Trophy, User, Users } from "lucide-react";
 import Link from "next/link";
@@ -90,7 +90,7 @@ export default function ClubMemberDetailClient({ clubId, memberId, clubName }: P
 			/>
 
 			{/* Tab Content */}
-			<div className="min-h-[300px] animate-in fade-in duration-300">
+			<div className="min-h-75 animate-in fade-in duration-300">
 				{activeTab === "overview" && <OverviewTab profile={profile} />}
 				{activeTab === "history" && <HistoryTab history={profile.historyEntries || []} />}
 				{activeTab === "teams" && <TeamsGroupsTab teams={userTeams} groups={userGroups} />}
@@ -110,7 +110,7 @@ function MemberHeader({ profile, clubName, clubId, role }: { profile: FullProfil
 			<div className="flex-1">
 				<div className="flex items-center gap-3">
 					<h1 className="text-2xl font-bold text-white">
-						{profile.name} {profile.surname}
+						{profile.userProfile?.name} {profile.userProfile?.surname}
 					</h1>
 					{role && <span className="px-2 py-0.5 rounded text-xs font-medium bg-white/10 text-muted uppercase">{role}</span>}
 				</div>
@@ -146,20 +146,20 @@ function MemberBannerCard({ profile, clubMember, activeTab, onTabChange, teamsCo
 			{/* Info Row */}
 			<div className="p-6 flex items-center gap-6">
 				{/* Avatar */}
-				<div className="w-24 h-24 rounded-xl bg-background-dark border-4 border-background-light overflow-hidden -mt-12 relative z-10 flex items-center justify-center shadow-lg">
-					<Avatar profile={profile} size="large" />
+				<div className="w-24 h-24 rounded-xl bg-background border-4 border-background-light overflow-hidden -mt-12 relative z-10 flex items-center justify-center shadow-lg">
+					<Avatar profile={profile.userProfile} size="lg" />
 				</div>
 
 				{/* Details */}
 				<div className="flex-1 min-w-0">
 					<h2 className="text-xl font-bold text-white truncate">
-						{profile.name} {profile.surname}
+						{profile.userProfile?.name} {profile.userProfile?.surname}
 					</h2>
 					<div className="flex flex-wrap items-center gap-4 text-sm text-muted mt-1">
-						{profile.email && (
+						{profile.userProfile?.email && (
 							<div className="flex items-center gap-1.5">
 								<Mail size={14} />
-								<span>{profile.email}</span>
+								<span>{profile.userProfile?.email}</span>
 							</div>
 						)}
 						{clubMember?.createdAt && (
@@ -242,12 +242,6 @@ function OverviewTab({ profile }: { profile: FullProfileDto }) {
 
 	return (
 		<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-			{profile.bio && (
-				<InfoCard title="About" icon={User} className="lg:col-span-2">
-					<p className="text-muted leading-relaxed whitespace-pre-line">{profile.bio}</p>
-				</InfoCard>
-			)}
-
 			{playerProfile ? (
 				<InfoCard title="Player Profile" icon={Trophy}>
 					<div className="space-y-4">
@@ -332,7 +326,7 @@ function HistoryTab({ history }: { history: any[] }) {
 					<div key={entry.id} className="relative flex flex-col md:flex-row gap-6 md:items-start group">
 						{/* Year Badge */}
 						<div className="md:w-[120px] md:text-right shrink-0 relative z-10 pl-8 md:pl-0">
-							<span className="inline-block px-3 py-1 rounded-full bg-background-dark border border-accent/30 text-accent font-bold shadow-xs group-hover:scale-105 transition-transform">
+							<span className="inline-block px-3 py-1 rounded-full bg-background border border-accent/30 text-accent font-bold shadow-xs group-hover:scale-105 transition-transform">
 								{entry.year}
 							</span>
 							{/* Dot on line */}

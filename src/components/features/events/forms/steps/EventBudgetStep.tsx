@@ -1,10 +1,10 @@
-import { Controller } from "react-hook-form";
-import { useEventFormContext } from "../context/EventFormContext";
-import { Coins, Clock, User, Users, Calculator } from "lucide-react";
-import { PricingModel } from "@/lib/models/EventBudget";
 import { Checkbox, Input, RadioCards } from "@/components/ui";
+import { PricingModel } from "@/lib/models/EventBudget";
+import { Calculator, Clock, Coins, User, Users } from "lucide-react";
 import { useState } from "react";
+import { Controller } from "react-hook-form";
 import PaymentMethodsSelector from "../components/PaymentMethodsSelector";
+import { useEventFormContext } from "../context/EventFormContext";
 import { usePaymentAccount } from "../hooks/usePaymentAccount";
 
 const pricingModelCards = [
@@ -43,9 +43,7 @@ const EventBudgetStep = () => {
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
 			<div>
 				<h2 className="text-xl font-bold text-white mb-1">Event Budget</h2>
-				<p className="text-muted text-sm">
-					Configure payment settings. Without budget you cannot collect payments or audit the event.
-				</p>
+				<p className="text-muted text-sm">Configure payment settings. Without budget you cannot collect payments or audit the event.</p>
 			</div>
 
 			<div className="p-4 rounded-xl bg-white/5 border border-white/10">
@@ -58,9 +56,9 @@ const EventBudgetStep = () => {
 							checked={value}
 							label="Enable budget management"
 							helperText="Track payments and manage event finances"
-							onChange={(e) => {
-								onChange(e);
-								e.target.checked ? setIgnoreBudget(true) : setIgnoreBudget(false);
+							onChange={(value) => {
+								onChange(value);
+								setIgnoreBudget(value);
 							}}
 						/>
 					)}
@@ -109,8 +107,8 @@ const EventBudgetStep = () => {
 							values.budget?.pricingModel === PricingModel.Event
 								? "Total event cost to be split between all participants"
 								: values.budget?.pricingModel === PricingModel.Team
-									? "Fixed price each team will pay"
-									: "Fixed price each person will pay"
+								? "Fixed price each team will pay"
+								: "Fixed price each person will pay"
 						}
 						error={errors.budget?.cost?.message}
 					/>

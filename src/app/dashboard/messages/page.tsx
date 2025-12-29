@@ -1,11 +1,11 @@
 "use client";
 
 import { Button, Loader, ResizableContainer } from "@/components";
+import { getChat, loadConversationsForUser, loadMessagesForChat, markChatAsRead, sendMessage } from "@/lib/api/messages";
 import { MESSAGES_API_URL } from "@/lib/constants";
 import { Chat } from "@/lib/models/Messages";
 import { useChatConnectionStore } from "@/lib/realtime/chatsConnectionStore";
 import signalr from "@/lib/realtime/signalrClient";
-import { getChat, loadConversationsForUser, loadMessagesForChat, markChatAsRead, sendMessage } from "@/lib/api/messages";
 import { HubConnectionState } from "@microsoft/signalr";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, ChevronLeft, MessageSquare, RefreshCw } from "lucide-react";
@@ -167,7 +167,7 @@ const MessagesPage = () => {
 				<span className="text-muted text-center max-w-md">
 					{chatsError instanceof Error ? chatsError.message : "An unexpected error occurred. Please try again."}
 				</span>
-				<Button onClick={() => refetchChats()} leftIcon={<RefreshCw size={16} />} color="accent">
+				<Button loading={chatsLoading} variant={"outline"} onClick={() => refetchChats()} leftIcon={<RefreshCw size={16} />}>
 					Try Again
 				</Button>
 			</div>
@@ -180,7 +180,7 @@ const MessagesPage = () => {
 	}
 
 	return (
-		<div className="relative h-full w-full rounded-2xl overflow-hidden shadow-2xl">
+		<div className="relative h-full w-full rounded-2xl overflow-hidden shadow-md bg-neutral-900">
 			<ChatsRealtimeClient />
 			<ResizableContainer
 				leftPanel={
@@ -228,7 +228,7 @@ const MessagesPage = () => {
 									</Button>
 								</div>
 							) : (
-								<div className="flex flex-col flex-1 min-h-0 bg-background/50 backdrop-blur-xl border border-white/5 overflow-hidden">
+								<div className="flex flex-col flex-1 min-h-0 h-[calc(100vh-4rem)] bg-background/50 backdrop-blur-xl border border-white/5 overflow-hidden">
 									{sendError && (
 										<div className="shrink-0 bg-error text-white p-2 text-center text-sm z-10">
 											{sendError}

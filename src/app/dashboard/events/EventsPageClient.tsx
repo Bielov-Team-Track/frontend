@@ -2,11 +2,13 @@
 
 import { Button, Input } from "@/components";
 import { EventsCalendar } from "@/components/ui/calendar/EventsCalendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Event } from "@/lib/models/Event";
 import { Calendar as CalendarIcon, Clock, Filter, Grid, List, MapPin, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import EventsListEmptyState from "./components/EmptyState";
 import { EventListView } from "./components/EventListView";
 
 const VIEWS = [
@@ -24,16 +26,15 @@ interface EventsPageClientProps {
 function EventsPageClient({ events }: EventsPageClientProps) {
 	const searchParams = useSearchParams();
 	const initialView = searchParams.get("view") as ViewType | null;
-	const [currentView, setCurrentView] = useState<ViewType>(initialView ?? "list");
 	const [searchQuery, setSearchQuery] = useState("");
 
 	// Filter logic placeholder
 	const filteredEvents = events.filter((e) => e.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
 	return (
-		<div className="h-full flex flex-col space-y-6">
+		<Tabs className="h-full flex flex-col space-y-4">
 			{/* --- Toolbar --- */}
-			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-background/50 backdrop-blur-md p-4 rounded-2xl border border-white/5">
+			<div className="flex flex-col bg-neutral-900 sm:flex-row justify-between items-start sm:items-center gap-4 backdrop-blur-md p-4 rounded-2xl border border-white/5">
 				{/* Search & Filter */}
 				<div className="flex items-center gap-3 w-full sm:w-auto flex-1 max-w-lg">
 					<div className="relative flex-1 group">
@@ -45,7 +46,7 @@ function EventsPageClient({ events }: EventsPageClientProps) {
 							leftIcon={<Search size={18} />}
 						/>
 					</div>
-					<Button leftIcon={<Filter size={18} />} variant="solid" color="neutral">
+					<Button leftIcon={<Filter size={18} />} variant="outline">
 						<span className="hidden sm:inline">Filters</span>
 					</Button>
 				</div>
@@ -53,50 +54,49 @@ function EventsPageClient({ events }: EventsPageClientProps) {
 				{/* View Toggles & Action */}
 				<div className="flex items-center gap-3 w-full sm:w-auto justify-end">
 					{/* View Switcher */}
-					<div role="tablist" className="tabs tabs-box h-10 bg-white/5 border border-white/10 rounded-xl">
-						{VIEWS.map((view) => (
-							<label key={view.value} className="tab h-6">
-								<input name="events-list-view" onClick={() => setCurrentView(view.value as ViewType)} type="radio" title={view.label}></input>
-								<span>
-									<view.icon size={14} />
-								</span>
-							</label>
-						))}
-					</div>
+					<TabsList className="border rounded-xl">
+						<TabsTrigger value="list">
+							<List size={18} />
+						</TabsTrigger>
+						<TabsTrigger value="calendar">
+							<CalendarIcon size={18} />
+						</TabsTrigger>
+						<TabsTrigger value="grid">
+							<Grid size={18} />
+						</TabsTrigger>
+					</TabsList>
 
-					<Link
-						href="/dashboard/events/create"
-						className="flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-white text-sm font-bold rounded-xl shadow-lg shadow-orange-500/20 transition-all active:scale-95">
-						<Plus size={18} />
-						<span className="hidden sm:inline">Create Event</span>
-					</Link>
+					<Button asChild variant="default" size={"lg"}>
+						<Plus />
+						<Link href="/dashboard/events/create">
+							<span className="hidden sm:inline">Create Event</span>
+						</Link>
+					</Button>
 				</div>
 			</div>
 
 			{/* --- Content Area --- */}
-			<div className="flex-1 min-h-0">
-				{currentView === "calendar" && (
-					<div className="h-[calc(100vh-12rem)] bg-background/50 rounded-2xl border border-white/5 overflow-hidden">
-						<EventsCalendar events={filteredEvents} />
-					</div>
-				)}
+			<div className="flex-1 bg-neutral-900 rounded-2xl">
+				<TabsContent value={"calendar"} className="h-[calc(100vh-12rem)]">
+					<EventsCalendar events={filteredEvents} />
+				</TabsContent>
 
-				{currentView === "list" && <EventListView events={filteredEvents} />}
+				<TabsContent value={"list"}>
+					<EventListView events={filteredEvents} />
+				</TabsContent>
 
-				{currentView === "grid" && (
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-						{filteredEvents.map((event) => (
-							<EventGridCard key={event.id} event={event} />
-						))}
-						{filteredEvents.length === 0 && (
-							<div className="col-span-full">
-								<EmptyState />
-							</div>
-						)}
-					</div>
-				)}
+				<TabsContent value={"grid"} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+					{filteredEvents.map((event) => (
+						<EventGridCard key={event.id} event={event} />
+					))}
+					{filteredEvents.length === 0 && (
+						<div className="col-span-full">
+							<EventsListEmptyState />
+						</div>
+					)}
+				</TabsContent>
 			</div>
-		</div>
+		</Tabs>
 	);
 }
 
@@ -150,21 +150,6 @@ function EventGridCard({ event }: { event: Event }) {
 				</div>
 			</div>
 		</Link>
-	);
-}
-
-function EmptyState() {
-	return (
-		<div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/2">
-			<div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 text-muted">
-				<CalendarIcon size={32} />
-			</div>
-			<h3 className="text-xl font-bold text-white mb-2">No events found</h3>
-			<p className="text-muted max-w-sm mb-6">We couldn&apos;t find any events matching your filters. Try adjusting them or create a new one.</p>
-			<Link href="/dashboard/events/create" className="btn btn-outline text-white border-white/20 hover:bg-white hover:text-black">
-				Create Event
-			</Link>
-		</div>
 	);
 }
 

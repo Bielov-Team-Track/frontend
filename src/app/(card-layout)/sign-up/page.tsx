@@ -1,15 +1,15 @@
 "use client";
 
-import React, { ChangeEvent, useRef, useState } from "react";
-import { Mail, Lock } from "lucide-react";
+import { Button, Input, Loader } from "@/components/ui";
 import { register as registerUser } from "@/lib/api/auth";
-import { AxiosError } from "axios";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useRouter } from "next/navigation";
-import { Loader, Input, Button } from "@/components/ui";
+import { AxiosError } from "axios";
+import { Lock, Mail } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import * as yup from "yup";
 
 interface SignUpFormInputs {
 	email: string;
@@ -19,10 +19,7 @@ interface SignUpFormInputs {
 
 const schema = yup.object().shape({
 	email: yup.string().email("Invalid email").required("Email is required"),
-	password: yup
-		.string()
-		.min(6, "Password must be at least 6 characters")
-		.required("Password is required"),
+	password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
 	confirmPassword: yup
 		.string()
 		.oneOf([yup.ref("password")], "Passwords must match")
@@ -57,11 +54,7 @@ function SignUpPage() {
 			if (errorResponse?.message) {
 				setError(errorResponse.message);
 			} else if (errorResponse?.errors) {
-				setError(
-					errorResponse.errors
-						.map((e: any) => e.description || e.errorMessage)
-						.join(", "),
-				);
+				setError(errorResponse.errors.map((e: any) => e.description || e.errorMessage).join(", "));
 			} else {
 				setError("Registration failed. Please try again.");
 			}
@@ -73,13 +66,9 @@ function SignUpPage() {
 	return (
 		<>
 			{" "}
-			{isLoading && (
-				<Loader className="bg-black/55 absolute inset-0 rounded-md" />
-			)}
+			{isLoading && <Loader className="bg-black/55 absolute inset-0 rounded-md" />}
 			<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-				<h1 className="text-5xl font-bold text-accent self-center mb-4">
-					Volleyer
-				</h1>
+				<h1 className="text-5xl font-bold text-accent self-center mb-4">Spike</h1>
 				<div>
 					Already have an account?{" "}
 					<Link href={"/login"} className="link">

@@ -1,3 +1,4 @@
+import { Button } from "@/components";
 import { loadEventsByFilter } from "@/lib/api/events";
 import { getUserProfile } from "@/lib/server/auth";
 import {
@@ -51,7 +52,7 @@ function EventCard({ event, isHosting }: { event: any; isHosting?: boolean }) {
 		<Link href={`/dashboard/events/${event.id}`} className="block">
 			<div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/[0.07] hover:border-white/10 transition-all group cursor-pointer">
 				{/* Date Badge */}
-				<div className="flex flex-col items-center justify-center min-w-14 h-14 rounded-lg bg-background-dark border border-white/10 group-hover:border-accent/30 transition-colors">
+				<div className="flex flex-col items-center justify-center min-w-14 h-14 rounded-lg bg-background border border-white/10 group-hover:border-accent/30 transition-colors">
 					<span className="text-lg font-bold text-white leading-none">{day}</span>
 					<span className="text-[10px] font-bold text-muted uppercase mt-0.5">{month}</span>
 				</div>
@@ -69,7 +70,7 @@ function EventCard({ event, isHosting }: { event: any; isHosting?: boolean }) {
 							<Clock size={12} /> {time}
 						</span>
 						{event.location && (
-							<span className="flex items-center gap-1 truncate max-w-[150px]">
+							<span className="flex items-center gap-1 truncate">
 								<MapPin size={12} /> {event.location.name || "TBD"}
 							</span>
 						)}
@@ -147,11 +148,10 @@ export default async function DashboardPage() {
 					<p className="text-muted mt-1">Here's what's happening with your volleyball schedule today.</p>
 				</div>
 				<div className="flex gap-3">
-					<Link
-						href="/dashboard/events/create"
-						className="btn bg-accent hover:bg-accent/90 text-white border-none shadow-lg shadow-orange-500/20 gap-2">
+					<Button asChild>
 						<Plus size={18} /> New Event
-					</Link>
+						<Link href="/dashboard/events/create"></Link>
+					</Button>
 				</div>
 			</div>
 
@@ -245,7 +245,7 @@ export default async function DashboardPage() {
 				{/* RIGHT COL (Quick Actions & Activity) */}
 				<div className="space-y-6">
 					{/* Quick Actions Panel */}
-					<div className="rounded-2xl bg-background-dark/50 border border-white/5 p-5">
+					<div className="rounded-2xl bg-background/50 border border-white/5 p-5">
 						<h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 opacity-80">Quick Actions</h3>
 						<div className="grid grid-cols-2 gap-3">
 							<QuickAction label="Create Team" icon={Users} href="/dashboard/teams/create" colorClass="bg-blue-500/20 text-blue-400" />

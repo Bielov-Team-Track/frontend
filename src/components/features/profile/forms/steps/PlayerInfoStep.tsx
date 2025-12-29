@@ -1,10 +1,5 @@
-import { Dropdown, MultiSelectPills, Slider } from "@/components/ui";
-import {
-	CreateOrUpdatePlayerProfileDto,
-	DominantHand,
-	SkillLevel,
-	VolleyballPosition,
-} from "@/lib/models/Profile";
+import { MultiSelectPills, Select, Slider } from "@/components/ui";
+import { CreateOrUpdatePlayerProfileDto, DominantHand, SkillLevel, VolleyballPosition } from "@/lib/models/Profile";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Hand, Star } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
@@ -37,11 +32,7 @@ const schema = yup.object().shape({
 		.optional(),
 	dominantHand: yup
 		.mixed<DominantHand>()
-		.oneOf(
-			Object.values(DominantHand).filter(
-				(v) => typeof v === "number"
-			) as DominantHand[]
-		)
+		.oneOf(Object.values(DominantHand).filter((v) => typeof v === "number") as DominantHand[])
 		.required("Dominant hand is required"),
 	preferredPosition: yup.string().required("Preferred position is required"),
 	secondaryPositions: yup.array().of(yup.string().required()).optional(),
@@ -99,29 +90,18 @@ const PlayerInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 			heightCm: defaultValues?.heightCm ?? null,
 			verticalJumpCm: defaultValues?.verticalJumpCm ?? null,
 			dominantHand: defaultValues?.dominantHand ?? DominantHand.Right,
-			preferredPosition:
-				defaultValues?.preferredPosition !== undefined &&
-				defaultValues?.preferredPosition !== null
-					? positionEnumToString[defaultValues.preferredPosition]
-					: "",
-			secondaryPositions:
-				defaultValues?.secondaryPositions?.map(
-					(p) => positionEnumToString[p]
-				) || [],
-			highestLevelPlayed:
-				defaultValues?.highestLevelPlayed !== undefined &&
-				defaultValues?.highestLevelPlayed !== null
-					? skillLevelEnumToString[defaultValues.highestLevelPlayed]
-					: "",
+			preferredPosition: defaultValues?.preferredPosition ? positionEnumToString[defaultValues.preferredPosition] : undefined,
+			secondaryPositions: defaultValues?.secondaryPositions?.map((p) => positionEnumToString[p]) || [],
+			highestLevelPlayed: defaultValues?.highestLevelPlayed ? skillLevelEnumToString[defaultValues.highestLevelPlayed] : undefined,
 		},
 	});
 
 	const selectedPreferredPosition = watch("preferredPosition");
 
 	const dominantHandOptions = [
-		{ value: DominantHand.Right, label: "Right" },
-		{ value: DominantHand.Left, label: "Left" },
-		{ value: DominantHand.Ambidextrous, label: "Ambidextrous" },
+		{ value: DominantHand.Right.toString(), label: "Right" },
+		{ value: DominantHand.Left.toString(), label: "Left" },
+		{ value: DominantHand.Ambidextrous.toString(), label: "Ambidextrous" },
 	];
 
 	const positionOptions = [
@@ -141,11 +121,7 @@ const PlayerInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 		{ value: "Professional", label: "Professional" },
 	];
 
-	const secondaryPositionOptions = positionOptions.filter(
-		(p) =>
-			p.value !== "No preferred position" &&
-			p.value !== selectedPreferredPosition
-	);
+	const secondaryPositionOptions = positionOptions.filter((p) => p.value !== "No preferred position" && p.value !== selectedPreferredPosition);
 
 	const cmToFeetAndInches = (cm: number) => {
 		const totalInches = cm / 2.54;
@@ -165,32 +141,19 @@ const PlayerInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 			verticalJumpCm: data.verticalJumpCm,
 			dominantHand: data.dominantHand,
 			preferredPosition:
-				data.preferredPosition &&
-				data.preferredPosition !== "No preferred position"
-					? positionStringToEnum[data.preferredPosition]
-					: undefined,
-			secondaryPositions:
-				data.secondaryPositions
-					?.filter((p) => p in positionStringToEnum)
-					.map((p) => positionStringToEnum[p]) || [],
-			highestLevelPlayed: data.highestLevelPlayed
-				? skillLevelStringToEnum[data.highestLevelPlayed]
-				: undefined,
+				data.preferredPosition && data.preferredPosition !== "No preferred position" ? positionStringToEnum[data.preferredPosition] : undefined,
+			secondaryPositions: data.secondaryPositions?.filter((p) => p in positionStringToEnum).map((p) => positionStringToEnum[p]) || [],
+			highestLevelPlayed: data.highestLevelPlayed ? skillLevelStringToEnum[data.highestLevelPlayed] : undefined,
 		};
 		onNext(apiData);
 	};
 
 	return (
-		<form
-			id={formId}
-			onSubmit={handleSubmit(onSubmit)}
-			className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+		<form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 			<div className="flex flex-col gap-2">
-				<h2 className="text-xl font-semibold text-white">
-					Player Profile
-				</h2>
+				<h2 className="text-xl font-semibold text-white">Player Profile</h2>
 				<p className="text-sm text-muted">
-					Tell us about your physical stats and preferences.
+					Tell us about your physical stats and preferences. If you are not sure about some fields, you can leave then empty and change it later.
 				</p>
 			</div>
 
@@ -201,7 +164,7 @@ const PlayerInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 					render={({ field: { value, onChange, ...field } }) => (
 						<Slider
 							{...field}
-							value={value ?? 170}
+							value={value}
 							onChange={(e) => onChange(Number(e.target.value))}
 							min={120}
 							max={220}
@@ -222,14 +185,14 @@ const PlayerInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 					render={({ field: { value, onChange, ...field } }) => (
 						<Slider
 							{...field}
-							value={value ?? 40}
-							onChange={(e) => onChange(Number(e.target.value))}
+							variant="default"
+							clearable
+							value={value}
+							onChange={(e) => onChange(e.target.value)}
 							min={0}
 							max={100}
 							step={1}
 							label="Vertical Jump"
-							variant={"default"}
-							color={"accent"}
 							error={errors.verticalJumpCm?.message}
 							optional
 							formatValue={(v) => `${v} cm`}
@@ -244,32 +207,31 @@ const PlayerInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 					name="dominantHand"
 					control={control}
 					render={({ field }) => (
-						<Dropdown
+						<Select
 							{...field}
 							label="Dominant Hand"
 							options={dominantHandOptions}
 							error={errors.dominantHand?.message}
 							leftIcon={<Hand />}
-							value={field.value}
+							value={field.value.toString()}
 							onChange={(val) => field.onChange(Number(val))}
 							required
 						/>
 					)}
 				/>
-
 				<Controller
-					name="preferredPosition"
+					name="highestLevelPlayed"
 					control={control}
 					render={({ field }) => (
-						<Dropdown
+						<Select
 							{...field}
-							label="Preferred Position"
-							placeholder="Select position"
-							options={positionOptions}
-							leftIcon={<Star />}
-							error={errors.preferredPosition?.message}
-							value={field.value || ""}
-							required
+							clearable={true}
+							label="Highest Level Played"
+							placeholder="Select level"
+							options={skillLevels}
+							value={field.value}
+							onChange={(val) => field.onChange(val)}
+							required={false}
 						/>
 					)}
 				/>
@@ -277,18 +239,19 @@ const PlayerInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 				<Controller
-					name="highestLevelPlayed"
+					name="preferredPosition"
 					control={control}
 					render={({ field }) => (
-						<Dropdown
+						<Select
 							{...field}
-							label="Highest Level Played"
-							placeholder="Select level"
-							options={skillLevels}
-							value={field.value || ""}
-							onChange={(val) => field.onChange(val)}
-							required={false}
-							helperText="Optional"
+							required
+							label="Preferred Position"
+							placeholder="Select position"
+							options={positionOptions}
+							leftIcon={<Star />}
+							clearable={true}
+							error={errors.preferredPosition?.message}
+							value={field.value || undefined}
 						/>
 					)}
 				/>
@@ -303,9 +266,7 @@ const PlayerInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 							label="Secondary Positions"
 							options={secondaryPositionOptions}
 							selectedItems={field.value || []}
-							onSelectedItemsChange={(items) =>
-								field.onChange(items)
-							}
+							onSelectedItemsChange={(items) => field.onChange(items)}
 							optional
 						/>
 					)}

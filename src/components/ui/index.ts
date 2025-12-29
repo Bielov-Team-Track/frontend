@@ -1,11 +1,12 @@
 // UI Components - Reusable, design system components
-export { default as Avatar } from "./avatar";
+export { default as Avatar } from "./avatar/index";
 export { default as BackButton } from "./back-button";
 export { Badge } from "./badge";
 export { default as BlockOverlay } from "./block-overlay";
 export { default as Button } from "./button/index";
 export { Card, CardTitle } from "./card";
-export { default as Checkbox } from "./checkbox";
+export { default as Checkbox } from "./checkbox/index";
+export { default as ColorPicker, DEFAULT_PRESET_COLORS } from "./color-picker/index";
 export { default as ConfirmationModal } from "./confirmation-modal";
 export { default as DelayWrapper } from "./delay-wrapper";
 export { default as DeleteConfirmModal } from "./delete-confirm-modal";
@@ -26,13 +27,15 @@ export { default as RadioCards } from "./radio-cards";
 export { default as ReactionPicker } from "./reaction-picker";
 export { default as ResizableContainer } from "./resizable-container";
 export { default as Section } from "./section";
-export { Select } from "./select";
-export { default as Slider } from "./slider";
+export { default as Select } from "./select/index";
+export { default as Slider } from "./slider/index";
+export { default as Steps } from "./steps/index";
 export { default as TextArea } from "./textarea/index";
 export { default as ThemeSwitcher } from "./theme-switcher";
 
 // Re-export types
-export type { CheckboxProps } from "./checkbox";
+export type { CheckboxProps } from "./checkbox/index";
+export type { ColorPickerProps } from "./color-picker/index";
 export type { DropdownOption, DropdownProps } from "./dropdown";
 export type { FilterDropdownProps, FilterOption } from "./filter-dropdown";
 export type { MultiSelectPillsOption, MultiSelectPillsProps } from "./multi-select-pills";

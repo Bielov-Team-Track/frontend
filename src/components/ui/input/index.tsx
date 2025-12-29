@@ -48,10 +48,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 			<div className="flex flex-col gap-1.5 w-full" data-disabled={disabled}>
 				{/* Label */}
 				{label && (
-					<Label htmlFor={id} className={cn(hasError && "text-destructive")}>
+					<Label htmlFor={id} className={cn(hasError && "text-destructive", "gap-1")}>
 						{label}
-						{required && <span className="text-destructive ml-1">*</span>}
-						{optional && !required && <span className="text-muted-foreground ml-1.5 font-normal text-xs">(optional)</span>}
+						{required && <span className="text-destructive">*</span>}
+						{optional && !required && <span className="text-muted-foreground font-normal text-xs">(optional)</span>}
 					</Label>
 				)}
 

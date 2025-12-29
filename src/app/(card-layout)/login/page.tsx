@@ -45,12 +45,14 @@ function LoginContent() {
 	return (
 		<>
 			<form onSubmit={credentialsSignIn} className="flex flex-col gap-4">
-				<h1 className="text-4xl sm:text-5xl font-bold text-accent text-center mb-4">Volleyer</h1>
+				<h1 className="text-4xl sm:text-5xl font-bold text-accent text-center mb-4">Spike</h1>
 				<div className="text-center text-sm sm:text-base">
 					Do not have an account?{" "}
-					<Link href={"/sign-up"} className="link">
-						Register
-					</Link>
+					<Button variant={"link"} asChild>
+						<Link href={"/sign-up"} className="link">
+							Register
+						</Link>
+					</Button>
 				</div>
 				{error && <div className="text-red-500 text-sm">{error}</div>}
 				{resendSuccess && <div className="text-green-500 text-sm">Verification email sent! Please check your inbox.</div>}
@@ -81,10 +83,12 @@ function LoginContent() {
 						setResendSuccess(false);
 					}}
 				/>
-				<Link href={"/forgot-password"} className="link text-sm">
-					Forgot your password?
-				</Link>
-				<Button type="submit" loading={isLoading}>Login</Button>
+				<Button variant={"link"} asChild className="w-fit">
+					<Link href={"/forgot-password"}>Forgot your password?</Link>
+				</Button>
+				<Button type="submit" loading={isLoading}>
+					Login
+				</Button>
 			</form>
 			{/* <div className="divider">OR</div>
         <div className="flex flex-col gap-4">

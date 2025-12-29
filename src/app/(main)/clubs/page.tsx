@@ -1,6 +1,7 @@
 "use client";
 
-import { Badge, Button, Card, CardBody, FilterDropdown, Input } from "@/components";
+import { Badge, Button, FilterDropdown, Input } from "@/components";
+import { Card, CardContent } from "@/components/ui/card";
 import { getClubs } from "@/lib/api/clubs";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight, ImageOff, MapPin, Search, Shield, Sun, Trophy, Users, X } from "lucide-react";
@@ -129,7 +130,6 @@ export default function ClubsDirectory() {
 					<Input
 						placeholder="Search by name, city, or league..."
 						leftIcon={<Search size={18} />}
-						size="lg"
 						rightIcon={
 							<div className="hidden md:flex items-center gap-2">
 								<Button variant="ghost" color="neutral" size="sm" leftIcon={<MapPin size={16} />}>
@@ -175,19 +175,14 @@ export default function ClubsDirectory() {
 				))}
 
 				{/* "Add Your Club" Card */}
-				<Card
-					variant="dash"
-					hoverable
-					className="flex flex-col items-center justify-center text-center p-6 cursor-pointer min-h-[280px] bg-transparent border-base-content/10 hover:border-accent/40">
-					<CardBody className="items-center">
-						<div className="w-12 h-12 rounded-full bg-base-content/5 flex items-center justify-center text-base-content/50 group-hover:bg-accent group-hover:text-white transition-colors mb-4">
-							<ArrowUpRight size={24} />
-						</div>
+				<Card className="flex flex-col items-center justify-center text-center p-6 cursor-pointer border min-h-70 bg-transparent border-base-content/10 hover:border-accent/40">
+					<CardContent className="flex flex-col items-center ">
+						<ArrowUpRight size={24} />
 						<Link href="/clubs/create">
 							<h3 className="text-lg font-bold mb-2">List your Club</h3>
-							<p className="text-sm text-base-content/60 max-w-[200px]">Recruit players and manage events.</p>
+							<p className="text-sm text-muted max-w-50">Recruit players and manage events.</p>
 						</Link>
-					</CardBody>
+					</CardContent>
 				</Card>
 			</div>
 		</div>
@@ -214,9 +209,7 @@ function ClubCard({ club }: { club: ClubData }) {
 
 	return (
 		<Link href={`/clubs/${club.id}`}>
-			<Card
-				hoverable
-				className="overflow-hidden border border-base-content/5 bg-base-100 hover:border-accent/40 transition-all duration-300 hover:-translate-y-1">
+			<Card>
 				{/* Banner */}
 				<figure className="h-28 relative bg-base-200">
 					<div className="absolute inset-0 bg-linear-to-t from-base-100 via-transparent to-transparent z-10" />
@@ -237,14 +230,12 @@ function ClubCard({ club }: { club: ClubData }) {
 
 					{/* Level Badge */}
 					<div className="absolute top-3 right-3 z-20">
-						<Badge variant="soft" color="neutral" size="xs">
-							{club.level}
-						</Badge>
+						<Badge variant={"secondary"}>{club.level}</Badge>
 					</div>
 				</figure>
 
 				{/* Content */}
-				<CardBody className="relative z-20 -mt-10">
+				<CardContent className="relative z-20 -mt-10">
 					<div className="flex justify-between items-end mb-3">
 						{/* Logo */}
 						<div className="relative">
@@ -282,14 +273,16 @@ function ClubCard({ club }: { club: ClubData }) {
 
 					{/* Tags Row */}
 					<div className="flex flex-wrap gap-2 pt-3 border-t border-base-content/5">
-						<Badge variant="ghost" color="neutral" size="xs" icon={<Sun size={10} />}>
+						<Badge variant="ghost" color="neutral">
+							<Sun size={10} />
 							{club.surface}
 						</Badge>
-						<Badge variant="ghost" color="neutral" size="xs" icon={<Users size={10} />}>
+						<Badge variant="ghost" color="neutral">
+							<Users size={10} />
 							{club.gender}
 						</Badge>
 					</div>
-				</CardBody>
+				</CardContent>
 			</Card>
 		</Link>
 	);

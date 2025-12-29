@@ -1,57 +1,57 @@
 "use client";
 
-import { ThemeSwitcher } from "@/components/ui";
+import { NotificationBell } from "@/components/features/notifications";
+import { Input, ThemeSwitcher } from "@/components/ui";
 import { useAuth } from "@/providers";
-import { Bell, Menu, Search } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { getPageTitle } from "../shared/page-titles";
+import { Menu, Search, Volleyball } from "lucide-react";
+import Link from "next/link";
 import UserMenu from "./UserMenu";
 
-function DashboardHeader() {
+interface DashboardHeaderProps {
+	onMenuClick?: () => void;
+}
+
+function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 	const { userProfile, isLoading } = useAuth();
-	const pathname = usePathname();
-	const pageTitle = getPageTitle(pathname);
-	const [isSearchFocused, setIsSearchFocused] = useState(false);
 
 	return (
-		<header className="sticky z-30 flex items-center justify-between w-full h-16 px-6 bg-base-200 backdrop-blur-xl border border-white/5 rounded-2xl shadow-xs mb-6">
-			{/* Left: Mobile Menu & Title */}
-			<div className="flex items-center gap-4">
-				<button className="xl:hidden p-2 text-muted hover:text-white transition-colors">
-					<Menu size={24} />
-				</button>
-				<h1 className="text-xl font-bold text-white tracking-tight hidden sm:block">{pageTitle}</h1>
-			</div>
+		<header className="sticky top-0 z-40 bg-neutral-900 border-b border-white/5">
+			<div className="flex items-center justify-between max-w-7xl h-16 px-4 md:px-6  m-auto">
+				{/* Left: Logo & Mobile Menu */}
+				<div className="flex items-center gap-3">
+					{/* Mobile Menu Button - only show for authenticated users */}
+					{onMenuClick && (
+						<button
+							onClick={onMenuClick}
+							className="md:hidden p-2 -ml-2 text-muted hover:text-white transition-colors rounded-lg hover:bg-white/5"
+							aria-label="Open menu">
+							<Menu size={24} />
+						</button>
+					)}
 
-			{/* Center: Search Bar */}
-			<div className={`hidden md:flex items-center max-w-md w-full mx-6 transition-all duration-300 ${isSearchFocused ? "scale-105" : ""}`}>
-				<div className="relative w-full group">
-					<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-						<Search size={16} className={`transition-colors ${isSearchFocused ? "text-accent" : "text-muted group-hover:text-white"}`} />
-					</div>
-					<input
-						type="text"
-						className="block w-full pl-10 pr-3 py-2 bg-background-light/50 border border-white/5 rounded-xl text-sm text-white placeholder-muted focus:outline-hidden focus:ring-1 focus:ring-accent/50 focus:bg-background-light transition-all"
-						placeholder="Search anything..."
-						onFocus={() => setIsSearchFocused(true)}
-						onBlur={() => setIsSearchFocused(false)}
-					/>
+					{/* Logo */}
+					<Link href="/dashboard" className="flex items-center gap-3">
+						<div className="w-9 h-9 bg-linear-to-tr from-secondary to-primary rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 text-white">
+							<Volleyball size={18} />
+						</div>
+						<span className="text-xl font-bold text-white tracking-tight">Spike</span>
+					</Link>
 				</div>
-			</div>
 
-			{/* Right: Actions & Profile */}
-			<div className="flex items-center gap-4">
-				<ThemeSwitcher />
+				{/* Center: Search Bar */}
+				<div className={`hidden md:flex items-center max-w-md w-full mx-6 transition-all duration-300`}>
+					<Input placeholder="Search anything..." leftIcon={<Search size={16} />} />
+				</div>
 
-				<button className="relative p-2 text-muted hover:text-white transition-colors hover:bg-white/5 rounded-full">
-					<Bell size={20} />
-					<span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-background"></span>
-				</button>
+				{/* Right: Actions & Profile */}
+				<div className="flex items-center gap-2 md:gap-4">
+					<ThemeSwitcher />
 
-				<div className="h-6 w-px bg-white/10 mx-1"></div>
+					{userProfile && <NotificationBell />}
+					<div className="hidden md:block h-6 w-px bg-white/10 mx-1"></div>
 
-				<UserMenu user={userProfile!} isLoading={isLoading} />
+					<UserMenu user={userProfile!} isLoading={isLoading} />
+				</div>
 			</div>
 		</header>
 	);

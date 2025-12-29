@@ -1,5 +1,6 @@
 "use client";
 
+import { Avatar, Button } from "@/components";
 import { Link } from "@/components/ui";
 import { getClub, getClubMembers, getTeamsByClub } from "@/lib/api/clubs";
 import { useQuery } from "@tanstack/react-query";
@@ -59,7 +60,7 @@ export default function ClubPage() {
 
 	if (clubLoading) {
 		return (
-			<div className="min-h-screen bg-background-dark flex items-center justify-center">
+			<div className="min-h-screen bg-background flex items-center justify-center">
 				<Loader2 className="w-8 h-8 text-accent animate-spin" />
 			</div>
 		);
@@ -67,7 +68,7 @@ export default function ClubPage() {
 
 	if (!club) {
 		return (
-			<div className="min-h-screen bg-background-dark flex flex-col items-center justify-center text-white">
+			<div className="min-h-screen bg-background flex flex-col items-center justify-center text-white">
 				<Shield className="w-16 h-16 text-muted mb-4" />
 				<h1 className="text-2xl font-bold mb-2">Club Not Found</h1>
 				<p className="text-muted mb-6">The club you&apos;re looking for doesn&apos;t exist.</p>
@@ -77,7 +78,7 @@ export default function ClubPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-background-dark text-white font-sans pb-20">
+		<div className="min-h-screen bg-background text-white font-sans pb-20">
 			{/* --- HERO SECTION --- */}
 			<div className="relative w-full">
 				{/* Banner Image with Gradient Overlay */}
@@ -97,15 +98,8 @@ export default function ClubPage() {
 				<div className="max-w-desktop mx-auto px-4 sm:px-6 relative -mt-16 md:-mt-20">
 					<div className="flex flex-col md:flex-row items-end md:items-center gap-6">
 						{/* Logo */}
-						<div className="relative group self-start md:self-auto">
-							<div className="h-28 w-28 md:h-40 md:w-40 rounded-2xl border-4 border-background-dark bg-background-light overflow-hidden shadow-2xl shadow-black/50 flex items-center justify-center">
-								{club.logoUrl && !logoError ? (
-									/* eslint-disable-next-line @next/next/no-img-element */
-									<img src={club.logoUrl} alt="Logo" className="w-full h-full object-cover" onError={() => setLogoError(true)} />
-								) : (
-									<Shield className="text-muted/50 w-12 h-12" />
-								)}
-							</div>
+						<div className="relative group self-center md:self-auto">
+							<Avatar src={club.logoUrl} variant="club" size={"2xl"} />
 							{/* Online Status Indicator */}
 							<div className="absolute bottom-2 right-2 md:bottom-4 md:right-4 w-4 h-4 bg-success rounded-full border-2 border-background-dark"></div>
 						</div>
@@ -138,15 +132,13 @@ export default function ClubPage() {
 
 						{/* Actions */}
 						<div className="flex gap-3 mb-4 w-full md:w-auto mt-4 md:mt-0">
-							<Link variant="primary" href={"/clubs/" + club.id + "/register"}>
-								Join Club
-							</Link>
-							<button className="flex-1 md:flex-none btn btn-ghost bg-white/5 hover:bg-white/10 border border-white/10 text-white">
+							<Button asChild>
+								<Link href={"/clubs/" + club.id + "/register"}>Join Club</Link>
+							</Button>
+							<Button variant={"secondary"}>
 								<MessageCircle size={18} />
-							</button>
-							<button className="btn btn-square btn-ghost hover:bg-white/5 text-muted hover:text-white">
-								<MoreHorizontal />
-							</button>
+								Message
+							</Button>
 						</div>
 					</div>
 				</div>
@@ -314,7 +306,7 @@ export default function ClubPage() {
 									<div className="flex items-center justify-between mb-3">
 										<div className="flex items-center gap-3">
 											<div className="w-10 h-10 rounded-full bg-linear-to-br from-accent to-secondary p-[2px]">
-												<div className="w-full h-full rounded-full bg-background-dark overflow-hidden flex items-center justify-center">
+												<div className="w-full h-full rounded-full bg-background overflow-hidden flex items-center justify-center">
 													{club.logoUrl && !logoError ? (
 														/* eslint-disable-next-line @next/next/no-img-element */
 														<img

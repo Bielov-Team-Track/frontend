@@ -1,6 +1,6 @@
+import { DominantHand } from "@/lib/models/Profile";
 import type { Meta, StoryObj } from "@storybook/react";
 import PlayerInfoStep from "./PlayerInfoStep";
-import { DominantHand } from "@/lib/models/Profile";
 
 const meta: Meta<typeof PlayerInfoStep> = {
 	title: "Features/Profile/Forms/PlayerInfoStep",

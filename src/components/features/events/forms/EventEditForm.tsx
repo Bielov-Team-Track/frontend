@@ -9,7 +9,7 @@
 // import { useRouter } from "next/navigation";
 // import Link from "next/link";
 // import { Event } from "@/lib/models/Event";
-// import Avatar from "@/components/ui/avatar";
+// import { Avatar } from "@/components";
 // import useUser from "@/hooks/useUser";
 // import { UserProfile } from "@/lib/models/User";
 

@@ -90,7 +90,7 @@ export default function ManageMembersModal({
 										isIncluded ? "bg-accent/10 border-accent/30" : "bg-white/5 border-white/10 hover:border-white/20"
 									}`}>
 									<div className="flex items-center gap-3">
-										<div className="w-10 h-10 rounded-full bg-background-dark flex items-center justify-center text-sm font-bold text-muted">
+										<div className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-sm font-bold text-muted">
 											{member.userProfile?.name?.[0] || "?"}
 										</div>
 										<div>

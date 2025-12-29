@@ -1,9 +1,8 @@
-import React from "react";
 import { Button } from "@/components";
-import Link from "next/link";
-import { CheckCircle } from "lucide-react";
-import { redirect } from "next/navigation";
 import client from "@/lib/api/client";
+import { CheckCircle } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 type SuccessPageParams = {
 	searchParams: Promise<{
@@ -47,8 +46,7 @@ async function PaymentSuccessPage({ searchParams }: SuccessPageParams) {
 				<h1 className="text-4xl font-bold mb-4">Payment Successful!</h1>
 
 				<p className="/70 mb-8">
-					Thank you for your payment. Your transaction has been completed
-					successfully. You will receive a confirmation email shortly.
+					Thank you for your payment. Your transaction has been completed successfully. You will receive a confirmation email shortly.
 				</p>
 
 				{error && (

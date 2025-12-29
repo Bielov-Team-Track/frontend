@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 
-export type Theme = "volleylight" | "volleydark";
+export type Theme = "light" | "dark";
 
 interface ThemeContextType {
 	theme: Theme;
@@ -18,7 +18,7 @@ interface ThemeProviderProps {
 	defaultTheme?: Theme;
 }
 
-export function ThemeProvider({ children, defaultTheme = "volleydark" }: ThemeProviderProps) {
+export function ThemeProvider({ children, defaultTheme = "dark" }: ThemeProviderProps) {
 	const [theme, setThemeState] = useState<Theme>(defaultTheme);
 	const [mounted, setMounted] = useState(false);
 
@@ -26,20 +26,29 @@ export function ThemeProvider({ children, defaultTheme = "volleydark" }: ThemePr
 		setMounted(true);
 		const savedTheme = localStorage.getItem("theme") as Theme | null;
 		const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-		const initialTheme = savedTheme || (prefersDark ? "volleydark" : "volleylight");
+		const initialTheme = savedTheme || (prefersDark ? "dark" : "light");
 
 		setThemeState(initialTheme);
-		document.documentElement.setAttribute("data-theme", initialTheme);
+		applyTheme(initialTheme);
 	}, []);
+
+	const applyTheme = (newTheme: Theme) => {
+		const root = document.documentElement;
+		if (newTheme === "dark") {
+			root.classList.add("dark");
+		} else {
+			root.classList.remove("dark");
+		}
+	};
 
 	const setTheme = useCallback((newTheme: Theme) => {
 		setThemeState(newTheme);
 		localStorage.setItem("theme", newTheme);
-		document.documentElement.setAttribute("data-theme", newTheme);
+		applyTheme(newTheme);
 	}, []);
 
 	const toggleTheme = useCallback(() => {
-		const newTheme = theme === "volleydark" ? "volleylight" : "volleydark";
+		const newTheme = theme === "dark" ? "light" : "dark";
 		setTheme(newTheme);
 	}, [theme, setTheme]);
 

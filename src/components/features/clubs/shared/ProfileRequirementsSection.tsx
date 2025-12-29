@@ -73,7 +73,7 @@ const ProfileRequirementsSection = ({
 								</p>
 							</div>
 						</div>
-						<Button variant={playerComplete ? "ghost" : "outline-solid"} size="sm" onClick={() => setShowPlayerModal(true)} leftIcon={<User size={14} />}>
+						<Button variant={playerComplete ? "ghost" : "outline"} size="sm" onClick={() => setShowPlayerModal(true)} leftIcon={<User size={14} />}>
 							{playerComplete ? "Edit" : "Complete"}
 						</Button>
 					</div>
@@ -96,7 +96,7 @@ const ProfileRequirementsSection = ({
 								</p>
 							</div>
 						</div>
-						<Button variant={coachComplete ? "ghost" : "outline-solid"} size="sm" onClick={() => setShowCoachModal(true)} leftIcon={<Award size={14} />}>
+						<Button variant={coachComplete ? "ghost" : "outline"} size="sm" onClick={() => setShowCoachModal(true)} leftIcon={<Award size={14} />}>
 							{coachComplete ? "Edit" : "Complete"}
 						</Button>
 					</div>
@@ -110,7 +110,7 @@ const ProfileRequirementsSection = ({
 					<Button variant="ghost" onClick={() => setShowPlayerModal(false)}>
 						Cancel
 					</Button>
-					<Button type="submit" form="player-profile-form" variant="solid" color="primary">
+					<Button type="submit" form="player-profile-form" color="primary">
 						Save
 					</Button>
 				</div>
@@ -123,7 +123,7 @@ const ProfileRequirementsSection = ({
 					<Button variant="ghost" onClick={() => setShowCoachModal(false)}>
 						Cancel
 					</Button>
-					<Button type="submit" form="coach-profile-form" variant="solid" color="primary">
+					<Button type="submit" form="coach-profile-form" color="primary">
 						Save
 					</Button>
 				</div>

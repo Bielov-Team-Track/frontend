@@ -395,7 +395,7 @@ function DraggableMemberRow({
 // Export for drag overlay
 export function PlayerDragOverlay({ member }: { member: TeamMember }) {
 	return (
-		<div className="flex items-center gap-3 p-3 rounded-xl bg-background-dark border-2 border-accent shadow-2xl min-w-[200px]">
+		<div className="flex items-center gap-3 p-3 rounded-xl bg-background border-2 border-accent shadow-2xl min-w-[200px]">
 			<div className="relative">
 				<div className="rounded-lg overflow-hidden ring-2 ring-accent">
 					{member.userProfile && <Avatar profile={member.userProfile} size="small" />}

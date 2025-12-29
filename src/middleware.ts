@@ -12,6 +12,7 @@ const PUBLIC_ROUTES = [
 	"/privacy-policy",
 	"/terms-of-service",
 	"/error",
+	"/clubs",
 ];
 
 const PROFILE_SETUP_ROUTE = "/complete-profile-setup";
@@ -101,7 +102,5 @@ export default async function authMiddleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: [
-		"/((?!api|_next/static|_next/image|_next/webpack-hmr|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js|ico|woff|woff2|ttf|eot)$).*)",
-	],
+	matcher: ["/((?!api|_next/static|_next/image|_next/webpack-hmr|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js|ico|woff|woff2|ttf|eot)$).*)"],
 };

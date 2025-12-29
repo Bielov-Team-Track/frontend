@@ -2,15 +2,18 @@ import { Metadata } from "next";
 import RegisterPageClient from "./RegisterPageClient";
 
 type Props = {
-	params: { id: string };
+	params: Promise<{
+		id: string;
+	}>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	return {
-		title: `Join Club | Bielov Volleyer`,
+		title: `Join Club | Spike`,
 	};
 }
 
-export default function RegisterPage({ params }: Props) {
-	return <RegisterPageClient clubSlug={params.id} />;
+export default async function RegisterPage({ params }: Props) {
+	const parameters = await params;
+	return <RegisterPageClient clubSlug={parameters.id} />;
 }

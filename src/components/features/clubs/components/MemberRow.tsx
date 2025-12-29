@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { Edit, UserMinus } from "lucide-react";
 import { Avatar } from "@/components";
 import { ClubMember, ClubRole } from "@/lib/models/Club";
+import { Edit, UserMinus } from "lucide-react";
+import Link from "next/link";
 
 interface MemberRowProps {
 	member: ClubMember;
@@ -39,69 +39,44 @@ const getSkillLevelBadge = (skillLevel?: string) => {
 	};
 
 	return (
-		<span
-			className={`px-2 py-0.5 rounded text-xs font-medium border ${
-				colors[skillLevel] || "bg-white/10 text-muted border-white/10"
-			}`}>
-			{skillLevel}
-		</span>
+		<span className={`px-2 py-0.5 rounded text-xs font-medium border ${colors[skillLevel] || "bg-white/10 text-muted border-white/10"}`}>{skillLevel}</span>
 	);
 };
 
-export default function MemberRow({
-	member,
-	clubId,
-	currentUserRole,
-	onEdit,
-	onRemove,
-}: MemberRowProps) {
+export default function MemberRow({ member, clubId, currentUserRole, onEdit, onRemove }: MemberRowProps) {
 	const memberUrl = `/dashboard/clubs/${clubId}/members/${member.userId}`;
 
 	// Check if current user can remove this member
 	// Owners and Admins can remove members, but not themselves or other owners
-	const canRemove =
-		onRemove &&
-		(currentUserRole === ClubRole.Owner || currentUserRole === ClubRole.Admin) &&
-		member.role !== ClubRole.Owner;
+	const canRemove = onRemove && (currentUserRole === ClubRole.Owner || currentUserRole === ClubRole.Admin) && member.role !== ClubRole.Owner;
 
 	return (
 		<tr className="border-b border-white/5 hover:bg-white/5 group">
 			<td className="px-4 py-3">
 				<Link href={memberUrl} className="flex items-center gap-3">
-					{member.userProfile && <Avatar profile={member.userProfile} />}
+					{member.userProfile && <Avatar name={member.userProfile.name + " " + member.userProfile.surname} src={member.userProfile.imageUrl} />}
 					<div>
 						<div className="text-sm font-medium text-white group-hover:text-accent transition-colors">
 							{member.userProfile?.name} {member.userProfile?.surname}
 						</div>
-						<div className="text-xs text-muted">
-							{member.userProfile?.email || "No email"}
-						</div>
+						<div className="text-xs text-muted">{member.userProfile?.email || "No email"}</div>
 					</div>
 				</Link>
 			</td>
 			<td className="px-4 py-3">
 				<Link href={memberUrl}>
-					<span
-						className={`px-2 py-1 rounded text-xs font-medium border ${getRoleBadgeColor(
-							member.role
-						)}`}>
-						{member.role}
-					</span>
+					<span className={`px-2 py-1 rounded text-xs font-medium border ${getRoleBadgeColor(member.role)}`}>{member.role}</span>
 				</Link>
 			</td>
 			<td className="px-4 py-3">
 				<Link href={memberUrl}>
 					{getSkillLevelBadge(member.skillLevel)}
-					{!member.skillLevel && (
-						<span className="text-xs text-muted">—</span>
-					)}
+					{!member.skillLevel && <span className="text-xs text-muted">—</span>}
 				</Link>
 			</td>
 			<td className="px-4 py-3">
 				<Link href={memberUrl} className="text-sm text-muted">
-					{member.createdAt
-						? new Date(member.createdAt).toLocaleDateString()
-						: "Unknown"}
+					{member.createdAt ? new Date(member.createdAt).toLocaleDateString() : "Unknown"}
 				</Link>
 			</td>
 			<td className="px-4 py-3">

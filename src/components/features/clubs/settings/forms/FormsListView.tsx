@@ -1,7 +1,7 @@
 // frontend/src/components/features/clubs/settings/FormsListView.tsx
 "use client";
 
-import { Button, DeleteConfirmModal, Dropdown, EmptyState, Input, Loader } from "@/components";
+import { Button, DeleteConfirmModal, EmptyState, Input, Loader, Select } from "@/components";
 import { deleteFormTemplate, duplicateFormTemplate, updateClubSettings, updateFormTemplate } from "@/lib/api/clubs";
 import { FormTemplate } from "@/lib/models/Club";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -127,7 +127,8 @@ export default function FormsListView({ clubId, forms, isLoading, onCreate, onEd
 							<Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search forms..." leftIcon={<Search size={16} />} />
 						</div>
 						<div className="flex gap-2">
-							<Dropdown
+							<Select
+								inlineLabel="Status"
 								value={filterStatus}
 								onChange={(val) => setFilterStatus(val as FilterStatus)}
 								options={[
@@ -135,16 +136,15 @@ export default function FormsListView({ clubId, forms, isLoading, onCreate, onEd
 									{ value: "active", label: "Active" },
 									{ value: "inactive", label: "Inactive" },
 								]}
-								size="md"
 							/>
-							<Dropdown
+							<Select
+								inlineLabel="Sort by"
 								value={sortBy}
-								onChange={(val) => setSortBy(val as SortOption)}
+								onChange={(val) => setSortBy(val! as SortOption)}
 								options={[
-									{ value: "createdAt", label: "Sort by Date" },
-									{ value: "name", label: "Sort by Name" },
+									{ value: "createdAt", label: "Creation Date" },
+									{ value: "name", label: "Name" },
 								]}
-								size="md"
 							/>
 						</div>
 					</div>

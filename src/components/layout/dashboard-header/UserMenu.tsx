@@ -1,12 +1,12 @@
 "use client";
 
+import { Avatar, Button } from "@/components/ui";
 import { UserProfile } from "@/lib/models/User";
-import Link from "next/link";
-import React, { useEffect, useRef } from "react";
-import { LogIn as LoginIcon, LogOut as LogoutIcon, CircleUser as UserIcon, Settings as SettingsIcon, LayoutDashboard } from "lucide-react";
-import { Avatar, Button, Loader } from "@/components/ui";
 import { useAuth } from "@/providers";
+import { LayoutDashboard, LogIn as LoginIcon, LogOut as LogoutIcon, Settings as SettingsIcon, CircleUser as UserIcon } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import React, { useEffect, useRef } from "react";
 
 function UserMenu({ user, isLoading }: UserMenuProps) {
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -77,11 +77,8 @@ function UserMenu({ user, isLoading }: UserMenuProps) {
 					</div>
 
 					{/* Avatar Button */}
-					<button
-						onClick={toggleUserMenu}
-						className="btn btn-ghost btn-circle hover:btn-primary transition-colors duration-200"
-					>
-						<Avatar profile={user} size="small" />
+					<button onClick={toggleUserMenu} className="btn btn-ghost btn-circle hover:btn-primary transition-colors duration-200">
+						<Avatar name={user.name + " " + user.surname} size="xs" src={user.imageUrl} />
 					</button>
 
 					{/* Dropdown Menu */}
@@ -99,8 +96,7 @@ function UserMenu({ user, isLoading }: UserMenuProps) {
 									key={link.label}
 									href={link.href}
 									className="flex items-center px-4 py-2 text-sm  hover:bg-base-200 transition-colors duration-150"
-									onClick={closeMenu}
-								>
+									onClick={closeMenu}>
 									<link.icon className="w-4 h-4 mr-3" />
 									{link.label}
 								</Link>
@@ -108,23 +104,19 @@ function UserMenu({ user, isLoading }: UserMenuProps) {
 
 							<hr className="border-base-200" />
 
-							<Button
-								variant="ghost"
-								color="secondary"
-								leftIcon={<LogoutIcon size={16} />}
-								onClick={handleLogout}
-								className="w-full"
-							>
+							<Button variant="ghost" color="secondary" leftIcon={<LogoutIcon size={16} />} onClick={handleLogout} className="w-full">
 								Sign Out
 							</Button>
 						</div>
 					)}
 				</div>
 			) : (
-				<Link href="/login" className="btn btn-sm">
+				<Button asChild variant="outline">
 					<LoginIcon size={16} />
-					<span className="hidden sm:inline ml-2">Login</span>
-				</Link>
+					<Link href="/login">
+						<span className="hidden sm:inline">Login</span>
+					</Link>
+				</Button>
 			)}
 		</div>
 	);

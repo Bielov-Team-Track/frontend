@@ -76,7 +76,7 @@ export default function PositionAssignmentPopup({
 										{index + 1}
 									</div>
 
-									<div className="w-7 h-7 rounded-full bg-background-dark flex items-center justify-center text-xs font-bold text-muted">
+									<div className="w-7 h-7 rounded-full bg-background flex items-center justify-center text-xs font-bold text-muted">
 										{member.jerseyNumber || "#"}
 									</div>
 
@@ -120,7 +120,7 @@ export default function PositionAssignmentPopup({
 								}`}>
 								<div
 									className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-										isSelected ? "bg-accent text-white" : "bg-background-dark text-muted"
+										isSelected ? "bg-accent text-white" : "bg-background text-muted"
 									}`}>
 									{member.jerseyNumber || "#"}
 								</div>

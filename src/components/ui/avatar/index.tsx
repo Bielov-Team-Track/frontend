@@ -1,88 +1,108 @@
 "use client";
 
+import { AvatarFallback, AvatarImage, Avatar as AvatarRoot } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { UserProfile } from "@/lib/models/User";
 import { stringToColor } from "@/lib/utils/color";
-import Image from "next/image";
-import { useState } from "react";
+import { ImageOff, Shield, User, Users, UsersRound } from "lucide-react";
+import * as React from "react";
 
-type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
+type AvatarVariant = "user" | "club" | "team" | "group";
+type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 
 type AvatarProps = {
-	profile: Partial<UserProfile>;
+	src?: string | null;
+	alt?: string;
+	name?: string;
+	icon?: React.ReactNode;
+	variant?: AvatarVariant;
 	size?: AvatarSize;
-	online?: boolean;
-	offline?: boolean;
-	mask?: "squircle" | "hexagon" | "triangle" | "circle";
+	color?: string;
+	className?: string;
 };
 
-const Avatar = ({ profile, size = "md", online, offline, mask }: AvatarProps) => {
-	const [imageError, setImageError] = useState(false);
+const VARIANT_ICONS: Record<AvatarVariant, React.ElementType> = {
+	user: User,
+	club: Shield,
+	team: Users,
+	group: UsersRound,
+};
 
-	if (!profile) {
-		return null;
-	}
+const SIZE_CLASSES: Record<AvatarSize, string> = {
+	xs: "size-8",
+	sm: "size-10",
+	md: "size-12",
+	lg: "size-16",
+	xl: "size-24",
+	"2xl": "size-40",
+};
 
-	// DaisyUI avatar size classes
-	const sizeClasses = {
-		xs: "w-8",
-		sm: "w-12",
-		md: "w-16",
-		lg: "w-24",
-		xl: "w-32",
+const FONT_CLASSES: Record<AvatarSize, string> = {
+	xs: "text-xs",
+	sm: "text-sm",
+	md: "text-base",
+	lg: "text-lg",
+	xl: "text-2xl",
+	"2xl": "text-3xl",
+};
+
+const ICON_CLASSES: Record<AvatarSize, string> = {
+	xs: "size-3",
+	sm: "size-4",
+	md: "size-5",
+	lg: "size-6",
+	xl: "size-8",
+	"2xl": "size-12",
+};
+
+function getInitials(name: string): string {
+	return name
+		.split(" ")
+		.map((word) => word[0])
+		.join("")
+		.toUpperCase()
+		.slice(0, 2);
+}
+
+const Avatar = ({ src, alt, name, icon, variant, size = "md", color, className }: AvatarProps) => {
+	const backgroundColor = color ?? (name ? stringToColor(name) : undefined);
+
+	// Determine what to render in fallback
+	const renderFallback = () => {
+		const iconClass = ICON_CLASSES[size];
+		const fontClass = FONT_CLASSES[size];
+
+		// Priority 1: Custom icon provided
+		if (icon) {
+			return <span className={iconClass}>{icon}</span>;
+		}
+
+		// Priority 2: Variant default icon
+		if (variant) {
+			const VariantIcon = VARIANT_ICONS[variant];
+			return <VariantIcon className={iconClass} />;
+		}
+
+		// Priority 3: Initials from name
+		if (name) {
+			return <span className={cn("font-medium", fontClass)}>{getInitials(name)}</span>;
+		}
+
+		// Priority 4: Image not available
+		return <ImageOff className={iconClass} />;
 	};
-
-	// Font size for initials based on avatar size
-	const fontSizeClasses = {
-		xs: "text-xs",
-		sm: "text-sm",
-		md: "text-xl",
-		lg: "text-3xl",
-		xl: "text-5xl",
-	};
-
-	// Mask classes
-	const maskClass = mask ? `mask mask-${mask}` : "rounded";
-
-	const backgroundColor = stringToColor(profile?.email!);
-
-	// Show initials fallback if no imageUrl or if image failed to load
-	const shouldShowFallback = !profile.imageUrl || imageError;
-
-	const initials = profile.name
-		?.split(" ")
-		.map((w) => w[0])
-		.join("");
 
 	return (
-		<div
-			className={cn(
-				"avatar",
-				online && "avatar-online",
-				offline && "avatar-offline",
-				shouldShowFallback && "avatar-placeholder"
-			)}
-		>
-			<div className={cn(sizeClasses[size], maskClass)}>
-				{!shouldShowFallback ? (
-					<Image
-						alt={profile.name ?? "User Avatar"}
-						src={profile.imageUrl as string}
-						fill
-						className="object-cover"
-						onError={() => setImageError(true)}
-					/>
-				) : (
-					<div
-						style={{ backgroundColor }}
-						className={cn("w-full h-full flex items-center justify-center text-neutral-content font-bold", fontSizeClasses[size])}
-					>
-						{initials}
-					</div>
-				)}
-			</div>
-		</div>
+		<AvatarRoot className={cn(SIZE_CLASSES[size], className)}>
+			{src && <AvatarImage src={src} alt={alt ?? name ?? "Avatar"} className={"bg-black"} />}
+			<AvatarFallback
+				style={backgroundColor ? { backgroundColor } : undefined}
+				className={cn("bg-neutral-800", backgroundColor ? "text-white" : undefined)}>
+				{renderFallback()}
+			</AvatarFallback>
+		</AvatarRoot>
 	);
 };
 
 export default Avatar;
+export { Avatar };
+export type { AvatarProps, AvatarSize, AvatarVariant };

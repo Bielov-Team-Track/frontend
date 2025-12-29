@@ -1,66 +1,13 @@
 "use client";
 
-import {
-	Club,
-	ClubMember,
-	ClubRole,
-	Group,
-	GroupMember,
-	SkillLevel,
-	UpdateGroupRequest,
-} from "@/lib/models/Club";
-import {
-	addGroupMember,
-	deleteGroup,
-	getClub,
-	getClubMembers,
-	getGroup,
-	removeGroupMember,
-	updateGroup,
-} from "@/lib/api/clubs";
+import { Avatar, Button, ColorPicker, DEFAULT_PRESET_COLORS, Input, Modal, Select, TextArea } from "@/components";
+import { addGroupMember, deleteGroup, getClub, getClubMembers, getGroup, removeGroupMember, updateGroup } from "@/lib/api/clubs";
+import { ClubMember, Group, SkillLevel, UpdateGroupRequest } from "@/lib/models/Club";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-	AlertTriangle,
-	ArrowLeft,
-	Calendar,
-	Check,
-	Clock,
-	Edit,
-	Layers,
-	MapPin,
-	MessageSquare,
-	Plus,
-	Search,
-	Settings,
-	Shield,
-	Trash2,
-	UserMinus,
-	UserPlus,
-	Users,
-	X,
-} from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Layers, MapPin, MessageSquare, Plus, Save, Search, Settings, UserMinus, UserPlus, Users, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-// Predefined colors for groups
-const GROUP_COLORS = [
-	"#FF6B6B",
-	"#4ECDC4",
-	"#45B7D1",
-	"#96CEB4",
-	"#FFEAA7",
-	"#DDA0DD",
-	"#98D8C8",
-	"#F7DC6F",
-	"#BB8FCE",
-	"#85C1E9",
-	"#F1948A",
-	"#82E0AA",
-	"#F8C471",
-	"#AED6F1",
-	"#D7BDE2",
-];
+import { useState } from "react";
 
 interface Props {
 	groupId: string;
@@ -122,12 +69,8 @@ export default function GroupDetailClient({ groupId }: Props) {
 		return (
 			<div className="text-center py-20">
 				<Layers className="w-16 h-16 text-muted mx-auto mb-4" />
-				<h2 className="text-xl font-bold text-white mb-2">
-					Group not found
-				</h2>
-				<Link
-					href="/dashboard/clubs"
-					className="text-accent hover:underline">
+				<h2 className="text-xl font-bold text-white mb-2">Group not found</h2>
+				<Link href="/dashboard/clubs" className="text-accent hover:underline">
 					Back to clubs
 				</Link>
 			</div>
@@ -150,28 +93,18 @@ export default function GroupDetailClient({ groupId }: Props) {
 		<div className="space-y-6">
 			{/* Header */}
 			<div className="flex items-center gap-4">
-				<Link
-					href={`/dashboard/clubs/${group.clubId}`}
-					className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+				<Link href={`/dashboard/clubs/${group.clubId}`} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
 					<ArrowLeft size={20} />
 				</Link>
 				<div className="flex-1">
 					<div className="flex items-center gap-3">
-						<h1 className="text-2xl font-bold text-white">
-							{group.name}
-						</h1>
-						{group.skillLevel && (
-							<span className="px-2 py-0.5 rounded text-xs font-medium bg-white/10 text-muted">
-								{group.skillLevel}
-							</span>
-						)}
+						<h1 className="text-2xl font-bold text-white">{group.name}</h1>
+						{group.skillLevel && <span className="px-2 py-0.5 rounded text-xs font-medium bg-white/10 text-muted">{group.skillLevel}</span>}
 					</div>
 					<div className="flex items-center gap-2 text-sm text-muted">
 						<span>Group</span>
 						<span>•</span>
-						<Link
-							href={`/dashboard/clubs/${group.clubId}`}
-							className="hover:text-accent">
+						<Link href={`/dashboard/clubs/${group.clubId}`} className="hover:text-accent">
 							{club?.name || "Loading club..."}
 						</Link>
 					</div>
@@ -193,30 +126,18 @@ export default function GroupDetailClient({ groupId }: Props) {
 				{/* Info Row */}
 				<div className="p-6 flex items-center gap-6">
 					{/* Icon */}
-					<div
-						className="w-24 h-24 rounded-xl border-4 border-background-light overflow-hidden -mt-12 relative z-10 flex items-center justify-center shadow-lg"
-						style={{ backgroundColor: group.color || "#6B7280" }}>
-						<Layers className="text-white w-10 h-10" />
-					</div>
+					<Avatar name={group.name} size="lg" color={group.color} variant={"group"} />
 
 					{/* Details */}
 					<div className="flex-1 min-w-0">
-						<h2 className="text-xl font-bold text-white truncate">
-							{group.name}
-						</h2>
-						{group.description && (
-							<p className="text-sm text-muted truncate">
-								{group.description}
-							</p>
-						)}
+						<h2 className="text-xl font-bold text-white truncate">{group.name}</h2>
+						{group.description && <p className="text-sm text-muted truncate">{group.description}</p>}
 					</div>
 
 					{/* Quick Stats */}
 					<div className="flex gap-6">
 						<div className="text-center">
-							<div className="text-2xl font-bold text-white">
-								{group.members?.length || 0}
-							</div>
+							<div className="text-2xl font-bold text-white">{group.members?.length || 0}</div>
 							<div className="text-xs text-muted">Members</div>
 						</div>
 					</div>
@@ -230,20 +151,12 @@ export default function GroupDetailClient({ groupId }: Props) {
 								key={tab.id}
 								onClick={() => setActiveTab(tab.id)}
 								className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
-									activeTab === tab.id
-										? "text-accent"
-										: "text-muted hover:text-white"
+									activeTab === tab.id ? "text-accent" : "text-muted hover:text-white"
 								}`}>
 								<tab.icon size={16} />
 								{tab.label}
-								{tab.count !== undefined && (
-									<span className="px-1.5 py-0.5 rounded-full bg-white/10 text-xs">
-										{tab.count}
-									</span>
-								)}
-								{activeTab === tab.id && (
-									<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />
-								)}
+								{tab.count !== undefined && <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-xs">{tab.count}</span>}
+								{activeTab === tab.id && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
 							</button>
 						))}
 					</div>
@@ -254,16 +167,8 @@ export default function GroupDetailClient({ groupId }: Props) {
 			<div className="min-h-[400px]">
 				{activeTab === "events" && <EventsTab />}
 				{activeTab === "posts" && <PostsTab />}
-				{activeTab === "members" && (
-					<MembersTab
-						group={group}
-						clubMembers={clubMembers}
-						groupId={groupId}
-					/>
-				)}
-				{activeTab === "settings" && (
-					<SettingsTab group={group} clubId={group.clubId} />
-				)}
+				{activeTab === "members" && <MembersTab group={group} clubMembers={clubMembers} groupId={groupId} />}
+				{activeTab === "settings" && <SettingsTab group={group} clubId={group.clubId} />}
 			</div>
 		</div>
 	);
@@ -299,9 +204,7 @@ function EventsTab() {
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<h3 className="text-lg font-bold text-white">Group Events</h3>
-				<button
-					onClick={() => setShowCreateModal(true)}
-					className="btn bg-accent hover:bg-accent/90 text-white border-none gap-2">
+				<button onClick={() => setShowCreateModal(true)} className="btn bg-accent hover:bg-accent/90 text-white border-none gap-2">
 					<Plus size={16} />
 					Create Event
 				</button>
@@ -309,35 +212,19 @@ function EventsTab() {
 
 			{/* Events List */}
 			{events.length === 0 ? (
-				<EmptyState
-					icon={Calendar}
-					title="No events yet"
-					description="Create events for your group members"
-				/>
+				<EmptyState icon={Calendar} title="No events yet" description="Create events for your group members" />
 			) : (
 				<div className="space-y-3">
 					{events.map((event) => (
-						<div
-							key={event.id}
-							className="rounded-xl bg-white/5 border border-white/10 p-4 hover:border-accent/30 transition-colors">
+						<div key={event.id} className="rounded-xl bg-white/5 border border-white/10 p-4 hover:border-accent/30 transition-colors">
 							<div className="flex items-start justify-between gap-4">
 								<div className="flex-1 min-w-0">
-									<h4 className="font-bold text-white truncate">
-										{event.name}
-									</h4>
-									{event.description && (
-										<p className="text-sm text-muted line-clamp-2 mt-1">
-											{event.description}
-										</p>
-									)}
+									<h4 className="font-bold text-white truncate">{event.name}</h4>
+									{event.description && <p className="text-sm text-muted line-clamp-2 mt-1">{event.description}</p>}
 									<div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted">
 										<div className="flex items-center gap-1.5">
 											<Clock size={14} />
-											<span>
-												{formatDateTime(
-													event.startTime
-												)}
-											</span>
+											<span>{formatDateTime(event.startTime)}</span>
 										</div>
 										{event.location && (
 											<div className="flex items-center gap-1.5">
@@ -354,12 +241,7 @@ function EventsTab() {
 			)}
 
 			{/* Create Event Modal */}
-			{showCreateModal && (
-				<CreateGroupEventModal
-					onClose={() => setShowCreateModal(false)}
-					onSubmit={handleCreateEvent}
-				/>
-			)}
+			{showCreateModal && <CreateGroupEventModal onClose={() => setShowCreateModal(false)} onSubmit={handleCreateEvent} />}
 		</div>
 	);
 }
@@ -410,42 +292,27 @@ function PostsTab() {
 
 			{/* Posts Feed */}
 			{posts.length === 0 ? (
-				<EmptyState
-					icon={MessageSquare}
-					title="No posts yet"
-					description="Be the first to post in this group"
-				/>
+				<EmptyState icon={MessageSquare} title="No posts yet" description="Be the first to post in this group" />
 			) : (
 				<div className="space-y-4">
 					{posts.map((post) => (
-						<div
-							key={post.id}
-							className="rounded-2xl bg-white/5 border border-white/10 p-6">
+						<div key={post.id} className="rounded-2xl bg-white/5 border border-white/10 p-6">
 							<div className="flex items-center gap-3 mb-4">
 								<div className="w-10 h-10 rounded-full bg-background-light flex items-center justify-center text-sm font-bold text-muted">
 									{post.authorName[0]}
 								</div>
 								<div>
-									<div className="font-bold text-white">
-										{post.authorName}
-									</div>
+									<div className="font-bold text-white">{post.authorName}</div>
 									<div className="text-xs text-muted">
-										{new Date(
-											post.createdAt
-										).toLocaleDateString()}{" "}
-										at{" "}
-										{new Date(
-											post.createdAt
-										).toLocaleTimeString([], {
+										{new Date(post.createdAt).toLocaleDateString()} at{" "}
+										{new Date(post.createdAt).toLocaleTimeString([], {
 											hour: "2-digit",
 											minute: "2-digit",
 										})}
 									</div>
 								</div>
 							</div>
-							<p className="text-white whitespace-pre-wrap">
-								{post.content}
-							</p>
+							<p className="text-white whitespace-pre-wrap">{post.content}</p>
 						</div>
 					))}
 				</div>
@@ -455,15 +322,7 @@ function PostsTab() {
 }
 
 // Members Tab
-function MembersTab({
-	group,
-	clubMembers,
-	groupId,
-}: {
-	group: Group;
-	clubMembers: ClubMember[];
-	groupId: string;
-}) {
+function MembersTab({ group, clubMembers, groupId }: { group: Group; clubMembers: ClubMember[]; groupId: string }) {
 	const [showAddModal, setShowAddModal] = useState(false);
 	const queryClient = useQueryClient();
 
@@ -486,57 +345,34 @@ function MembersTab({
 		<div className="space-y-4">
 			{/* Header */}
 			<div className="flex items-center justify-between">
-				<h3 className="text-lg font-bold text-white">
-					Members ({group.members?.length || 0})
-				</h3>
-				<button
-					onClick={() => setShowAddModal(true)}
-					className="btn bg-accent hover:bg-accent/90 text-white border-none gap-2">
+				<h3 className="text-lg font-bold text-white">Members ({group.members?.length || 0})</h3>
+				<Button onClick={() => setShowAddModal(true)}>
 					<UserPlus size={16} />
 					Add Member
-				</button>
+				</Button>
 			</div>
 
 			{/* Members List */}
-			{(!group.members || group.members.length === 0) ? (
-				<EmptyState
-					icon={Users}
-					title="No members yet"
-					description="Add members to this group"
-				/>
+			{!group.members || group.members.length === 0 ? (
+				<EmptyState icon={Users} title="No members yet" description="Add members to this group" />
 			) : (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 					{group.members.map((member) => (
-						<div
-							key={member.id}
-							className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+						<div key={member.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
 							<div className="flex items-center gap-3">
 								<div className="w-10 h-10 rounded-full bg-background-light flex items-center justify-center text-sm font-bold text-muted">
-									{member.clubMember?.userProfile?.firstName?.[0] ||
-										"?"}
+									{member.clubMember?.userProfile?.name?.[0] || "?"}
 								</div>
 								<div>
 									<div className="font-bold text-white">
-										{member.clubMember?.userProfile
-											?.firstName}{" "}
-										{
-											member.clubMember?.userProfile
-												?.lastName
-										}
+										{member.clubMember?.userProfile?.name} {member.clubMember?.userProfile?.surname}
 									</div>
-									<div className="text-xs text-muted">
-										{member.role || "Member"}
-									</div>
+									<div className="text-xs text-muted">{member.role || "Member"}</div>
 								</div>
 							</div>
 							<button
 								onClick={() =>
-									confirm(
-										"Are you sure you want to remove this member?"
-									) &&
-									removeMemberMutation.mutate(
-										member.clubMember!.userId
-									)
+									confirm("Are you sure you want to remove this member?") && removeMemberMutation.mutate(member.clubMember!.userId)
 								}
 								className="p-2 rounded-lg hover:bg-red-500/20 text-muted hover:text-red-400 transition-colors">
 								<UserMinus size={16} />
@@ -547,17 +383,16 @@ function MembersTab({
 			)}
 
 			{/* Add Member Modal */}
-			{showAddModal && (
+
+			<Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add Group Member">
 				<AddGroupMemberModal
 					clubMembers={clubMembers}
-					currentMemberIds={
-						group.members?.map((m) => m.clubMemberId) || []
-					}
+					currentMemberIds={group.members?.map((m) => m.clubMemberId) || []}
 					onClose={() => setShowAddModal(false)}
 					onAdd={(userId) => addMemberMutation.mutate(userId)}
 					isLoading={addMemberMutation.isPending}
 				/>
-			)}
+			</Modal>
 		</div>
 	);
 }
@@ -568,8 +403,7 @@ function SettingsTab({ group, clubId }: { group: Group; clubId: string }) {
 	const router = useRouter();
 
 	const updateMutation = useMutation({
-		mutationFn: (data: UpdateGroupRequest) =>
-			updateGroup(group.id, data),
+		mutationFn: (data: UpdateGroupRequest) => updateGroup(group.id, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["group", group.id] });
 		},
@@ -590,55 +424,30 @@ function SettingsTab({ group, clubId }: { group: Group; clubId: string }) {
 			{/* General Settings */}
 			<div className="space-y-6">
 				<h3 className="text-lg font-bold text-white">Group Settings</h3>
-				<GroupSettingsForm
-					group={group}
-					onSubmit={(data) => updateMutation.mutate(data)}
-					isLoading={updateMutation.isPending}
-				/>
+				<GroupSettingsForm group={group} onSubmit={(data) => updateMutation.mutate(data)} isLoading={updateMutation.isPending} />
 			</div>
 
 			{/* Danger Zone */}
 			<div className="rounded-2xl bg-red-500/10 border border-red-500/20 p-6">
-				<h3 className="text-lg font-bold text-red-400 mb-2">
-					Danger Zone
-				</h3>
-				<p className="text-muted text-sm mb-4">
-					Once you delete a group, there is no going back. Please be
-					certain.
-				</p>
-				<button
+				<h3 className="text-lg font-bold text-red-400 mb-2">Danger Zone</h3>
+				<p className="text-muted text-sm mb-4">Once you delete a group, there is no going back. Please be certain.</p>
+				<Button
+					variant="destructive"
 					onClick={() => {
-						if (
-							confirm(
-								"Are you sure you want to delete this group? This action cannot be undone."
-							)
-						) {
+						if (confirm("Are you sure you want to delete this group? This action cannot be undone.")) {
 							deleteMutation.mutate();
 						}
 					}}
-					disabled={deleteMutation.isPending}
-					className="btn bg-red-500/20 hover:bg-red-500/30 text-red-400 border-red-500/30">
-					{deleteMutation.isPending ? (
-						<span className="loading loading-spinner loading-sm" />
-					) : (
-						"Delete Group"
-					)}
-				</button>
+					disabled={deleteMutation.isPending}>
+					{deleteMutation.isPending ? <span className="loading loading-spinner loading-sm" /> : "Delete Group"}
+				</Button>
 			</div>
 		</div>
 	);
 }
 
 // Helper Components
-function EmptyState({
-	icon: Icon,
-	title,
-	description,
-}: {
-	icon: React.ElementType;
-	title: string;
-	description: string;
-}) {
+function EmptyState({ icon: Icon, title, description }: { icon: React.ElementType; title: string; description: string }) {
 	return (
 		<div className="text-center py-12 rounded-2xl bg-white/5 border border-white/10">
 			<Icon className="w-12 h-12 text-muted mx-auto mb-4" />
@@ -648,13 +457,7 @@ function EmptyState({
 	);
 }
 
-function CreateGroupEventModal({
-	onClose,
-	onSubmit,
-}: {
-	onClose: () => void;
-	onSubmit: (event: Omit<GroupEvent, "id" | "createdAt">) => void;
-}) {
+function CreateGroupEventModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (event: Omit<GroupEvent, "id" | "createdAt">) => void }) {
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [startTime, setStartTime] = useState("");
@@ -676,24 +479,17 @@ function CreateGroupEventModal({
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-			<div
-				className="absolute inset-0 bg-black/60 backdrop-blur-xs"
-				onClick={onClose}
-			/>
+			<div className="absolute inset-0 bg-black/60 backdrop-blur-xs" onClick={onClose} />
 			<div className="relative w-full max-w-md rounded-2xl bg-background-light border border-white/10 shadow-2xl">
 				<div className="flex items-center justify-between p-6 border-b border-white/10">
 					<h3 className="text-lg font-bold text-white">Create Event</h3>
-					<button
-						onClick={onClose}
-						className="p-2 rounded-lg hover:bg-white/10 transition-colors">
+					<button onClick={onClose} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
 						<X size={18} className="text-muted" />
 					</button>
 				</div>
 				<form onSubmit={handleSubmit} className="p-6 space-y-4">
 					<div>
-						<label className="block text-sm font-medium text-muted mb-2">
-							Event Name *
-						</label>
+						<label className="block text-sm font-medium text-muted mb-2">Event Name *</label>
 						<input
 							type="text"
 							value={name}
@@ -703,9 +499,7 @@ function CreateGroupEventModal({
 						/>
 					</div>
 					<div>
-						<label className="block text-sm font-medium text-muted mb-2">
-							Description
-						</label>
+						<label className="block text-sm font-medium text-muted mb-2">Description</label>
 						<textarea
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
@@ -715,9 +509,7 @@ function CreateGroupEventModal({
 					</div>
 					<div className="grid grid-cols-2 gap-4">
 						<div>
-							<label className="block text-sm font-medium text-muted mb-2">
-								Start Time *
-							</label>
+							<label className="block text-sm font-medium text-muted mb-2">Start Time *</label>
 							<input
 								type="datetime-local"
 								value={startTime}
@@ -727,9 +519,7 @@ function CreateGroupEventModal({
 							/>
 						</div>
 						<div>
-							<label className="block text-sm font-medium text-muted mb-2">
-								End Time *
-							</label>
+							<label className="block text-sm font-medium text-muted mb-2">End Time *</label>
 							<input
 								type="datetime-local"
 								value={endTime}
@@ -740,9 +530,7 @@ function CreateGroupEventModal({
 						</div>
 					</div>
 					<div>
-						<label className="block text-sm font-medium text-muted mb-2">
-							Location
-						</label>
+						<label className="block text-sm font-medium text-muted mb-2">Location</label>
 						<input
 							type="text"
 							value={location}
@@ -751,15 +539,10 @@ function CreateGroupEventModal({
 						/>
 					</div>
 					<div className="flex gap-3 pt-4">
-						<button
-							type="button"
-							onClick={onClose}
-							className="flex-1 btn bg-white/5 hover:bg-white/10 border-white/10 text-white">
+						<button type="button" onClick={onClose} className="flex-1 btn bg-white/5 hover:bg-white/10 border-white/10 text-white">
 							Cancel
 						</button>
-						<button
-							type="submit"
-							className="flex-1 btn bg-accent hover:bg-accent/90 text-white border-none">
+						<button type="submit" className="flex-1 btn bg-accent hover:bg-accent/90 text-white border-none">
 							Create Event
 						</button>
 					</div>
@@ -787,97 +570,64 @@ function AddGroupMemberModal({
 	const filteredMembers = clubMembers
 		.filter((member) => !currentMemberIds.includes(member.id))
 		.filter((member) => {
-			const name = `${member.userProfile?.firstName || ""} ${
-				member.userProfile?.lastName || ""
-			}`.toLowerCase();
+			const name = `${member.userProfile?.name || ""} ${member.userProfile?.surname || ""}`.toLowerCase();
 			return name.includes(searchQuery.toLowerCase());
 		});
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-			<div
-				className="absolute inset-0 bg-black/60 backdrop-blur-xs"
-				onClick={onClose}
-			/>
-			<div className="relative w-full max-w-lg rounded-2xl bg-background-light border border-white/10 shadow-2xl max-h-[80vh] flex flex-col">
-				<div className="flex items-center justify-between p-6 border-b border-white/10">
-					<h3 className="text-lg font-bold text-white">Add Member</h3>
-					<button
-						onClick={onClose}
-						className="p-2 rounded-lg hover:bg-white/10 transition-colors">
-						<X size={18} className="text-muted" />
-					</button>
+		<div className="flex flex-col gap-4">
+			<div>
+				<div className="relative">
+					<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
+					<input
+						type="text"
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+						placeholder="Search club members..."
+						className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
+					/>
 				</div>
-				<div className="p-4 border-b border-white/10">
-					<div className="relative">
-						<Search
-							className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-							size={18}
-						/>
-						<input
-							type="text"
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							placeholder="Search club members..."
-							className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
-						/>
+			</div>
+			<div className="flex-1 overflow-y-auto space-y-2">
+				{filteredMembers.length === 0 ? (
+					<div className="text-center py-8 text-muted">
+						<p>No available members found</p>
 					</div>
-				</div>
-				<div className="flex-1 overflow-y-auto p-4 space-y-2">
-					{filteredMembers.length === 0 ? (
-						<div className="text-center py-8 text-muted">
-							<p>No available members found</p>
-						</div>
-					) : (
-						filteredMembers.map((member) => (
-							<div
-								key={member.id}
-								className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors">
-								<div className="flex items-center gap-3">
-									<div className="w-10 h-10 rounded-full bg-background-dark flex items-center justify-center text-sm font-bold text-muted">
-										{member.userProfile?.firstName?.[0] ||
-											"?"}
-									</div>
-									<div>
-										<div className="text-sm font-medium text-white">
-											{member.userProfile?.firstName}{" "}
-											{member.userProfile?.lastName}
-										</div>
-										<div className="text-xs text-muted">
-											{member.role}
-										</div>
-									</div>
+				) : (
+					filteredMembers.map((member) => (
+						<div
+							key={member.id}
+							className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors">
+							<div className="flex items-center gap-3">
+								<div className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-sm font-bold text-muted">
+									{member.userProfile?.name?.[0] || "?"}
 								</div>
-								<button
-									onClick={() => onAdd(member.userId)}
-									disabled={isLoading}
-									className="p-2 rounded-lg bg-accent/20 hover:bg-accent/30 text-accent transition-colors">
-									<Plus size={18} />
-								</button>
+								<div>
+									<div className="text-sm font-medium text-white">
+										{member.userProfile?.name} {member.userProfile?.surname}
+									</div>
+									<div className="text-xs text-muted">{member.role}</div>
+								</div>
 							</div>
-						))
-					)}
-				</div>
+							<button
+								onClick={() => onAdd(member.userId)}
+								disabled={isLoading}
+								className="p-2 rounded-lg bg-accent/20 hover:bg-accent/30 text-accent transition-colors">
+								<Plus size={18} />
+							</button>
+						</div>
+					))
+				)}
 			</div>
 		</div>
 	);
 }
 
-function GroupSettingsForm({
-	group,
-	onSubmit,
-	isLoading,
-}: {
-	group: Group;
-	onSubmit: (data: UpdateGroupRequest) => void;
-	isLoading: boolean;
-}) {
+function GroupSettingsForm({ group, onSubmit, isLoading }: { group: Group; onSubmit: (data: UpdateGroupRequest) => void; isLoading: boolean }) {
 	const [name, setName] = useState(group.name);
 	const [description, setDescription] = useState(group.description || "");
-	const [color, setColor] = useState(group.color || GROUP_COLORS[0]);
-	const [skillLevel, setSkillLevel] = useState<string>(
-		group.skillLevel || ""
-	);
+	const [color, setColor] = useState(group.color);
+	const [skillLevel, setSkillLevel] = useState<string>(group.skillLevel || "");
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -892,90 +642,32 @@ function GroupSettingsForm({
 	};
 
 	return (
-		<form
-			onSubmit={handleSubmit}
-			className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-6">
+		<form onSubmit={handleSubmit} className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-6">
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<div className="space-y-4">
-					<div>
-						<label className="block text-sm font-medium text-muted mb-2">
-							Group Name
-						</label>
-						<input
-							type="text"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-hidden focus:border-accent"
-						/>
-					</div>
-					<div>
-						<label className="block text-sm font-medium text-muted mb-2">
-							Description
-						</label>
-						<textarea
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							rows={3}
-							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-hidden focus:border-accent resize-none"
-						/>
-					</div>
+					<Input type="text" value={name} label="Group Name" onChange={(e) => setName(e.target.value)} />
+					<TextArea
+						label="Description"
+						value={description}
+						onChange={(e) => setDescription(e.target.value)}
+						rows={3}
+						className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-hidden focus:border-accent resize-none"
+					/>
 				</div>
 				<div className="space-y-4">
-					<div>
-						<label className="block text-sm font-medium text-muted mb-2">
-							Skill Level
-						</label>
-						<select
-							value={skillLevel}
-							onChange={(e) => setSkillLevel(e.target.value)}
-							className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-hidden focus:border-accent">
-							<option value="">Select skill level</option>
-							{Object.values(SkillLevel).map((level) => (
-								<option key={level} value={level}>
-									{level}
-								</option>
-							))}
-						</select>
-					</div>
-					<div>
-						<label className="block text-sm font-medium text-muted mb-2">
-							Color Theme
-						</label>
-						<div className="flex flex-wrap gap-2">
-							{GROUP_COLORS.map((c) => (
-								<button
-									key={c}
-									type="button"
-									onClick={() => setColor(c)}
-									className={`w-8 h-8 rounded-lg transition-all ${
-										color === c
-											? "ring-2 ring-white ring-offset-2 ring-offset-background-light scale-110"
-											: "hover:scale-105"
-									}`}
-									style={{ backgroundColor: c }}>
-									{color === c && (
-										<Check
-											size={16}
-											className="text-white mx-auto"
-										/>
-									)}
-								</button>
-							))}
-						</div>
-					</div>
+					<Select
+						label="Skill Level"
+						value={skillLevel}
+						options={Object.values(SkillLevel).map((level) => ({ label: level, value: level }))}
+						onChange={(value) => setSkillLevel(value!)}></Select>
+
+					<ColorPicker label="Color Theme" value={color} onChange={setColor} presetColors={DEFAULT_PRESET_COLORS} />
 				</div>
 			</div>
 			<div className="flex justify-end pt-4 border-t border-white/10">
-				<button
-					type="submit"
-					disabled={isLoading}
-					className="btn bg-accent hover:bg-accent/90 text-white border-none">
-					{isLoading ? (
-						<span className="loading loading-spinner loading-sm" />
-					) : (
-						"Save Changes"
-					)}
-				</button>
+				<Button type="submit" disabled={isLoading} leftIcon={<Save size={16} />}>
+					Save changes
+				</Button>
 			</div>
 		</form>
 	);

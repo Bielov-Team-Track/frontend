@@ -4,16 +4,9 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import {
-	updateCurrentProfile,
-	createOrUpdatePlayerProfile,
-	createOrUpdateCoachProfile
-} from "@/lib/api/user";
+import { createOrUpdateCoachProfile, createOrUpdatePlayerProfile, updateCurrentProfile } from "@/lib/api/user";
 
-import {
-	CreateOrUpdatePlayerProfileDto,
-	CreateOrUpdateCoachProfileDto,
-} from "@/lib/models/Profile";
+import { CreateOrUpdateCoachProfileDto, CreateOrUpdatePlayerProfileDto } from "@/lib/models/Profile";
 
 import BasicInfoStep from "./steps/BasicInfoStep";
 
@@ -23,10 +16,9 @@ import CoachInfoStep from "./steps/CoachInfoStep";
 
 import HistoryStep from "./steps/HistoryStep";
 
-import StepIndicator from "./steps/StepIndicator";
-
 import { Button } from "@/components/ui";
 
+import Steps from "@/components/ui/steps";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 
 type CompleteProfileFormProps = {
@@ -43,9 +35,7 @@ const STEPS = [
 	{ id: 4, label: "History", formId: "history-form" },
 ];
 
-const CompleteProfileForm = ({
-	onProfileComplete,
-}: CompleteProfileFormProps) => {
+const CompleteProfileForm = ({ onProfileComplete }: CompleteProfileFormProps) => {
 	const router = useRouter();
 
 	const [currentStep, setCurrentStep] = useState(1);
@@ -66,15 +56,9 @@ const CompleteProfileForm = ({
 
 	const [coachInfo, setCoachInfo] = useState<CreateOrUpdateCoachProfileDto | null>(null);
 
-	const [historyInfo, setHistoryInfo] = useState<{ bio: string } | null>(
-		null
-	);
+	const [historyInfo, setHistoryInfo] = useState<{ bio: string } | null>(null);
 
-	const handleBasicInfoNext = (data: {
-		name: string;
-		surname: string;
-		imageUrl?: string;
-	}) => {
+	const handleBasicInfoNext = (data: { name: string; surname: string; imageUrl?: string }) => {
 		setBasicInfo(data);
 
 		setCurrentStep(2);
@@ -131,8 +115,7 @@ const CompleteProfileForm = ({
 		} catch (error: any) {
 			console.error("Profile update error:", error);
 
-			const message =
-				error.response?.data?.message || "Failed to update profile";
+			const message = error.response?.data?.message || "Failed to update profile";
 
 			setError(message);
 		} finally {
@@ -172,7 +155,7 @@ const CompleteProfileForm = ({
 
 	return (
 		<div className="flex flex-col gap-6 w-full">
-			<StepIndicator steps={STEPS} currentStep={currentStep} />
+			<Steps steps={STEPS} currentStep={currentStep} className="max-w-96 m-auto" />
 
 			{error && (
 				<div className="text-error bg-error/10 p-3 rounded-lg border border-error/20 text-center">
@@ -180,50 +163,20 @@ const CompleteProfileForm = ({
 				</div>
 			)}
 
-			{currentStep === 1 && (
-				<BasicInfoStep
-					defaultValues={basicInfo || undefined}
-					onNext={handleBasicInfoNext}
-					formId={STEPS[0].formId}
-				/>
-			)}
+			{currentStep === 1 && <BasicInfoStep defaultValues={basicInfo || undefined} onNext={handleBasicInfoNext} formId={STEPS[0].formId} />}
 
-			{currentStep === 2 && (
-				<PlayerInfoStep
-					defaultValues={playerInfo || undefined}
-					onNext={handlePlayerInfoNext}
-					formId={STEPS[1].formId}
-				/>
-			)}
+			{currentStep === 2 && <PlayerInfoStep defaultValues={playerInfo || undefined} onNext={handlePlayerInfoNext} formId={STEPS[1].formId} />}
 
-			{currentStep === 3 && (
-				<CoachInfoStep
-					defaultValues={coachInfo || undefined}
-					onNext={handleCoachInfoNext}
-					formId={STEPS[2].formId}
-				/>
-			)}
+			{currentStep === 3 && <CoachInfoStep defaultValues={coachInfo || undefined} onNext={handleCoachInfoNext} formId={STEPS[2].formId} />}
 
-			{currentStep === 4 && (
-				<HistoryStep
-					defaultValues={historyInfo || undefined}
-					onNext={handleHistoryNext}
-					formId={STEPS[3].formId}
-				/>
-			)}
+			{currentStep === 4 && <HistoryStep defaultValues={historyInfo || undefined} onNext={handleHistoryNext} formId={STEPS[3].formId} />}
 
 			{/* Navigation Buttons */}
 
 			<div className="flex justify-between pt-4 items-center mt-2 border-t border-white/5">
 				<div>
 					{!isFirstStep && (
-						<Button
-							variant="ghost"
-							onClick={handleBack}
-							type="button"
-							className="gap-2"
-							disabled={isLoading}
-							leftIcon={<ArrowLeft size={20} />}>
+						<Button variant="ghost" onClick={handleBack} type="button" className="gap-2" disabled={isLoading} leftIcon={<ArrowLeft size={20} />}>
 							Back
 						</Button>
 					)}
@@ -231,13 +184,7 @@ const CompleteProfileForm = ({
 
 				<div className="flex gap-2">
 					{isOptionalStep && (
-						<Button
-							variant="ghost"
-							onClick={handleSkip}
-							type="button"
-							color={"neutral"}
-							className="hover:text-white"
-							disabled={isLoading}>
+						<Button variant="ghost" onClick={handleSkip} type="button" color={"neutral"} className="hover:text-white" disabled={isLoading}>
 							Skip
 						</Button>
 					)}
@@ -248,13 +195,8 @@ const CompleteProfileForm = ({
 						disabled={isLoading}
 						loading={isLoading}
 						className="gap-2"
-						rightIcon={
-							isLastStep ? (
-								<Check size={20} />
-							) : (
-								<ArrowRight size={20} />
-							)
-						}>
+						variant={isLastStep ? "default" : "outline"}
+						rightIcon={isLastStep ? <Check size={20} /> : <ArrowRight size={20} />}>
 						{isLastStep ? <>Finish Setup</> : <>Next Step</>}
 					</Button>
 				</div>

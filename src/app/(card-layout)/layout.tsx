@@ -7,7 +7,7 @@ import "../globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-	title: "Volleyer",
+	title: "Spike",
 	description: "",
 };
 
@@ -28,7 +28,7 @@ export default async function RootLayout({
 					<AuthProvider>
 						<QueryProvider>
 							<div className="min-h-screen flex items-center justify-center p-4">
-								<div className="w-fit max-w-2xl relative bg-base-100 p-6 sm:p-8 rounded-lg shadow-lg flex flex-col gap-6">{children}</div>
+								<div className="w-full max-w-2xl relative bg-neutral-900 p-6 sm:p-8 rounded-lg shadow-lg flex flex-col gap-6">{children}</div>
 							</div>
 						</QueryProvider>
 					</AuthProvider>

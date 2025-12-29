@@ -1,10 +1,10 @@
 import { ReactionPicker } from "@/components";
-import { useAuth } from "@/providers";
-import { Message } from "@/lib/models/Messages";
 import { addReaction } from "@/lib/api/messages";
+import { Message } from "@/lib/models/Messages";
 import { stringToColor } from "@/lib/utils/color";
 import { getFormattedTime } from "@/lib/utils/date";
 import getUknownUser from "@/lib/utils/user";
+import { useAuth } from "@/providers";
 import { useQueryClient } from "@tanstack/react-query";
 import { clsx } from "clsx";
 import { Forward, Reply, SmilePlus } from "lucide-react";
@@ -144,7 +144,7 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 
 						{/* Reactions display */}
 						{message.reactions && message.reactions.length > 0 && (
-							<div className={clsx("flex gap-1 mt-1 flex-wrap", currentUserMessage ? "justify-end" : "justify-start")}>
+							<div className={clsx("flex gap-2 mt-1 flex-wrap", currentUserMessage ? "justify-end" : "justify-start")}>
 								{message.reactions.map((reaction) => (
 									<ReactionBadge
 										key={reaction.emoji}

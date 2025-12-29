@@ -1,9 +1,9 @@
+import { Map } from "@/components";
+import AddressAutocomplete from "@/components/ui/address-autocomplete";
+import { APIProvider } from "@vis.gl/react-google-maps";
+import { MapPin } from "lucide-react";
 import { useState } from "react";
 import { Controller } from "react-hook-form";
-import { MapPin } from "lucide-react";
-import { APIProvider } from "@vis.gl/react-google-maps";
-import AddressAutocomplete from "@/components/ui/address-autocomplete";
-import { Map } from "@/components";
 import { useEventFormContext } from "../context/EventFormContext";
 import { parseAddressComponents } from "../utils/addressUtils";
 
@@ -82,6 +82,7 @@ export function LocationStep() {
 					</div>
 					<div className="rounded-xl overflow-hidden border border-white/10">
 						<Map
+							readonly={false}
 							defaultAddress={values.location?.address}
 							onAddressSelected={handleAddressSelected}
 							onPositionChanged={handleMapPositionChanged}

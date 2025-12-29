@@ -51,7 +51,7 @@ export default function EditTeamMemberModal({ isOpen, member, onClose, onSave, i
 			<div className="space-y-6">
 				{/* Player Info Header */}
 				<div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
-					<div className="w-12 h-12 rounded-full bg-background-dark flex items-center justify-center text-lg font-bold text-muted">
+					<div className="w-12 h-12 rounded-full bg-background flex items-center justify-center text-lg font-bold text-muted">
 						{member.userProfile?.name?.[0] || "?"}
 					</div>
 					<div>

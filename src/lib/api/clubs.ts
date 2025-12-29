@@ -5,7 +5,6 @@ import {
 	CreateFormTemplateRequest,
 	CreateInvitationRequest,
 	CreateRegistrationRequest,
-	CursorPagedResult,
 	FormFieldAnswerDto,
 	FormTemplate,
 	InvitationPreview,
@@ -16,7 +15,6 @@ import {
 	UpdateFormTemplateRequest,
 	UpdateRegistrationStatusRequest,
 } from "@/lib/models/Club";
-import client from "./client";
 import { CLUBS_API_V1 } from "../constants";
 import {
 	Club,
@@ -33,6 +31,8 @@ import {
 	UpdateTeamMemberRequest,
 	UpdateTeamRequest,
 } from "../models/Club";
+import { CursorPagedResult } from "../models/Pagination";
+import client from "./client";
 
 export async function getClubs(): Promise<Club[]> {
 	const endpoint = "/clubs";

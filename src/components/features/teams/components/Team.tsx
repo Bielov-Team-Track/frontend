@@ -1,26 +1,19 @@
 "use client";
 
 import { Position as PositionComponent } from "@/components/features/teams/";
-import { Button, Input, Loader } from "@/components/ui";
+import { Loader } from "@/components/ui";
 import { useRealtimePositions } from "@/hooks/useRealtimePositions";
+import { addPosition } from "@/lib/api/positions";
+import { EVENTS_API_URL } from "@/lib/constants";
 import { Position } from "@/lib/models/Position";
 import { Team as TeamModel } from "@/lib/models/Team";
 import { UserProfile } from "@/lib/models/User";
 import { usePositionStore } from "@/lib/realtime/positionStore";
 import signalr from "@/lib/realtime/signalrClient";
-import { addPosition } from "@/lib/api/positions";
+import { Check, Crown, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-    Plus,
-    X,
-    User,
-    Crown,
-    Check
-} from "lucide-react";
 import TeamMenu from "./TeamMenu";
-import { EVENTS_API_URL } from "@/lib/constants";
-import { Avatar } from "@/components/ui";
 
 type TeamProps = {
 	open?: boolean;
@@ -29,21 +22,14 @@ type TeamProps = {
 	team: TeamModel;
 };
 
-function Team({
-	team: defaultTeam,
-	open = false,
-	editable = false,
-	audit = false,
-}: TeamProps) {
+function Team({ team: defaultTeam, open = false, editable = false, audit = false }: TeamProps) {
 	const [team, setTeam] = useState(defaultTeam);
 	const [positions, setLocalPositions] = useState(team.positions);
 	const captain = team.captain;
 	useRealtimePositions();
 
 	const filteredPositions = useMemo(() => {
-		return positions?.filter(
-			(p) => p.eventParticipant?.userProfile || open || editable
-		);
+		return positions?.filter((p) => p.eventParticipant?.userProfile || open || editable);
 	}, [positions, open, editable]);
 
 	const positionStore = usePositionStore((s) => s.positions);
@@ -74,10 +60,7 @@ function Team({
 			const leaveGroup = async () => {
 				try {
 					if (connection && connectionStatus === "connected") {
-						await connection.invoke(
-							"LeaveEventGroup",
-							team.event.id
-						);
+						await connection.invoke("LeaveEventGroup", team.event.id);
 					}
 				} catch (error) {
 					console.error("Failed to leave event group:", error);
@@ -95,9 +78,7 @@ function Team({
 	const updatePositions = useCallback(() => {
 		setLocalPositions((prev) => {
 			if (!prev) return prev;
-			return prev.map((p) =>
-				positionStore[p.id] ? { ...p, ...positionStore[p.id] } : p
-			);
+			return prev.map((p) => (positionStore[p.id] ? { ...p, ...positionStore[p.id] } : p));
 		});
 	}, [positionStore]);
 
@@ -116,13 +97,11 @@ function Team({
 		setTeam((prevTeam) => ({ ...prevTeam, captain: undefined }));
 	};
 
-	const isTeamFull = !positions?.find(
-		(p) => !p.eventParticipant?.userProfile
-	);
+	const isTeamFull = !positions?.find((p) => !p.eventParticipant?.userProfile);
 
 	return (
 		<div className="bg-[#1E1E1E] border border-white/5 relative max-w-sm flex flex-col rounded-2xl w-full sm:w-80 shadow-lg hover:border-white/10 transition-all overflow-hidden group">
-            {/* Team Header */}
+			{/* Team Header */}
 			<div className="p-4 border-b border-white/5 bg-white/2">
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-between w-full">
@@ -130,88 +109,76 @@ function Team({
 							<span className="text-lg font-bold text-white truncate max-w-[150px]" title={team.name}>
 								{team.name}
 							</span>
-							
+
 							<div className="flex items-center gap-2">
-                                {/* Captain Badge */}
+								{/* Captain Badge */}
 								{captain && (
-                                    <div className="tooltip tooltip-bottom" data-tip="Captain">
-                                        <Link
-                                            href={"/profiles/" + captain.userId}
-                                            className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-accent/10 border border-accent/20 hover:bg-accent/20 transition-colors"
-                                        >
-                                            <Crown size={12} className="text-accent" />
-                                            <span className="text-xs font-bold text-accent truncate max-w-[80px]">
-                                                {captain.name}
-                                            </span>
-                                        </Link>
-                                    </div>
+									<div className="tooltip tooltip-bottom" data-tip="Captain">
+										<Link
+											href={"/profiles/" + captain.userId}
+											className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-accent/10 border border-accent/20 hover:bg-accent/20 transition-colors">
+											<Crown size={12} className="text-accent" />
+											<span className="text-xs font-bold text-accent truncate max-w-[80px]">{captain.name}</span>
+										</Link>
+									</div>
 								)}
-                                
-                                {/* Status Badge */}
-								{open && !captain && positions && positions.length > 0 && (
-                                    isTeamFull ? (
-                                        <span className="px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20 text-[10px] font-bold uppercase">
-                                            Full
-                                        </span>
-                                    ) : (
-                                        <span className="px-2 py-0.5 rounded-full bg-white/5 text-muted border border-white/10 text-[10px] font-bold uppercase whitespace-nowrap">
-                                            Open
-                                        </span>
-                                    )
-                                )}
-                                
-                                {/* Menu */}
-								<TeamMenu
-									team={team}
-									onCaptainAssigned={handleCaptainAssigned}
-									onCaptainRemoved={handleCaptainRemoved}
-								/>
+
+								{/* Status Badge */}
+								{open &&
+									!captain &&
+									positions &&
+									positions.length > 0 &&
+									(isTeamFull ? (
+										<span className="px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20 text-[10px] font-bold uppercase">
+											Full
+										</span>
+									) : (
+										<span className="px-2 py-0.5 rounded-full bg-white/5 text-muted border border-white/10 text-[10px] font-bold uppercase whitespace-nowrap">
+											Open
+										</span>
+									))}
+
+								{/* Menu */}
+								<TeamMenu team={team} onCaptainAssigned={handleCaptainAssigned} onCaptainRemoved={handleCaptainRemoved} />
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-            
-            {/* Positions List */}
+
+			{/* Positions List */}
 			<div className="p-2 space-y-1">
-                {filteredPositions && filteredPositions.length !== 0 ? (
-                    positions?.map((p) => (
-                        <div key={p.id + p.eventParticipant?.userProfile?.userId} className="transform transition-all duration-200">
-                            <PositionComponent
-                                open={open}
-                                audit={audit}
-                                editable={editable}
-                                payToJoin={team.event.budget?.payToJoin}
-                                team={team}
-                                position={p}
-                                onPositionRemoved={(id) => {
-                                    setLocalPositions((prev) =>
-                                        prev ? prev.filter((pos) => pos.id !== id) : prev
-                                    );
-                                }}
-                            />
-                        </div>
-                    ))
-                ) : (
-                    <div className="py-8 text-center text-muted/50 text-sm italic">
-                        No players assigned yet
-                    </div>
-                )}
-                
-                {editable && (
-                    <div className="pt-2 px-2 pb-2">
-                        <AddNewPosition
-                            teamId={team.id!}
-                            onPositionAdded={(p) => {
-                                upsertPosition(p);
-                                setLocalPositions((prev) => [
-                                    ...(prev || []),
-                                    p,
-                                ]);
-                            }}
-                        />
-                    </div>
-                )}
+				{filteredPositions && filteredPositions.length !== 0 ? (
+					positions?.map((p) => (
+						<div key={p.id + p.eventParticipant?.userProfile?.userId} className="transform transition-all duration-200">
+							<PositionComponent
+								open={open}
+								audit={audit}
+								editable={editable}
+								payToJoin={team.event.budget?.payToJoin}
+								team={team}
+								position={p}
+								onPositionRemoved={(id) => {
+									setLocalPositions((prev) => (prev ? prev.filter((pos) => pos.id !== id) : prev));
+								}}
+							/>
+						</div>
+					))
+				) : (
+					<div className="py-8 text-center text-muted/50 text-sm italic">No players assigned yet</div>
+				)}
+
+				{editable && (
+					<div className="pt-2 px-2 pb-2">
+						<AddNewPosition
+							teamId={team.id!}
+							onPositionAdded={(p) => {
+								upsertPosition(p);
+								setLocalPositions((prev) => [...(prev || []), p]);
+							}}
+						/>
+					</div>
+				)}
 			</div>
 		</div>
 	);
@@ -249,7 +216,7 @@ const AddNewPosition = ({ teamId, onPositionAdded }: AddNewPositionProps) => {
 	};
 
 	return addingNewPosition ? (
-		<div className="flex flex-col relative mt-2 bg-background-dark p-2 rounded-xl border border-white/10 animate-in fade-in slide-in-from-top-2">
+		<div className="flex flex-col relative mt-2 bg-background p-2 rounded-xl border border-white/10 animate-in fade-in slide-in-from-top-2">
 			{isLoading && <Loader className="inset-0 absolute bg-black/40 rounded-xl" />}
 			<div className="flex items-center gap-2 w-full">
 				<input
@@ -268,8 +235,7 @@ const AddNewPosition = ({ teamId, onPositionAdded }: AddNewPositionProps) => {
 				<button
 					className="p-2 bg-accent/10 text-accent hover:bg-accent hover:text-white rounded-lg transition-colors border border-accent/20"
 					onClick={() => handleAddNewPosition()}
-                    title="Add"
-                >
+					title="Add">
 					<Check size={16} />
 				</button>
 				<button
@@ -279,8 +245,7 @@ const AddNewPosition = ({ teamId, onPositionAdded }: AddNewPositionProps) => {
 						setNewPositionName("");
 						setError(null);
 					}}
-                    title="Cancel"
-                >
+					title="Cancel">
 					<X size={16} />
 				</button>
 			</div>
@@ -288,9 +253,8 @@ const AddNewPosition = ({ teamId, onPositionAdded }: AddNewPositionProps) => {
 		</div>
 	) : (
 		<button
-            className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-dashed border-white/10 text-xs font-medium text-muted hover:text-white hover:border-white/20 hover:bg-white/5 transition-all"
-			onClick={() => setAddingNewPosition(true)}
-        >
+			className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-dashed border-white/10 text-xs font-medium text-muted hover:text-white hover:border-white/20 hover:bg-white/5 transition-all"
+			onClick={() => setAddingNewPosition(true)}>
 			<Plus size={14} /> Add Position
 		</button>
 	);

@@ -2,79 +2,77 @@
 
 import { cn } from "@/lib/utils";
 import { AlertCircle } from "lucide-react";
-import React, { forwardRef } from "react";
+import { useId } from "react";
+import { Checkbox as CheckboxPrimitive } from "../checkbox";
+import { Label } from "../label";
 
-type CheckboxSize = "xs" | "sm" | "md" | "lg" | "xl";
-type CheckboxColor = "primary" | "secondary" | "accent" | "neutral" | "success" | "warning" | "error";
-
-export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "type"> {
+export interface CheckboxProps {
 	label?: string;
 	error?: string;
 	helperText?: string;
-	checkboxSize?: CheckboxSize;
-	color?: CheckboxColor;
-	fullWidth?: boolean;
+	checked?: boolean;
+	onChange?: (checked: boolean) => void;
+	disabled?: boolean;
+	required?: boolean;
+	className?: string;
+	id?: string;
+	name?: string;
 }
 
-const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-	({ label, error, helperText, checkboxSize = "md", color = "neutral", fullWidth = false, className = "", disabled, checked, ...props }, ref) => {
-		// DaisyUI size classes
-		const sizeClass = {
-			xs: "checkbox-xs",
-			sm: "checkbox-sm",
-			md: "checkbox-md",
-			lg: "checkbox-lg",
-			xl: "checkbox-xl",
-		}[checkboxSize];
+function Checkbox({ label, error, helperText, checked, onChange, disabled, required, className, id: providedId, name }: CheckboxProps) {
+	const generatedId = useId();
+	const id = providedId || generatedId;
+	const hasError = Boolean(error);
 
-		// DaisyUI color classes
-		const colorClass = `checkbox-${error ? "error" : color}`;
-
-		// Label text size based on checkbox size
-		const labelSizeClass = {
-			xs: "text-xs",
-			sm: "text-sm",
-			md: "text-sm",
-			lg: "text-base",
-			xl: "text-lg",
-		}[checkboxSize];
-
-		return (
-			<div className={cn("form-control", fullWidth ? "w-full" : "w-auto")}>
-				<label className={cn("label cursor-pointer justify-start gap-3", disabled && "opacity-50 cursor-not-allowed")}>
-					<input
-						ref={ref}
-						type="checkbox"
+	return (
+		<div className="flex flex-col gap-1.5" data-disabled={disabled}>
+			<div className="flex items-start gap-2">
+				<Label
+					htmlFor={id}
+					className={cn(
+						"text-sm leading-none font-medium cursor-pointer",
+						disabled && "cursor-not-allowed opacity-50",
+						hasError && "text-destructive"
+					)}>
+					<CheckboxPrimitive
+						id={id}
 						checked={checked}
+						onCheckedChange={onChange}
 						disabled={disabled}
-						className={cn("checkbox", sizeClass, colorClass, className)}
-						{...props}
+						name={name}
+						aria-invalid={hasError}
+						aria-describedby={error ? `${id}-error` : helperText ? `${id}-helper` : undefined}
+						className={cn(hasError && "border-destructive aria-invalid:border-destructive", className)}
 					/>
 					{(label || helperText) && (
-						<div className="flex-1 min-w-0">
+						<div className="grid gap-1 leading-none">
 							{label && (
-								<span className={cn("label-text", labelSizeClass, error && "text-error")}>
+								<div>
 									{label}
-									{props.required && <span className="text-error ml-1">*</span>}
-								</span>
+									{required && <span className="text-destructive ml-1">*</span>}
+								</div>
 							)}
-							{helperText && !error && <span className="block text-xs text-base-content/50 mt-0.5">{helperText}</span>}
+							{helperText && !error && (
+								<p id={`${id}-helper`} className="text-xs text-muted-foreground">
+									{helperText}
+								</p>
+							)}
 						</div>
 					)}
-				</label>
-
-				{/* Error Message */}
-				{error && (
-					<div className="flex items-center gap-1.5 mt-1.5 text-error animate-in slide-in-from-top-1 fade-in duration-200">
-						<AlertCircle size={14} />
-						<span className="text-xs">{error}</span>
-					</div>
-				)}
+				</Label>
 			</div>
-		);
-	}
-);
+
+			{error && (
+				<div id={`${id}-error`} role="alert" className="flex items-center gap-1.5 text-destructive">
+					<AlertCircle size={14} className="shrink-0" />
+					<span className="text-xs">{error}</span>
+				</div>
+			)}
+		</div>
+	);
+}
 
 Checkbox.displayName = "Checkbox";
 
 export default Checkbox;
+export { Checkbox };

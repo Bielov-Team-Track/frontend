@@ -5,9 +5,10 @@ import { cn } from "@/lib/utils";
 import { Check, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import Cropper, { Area } from "react-easy-crop";
+import { DialogFooter } from "../dialog";
 import Loader from "../loader";
 
-export const readFile = (file: any): Promise<string> => {
+export const readFile = (file: File): Promise<string> => {
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();
 		reader.onload = () => {
@@ -27,7 +28,7 @@ export const createImage = (url: string): Promise<HTMLImageElement> =>
 		const image = new Image();
 		image.addEventListener("load", () => resolve(image));
 		image.addEventListener("error", (error) => reject(error));
-		image.setAttribute("crossOrigin", "anonymous"); // needed to avoid cross-origin issues on CodeSandbox
+		image.setAttribute("crossOrigin", "anonymous");
 		image.src = url;
 	});
 
@@ -53,11 +54,9 @@ export async function getCroppedImg(imageSrc: string, pixelCrop: { x: number; y:
 		return null;
 	}
 
-	// Set the size of the cropped canvas
 	croppedCanvas.width = pixelCrop.width;
 	croppedCanvas.height = pixelCrop.height;
 
-	// Draw the cropped image onto the new canvas
 	croppedCtx.drawImage(canvas, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, pixelCrop.width, pixelCrop.height);
 
 	return new Promise((resolve) => {
@@ -109,9 +108,9 @@ const ImageCropper = ({ imageFile, onImageSave, onCancel, aspect = 1, className 
 	};
 
 	return (
-		<div className={cn("flex flex-col rounded-2xl bg-[#141414] border border-white/10 overflow-hidden", className)}>
+		<div className={cn("flex flex-col -m-4", className)}>
 			{/* Cropper Area */}
-			<div className="relative w-full aspect-4/3 bg-black/50">
+			<div className="relative w-full aspect-4/3 bg-muted/50">
 				{image ? (
 					<Cropper
 						image={image}
@@ -121,9 +120,6 @@ const ImageCropper = ({ imageFile, onImageSave, onCancel, aspect = 1, className 
 						aspect={aspect}
 						onZoomChange={setZoom}
 						onCropComplete={onCropComplete}
-						classes={{
-							containerClassName: "rounded-t-2xl",
-						}}
 					/>
 				) : (
 					<div className="absolute inset-0 flex items-center justify-center">
@@ -131,50 +127,41 @@ const ImageCropper = ({ imageFile, onImageSave, onCancel, aspect = 1, className 
 					</div>
 				)}
 				{isSaving && (
-					<div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-xs">
+					<div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/60 backdrop-blur-xs">
 						<Loader />
-						<span className="mt-3 text-sm font-medium text-white">Saving...</span>
+						<span className="mt-3 text-sm font-medium">Saving...</span>
 					</div>
 				)}
 			</div>
 
-			{/* Controls Area */}
-			<div className="p-4 space-y-4 bg-inherit">
-				{/* Zoom Control */}
-				<div className="flex items-center gap-3 px-2">
-					<ZoomOut size={16} className="text-muted" />
-					<input
-						type="range"
-						value={zoom}
-						min={1}
-						max={3}
-						step={0.1}
-						aria-labelledby="Zoom"
-						onChange={(e) => setZoom(Number(e.target.value))}
-						className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:hover:bg-primary/90 transition-all"
-					/>
-					<ZoomIn size={16} className="text-muted" />
-				</div>
-
-				{/* Actions */}
-				<div className="flex items-center gap-3 pt-2">
-					{onCancel && (
-						<Button variant="ghost" color="neutral" fullWidth onClick={onCancel} disabled={isSaving}>
-							Cancel
-						</Button>
-					)}
-					<Button
-						variant="solid"
-						color="primary"
-						fullWidth
-						onClick={saveImage}
-						disabled={isSaving || !image}
-						loading={isSaving}
-						leftIcon={!isSaving && <Check size={18} />}>
-						Save Crop
-					</Button>
-				</div>
+			{/* Zoom Control */}
+			<div className="flex items-center gap-3 px-4 py-3 border-t border-border">
+				<ZoomOut size={16} className="text-muted-foreground" />
+				<input
+					type="range"
+					value={zoom}
+					min={1}
+					max={3}
+					step={0.1}
+					aria-label="Zoom"
+					onChange={(e) => setZoom(Number(e.target.value))}
+					className="flex-1 h-1.5 bg-muted rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:hover:bg-primary/90 transition-all"
+				/>
+				<ZoomIn size={16} className="text-muted-foreground" />
 			</div>
+
+			{/* Actions */}
+			<DialogFooter>
+				{onCancel && (
+					<Button variant="outline" onClick={onCancel} disabled={isSaving}>
+						Cancel
+					</Button>
+				)}
+				<Button onClick={saveImage} disabled={isSaving || !image} loading={isSaving}>
+					{!isSaving && <Check size={16} />}
+					Save
+				</Button>
+			</DialogFooter>
 		</div>
 	);
 };

@@ -1,5 +1,5 @@
 /**
- * Responsive utility classes and breakpoints for the Bielov Volleyer app
+ * Responsive utility classes and breakpoints for the Bielov Spike app
  * Mobile-first responsive design patterns
  *
  * FONT SIZE STRATEGY:
@@ -41,10 +41,8 @@ export const responsiveClasses = {
 	// Text patterns with device-optimized sizing
 	text: {
 		// Primary headings
-		heading:
-			"text-mobile-lg sm:text-tablet-lg lg:text-2xl xl:text-3xl font-bold",
-		subheading:
-			"text-mobile-base sm:text-tablet-base lg:text-xl xl:text-2xl font-semibold",
+		heading: "text-mobile-lg sm:text-tablet-lg lg:text-2xl xl:text-3xl font-bold",
+		subheading: "text-mobile-base sm:text-tablet-base lg:text-xl xl:text-2xl font-semibold",
 
 		// Body text optimized for readability
 		body: "text-mobile-sm sm:text-tablet-base lg:text-desktop-base",
@@ -55,18 +53,15 @@ export const responsiveClasses = {
 		small: "text-mobile-xs sm:text-xs",
 
 		// Interactive elements
-		button:
-			"text-mobile-sm sm:text-tablet-base lg:text-desktop-base font-medium",
+		button: "text-mobile-sm sm:text-tablet-base lg:text-desktop-base font-medium",
 		link: "text-mobile-sm sm:text-tablet-base lg:text-desktop-base",
 
 		// Form elements
-		label:
-			"text-mobile-sm sm:text-tablet-base lg:text-desktop-base font-medium",
+		label: "text-mobile-sm sm:text-tablet-base lg:text-desktop-base font-medium",
 		input: "text-mobile-base sm:text-tablet-base lg:text-desktop-base",
 
 		// Navigation
-		navMain:
-			"text-mobile-base sm:text-tablet-base lg:text-desktop-base font-medium",
+		navMain: "text-mobile-base sm:text-tablet-base lg:text-desktop-base font-medium",
 		navSecondary: "text-mobile-xs sm:text-mobile-sm lg:text-sm",
 	},
 
@@ -85,8 +80,7 @@ export const responsiveClasses = {
 
 	// Grid patterns
 	grid: {
-		responsive:
-			"grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4",
+		responsive: "grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4",
 		cards: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4",
 		form: "grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4",
 	},
@@ -120,18 +114,8 @@ export function cn(...classes: (string | undefined | false)[]): string {
  * @param classes Object with breakpoint keys and class values
  * @returns Combined responsive classes
  */
-export function responsive(
-	classes: Partial<Record<keyof typeof breakpoints | "base", string>>,
-): string {
+export function responsive(classes: Partial<Record<keyof typeof breakpoints | "base", string>>): string {
 	const { base = "", xs, sm, md, lg, xl, xxl } = classes;
 
-	return cn(
-		base,
-		xs && `xs:${xs}`,
-		sm && `sm:${sm}`,
-		md && `md:${md}`,
-		lg && `lg:${lg}`,
-		xl && `xl:${xl}`,
-		xxl && `2xl:${xxl}`,
-	);
+	return cn(base, xs && `xs:${xs}`, sm && `sm:${sm}`, md && `md:${md}`, lg && `lg:${lg}`, xl && `xl:${xl}`, xxl && `2xl:${xxl}`);
 }

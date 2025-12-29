@@ -1,6 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
-import { handleDates } from "../utils/date";
 import { API_BASE_URL } from "../constants";
+import { handleDates } from "../utils/date";
 
 const client = axios.create({
 	baseURL: API_BASE_URL,
@@ -11,16 +11,18 @@ const client = axios.create({
 // Cookie utility functions
 const getCookie = (name: string): string | null => {
 	if (typeof window === "undefined") return null;
-	const value = document.cookie
-		.split("; ")
-		.find((row) => row.startsWith(`${name}=`))
-		?.split("=")[1];
-	return value ?? null;
+	const cookies = document.cookie.split("; ");
+	const cookie = cookies.find((row) => row.startsWith(`${name}=`));
+	if (!cookie) return null;
+	// Use substring to get everything after the first "=" to avoid truncation on "=" chars in Base64
+	const value = cookie.substring(name.length + 1);
+	return value ? decodeURIComponent(value) : null;
 };
 
 const setCookie = (name: string, value: string, maxAge: number): void => {
 	if (typeof window === "undefined") return;
-	document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Lax`;
+	// Encode the value to handle special characters in Base64 tokens (+, /, =)
+	document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
 };
 
 const deleteCookie = (name: string): void => {
@@ -95,7 +97,7 @@ client.interceptors.request.use(
 	},
 	(error) => {
 		return Promise.reject(error);
-	},
+	}
 );
 
 // Response interceptor to handle dates and token refresh
@@ -110,12 +112,7 @@ client.interceptors.response.use(
 		};
 
 		// Check if error is 401 and we haven't retried yet
-		if (
-			error.response?.status === 401 &&
-			originalRequest &&
-			!originalRequest._retry &&
-			typeof window !== "undefined"
-		) {
+		if (error.response?.status === 401 && originalRequest && !originalRequest._retry && typeof window !== "undefined") {
 			// Skip refresh for login, register, and refresh endpoints
 			const skipRefreshUrls = ["/auth/v1/auth/login", "/auth/v1/auth/register", "/auth/v1/auth/refresh"];
 			if (skipRefreshUrls.some((url) => originalRequest.url?.includes(url))) {
@@ -152,12 +149,9 @@ client.interceptors.response.use(
 
 			try {
 				// Call refresh token endpoint
-				const response = await axios.post(
-					`${API_BASE_URL}/auth/v1/auth/refresh`,
-					{
-						refreshToken: refreshToken,
-					}
-				);
+				const response = await axios.post(`${API_BASE_URL}/auth/v1/auth/refresh`, {
+					refreshToken: refreshToken,
+				});
 
 				const { token, refreshToken: newRefreshToken, expiresAt } = response.data;
 
@@ -188,7 +182,7 @@ client.interceptors.response.use(
 
 		console.error(error.response || error.message);
 		return Promise.reject(error);
-	},
+	}
 );
 
 export default client;

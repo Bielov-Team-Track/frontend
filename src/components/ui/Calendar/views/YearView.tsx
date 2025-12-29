@@ -20,20 +20,11 @@ import { CalendarDays, ChevronLeft, ChevronRight, Clock, MapPin } from "lucide-r
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ViewComponentProps } from "./ViewProps";
 
-const MONTHS = [
-	"January", "February", "March", "April",
-	"May", "June", "July", "August",
-	"September", "October", "November", "December",
-];
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
-function YearView({
-	events,
-	date,
-	onEventClick,
-	onViewChange,
-}: ViewComponentProps) {
+function YearView({ events, date, onEventClick, onViewChange }: ViewComponentProps) {
 	const [currentDate, setCurrentDate] = useState(date);
 
 	useEffect(() => {
@@ -66,9 +57,7 @@ function YearView({
 		<div className="w-full h-full flex flex-col border border-white/5 rounded-2xl backdrop-blur-xl overflow-hidden shadow-2xl">
 			{/* Header - consistent with MonthView/WeekView */}
 			<div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/2">
-				<h2 className="text-2xl font-bold text-white tracking-tight">
-					{year}
-				</h2>
+				<h2 className="text-2xl font-bold text-white tracking-tight">{year}</h2>
 				<div className="flex items-center bg-black/20 rounded-lg p-1 border border-white/5">
 					<Button
 						size="sm"
@@ -94,7 +83,7 @@ function YearView({
 			<div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
 				{/* Year Grid */}
 				<div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-					<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 						{MONTHS.map((monthName, monthIndex) => (
 							<MonthCard
 								key={monthIndex}
@@ -106,16 +95,6 @@ function YearView({
 							/>
 						))}
 					</div>
-				</div>
-
-				{/* Agenda Sidebar */}
-				<div className="w-full lg:w-80 xl:w-96 border-t lg:border-t-0 lg:border-l border-white/5 flex flex-col bg-white/2">
-					<YearAgendaSidebar
-						events={yearEvents}
-						year={year}
-						onEventClick={onEventClick}
-						onViewChange={onViewChange}
-					/>
 				</div>
 			</div>
 		</div>
@@ -140,37 +119,27 @@ function MonthCard({
 	const daysInMonth = eachDayOfInterval({ start, end });
 	const startDayOfWeek = getDay(start);
 
-	const days = Array.from({ length: startDayOfWeek })
-		.fill(null)
-		.concat(daysInMonth);
+	const days = Array.from({ length: startDayOfWeek }).fill(null).concat(daysInMonth);
 
 	const handleMonthClick = () => {
 		onViewChange?.("month", new Date(year, monthIndex, 1));
 	};
 
 	// Check if this month has any events
-	const monthHasEvents = daysInMonth.some(day => getEventsForDate(day).length > 0);
+	const monthHasEvents = daysInMonth.some((day) => getEventsForDate(day).length > 0);
 
 	return (
 		<div className="bg-white/2 border border-white/5 rounded-xl p-4 hover:bg-white/4 hover:border-white/10 transition-all duration-200">
 			{/* Month Header */}
-			<button
-				onClick={handleMonthClick}
-				className="w-full flex items-center justify-between mb-3 group">
-				<span className="text-sm font-bold text-white group-hover:text-accent transition-colors">
-					{monthName}
-				</span>
-				{monthHasEvents && (
-					<span className="w-1.5 h-1.5 rounded-full bg-accent/60" />
-				)}
+			<button onClick={handleMonthClick} className="w-full flex items-center justify-between mb-3 group">
+				<span className="text-sm font-bold text-white group-hover:text-accent transition-colors">{monthName}</span>
+				{monthHasEvents && <span className="w-1.5 h-1.5 rounded-full bg-accent/60" />}
 			</button>
 
 			{/* Day Labels */}
 			<div className="grid grid-cols-7 gap-0.5 mb-1">
 				{DAY_LABELS.map((label, i) => (
-					<div
-						key={i}
-						className="text-[9px] text-muted/50 font-medium text-center py-1">
+					<div key={i} className="text-[9px] text-muted/50 font-medium text-center py-1">
 						{label}
 					</div>
 				))}
@@ -195,19 +164,18 @@ function MonthCard({
 							className={`
 								aspect-square flex items-center justify-center text-[11px] font-medium
 								rounded-md transition-all duration-150 relative
-								${isTodayDate
-									? "bg-accent/20 text-accent ring-1 ring-accent/30"
-									: "text-white/60 hover:bg-white/10 hover:text-white"
-								}
+								${isTodayDate ? "bg-accent/20 text-accent ring-1 ring-accent/30" : "text-white/60 hover:bg-white/10 hover:text-white"}
 							`}>
 							{format(date, "d")}
 
 							{/* Event indicator */}
 							{hasEvents && (
-								<span className={`
+								<span
+									className={`
 									absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full
 									${isTodayDate ? "bg-accent" : "bg-white/40"}
-								`} />
+								`}
+								/>
 							)}
 						</button>
 					);
@@ -260,9 +228,7 @@ function YearAgendaSidebar({
 			groups.get(dateKey)!.events.push(event);
 		});
 
-		return Array.from(groups.values()).sort(
-			(a, b) => a.date.getTime() - b.date.getTime()
-		);
+		return Array.from(groups.values()).sort((a, b) => a.date.getTime() - b.date.getTime());
 	}, [events]);
 
 	// Find the first non-past group index for scroll target
@@ -300,9 +266,7 @@ function YearAgendaSidebar({
 						<CalendarDays size={18} className="text-accent" />
 					</div>
 					<div className="flex-1">
-						<h3 className="text-base font-bold text-white">
-							{year} Events
-						</h3>
+						<h3 className="text-base font-bold text-white">{year} Events</h3>
 						<p className="text-sm text-muted">
 							{events.length} {events.length === 1 ? "event" : "events"} total
 						</p>
@@ -312,20 +276,14 @@ function YearAgendaSidebar({
 				{/* Stats pills */}
 				{events.length > 0 && (
 					<div className="flex gap-2 mt-4">
-						<span className="text-xs px-3 py-1.5 rounded-full bg-white/5 text-muted">
-							{pastCount} past
-						</span>
-						<span className="text-xs px-3 py-1.5 rounded-full bg-accent/10 text-accent border border-accent/20">
-							{upcomingCount} upcoming
-						</span>
+						<span className="text-xs px-3 py-1.5 rounded-full bg-white/5 text-muted">{pastCount} past</span>
+						<span className="text-xs px-3 py-1.5 rounded-full bg-accent/10 text-accent border border-accent/20">{upcomingCount} upcoming</span>
 					</div>
 				)}
 			</div>
 
 			{/* Events List */}
-			<div
-				ref={scrollContainerRef}
-				className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+			<div ref={scrollContainerRef} className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
 				{eventGroups.length > 0 ? (
 					<div className="p-4 space-y-2">
 						{eventGroups.map((group, index) => (
@@ -345,11 +303,7 @@ function YearAgendaSidebar({
 									</div>
 								)}
 
-								<DateGroup
-									group={group}
-									onEventClick={onEventClick}
-									onViewChange={onViewChange}
-								/>
+								<DateGroup group={group} onEventClick={onEventClick} onViewChange={onViewChange} />
 							</div>
 						))}
 
@@ -376,25 +330,15 @@ function DateGroup({
 	return (
 		<div className={`transition-all duration-200 ${group.isPast ? "opacity-50" : ""}`}>
 			{/* Date Header */}
-			<button
-				onClick={() => onViewChange?.("week", group.date)}
-				className="w-full flex items-center gap-4 p-3 hover:bg-white/5 transition-colors group">
+			<button onClick={() => onViewChange?.("week", group.date)} className="w-full flex items-center gap-4 p-3 hover:bg-white/5 transition-colors group">
 				{/* Date badge */}
-				<div className={`
+				<div
+					className={`
 					w-12 h-12 flex flex-col items-center justify-center
-					${group.isToday
-						? "bg-accent text-white"
-						: group.isPast
-							? "bg-white/5 text-muted"
-							: "bg-white/8 text-white group-hover:bg-white/10"
-					}
+					${group.isToday ? "bg-accent text-white" : group.isPast ? "bg-white/5 text-muted" : "bg-white/8 text-white group-hover:bg-white/10"}
 				`}>
-					<span className="text-[11px] font-semibold uppercase leading-none">
-						{format(group.date, "MMM")}
-					</span>
-					<span className="text-lg font-bold leading-tight">
-						{format(group.date, "d")}
-					</span>
+					<span className="text-[11px] font-semibold uppercase leading-none">{format(group.date, "MMM")}</span>
+					<span className="text-lg font-bold leading-tight">{format(group.date, "d")}</span>
 				</div>
 
 				{/* Date info */}
@@ -411,36 +355,20 @@ function DateGroup({
 			{/* Events for this date */}
 			<div className="ml-14 space-y-1.5 pb-3 pr-2">
 				{group.events.map((event) => (
-					<CompactEventCard
-						key={event.id}
-						event={event}
-						isPast={group.isPast}
-						onClick={() => onEventClick(event.id)}
-					/>
+					<CompactEventCard key={event.id} event={event} isPast={group.isPast} onClick={() => onEventClick(event.id)} />
 				))}
 			</div>
 		</div>
 	);
 }
 
-function CompactEventCard({
-	event,
-	isPast,
-	onClick,
-}: {
-	event: Event;
-	isPast: boolean;
-	onClick: () => void;
-}) {
+function CompactEventCard({ event, isPast, onClick }: { event: Event; isPast: boolean; onClick: () => void }) {
 	return (
 		<button
 			onClick={onClick}
 			className={`
 				w-full text-left p-2.5 border-b transition-all duration-150 group
-				${isPast
-					? "border-white/5 hover:bg-white/5"
-					: "border-white/5 hover:bg-white/8"
-				}
+				${isPast ? "border-white/5 hover:bg-white/5" : "border-white/5 hover:bg-white/8"}
 			`}>
 			<div className="flex items-start gap-3">
 				{/* Time */}
@@ -450,12 +378,10 @@ function CompactEventCard({
 
 				{/* Content */}
 				<div className="flex-1 min-w-0">
-					<h4 className={`
+					<h4
+						className={`
 						text-sm font-medium truncate transition-colors
-						${isPast
-							? "text-muted/80 group-hover:text-muted"
-							: "text-white group-hover:text-accent"
-						}
+						${isPast ? "text-muted/80 group-hover:text-muted" : "text-white group-hover:text-accent"}
 					`}>
 						{event.name}
 					</h4>
@@ -479,9 +405,7 @@ function EmptyYearState({ year }: { year: number }) {
 				<Clock size={20} className="text-muted/50" />
 			</div>
 			<p className="text-sm text-muted mb-1">No events in {year}</p>
-			<p className="text-xs text-muted/60">
-				Events will appear here as they are scheduled
-			</p>
+			<p className="text-xs text-muted/60">Events will appear here as they are scheduled</p>
 		</div>
 	);
 }

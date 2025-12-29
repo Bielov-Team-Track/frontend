@@ -1,5 +1,5 @@
+import { Avatar } from "@/components";
 import { Button } from "@/components/ui";
-import Avatar from "@/components/ui/avatar";
 import { UserProfile } from "@/lib/models/User";
 import { Edit, MapPin } from "lucide-react";
 import Link from "next/link";

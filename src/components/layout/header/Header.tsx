@@ -1,9 +1,9 @@
 "use client";
 
-import { useAuth } from "@/providers";
 import { ThemeSwitcher } from "@/components/ui";
-import UserMenu from "../dashboard-header/UserMenu";
+import { useAuth } from "@/providers";
 import Link from "next/link";
+import UserMenu from "../dashboard-header/UserMenu";
 
 const Header = () => {
 	const auth = useAuth();
@@ -11,7 +11,7 @@ const Header = () => {
 	return (
 		<header className="bg-background h-16 p-4 shadow-md ">
 			<div className="flex items-center justify-between max-w-6xl mx-auto px-8">
-				<h1 className="text-lg font-semibold text-accent">Volleyer</h1>
+				<h1 className="text-lg font-semibold text-accent">Spike</h1>
 
 				<nav className="hidden md:flex items-center space-x-6">
 					<Link href="/clubs" className="text-white/80 hover:text-accent transition-colors text-sm font-medium">

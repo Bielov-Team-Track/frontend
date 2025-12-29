@@ -1,16 +1,11 @@
 "use client";
 
-import Avatar from "@/components/ui/avatar";
+import { Avatar } from "@/components";
+import { loadWaitlist } from "@/lib/api/waitlist";
 import { Position as PositionModel } from "@/lib/models/Position";
 import { Team } from "@/lib/models/Team";
-import { Button } from "@/components/ui";
-import {
-    LogOut,
-    Crown,
-    ChevronDown
-} from "lucide-react";
+import { ChevronDown, Crown, LogOut } from "lucide-react";
 import Link from "next/link";
-import { loadWaitlist } from "@/lib/api/waitlist";
 import { useState } from "react";
 import PositionWaitlist from "./PositionWaitlist";
 
@@ -23,14 +18,7 @@ type PositionWithUserProps = {
 	editable?: boolean;
 };
 
-function PositionWithUser({
-	position,
-	userId,
-	team,
-	onPositionLeave,
-	open = false,
-	editable = false,
-}: PositionWithUserProps) {
+function PositionWithUser({ position, userId, team, onPositionLeave, open = false, editable = false }: PositionWithUserProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	const handleLeavePosition = () => {
@@ -41,9 +29,7 @@ function PositionWithUser({
 	};
 
 	const collapseOtherPositions = (positionId: string) => {
-		const checkboxes = document.querySelectorAll(
-			`input[type="checkbox"][name="${team.id}"]`,
-		);
+		const checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${team.id}"]`);
 		checkboxes.forEach((checkbox) => {
 			if ((checkbox as HTMLInputElement).id !== positionId) {
 				(checkbox as HTMLInputElement).checked = false;
@@ -51,20 +37,14 @@ function PositionWithUser({
 		});
 	};
 
-	const collapsable =
-		open ||
-		editable ||
-		position.eventParticipant?.userProfile?.userId === userId;
+	const collapsable = open || editable || position.eventParticipant?.userProfile?.userId === userId;
 
-    const userProfile = position.eventParticipant?.userProfile;
+	const userProfile = position.eventParticipant?.userProfile;
 
 	if (!collapsable) {
 		return (
 			<div className="p-3 rounded-xl bg-background-light border border-white/5 w-full flex justify-between items-center transition-all hover:bg-white/5">
-				<Link
-					href={`/profiles/${userProfile?.userId}`}
-					className="flex gap-3 items-center z-50 group"
-				>
+				<Link href={`/profiles/${userProfile?.userId}`} className="flex gap-3 items-center z-50 group">
 					<Avatar profile={userProfile!} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors" />
 					<div className="flex flex-col">
 						<span className="whitespace-nowrap font-bold text-sm text-white group-hover:text-accent transition-colors">
@@ -78,20 +58,22 @@ function PositionWithUser({
 	}
 
 	return (
-		<div className={`rounded-xl border transition-all duration-300 overflow-hidden ${isExpanded ? "bg-[#1E1E1E] border-white/10 shadow-lg" : "bg-background-light border-white/5"}`}>
-            {/* Header / Trigger */}
-            <div 
-                className="p-3 flex items-center justify-between cursor-pointer hover:bg-white/5 transition-colors"
-                onClick={() => {
-                    const newValue = !isExpanded;
-                    setIsExpanded(newValue);
-                    if (newValue) collapseOtherPositions(position.id);
-                }}
-            >
+		<div
+			className={`rounded-xl border transition-all duration-300 overflow-hidden ${
+				isExpanded ? "bg-[#1E1E1E] border-white/10 shadow-lg" : "bg-background-light border-white/5"
+			}`}>
+			{/* Header / Trigger */}
+			<div
+				className="p-3 flex items-center justify-between cursor-pointer hover:bg-white/5 transition-colors"
+				onClick={() => {
+					const newValue = !isExpanded;
+					setIsExpanded(newValue);
+					if (newValue) collapseOtherPositions(position.id);
+				}}>
 				<Link
 					href={`/profiles/${userProfile?.userId}`}
 					className="flex gap-3 items-center group flex-1 min-w-0"
-                    onClick={(e) => e.stopPropagation()} // Prevent expansion when clicking profile
+					onClick={(e) => e.stopPropagation()} // Prevent expansion when clicking profile
 				>
 					<Avatar profile={userProfile!} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors shrink-0" />
 					<div className="flex flex-col min-w-0">
@@ -99,56 +81,51 @@ function PositionWithUser({
 							<span className="whitespace-nowrap font-bold text-sm text-white group-hover:text-accent transition-colors truncate">
 								{userProfile?.name} {userProfile?.surname}
 							</span>
-							{team.captain?.userId === userProfile?.userId && (
-								<Crown size={12} className="text-accent shrink-0 fill-accent" />
-							)}
+							{team.captain?.userId === userProfile?.userId && <Crown size={12} className="text-accent shrink-0 fill-accent" />}
 						</div>
 						<span className="text-muted text-[10px] uppercase font-bold tracking-wider truncate">{position.name}</span>
 					</div>
 				</Link>
 
-                {/* Arrow */}
-                <div className={`p-1 text-muted transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}>
-                    <ChevronDown size={16} />
-                </div>
-            </div>
+				{/* Arrow */}
+				<div className={`p-1 text-muted transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}>
+					<ChevronDown size={16} />
+				</div>
+			</div>
 
-            {/* Collapsible Content */}
-            <div className={`transition-all duration-300 ease-in-out ${isExpanded ? "max-h-96 opacity-100 border-t border-white/5" : "max-h-0 opacity-0 border-none"}`}>
-                <div className="p-3 bg-black/20">
-                    {(userProfile?.userId === userId || editable) && (
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleLeavePosition();
-                            }}
-                            className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-red-500/10 text-error hover:bg-red-500/20 transition-colors text-xs font-bold uppercase tracking-wide border border-red-500/20"
-                        >
-                            <LogOut size={14} /> Free Position
-                        </button>
-                    )}
-                    
-                    {open && (
-                        <div className="mt-3">
-                             <PositionWaitlist
-                                position={position}
-                                team={team}
-                                userId={userId}
-                                shouldLoad={isExpanded}
-                            />
-                        </div>
-                    )}
-                </div>
-            </div>
-            
-            {/* Hidden Checkbox for Logic Preservation (if needed by other components, though mostly handled by state now) */}
+			{/* Collapsible Content */}
+			<div
+				className={`transition-all duration-300 ease-in-out ${
+					isExpanded ? "max-h-96 opacity-100 border-t border-white/5" : "max-h-0 opacity-0 border-none"
+				}`}>
+				<div className="p-3 bg-black/20">
+					{(userProfile?.userId === userId || editable) && (
+						<button
+							onClick={(e) => {
+								e.stopPropagation();
+								handleLeavePosition();
+							}}
+							className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-red-500/10 text-error hover:bg-red-500/20 transition-colors text-xs font-bold uppercase tracking-wide border border-red-500/20">
+							<LogOut size={14} /> Free Position
+						</button>
+					)}
+
+					{open && (
+						<div className="mt-3">
+							<PositionWaitlist position={position} team={team} userId={userId} shouldLoad={isExpanded} />
+						</div>
+					)}
+				</div>
+			</div>
+
+			{/* Hidden Checkbox for Logic Preservation (if needed by other components, though mostly handled by state now) */}
 			<input
 				id={position.id}
 				type="checkbox"
 				name={team?.id!}
 				checked={isExpanded}
 				onChange={() => {}} // Controlled by div click
-                className="hidden"
+				className="hidden"
 			/>
 		</div>
 	);

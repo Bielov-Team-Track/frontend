@@ -8,183 +8,143 @@ import Link from "next/link";
 import { getNavigationItems, NavigationItem } from "../shared/nav-items";
 import { useNavigation } from "../shared/useNavigation";
 
-// Helper to render item icon (logoUrl > color > icon)
-const ItemIcon = ({ item, size, className = "" }: { item: NavigationItem; size: number; className?: string }) => {
-	const Icon = item.icon;
+// --- Types ---
 
-	if (item.logoUrl) {
-		return <Image src={item.logoUrl} alt={`${item.name} logo`} width={size} height={size} className={`rounded-full object-cover shrink-0 ${className}`} />;
-	}
-
-	if (item.color) {
-		return (
-			<span
-				className={`shrink-0 rounded-full ${className}`}
-				style={{
-					width: size,
-					height: size,
-					backgroundColor: item.color,
-				}}
-			/>
-		);
-	}
-
-	return <Icon size={size} className={`shrink-0 ${className}`} />;
-};
-
-// Recursive NavItem component
-const NavItem = ({
-	item,
-	depth = 0,
-	pathname,
-	toggleExpanded,
-	isItemOrSubItemActive,
-	isExpanded,
-	allItems,
-}: {
+interface SidebarItemProps {
 	item: NavigationItem;
 	depth?: number;
 	pathname: string;
-	toggleExpanded: (name: string) => void;
-	isItemOrSubItemActive: (item: NavigationItem) => boolean;
-	isExpanded: (item: NavigationItem, items: NavigationItem[]) => boolean;
+	onToggle: (name: string) => void;
+	checkActive: (item: NavigationItem) => boolean;
+	checkExpanded: (item: NavigationItem, items: NavigationItem[]) => boolean;
 	allItems: NavigationItem[];
-}) => {
-	const active = isItemOrSubItemActive(item);
-	const itemExpanded = isExpanded(item, allItems);
-	const hasSubItems = item.subItems && item.subItems.length > 0;
+}
 
-	// Get badge value
-	const getBadgeValue = (): number | undefined => {
-		if (!item.badge) return undefined;
-		if (typeof item.badge === "function") return item.badge();
-		return item.badge;
-	};
-	const badgeValue = getBadgeValue();
+interface BadgeProps {
+	value?: number;
+	isCollapsed?: boolean;
+}
 
-	// Root level items (depth 0)
-	if (depth === 0) {
+// --- Helper Components ---
+
+const ItemIcon = ({ item, size, isActive, className = "" }: { item: NavigationItem; size: number; isActive: boolean; className?: string }) => {
+	// Priority: Logo URL -> Custom Color -> Icon Component
+	if (item.logoUrl) {
+		return <Image src={item.logoUrl} alt={`${item.name} logo`} width={size} height={size} className={`shrink-0 rounded-full object-cover ${className}`} />;
+	}
+
+	if (item.color) {
+		return <span className={`shrink-0 rounded-full ${className}`} style={{ width: size, height: size, backgroundColor: item.color }} />;
+	}
+
+	const Icon = item.icon;
+	// Dynamic color classes based on active state
+	const colorClass = isActive ? "text-white" : "text-muted group-hover:text-white";
+
+	return <Icon size={size} className={`shrink-0 ${colorClass} ${className}`} />;
+};
+
+const Badge = ({ value, isCollapsed = false }: BadgeProps) => {
+	if (!value || value <= 0) return null;
+
+	const displayValue = value > 99 ? (isCollapsed ? "!" : "99+") : value;
+
+	// Collapsed View (Tablet / Mobile Icon-only)
+	if (isCollapsed) {
 		return (
-			<div>
-				<div
-					className={`
-						group relative flex items-center justify-center xl:justify-start px-3 py-3 rounded-xl cursor-pointer transition-all duration-200
-						${active ? "bg-linear-to-r from-accent/20 to-transparent text-accent" : "text-muted hover:text-white hover:bg-white/5"}
-					`}>
-					{active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-accent rounded-r-full" />}
-
-					{hasSubItems ? (
-						<>
-							<Link href={item.href} className="flex items-center flex-1" onClick={(e) => e.stopPropagation()}>
-								<ItemIcon
-									item={item}
-									size={20}
-									className={!item.logoUrl && !item.color ? (active ? "text-accent" : "text-muted group-hover:text-white") : ""}
-								/>
-								<span className="hidden xl:block flex-1 ml-4 font-medium text-sm">{item.name}</span>
-							</Link>
-							{badgeValue && badgeValue > 0 && (
-								<span className="hidden xl:flex items-center justify-center h-5 min-w-[20px] px-1.5 text-[10px] font-bold text-white bg-error rounded-full shadow-xs">
-									{badgeValue > 99 ? "99+" : badgeValue}
-								</span>
-							)}
-							<button
-								onClick={(e) => {
-									e.stopPropagation();
-									toggleExpanded(item.name);
-								}}
-								className="hidden xl:block ml-2 text-muted/50 hover:text-white p-1 -mr-1">
-								{itemExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-							</button>
-						</>
-					) : (
-						<Link href={item.href} className="flex items-center w-full relative">
-							<div className="relative">
-								<ItemIcon
-									item={item}
-									size={20}
-									className={!item.logoUrl && !item.color ? (active ? "text-accent" : "text-muted group-hover:text-white") : ""}
-								/>
-								{badgeValue && badgeValue > 0 && (
-									<span className="xl:hidden absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white bg-error rounded-full border border-background">
-										{badgeValue > 99 ? "!" : badgeValue}
-									</span>
-								)}
-							</div>
-							<span className="hidden xl:block flex-1 ml-4 font-medium text-sm">{item.name}</span>
-							{badgeValue && badgeValue > 0 && (
-								<span className="hidden xl:flex items-center justify-center h-5 min-w-[20px] px-1.5 text-[10px] font-bold text-white bg-error rounded-full shadow-xs">
-									{badgeValue > 99 ? "99+" : badgeValue}
-								</span>
-							)}
-						</Link>
-					)}
-				</div>
-
-				{/* Render sub items recursively */}
-				{hasSubItems && itemExpanded && (
-					<div className="hidden xl:block ml-5 mt-1 space-y-1 border-l border-white/10 pl-3">
-						{item.subItems!.map((subItem) => (
-							<NavItem
-								key={subItem.name}
-								item={subItem}
-								depth={depth + 1}
-								pathname={pathname}
-								toggleExpanded={toggleExpanded}
-								isItemOrSubItemActive={isItemOrSubItemActive}
-								isExpanded={isExpanded}
-								allItems={allItems}
-							/>
-						))}
-					</div>
-				)}
-			</div>
+			<span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-error text-[9px] font-bold text-white xl:hidden">
+				{displayValue}
+			</span>
 		);
 	}
 
-	// Nested items (depth > 0)
-	const isSubActive = pathname === item.href;
+	// Full View
+	return (
+		<span className="ml-auto flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-error px-1.5 text-[10px] font-bold text-white shadow-xs">
+			{displayValue}
+		</span>
+	);
+};
+
+// --- Recursive Item Component ---
+
+const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkExpanded, allItems }: SidebarItemProps) => {
+	const isActive = checkActive(item);
+	const isExpanded = checkExpanded(item, allItems);
+	const hasSubItems = !!item.subItems?.length;
+	const isRoot = depth === 0;
+
+	// Calculate badge value once
+	const badgeValue = typeof item.badge === "function" ? item.badge() : item.badge;
+
+	// Styles based on depth/nesting
+	const containerBaseStyles = isRoot
+		? "group relative flex items-center justify-center xl:justify-start px-3 py-3 rounded-xl transition-all duration-200"
+		: "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors";
+
+	const activeStyles = isActive ? (isRoot ? "bg-neutral-900 text-white" : "bg-white/5 text-white") : "text-muted hover:bg-white/5 hover:text-white";
+
+	const iconSize = isRoot ? 20 : 16;
+	const indentSize = isRoot ? "ml-5 pl-3" : "ml-4 pl-3";
+	const textStyles = isRoot ? "md:hidden xl:block ml-4 font-medium text-sm" : "ml-3";
+
+	// Render Content Wrapper (Link vs Button logic)
+	const ItemContent = () => (
+		<>
+			<div className="relative shrink-0" title={item.name}>
+				<ItemIcon item={item} size={iconSize} isActive={isActive} className={!isRoot ? "opacity-70" : ""} />
+				{isRoot && <Badge value={badgeValue} isCollapsed={true} />}
+			</div>
+
+			<span className={`${textStyles} flex-1 truncate`}>{item.name}</span>
+
+			{/* Desktop Full Badge */}
+			<div className={isRoot ? "hidden xl:block" : ""}>
+				<Badge value={badgeValue} />
+			</div>
+		</>
+	);
 
 	return (
 		<div>
-			{hasSubItems ? (
-				<div
-					className={`
-						flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer
-						${active ? "text-white bg-white/5" : "text-muted hover:text-white hover:bg-white/5"}
-					`}>
-					<Link href={item.href} className="flex items-center flex-1">
-						<ItemIcon item={item} size={16} className="mr-3 opacity-70" />
-						<span className="flex-1">{item.name}</span>
-					</Link>
-					<button onClick={() => toggleExpanded(item.name)} className="text-muted/50 hover:text-white p-1 -mr-1">
-						{itemExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-					</button>
-				</div>
-			) : (
-				<Link
-					href={item.href}
-					className={`
-						flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors
-						${isSubActive ? "text-white bg-white/5" : "text-muted hover:text-white hover:bg-white/5"}
-					`}>
-					<ItemIcon item={item} size={16} className="mr-3 opacity-70" />
-					<span>{item.name}</span>
-				</Link>
-			)}
+			<div className={`${containerBaseStyles} ${activeStyles} cursor-pointer`}>
+				{hasSubItems ? (
+					// Parent Item (Click to Toggle or Link)
+					<>
+						<Link href={item.href} className="flex min-w-0 flex-1 items-center" onClick={(e) => isRoot && e.stopPropagation()}>
+							<ItemContent />
+						</Link>
 
-			{/* Render nested sub items recursively */}
-			{hasSubItems && itemExpanded && (
-				<div className="ml-4 mt-1 space-y-1 border-l border-white/10 pl-3">
+						{/* Toggle Button */}
+						<button
+							onClick={(e) => {
+								e.stopPropagation();
+								onToggle(item.name);
+							}}
+							className={`p-1 text-muted/50 hover:text-white ${isRoot ? "hidden xl:block ml-2 -mr-1" : "-mr-1"}`}>
+							{isExpanded ? <ChevronDown size={isRoot ? 14 : 12} /> : <ChevronRight size={isRoot ? 14 : 12} />}
+						</button>
+					</>
+				) : (
+					// Leaf Item (Direct Link)
+					<Link href={item.href} className="flex min-w-0 flex-1 items-center w-full">
+						<ItemContent />
+					</Link>
+				)}
+			</div>
+
+			{/* Recursive Sub-items */}
+			{hasSubItems && isExpanded && (
+				<div className={`${isRoot ? "hidden xl:block" : ""} mt-1 space-y-1 border-l border-white/10 ${indentSize}`}>
 					{item.subItems!.map((subItem) => (
-						<NavItem
+						<SidebarItem
 							key={subItem.name}
 							item={subItem}
 							depth={depth + 1}
 							pathname={pathname}
-							toggleExpanded={toggleExpanded}
-							isItemOrSubItemActive={isItemOrSubItemActive}
-							isExpanded={isExpanded}
+							onToggle={onToggle}
+							checkActive={checkActive}
+							checkExpanded={checkExpanded}
 							allItems={allItems}
 						/>
 					))}
@@ -194,48 +154,84 @@ const NavItem = ({
 	);
 };
 
-const Sidebar = () => {
-	const { pathname, toggleExpanded, isItemOrSubItemActive, isExpanded, isActive } = useNavigation();
+// --- Sub-Layout Components ---
 
+const MobileDrawer = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => (
+	<>
+		{/* Backdrop */}
+		{isOpen && <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={onClose} aria-hidden="true" />}
+
+		{/* Drawer */}
+		<aside
+			className={`
+				fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-neutral-900 border-r border-white/5
+				transition-transform duration-300 ease-in-out md:hidden
+				${isOpen ? "translate-x-0" : "-translate-x-full"}
+			`}>
+			<div className="flex h-16 items-center justify-between border-b border-white/5 px-4">
+				<div className="flex items-center gap-3">
+					<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-tr from-accent to-primary text-white shadow-lg shadow-orange-500/20">
+						<Volleyball size={18} />
+					</div>
+					<span className="text-xl font-bold tracking-tight text-white">Volleyer</span>
+				</div>
+				<button onClick={onClose} className="rounded-lg p-2 text-muted transition-colors hover:bg-white/5 hover:text-white" aria-label="Close menu">
+					<ChevronDown size={20} className="-rotate-90" />
+				</button>
+			</div>
+
+			<div className="flex-1 overflow-y-auto px-3 py-4 no-scrollbar">{children}</div>
+		</aside>
+	</>
+);
+
+const DesktopSidebar = ({ children }: { children: React.ReactNode }) => (
+	<aside className="hidden w-18 shrink-0 md:block xl:w-64">
+		<div className="sticky top-0 max-h-[calc(100vh-4rem)] overflow-y-auto px-3 py-4 no-scrollbar">{children}</div>
+	</aside>
+);
+
+// --- Main Export ---
+
+interface SidebarProps {
+	isOpen?: boolean;
+	onClose?: () => void;
+}
+
+const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
+	// Hooks
+	const { pathname, toggleExpanded, isItemOrSubItemActive, isExpanded } = useNavigation();
 	const unreadMessageCount = useUnreadMessageCount();
-	const clubs = useClub().clubs;
+	const { clubs } = useClub();
+
+	// Data Preparation
 	const navigationItems = getNavigationItems(unreadMessageCount, clubs);
 
+	const renderNavItems = () => (
+		<nav className="space-y-1">
+			{navigationItems.map((item) => (
+				<SidebarItem
+					key={item.name}
+					item={item}
+					depth={0}
+					pathname={pathname}
+					onToggle={toggleExpanded}
+					checkActive={isItemOrSubItemActive}
+					checkExpanded={isExpanded}
+					allItems={navigationItems}
+				/>
+			))}
+		</nav>
+	);
+
 	return (
-		<aside className="w-20 xl:w-72 h-[calc(100vh-2rem)] sticky top-4 z-40 flex flex-col bg-base-200 backdrop-blur-xl border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
-			{/* --- Logo Area --- */}
-			<div className="h-24 flex items-center justify-center xl:justify-start xl:px-8 border-b border-white/5">
-				<div className="flex items-center gap-3">
-					<div className="w-10 h-10 bg-linear-to-tr from-accent to-primary rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 text-white">
-						<Volleyball size={20} />
-					</div>
-					<span className="hidden xl:block text-2xl font-bold text-white tracking-tight">Volleyer</span>
-				</div>
-			</div>
+		<>
+			<MobileDrawer isOpen={isOpen} onClose={onClose!}>
+				{renderNavItems()}
+			</MobileDrawer>
 
-			{/* --- Navigation --- */}
-			<div className="flex-1 overflow-y-auto py-6 px-3 space-y-2 no-scrollbar">
-				<nav className="space-y-1">
-					{navigationItems.map((item) => (
-						<NavItem
-							key={item.name}
-							item={item}
-							depth={0}
-							pathname={pathname}
-							toggleExpanded={toggleExpanded}
-							isItemOrSubItemActive={isItemOrSubItemActive}
-							isExpanded={isExpanded}
-							allItems={navigationItems}
-						/>
-					))}
-				</nav>
-			</div>
-
-			{/* --- Footer Area (Optional User Profile mini view) --- */}
-			{/* <div className="p-4 border-t border-white/5">
-                ...
-            </div> */}
-		</aside>
+			<DesktopSidebar>{renderNavItems()}</DesktopSidebar>
+		</>
 	);
 };
 

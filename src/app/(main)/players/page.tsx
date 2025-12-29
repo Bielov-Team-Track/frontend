@@ -1,22 +1,7 @@
 "use client";
 
-import {
-	Activity,
-	Crown,
-	MapPin,
-	Medal,
-	MessageCircle,
-	Share2,
-	Trophy,
-	UserPlus,
-	Volleyball,
-    Check,
-    Users,
-    ImageOff,
-    Shield
-} from "lucide-react";
+import { Activity, Check, Crown, ImageOff, MapPin, Medal, MessageCircle, Share2, Trophy, UserPlus, Users, Volleyball } from "lucide-react";
 import React, { useState } from "react";
-import Image from "next/image";
 
 // --- Mock Data ---
 const PLAYER = {
@@ -123,28 +108,23 @@ type TabType = "overview" | "tournaments" | "achievements";
 
 export default function PlayerPage() {
 	const [activeTab, setActiveTab] = useState<TabType>("overview");
-    const [bannerError, setBannerError] = useState(false);
-    const [avatarError, setAvatarError] = useState(false);
+	const [bannerError, setBannerError] = useState(false);
+	const [avatarError, setAvatarError] = useState(false);
 
 	return (
-		<div className="min-h-screen bg-background-dark text-white font-sans pb-20">
+		<div className="min-h-screen bg-background text-white font-sans pb-20">
 			{/* --- HERO SECTION --- */}
 			<div className="relative mb-6">
 				{/* Banner & Gradient */}
 				<div className="h-48 md:h-80 w-full relative overflow-hidden bg-background-light">
-                    {!bannerError ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                            src={PLAYER.banner}
-                            alt="Banner"
-                            className="w-full h-full object-cover opacity-60"
-                            onError={() => setBannerError(true)}
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-background-light text-muted/30">
-                            <ImageOff size={48} />
-                        </div>
-                    )}
+					{!bannerError ? (
+						/* eslint-disable-next-line @next/next/no-img-element */
+						<img src={PLAYER.banner} alt="Banner" className="w-full h-full object-cover opacity-60" onError={() => setBannerError(true)} />
+					) : (
+						<div className="w-full h-full flex items-center justify-center bg-background-light text-muted/30">
+							<ImageOff size={48} />
+						</div>
+					)}
 					<div className="absolute inset-0 bg-linear-to-t from-background-dark via-background-dark/60 to-transparent" />
 				</div>
 
@@ -153,17 +133,12 @@ export default function PlayerPage() {
 					{/* Avatar */}
 					<div className="relative">
 						<div className="w-28 h-28 md:w-48 md:h-48 rounded-full border-4 border-background-dark bg-background-light overflow-hidden shadow-2xl shadow-black/50 flex items-center justify-center">
-                            {!avatarError ? (
-                                /* eslint-disable-next-line @next/next/no-img-element */
-                                <img
-                                    src={PLAYER.avatar}
-                                    alt={PLAYER.name}
-                                    className="w-full h-full object-cover"
-                                    onError={() => setAvatarError(true)}
-                                />
-                            ) : (
-                                <Users className="text-muted/50 w-16 h-16" />
-                            )}
+							{!avatarError ? (
+								/* eslint-disable-next-line @next/next/no-img-element */
+								<img src={PLAYER.avatar} alt={PLAYER.name} className="w-full h-full object-cover" onError={() => setAvatarError(true)} />
+							) : (
+								<Users className="text-muted/50 w-16 h-16" />
+							)}
 						</div>
 						{PLAYER.isVerified && (
 							<div
@@ -178,17 +153,12 @@ export default function PlayerPage() {
 					<div className="flex-1 mb-2 w-full">
 						<div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
 							<div>
-								<h1 className="text-2xl md:text-4xl font-bold text-white flex items-center gap-2">
-									{PLAYER.name}
-								</h1>
+								<h1 className="text-2xl md:text-4xl font-bold text-white flex items-center gap-2">{PLAYER.name}</h1>
 								<p className="text-muted text-sm md:text-base flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
-									<span className="text-primary font-medium">
-										{PLAYER.username}
-									</span>
+									<span className="text-primary font-medium">{PLAYER.username}</span>
 									<span className="w-1 h-1 bg-muted rounded-full hidden sm:block" />
 									<span className="flex items-center gap-1">
-										<Volleyball size={14} />{" "}
-										{PLAYER.position}
+										<Volleyball size={14} /> {PLAYER.position}
 									</span>
 									<span className="w-1 h-1 bg-muted rounded-full hidden sm:block" />
 									<span className="flex items-center gap-1">
@@ -217,12 +187,8 @@ export default function PlayerPage() {
 								<div
 									key={i}
 									className="bg-white/5 border border-white/10 rounded-xl p-3 text-center backdrop-blur-xs hover:bg-white/10 transition-colors">
-									<div className="text-xl md:text-3xl font-bold text-white">
-										{stat.value}
-									</div>
-									<div className="text-[10px] md:text-xs text-muted uppercase tracking-wider font-medium">
-										{stat.label}
-									</div>
+									<div className="text-xl md:text-3xl font-bold text-white">{stat.value}</div>
+									<div className="text-[10px] md:text-xs text-muted uppercase tracking-wider font-medium">{stat.label}</div>
 								</div>
 							))}
 						</div>
@@ -237,27 +203,18 @@ export default function PlayerPage() {
 					{/* Key Details Card */}
 					<div className="p-6 rounded-2xl bg-white/5 border border-white/5">
 						<h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-							<Activity size={18} className="text-primary" />{" "}
-							Player Details
+							<Activity size={18} className="text-primary" /> Player Details
 						</h3>
 						<div className="space-y-4">
 							<DetailRow label="Height" value={PLAYER.height} />
-							<DetailRow
-								label="Dominant Hand"
-								value={PLAYER.dominantHand}
-							/>
-							<DetailRow
-								label="Joined Volleyer"
-								value={PLAYER.joined}
-							/>
+							<DetailRow label="Dominant Hand" value={PLAYER.dominantHand} />
+							<DetailRow label="Joined Spike" value={PLAYER.joined} />
 						</div>
 					</div>
 
 					{/* Clubs History */}
 					<div className="p-6 rounded-2xl bg-white/5 border border-white/5">
-						<h3 className="text-lg font-bold text-white mb-4">
-							Club History
-						</h3>
+						<h3 className="text-lg font-bold text-white mb-4">Club History</h3>
 						<div className="space-y-4 relative before:absolute before:left-5 before:top-2 before:bottom-2 before:w-0.5 before:bg-white/5 before:z-0">
 							{PLAYER.clubs.map((club) => (
 								<div
@@ -266,49 +223,35 @@ export default function PlayerPage() {
 									<div className="flex items-center gap-3">
 										<div
 											className={`w-10 h-10 rounded-xl p-0.5 flex items-center justify-center overflow-hidden ${
-												club.current
-													? "bg-linear-to-br from-accent to-primary"
-													: "bg-gray-700"
+												club.current ? "bg-linear-to-br from-accent to-primary" : "bg-gray-700"
 											}`}>
-                                            <div className="w-full h-full bg-background-dark rounded-lg flex items-center justify-center">
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img
-                                                    src={club.logo}
-                                                    className="w-full h-full object-cover"
-                                                    alt=""
-                                                    onError={(e) => {
-                                                        e.currentTarget.style.display = 'none';
-                                                        e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
-                                                        const icon = document.createElement('div');
-                                                        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted/50"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
-                                                        e.currentTarget.parentElement?.appendChild(icon);
-                                                    }}
-                                                />
-                                            </div>
+											<div className="w-full h-full bg-background rounded-lg flex items-center justify-center">
+												{/* eslint-disable-next-line @next/next/no-img-element */}
+												<img
+													src={club.logo}
+													className="w-full h-full object-cover"
+													alt=""
+													onError={(e) => {
+														e.currentTarget.style.display = "none";
+														e.currentTarget.parentElement?.classList.add("flex", "items-center", "justify-center");
+														const icon = document.createElement("div");
+														icon.innerHTML =
+															'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted/50"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+														e.currentTarget.parentElement?.appendChild(icon);
+													}}
+												/>
+											</div>
 										</div>
 										<div>
-											<div
-												className={`text-sm font-bold ${
-													club.current
-														? "text-white"
-														: "text-gray-300"
-												}`}>
-												{club.name}
-											</div>
-											<div className="text-xs text-muted">
-												{club.period}
-											</div>
+											<div className={`text-sm font-bold ${club.current ? "text-white" : "text-gray-300"}`}>{club.name}</div>
+											<div className="text-xs text-muted">{club.period}</div>
 										</div>
 									</div>
 									<div className="flex flex-col items-end gap-1">
 										<span className="px-2 py-0.5 rounded bg-white/5 text-muted text-[10px] font-medium border border-white/10">
 											{club.division}
 										</span>
-										{club.current && (
-											<span className="text-[10px] text-accent font-bold">
-												Current
-											</span>
-										)}
+										{club.current && <span className="text-[10px] text-accent font-bold">Current</span>}
 									</div>
 								</div>
 							))}
@@ -320,28 +263,16 @@ export default function PlayerPage() {
 				<div className="lg:col-span-8">
 					{/* Tabs Navigation */}
 					<div className="flex items-center border-b border-white/10 mb-6 overflow-x-auto no-scrollbar">
-						{(
-							[
-								"overview",
-								"tournaments",
-								"achievements",
-							] as TabType[]
-						).map((tab) => (
+						{(["overview", "tournaments", "achievements"] as TabType[]).map((tab) => (
 							<button
 								key={tab}
 								onClick={() => setActiveTab(tab)}
 								className={`
                   flex-1 md:flex-none md:px-6 pb-4 text-sm font-bold capitalize relative transition-colors whitespace-nowrap
-                  ${
-						activeTab === tab
-							? "text-accent"
-							: "text-muted hover:text-white"
-					}
+                  ${activeTab === tab ? "text-accent" : "text-muted hover:text-white"}
                 `}>
 								{tab}
-								{activeTab === tab && (
-									<span className="absolute bottom-0 left-0 w-full h-0.5 bg-accent rounded-t-full z-10" />
-								)}
+								{activeTab === tab && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-accent rounded-t-full z-10" />}
 							</button>
 						))}
 					</div>
@@ -355,19 +286,11 @@ export default function PlayerPage() {
 									<div
 										key={ach.id}
 										className="group p-6 rounded-2xl bg-background border border-white/5 flex flex-col items-center text-center hover:border-accent/30 transition-all hover:-translate-y-1">
-										<div
-											className={`mb-4 p-3 rounded-full bg-linear-to-br ${ach.color} bg-opacity-10`}>
-											<ach.icon
-												size={32}
-												className="text-white drop-shadow-lg"
-											/>
+										<div className={`mb-4 p-3 rounded-full bg-linear-to-br ${ach.color} bg-opacity-10`}>
+											<ach.icon size={32} className="text-white drop-shadow-lg" />
 										</div>
-										<div className="text-2xl font-bold text-white mb-1">
-											{ach.count}x
-										</div>
-										<div className="text-sm text-muted font-medium uppercase tracking-wider">
-											{ach.title}
-										</div>
+										<div className="text-2xl font-bold text-white mb-1">{ach.count}x</div>
+										<div className="text-sm text-muted font-medium uppercase tracking-wider">{ach.title}</div>
 									</div>
 								))}
 							</div>
@@ -380,12 +303,8 @@ export default function PlayerPage() {
 									<div key={tour.id} className="flex group">
 										{/* Date Column */}
 										<div className="w-24 pt-4 text-right pr-4 flex flex-col items-end relative">
-											<span className="text-sm font-bold text-gray-300">
-												{tour.date.split(" ")[0]}
-											</span>
-											<span className="text-xs text-muted">
-												{tour.date.split(" ")[1]}
-											</span>
+											<span className="text-sm font-bold text-gray-300">{tour.date.split(" ")[0]}</span>
+											<span className="text-xs text-muted">{tour.date.split(" ")[1]}</span>
 											{/* Timeline Connector */}
 											<div className="absolute right-[-5px] top-[22px] w-2.5 h-2.5 rounded-full bg-background border-2 border-white/20 group-hover:border-accent z-10"></div>
 											<div className="absolute right-0 top-[22px] bottom-[-16px] w-0.5 bg-white/10 z-0"></div>
@@ -394,17 +313,12 @@ export default function PlayerPage() {
 										{/* Content Card */}
 										<div className="flex-1 p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/[0.07] transition-all flex justify-between items-center">
 											<div>
-												<h4 className="font-bold text-white text-lg group-hover:text-accent transition-colors">
-													{tour.name}
-												</h4>
+												<h4 className="font-bold text-white text-lg group-hover:text-accent transition-colors">{tour.name}</h4>
 												<div className="flex items-center gap-2 text-sm text-muted mt-1">
-													<Users size={14} />{" "}
-													Represents: {tour.team}
+													<Users size={14} /> Represents: {tour.team}
 												</div>
 											</div>
-											<ResultBadge type={tour.resultType}>
-												{tour.result}
-											</ResultBadge>
+											<ResultBadge type={tour.resultType}>{tour.result}</ResultBadge>
 										</div>
 									</div>
 								))}
@@ -414,17 +328,9 @@ export default function PlayerPage() {
 						{/* 3. OVERVIEW TAB (Placeholder for now) */}
 						{activeTab === "overview" && (
 							<div className="text-center py-12 text-muted bg-white/5 rounded-2xl border border-white/5 border-dashed">
-								<Activity
-									size={48}
-									className="mx-auto mb-4 opacity-50"
-								/>
-								<h3 className="text-lg font-bold text-white">
-									Season Overview
-								</h3>
-								<p className="text-sm">
-									Recent matches and highlights will appear
-									here.
-								</p>
+								<Activity size={48} className="mx-auto mb-4 opacity-50" />
+								<h3 className="text-lg font-bold text-white">Season Overview</h3>
+								<p className="text-sm">Recent matches and highlights will appear here.</p>
 							</div>
 						)}
 					</div>
@@ -444,13 +350,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 	);
 }
 
-function ResultBadge({
-	type,
-	children,
-}: {
-	type: string;
-	children: React.ReactNode;
-}) {
+function ResultBadge({ type, children }: { type: string; children: React.ReactNode }) {
 	const colors = {
 		gold: "bg-yellow-500/20 text-yellow-500 border-yellow-500/30",
 		silver: "bg-gray-300/20 text-gray-300 border-gray-300/30",
@@ -459,10 +359,5 @@ function ResultBadge({
 	};
 	const colorClass = colors[type as keyof typeof colors] || colors.neutral;
 
-	return (
-		<span
-			className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${colorClass}`}>
-			{children}
-		</span>
-	);
+	return <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${colorClass}`}>{children}</span>;
 }

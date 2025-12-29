@@ -1,36 +1,18 @@
 "use client";
 
-import {
-	Calendar,
-	Clock,
-	MapPin,
-	Users,
-	ChevronRight,
-	Share2,
-	MessageCircle,
-	AlertTriangle,
-	Shield,
-	Trophy,
-	CreditCard,
-	Info,
-	CheckCircle,
-} from "lucide-react";
-import { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { Event } from "@/lib/models/Event";
-import { UserProfile } from "@/lib/models/User";
-import { Team } from "@/lib/models/Team";
-import {
-	getDuration,
-	getFormattedDateWithDay,
-	getFormattedTime,
-} from "@/lib/utils/date";
-import { Avatar } from "@/components/ui";
-import { Map } from "@/components/features/locations";
 import CommentsSection from "@/components/features/comments/components/CommentsSection";
-import EventPageButtons from "./EventPageButtons";
+import { Map } from "@/components/features/locations";
 import { TeamsList } from "@/components/features/teams";
+import { Avatar } from "@/components/ui";
+import { Event } from "@/lib/models/Event";
+import { Unit } from "@/lib/models/EventBudget";
+import { Team } from "@/lib/models/Team";
+import { UserProfile } from "@/lib/models/User";
+import { getDuration, getFormattedDateWithDay, getFormattedTime } from "@/lib/utils/date";
+import { AlertTriangle, Clock, MapPin, Share2, Shield, Users } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import EventPageButtons from "./EventPageButtons";
 
 type EventDetailsV2Props = {
 	event: Event;
@@ -41,14 +23,7 @@ type EventDetailsV2Props = {
 	positionsRealtime: React.ReactNode;
 };
 
-export default function EventDetailsV2({
-	event,
-	user,
-	isAdmin,
-	teams,
-	paymentsSection,
-	positionsRealtime,
-}: EventDetailsV2Props) {
+export default function EventDetailsV2({ event, user, isAdmin, teams, paymentsSection, positionsRealtime }: EventDetailsV2Props) {
 	const [activeTab, setActiveTab] = useState("overview");
 
 	// Helpers
@@ -58,14 +33,12 @@ export default function EventDetailsV2({
 	const duration = getDuration(event.startTime, event.endTime);
 
 	// Extract participant IDs from teams for messaging
-	const participantIds = teams.flatMap((team) =>
-		(team.positions ?? [])
-			.filter((pos) => pos.eventParticipant?.userId)
-			.map((pos) => pos.eventParticipant!.userId)
-	).filter((id, index, self) => self.indexOf(id) === index); // unique IDs
+	const participantIds = teams
+		.flatMap((team) => (team.positions ?? []).filter((pos) => pos.eventParticipant?.userId).map((pos) => pos.eventParticipant!.userId))
+		.filter((id, index, self) => self.indexOf(id) === index); // unique IDs
 
 	return (
-		<div className="min-h-screen bg-background-dark text-white font-sans pb-20">
+		<div className="min-h-screen bg-background text-white font-sans pb-20">
 			{/* --- HERO SECTION --- */}
 			<div className="relative w-full">
 				{/* Banner & Gradient */}
@@ -96,9 +69,7 @@ export default function EventDetailsV2({
 									</span>
 								)}
 							</div>
-							<h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight">
-								{event.name}
-							</h1>
+							<h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight">{event.name}</h1>
 							<p className="text-muted text-sm md:text-base flex flex-wrap items-center gap-x-4 gap-y-2 mt-1">
 								<span className="flex items-center gap-1.5 text-white">
 									<Clock size={16} className="text-accent" />
@@ -129,9 +100,7 @@ export default function EventDetailsV2({
 			</div>
 
 			{/* --- REALTIME POSITIONS (Hidden but active) --- */}
-			<div className="hidden">
-				{positionsRealtime}
-			</div>
+			<div className="hidden">{positionsRealtime}</div>
 
 			{/* --- CONTENT GRID --- */}
 			<div className="max-w-desktop mx-auto px-4 sm:px-6 mt-8 md:mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -145,9 +114,7 @@ export default function EventDetailsV2({
 						</div>
 						<div>
 							<div className="text-sm font-medium text-white">Date & Time</div>
-							<div className="text-xs text-muted">
-								{getFormattedDateWithDay(event.startTime)}
-							</div>
+							<div className="text-xs text-muted">{getFormattedDateWithDay(event.startTime)}</div>
 						</div>
 					</div>
 
@@ -160,9 +127,7 @@ export default function EventDetailsV2({
 							{event.location?.address && (
 								<Link
 									target="_blank"
-									href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-										event.location.address!
-									)}`}
+									href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(event.location.address!)}`}
 									className="text-xs text-primary hover:underline">
 									Get Directions
 								</Link>
@@ -174,16 +139,10 @@ export default function EventDetailsV2({
 									<Map defaultAddress={event.location.address} readonly={true} />
 								</div>
 							) : (
-								<div className="h-full w-full flex items-center justify-center text-muted">
-									Map Unavailable
-								</div>
+								<div className="h-full w-full flex items-center justify-center text-muted">Map Unavailable</div>
 							)}
 						</div>
-						{event.location?.address && (
-							<div className="p-3 text-xs text-muted bg-background/50">
-								{event.location.address}
-							</div>
-						)}
+						{event.location?.address && <div className="p-3 text-xs text-muted bg-background/50">{event.location.address}</div>}
 					</div>
 
 					{/* Admins */}
@@ -194,11 +153,8 @@ export default function EventDetailsV2({
 							</h3>
 							<div className="flex flex-col gap-3">
 								{event.admins.map((admin) => (
-									<Link
-										key={admin.userId}
-										href={`/profiles/${admin.userId}`}
-										className="flex items-center gap-3 group">
-										<Avatar profile={admin} className="w-10 h-10 border-2 border-transparent group-hover:border-accent transition-all" />
+									<Link key={admin.userId} href={`/profiles/${admin.userId}`} className="flex items-center gap-3 group">
+										<Avatar name={admin.name + " " + admin.surname} src={admin.imageUrl} />
 										<div>
 											<div className="text-sm font-bold text-white group-hover:text-accent transition-colors">
 												{admin.name} {admin.surname}
@@ -222,23 +178,16 @@ export default function EventDetailsV2({
 								onClick={() => setActiveTab(tab)}
 								className={`
                   px-6 pb-4 text-sm font-bold capitalize relative transition-colors whitespace-nowrap
-                  ${
-						activeTab === tab
-							? "text-accent"
-							: "text-muted hover:text-white"
-					}
+                  ${activeTab === tab ? "text-accent" : "text-muted hover:text-white"}
                 `}>
 								{tab}
-								{activeTab === tab && (
-									<span className="absolute bottom-0 left-0 w-full h-0.5 bg-accent rounded-t-full z-10" />
-								)}
+								{activeTab === tab && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-accent rounded-t-full z-10" />}
 							</button>
 						))}
 					</div>
 
 					{/* Tab Content */}
 					<div className="animate-in fade-in duration-300 space-y-6">
-						
 						{/* OVERVIEW TAB */}
 						{activeTab === "overview" && (
 							<>
@@ -257,7 +206,9 @@ export default function EventDetailsV2({
 									</div>
 									<div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
 										<div className="text-xs text-muted uppercase font-bold mb-1">Format</div>
-										<div className="text-lg font-bold text-white truncate">{event.registrationUnit === "team" ? "Team" : "Individual"}</div>
+										<div className="text-lg font-bold text-white truncate">
+											{event.registrationUnit === Unit.Team ? "Team" : "Individual"}
+										</div>
 									</div>
 									<div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
 										<div className="text-xs text-muted uppercase font-bold mb-1">Cost</div>
@@ -280,12 +231,7 @@ export default function EventDetailsV2({
 									<h3 className="text-lg font-bold text-white">Registered Teams</h3>
 								</div>
 								{teams && teams.length > 0 ? (
-									<TeamsList
-										teams={teams}
-										userId={user?.userId}
-										isAdmin={isAdmin}
-										registrationType={event.registrationUnit}
-									/>
+									<TeamsList teams={teams} userId={user?.userId} isAdmin={isAdmin} registrationType={event.registrationUnit} />
 								) : (
 									<div className="text-center py-12 bg-white/5 rounded-2xl border border-white/5 border-dashed text-muted">
 										<Users size={48} className="mx-auto mb-4 opacity-50" />
@@ -296,11 +242,7 @@ export default function EventDetailsV2({
 						)}
 
 						{/* PAYMENTS TAB */}
-						{activeTab === "payments" && (
-							<div className="space-y-4">
-								{paymentsSection}
-							</div>
-						)}
+						{activeTab === "payments" && <div className="space-y-4">{paymentsSection}</div>}
 
 						{/* COMMENTS TAB */}
 						{activeTab === "comments" && (

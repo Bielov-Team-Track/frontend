@@ -1,5 +1,5 @@
-import { useEventFormContext } from "../context/EventFormContext";
 import { STEP_CONFIG } from "../config/stepConfig";
+import { useEventFormContext } from "../context/EventFormContext";
 
 export function StepRenderer() {
 	const { wizard } = useEventFormContext();

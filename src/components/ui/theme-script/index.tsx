@@ -4,10 +4,14 @@ export function ThemeScript() {
 			try {
 				const savedTheme = localStorage.getItem('theme');
 				const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-				const theme = savedTheme || (prefersDark ? 'volleydark' : 'volleylight');
-				document.documentElement.setAttribute('data-theme', theme);
+				const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+				if (theme === 'dark') {
+					document.documentElement.classList.add('dark');
+				} else {
+					document.documentElement.classList.remove('dark');
+				}
 			} catch (e) {
-				document.documentElement.setAttribute('data-theme', 'volleydark');
+				document.documentElement.classList.add('dark');
 			}
 		})();
 	`;

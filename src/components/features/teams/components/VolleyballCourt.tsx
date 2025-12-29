@@ -193,7 +193,7 @@ function DroppableCourtPosition({
 							{assignedMembers.slice(0, 2).map((member, idx) => (
 								<div
 									key={member.id}
-									className={`absolute inset-0 rounded-full bg-background-dark border-2 flex items-center justify-center text-sm font-bold text-white shadow-lg overflow-hidden ${
+									className={`absolute inset-0 rounded-full bg-background border-2 flex items-center justify-center text-sm font-bold text-white shadow-lg overflow-hidden ${
 										idx === 0 ? "border-yellow-500 z-10" : "border-accent translate-x-2 translate-y-2 z-0"
 									}`}>
 									{member.userProfile?.imageUrl ? (

@@ -16,23 +16,7 @@ import { ClubMember, ClubRegistration, ClubRole, RegistrationSortBy, Registratio
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-	ArrowDownUp,
-	Calendar,
-	Check,
-	ChevronRight,
-	Clock,
-	Filter,
-	Loader2,
-	Plus,
-	RotateCcw,
-	Search,
-	UserCheck,
-	UserMinus,
-	UserPlus,
-	Users,
-	X,
-} from "lucide-react";
+import { ArrowDownUp, Calendar, Check, Clock, Filter, Loader2, Plus, RotateCcw, Search, UserCheck, UserMinus, UserPlus, Users, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -391,7 +375,6 @@ function RegistrationsList({ clubId, status }: RegistrationsListProps) {
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
 							leftIcon={<Search size={16} />}
-							size="sm"
 							aria-label="Search registrations"
 						/>
 					</div>
@@ -441,18 +424,10 @@ function RegistrationsList({ clubId, status }: RegistrationsListProps) {
 								value={dateFrom}
 								onChange={(e) => setDateFrom(e.target.value)}
 								leftIcon={<Calendar size={16} />}
-								size="sm"
 							/>
 
 							{/* Date To */}
-							<Input
-								type="date"
-								label="To Date"
-								value={dateTo}
-								onChange={(e) => setDateTo(e.target.value)}
-								leftIcon={<Calendar size={16} />}
-								size="sm"
-							/>
+							<Input type="date" label="To Date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} leftIcon={<Calendar size={16} />} />
 
 							{/* Sort By */}
 							<Dropdown
@@ -591,7 +566,7 @@ function RegistrationCard({
 				{/* Avatar */}
 				<div className="shrink-0">
 					{userProfile ? (
-						<Avatar profile={userProfile} size="small" />
+						<Avatar name={userProfile.name + " " + userProfile.surname} src={userProfile.imageUrl} variant={"user"} />
 					) : (
 						<div className="w-10 h-10 rounded-lg bg-linear-to-br from-accent/30 to-primary/30 flex items-center justify-center text-sm font-bold text-white border border-white/10">
 							{initials}
@@ -605,7 +580,7 @@ function RegistrationCard({
 						<h4 className="font-medium text-white truncate">{userName || "Unknown User"}</h4>
 						{userEmail && <span className="text-xs text-muted truncate hidden sm:inline">({userEmail})</span>}
 					</div>
-					<div className="flex items-center gap-2 mt-1 text-sm text-muted">
+					<div className="flex items-center gap-1 mt-1 text-sm text-muted">
 						<Clock size={12} className="shrink-0" />
 						<span className="truncate">{formatDistanceToNow(new Date(registration.submittedAt), { addSuffix: true })}</span>
 						<span className="text-white/20">•</span>
@@ -618,7 +593,6 @@ function RegistrationCard({
 					{registration.status === RegistrationStatus.Pending && (
 						<>
 							<Button
-								variant="solid"
 								color="success"
 								size="sm"
 								onClick={() => onStatusChange(registration.id, RegistrationStatus.Accepted)}
@@ -654,7 +628,6 @@ function RegistrationCard({
 					{registration.status === RegistrationStatus.Waitlist && (
 						<>
 							<Button
-								variant="solid"
 								color="success"
 								size="sm"
 								onClick={() => onStatusChange(registration.id, RegistrationStatus.Accepted)}
@@ -678,7 +651,7 @@ function RegistrationCard({
 					)}
 					{registration.status === RegistrationStatus.Declined && (
 						<Button
-							variant="ghost"
+							variant="outline"
 							color="accent"
 							size="sm"
 							onClick={() => onStatusChange(registration.id, RegistrationStatus.Pending)}
@@ -689,9 +662,6 @@ function RegistrationCard({
 							Reconsider
 						</Button>
 					)}
-
-					{/* View Details Chevron */}
-					<ChevronRight size={16} className="text-muted group-hover:text-white/50 transition-colors hidden lg:block" />
 				</div>
 			</div>
 		</div>

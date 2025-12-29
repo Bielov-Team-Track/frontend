@@ -1,13 +1,13 @@
+import { ThemeScript } from "@/components/ui/theme-script";
+import { QueryProvider, ThemeProvider } from "@/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
-import { ThemeScript } from "@/components/ui/theme-script";
-import { QueryProvider, ThemeProvider } from "@/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-	title: "Volleyer",
+	title: "Spike",
 	description: "",
 };
 
@@ -22,7 +22,8 @@ export default async function RootLayout({
 				<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 				<ThemeScript />
 			</head>
-			<body className={`${inter.className} min-h-screen-safe flex flex-col text-mobile-base sm:text-tablet-base lg:text-desktop-base antialiased bg-base-200 text-base-content`}>
+			<body
+				className={`${inter.className} min-h-screen-safe flex flex-col text-mobile-base sm:text-tablet-base lg:text-desktop-base antialiased bg-base-200 text-base-content`}>
 				<ThemeProvider>
 					<QueryProvider>
 						<div className="min-h-screen-safe grid bg-base-200">

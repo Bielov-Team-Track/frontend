@@ -1,9 +1,9 @@
 "use client";
 
+import { Avatar } from "@/components";
 import { Input } from "@/components/ui";
-import Avatar from "@/components/ui/avatar";
-import { UserProfile } from "@/lib/models/User";
 import { searchUsers } from "@/lib/api/user";
+import { UserProfile } from "@/lib/models/User";
 import React, { useState } from "react";
 
 type UserSearchProps = {

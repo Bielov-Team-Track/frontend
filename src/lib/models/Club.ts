@@ -253,13 +253,6 @@ export interface RegistrationFilterRequest {
 	limit?: number;
 }
 
-export interface CursorPagedResult<T> {
-	items: T[];
-	nextCursor?: string;
-	hasMore: boolean;
-	totalCount?: number;
-}
-
 export interface ClubRegistration {
 	id: string;
 	clubId: string;

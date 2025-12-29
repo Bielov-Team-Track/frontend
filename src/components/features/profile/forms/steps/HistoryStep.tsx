@@ -1,4 +1,4 @@
-import { Button, Dropdown, Input, MultiSelectPills } from "@/components/ui";
+import { Button, Input, MultiSelectPills, Select } from "@/components/ui";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Calendar, Plus, Shield, Trash2 } from "lucide-react";
 import Image from "next/image";
@@ -49,8 +49,7 @@ const sampleTeams: Suggestion[] = [
 	{
 		id: "t1",
 		name: "White Panthers",
-		logoUrl:
-			"https://api.dicebear.com/7.x/identicon/svg?seed=WhitePanthers",
+		logoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=WhitePanthers",
 		clubId: "1",
 	},
 	{ id: "t2", name: "Black Panthers", clubId: "1" },
@@ -88,14 +87,14 @@ export type HistoryEntry = {
 	positions: string[];
 };
 
-const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Props) => {
+const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 	const [entries, setEntries] = useState<HistoryEntry[]>(initialEntries);
 
 	// Add Entry State
-	const [year, setYear] = useState<string | null>(null);
+	const [year, setYear] = useState<string | undefined>();
 	const [clubName, setClubName] = useState("");
 	const [teamName, setTeamName] = useState("");
-	const [role, setRole] = useState<string | null>(null);
+	const [role, setRole] = useState<string | undefined>();
 	const [positions, setPositions] = useState<string[]>([]);
 	const [addError, setAddError] = useState<string | null>(null);
 
@@ -105,15 +104,11 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 
 	// Suggestions State
 	const [showClubSuggestions, setShowClubSuggestions] = useState(false);
-	const [filteredClubSuggestions, setFilteredClubSuggestions] = useState<
-		Suggestion[]
-	>([]);
+	const [filteredClubSuggestions, setFilteredClubSuggestions] = useState<Suggestion[]>([]);
 	const clubInputRef = useRef<HTMLDivElement>(null);
 
 	const [showTeamSuggestions, setShowTeamSuggestions] = useState(false);
-	const [filteredTeamSuggestions, setFilteredTeamSuggestions] = useState<
-		Suggestion[]
-	>([]);
+	const [filteredTeamSuggestions, setFilteredTeamSuggestions] = useState<Suggestion[]>([]);
 	const teamInputRef = useRef<HTMLDivElement>(null);
 
 	const currentYear = new Date().getFullYear();
@@ -144,16 +139,10 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 	// Handle clicks outside for suggestions
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				clubInputRef.current &&
-				!clubInputRef.current.contains(event.target as Node)
-			) {
+			if (clubInputRef.current && !clubInputRef.current.contains(event.target as Node)) {
 				setShowClubSuggestions(false);
 			}
-			if (
-				teamInputRef.current &&
-				!teamInputRef.current.contains(event.target as Node)
-			) {
+			if (teamInputRef.current && !teamInputRef.current.contains(event.target as Node)) {
 				setShowTeamSuggestions(false);
 			}
 		};
@@ -174,11 +163,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 		setTeamName("");
 
 		if (value.length > 0) {
-			setFilteredClubSuggestions(
-				sampleClubs.filter((club) =>
-					club.name.toLowerCase().includes(value.toLowerCase())
-				)
-			);
+			setFilteredClubSuggestions(sampleClubs.filter((club) => club.name.toLowerCase().includes(value.toLowerCase())));
 			setShowClubSuggestions(true);
 		} else {
 			setShowClubSuggestions(false);
@@ -200,11 +185,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 				matches = matches.filter((t) => t.clubId === selectedClub.id);
 			}
 
-			setFilteredTeamSuggestions(
-				matches.filter((team) =>
-					team.name.toLowerCase().includes(value.toLowerCase())
-				)
-			);
+			setFilteredTeamSuggestions(matches.filter((team) => team.name.toLowerCase().includes(value.toLowerCase())));
 			setShowTeamSuggestions(true);
 		} else {
 			setShowTeamSuggestions(false);
@@ -238,17 +219,13 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 		// (handle case where user typed exact name but didn't click suggestion)
 		let finalClubLogo = selectedClub?.logoUrl;
 		if (!finalClubLogo) {
-			const match = sampleClubs.find(
-				(c) => c.name.toLowerCase() === clubName.toLowerCase()
-			);
+			const match = sampleClubs.find((c) => c.name.toLowerCase() === clubName.toLowerCase());
 			if (match) finalClubLogo = match.logoUrl;
 		}
 
 		let finalTeamLogo = selectedTeam?.logoUrl;
 		if (!finalTeamLogo) {
-			const match = sampleTeams.find(
-				(t) => t.name.toLowerCase() === teamName.toLowerCase()
-			);
+			const match = sampleTeams.find((t) => t.name.toLowerCase() === teamName.toLowerCase());
 			if (match) finalTeamLogo = match.logoUrl;
 		}
 
@@ -271,7 +248,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 		setTeamName("");
 		setSelectedClub(null);
 		setSelectedTeam(null);
-		setRole(null);
+		setRole(undefined);
 		setPositions([]);
 		setAddError(null);
 	};
@@ -293,9 +270,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 		return acc;
 	}, {} as Record<string, Record<string, HistoryEntry[]>>);
 
-	const sortedYears = Object.keys(groupedEntries).sort(
-		(a, b) => parseInt(b) - parseInt(a)
-	);
+	const sortedYears = Object.keys(groupedEntries).sort((a, b) => parseInt(b) - parseInt(a));
 
 	const onSubmit = () => {
 		const bioString = sortedYears
@@ -307,10 +282,8 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 						const entriesString = clubEntries
 							.map((e) => {
 								let details = e.role;
-								if (e.teamName)
-									details = `${e.teamName} - ${details}`;
-								if (e.positions.length > 0)
-									details += `, ${e.positions.join(", ")}`;
+								if (e.teamName) details = `${e.teamName} - ${details}`;
+								if (e.positions.length > 0) details += `, ${e.positions.join(", ")}`;
 								return details;
 							})
 							.join("\n");
@@ -323,22 +296,11 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 		onNext({ bio: bioString });
 	};
 
-	const renderSuggestionItem = (
-		item: Suggestion,
-		onSelect: (item: Suggestion) => void
-	) => (
-		<li
-			key={item.id}
-			className="px-4 py-2 hover:bg-white/5 cursor-pointer flex items-center gap-3"
-			onMouseDown={() => onSelect(item)}>
+	const renderSuggestionItem = (item: Suggestion, onSelect: (item: Suggestion) => void) => (
+		<li key={item.id} className="px-4 py-2 hover:bg-white/5 cursor-pointer flex items-center gap-3" onMouseDown={() => onSelect(item)}>
 			{item.logoUrl ? (
 				<div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0 bg-white/10">
-					<Image
-						src={item.logoUrl}
-						alt={item.name}
-						fill
-						className="object-cover"
-					/>
+					<Image src={item.logoUrl} alt={item.name} fill className="object-cover" />
 				</div>
 			) : (
 				<div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-muted">
@@ -350,17 +312,10 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 	);
 
 	return (
-		<form
-			id={formId}
-			onSubmit={handleSubmit(onSubmit)}
-			className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+		<form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 			<div className="flex flex-col gap-2">
-				<h2 className="text-xl font-semibold text-white">
-					Experience & History
-				</h2>
-				<p className="text-sm text-muted">
-					Add your past teams, clubs, and roles.
-				</p>
+				<h2 className="text-xl font-semibold text-white">Experience & History</h2>
+				<p className="text-sm text-muted">Add your past teams, clubs, and roles.</p>
 			</div>
 
 			{/* Add Entry Form */}
@@ -370,7 +325,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 				</h3>
 
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-					<Dropdown
+					<Select
 						placeholder="Year"
 						options={yearOptions}
 						value={year}
@@ -384,30 +339,18 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 							value={clubName}
 							onChange={handleClubNameChange}
 							onFocus={() => {
-								if (clubName.length > 0)
-									setShowClubSuggestions(true);
+								if (clubName.length > 0) setShowClubSuggestions(true);
 							}}
-							onBlur={() =>
-								setTimeout(
-									() => setShowClubSuggestions(false),
-									200
-								)
-							}
+							onBlur={() => setTimeout(() => setShowClubSuggestions(false), 200)}
 							required
 						/>
-						{showClubSuggestions &&
-							filteredClubSuggestions.length > 0 && (
-								<ul className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
-									{filteredClubSuggestions.map((club) =>
-										renderSuggestionItem(
-											club,
-											handleSelectClubSuggestion
-										)
-									)}
-								</ul>
-							)}
+						{showClubSuggestions && filteredClubSuggestions.length > 0 && (
+							<ul className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
+								{filteredClubSuggestions.map((club) => renderSuggestionItem(club, handleSelectClubSuggestion))}
+							</ul>
+						)}
 					</div>
-					<Dropdown
+					<Select
 						placeholder="Role"
 						options={roleOptions}
 						value={role}
@@ -427,32 +370,17 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 									setShowTeamSuggestions(true);
 								} else if (selectedClub) {
 									// Show all teams for this club if focused empty
-									setFilteredTeamSuggestions(
-										sampleTeams.filter(
-											(t) => t.clubId === selectedClub.id
-										)
-									);
+									setFilteredTeamSuggestions(sampleTeams.filter((t) => t.clubId === selectedClub.id));
 									setShowTeamSuggestions(true);
 								}
 							}}
-							onBlur={() =>
-								setTimeout(
-									() => setShowTeamSuggestions(false),
-									200
-								)
-							}
+							onBlur={() => setTimeout(() => setShowTeamSuggestions(false), 200)}
 						/>
-						{showTeamSuggestions &&
-							filteredTeamSuggestions.length > 0 && (
-								<ul className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
-									{filteredTeamSuggestions.map((team) =>
-										renderSuggestionItem(
-											team,
-											handleSelectTeamSuggestion
-										)
-									)}
-								</ul>
-							)}
+						{showTeamSuggestions && filteredTeamSuggestions.length > 0 && (
+							<ul className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
+								{filteredTeamSuggestions.map((team) => renderSuggestionItem(team, handleSelectTeamSuggestion))}
+							</ul>
+						)}
 					</div>
 				</div>
 
@@ -470,12 +398,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 
 				{addError && <p className="text-red-400 text-xs">{addError}</p>}
 
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					onClick={handleAddEntry}
-					className="self-end px-6">
+				<Button type="button" variant="outline" size="sm" onClick={handleAddEntry} className="self-end px-6">
 					Add Entry
 				</Button>
 			</div>
@@ -484,134 +407,77 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 			{sortedYears.length > 0 && (
 				<div className="relative pl-4 ml-2 border-l-2 border-white/10 space-y-8 py-2">
 					{sortedYears.map((year) => (
-						<div
-							key={year}
-							className="relative animate-in fade-in slide-in-from-left-4">
+						<div key={year} className="relative animate-in fade-in slide-in-from-left-4">
 							{/* Dot on line */}
 							<div className="absolute -left-[21px] top-1.5 w-3 h-3 rounded-full bg-accent border-2 border-background" />
 
 							<div className="flex flex-col gap-4">
-								<span className="text-accent font-bold text-lg leading-none">
-									{year}
-								</span>
+								<span className="text-accent font-bold text-lg leading-none">{year}</span>
 
-								{Object.keys(groupedEntries[year]).map(
-									(clubNameKey) => {
-										// We need to find the entry that represents this club to get the logo
-										// Since grouped by name, any entry in the array has the same clubName.
-										// But different entries might have different logoUrls if they were added differently?
-										// Ideally logo is tied to club name. Let's pick the first one's logo.
-										const clubEntries =
-											groupedEntries[year][clubNameKey];
-										const firstEntry = clubEntries[0];
+								{Object.keys(groupedEntries[year]).map((clubNameKey) => {
+									// We need to find the entry that represents this club to get the logo
+									// Since grouped by name, any entry in the array has the same clubName.
+									// But different entries might have different logoUrls if they were added differently?
+									// Ideally logo is tied to club name. Let's pick the first one's logo.
+									const clubEntries = groupedEntries[year][clubNameKey];
+									const firstEntry = clubEntries[0];
 
-										return (
-											<div
-												key={clubNameKey}
-												className="flex flex-col gap-2 ml-1">
-												<div className="flex items-center gap-2 border-b border-white/5 pb-1 mb-1">
-													{firstEntry.clubLogoUrl ? (
-														<div className="relative w-6 h-6 rounded-full overflow-hidden bg-white/10 shrink-0">
-															<Image
-																src={
-																	firstEntry.clubLogoUrl
-																}
-																alt={
-																	clubNameKey
-																}
-																fill
-																className="object-cover"
-															/>
-														</div>
-													) : (
-														<div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-muted shrink-0">
-															<Shield size={14} />
-														</div>
-													)}
-													<span className="text-white font-semibold text-base">
-														{clubNameKey}
-													</span>
-												</div>
+									return (
+										<div key={clubNameKey} className="flex flex-col gap-2 ml-1">
+											<div className="flex items-center gap-2 border-b border-white/5 pb-1 mb-1">
+												{firstEntry.clubLogoUrl ? (
+													<div className="relative w-6 h-6 rounded-full overflow-hidden bg-white/10 shrink-0">
+														<Image src={firstEntry.clubLogoUrl} alt={clubNameKey} fill className="object-cover" />
+													</div>
+												) : (
+													<div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-muted shrink-0">
+														<Shield size={14} />
+													</div>
+												)}
+												<span className="text-white font-semibold text-base">{clubNameKey}</span>
+											</div>
 
-												<div className="flex flex-col gap-3">
-													{clubEntries.map(
-														(entry) => (
-															<div
-																key={entry.id}
-																className="flex justify-between items-start group bg-white/5 p-3 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
-																<div className="flex flex-col gap-1">
-																	{entry.teamName && (
-																		<div className="flex items-center gap-2 mb-1">
-																			{entry.teamLogoUrl && (
-																				<div className="relative w-4 h-4 rounded-full overflow-hidden bg-white/10 shrink-0">
-																					<Image
-																						src={
-																							entry.teamLogoUrl
-																						}
-																						alt={
-																							entry.teamName
-																						}
-																						fill
-																						className="object-cover"
-																					/>
-																				</div>
-																			)}
-																			<span className="text-white text-sm font-medium">
-																				{
-																					entry.teamName
-																				}
-																			</span>
+											<div className="flex flex-col gap-3">
+												{clubEntries.map((entry) => (
+													<div
+														key={entry.id}
+														className="flex justify-between items-start group bg-white/5 p-3 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
+														<div className="flex flex-col gap-1">
+															{entry.teamName && (
+																<div className="flex items-center gap-2 mb-1">
+																	{entry.teamLogoUrl && (
+																		<div className="relative w-4 h-4 rounded-full overflow-hidden bg-white/10 shrink-0">
+																			<Image src={entry.teamLogoUrl} alt={entry.teamName} fill className="object-cover" />
 																		</div>
 																	)}
-
-																	<div className="text-white/90 text-sm flex items-center gap-2">
-																		<span
-																			className={
-																				entry.teamName
-																					? "text-muted"
-																					: "font-medium"
-																			}>
-																			{
-																				entry.role
-																			}
-																		</span>
-
-																		{entry
-																			.positions
-																			.length >
-																			0 && (
-																			<span className="text-muted text-xs italic before:content-['•'] before:mr-2">
-																				{entry.positions.join(
-																					", "
-																				)}
-																			</span>
-																		)}
-																	</div>
+																	<span className="text-white text-sm font-medium">{entry.teamName}</span>
 																</div>
+															)}
 
-																<button
-																	type="button"
-																	onClick={() =>
-																		handleRemoveEntry(
-																			entry.id
-																		)
-																	}
-																	className="text-muted hover:text-red-400 transition-colors p-1"
-																	title="Remove entry">
-																	<Trash2
-																		size={
-																			14
-																		}
-																	/>
-																</button>
+															<div className="text-white/90 text-sm flex items-center gap-2">
+																<span className={entry.teamName ? "text-muted" : "font-medium"}>{entry.role}</span>
+
+																{entry.positions.length > 0 && (
+																	<span className="text-muted text-xs italic before:content-['•'] before:mr-2">
+																		{entry.positions.join(", ")}
+																	</span>
+																)}
 															</div>
-														)
-													)}
-												</div>
+														</div>
+
+														<button
+															type="button"
+															onClick={() => handleRemoveEntry(entry.id)}
+															className="text-muted hover:text-red-400 transition-colors p-1"
+															title="Remove entry">
+															<Trash2 size={14} />
+														</button>
+													</div>
+												))}
 											</div>
-										);
-									}
-								)}
+										</div>
+									);
+								})}
 							</div>
 						</div>
 					))}
@@ -619,9 +485,7 @@ const HistoryStep = ({ defaultValues, onNext, formId, initialEntries = [] }: Pro
 			)}
 
 			{sortedYears.length === 0 && (
-				<div className="text-center py-8 text-muted border border-dashed border-white/10 rounded-xl">
-					No history entries added yet.
-				</div>
+				<div className="text-center py-8 text-muted border border-dashed border-white/10 rounded-xl">No history entries added yet.</div>
 			)}
 		</form>
 	);
