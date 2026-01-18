@@ -1,6 +1,7 @@
 "use client";
 
 import { Avatar, Button, Input, Loader } from "@/components";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getClubs } from "@/lib/api/clubs";
 import { Club } from "@/lib/models/Club";
 import { useQuery } from "@tanstack/react-query";
@@ -27,7 +28,7 @@ export default function ClubsPageClient() {
 	const filteredClubs = clubs.filter((club) => club.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
 	return (
-		<div className="h-full flex flex-col space-y-6">
+		<Tabs className="h-full flex flex-col space-y-6">
 			{/* Toolbar */}
 			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-neutral-900 backdrop-blur-md p-4 rounded-2xl border border-white/5">
 				{/* Search & Filter */}
@@ -41,26 +42,19 @@ export default function ClubsPageClient() {
 				{/* View Toggles & Action */}
 				<div className="flex items-center gap-3 w-full sm:w-auto justify-end">
 					{/* View Switcher */}
-					<div className="flex p-1 bg-white/5 border border-white/10 rounded-xl">
-						{VIEWS.map((view) => (
-							<button
-								key={view.value}
-								onClick={() => setCurrentView(view.value)}
-								className={`p-2 rounded-lg transition-all ${
-									currentView === view.value ? "bg-white/10 text-white shadow-xs" : "text-muted hover:text-white hover:bg-white/5"
-								}`}
-								title={view.label}>
-								<view.icon size={18} />
-							</button>
-						))}
-					</div>
+					<TabsList className="border rounded-xl">
+						<TabsTrigger value="grid">
+							<Grid size={18} />
+						</TabsTrigger>
+						<TabsTrigger value="list">
+							<List size={18} />
+						</TabsTrigger>
+					</TabsList>
 
-					<Link
-						href="/clubs/create"
-						className="flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-white text-sm font-bold rounded-xl shadow-lg shadow-orange-500/20 transition-all active:scale-95">
+					<Button asChild size={"lg"}>
 						<Plus size={18} />
-						<span className="hidden sm:inline">Create Club</span>
-					</Link>
+						<Link href="/clubs/create">Create Club</Link>
+					</Button>
 				</div>
 			</div>
 
@@ -71,18 +65,23 @@ export default function ClubsPageClient() {
 						<Loader />
 						<div className="text-muted">Loading clubs...</div>
 					</div>
-				) : currentView === "grid" ? (
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-						{filteredClubs.map((club) => (
-							<ClubGridCard key={club.id} club={club} />
-						))}
-						{filteredClubs.length === 0 && <EmptyState />}
-					</div>
 				) : (
-					<ClubListView clubs={filteredClubs} />
+					<>
+						<TabsContent value={"grid"}>
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+								{filteredClubs.map((club) => (
+									<ClubGridCard key={club.id} club={club} />
+								))}
+								{filteredClubs.length === 0 && <EmptyState />}
+							</div>
+						</TabsContent>
+						<TabsContent value={"list"}>
+							<ClubListView clubs={filteredClubs} />
+						</TabsContent>
+					</>
 				)}
 			</div>
-		</div>
+		</Tabs>
 	);
 }
 

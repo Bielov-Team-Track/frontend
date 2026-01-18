@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 import type { VariantProps } from "class-variance-authority";
 import { Loader2 } from "lucide-react";
@@ -15,10 +13,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-	({ variant, size, fullWidth = false, leftIcon, rightIcon, loading = false, disabled, className, children, ...props }, ref) => {
+	({ variant, size, fullWidth = false, leftIcon, rightIcon, loading = false, disabled, className, children, ...props }) => {
 		return (
 			<ButtonPrimitive
-				itemRef={ref}
 				variant={variant}
 				size={size}
 				className={cn(fullWidth && "w-full", loading && "cursor-wait", className)}

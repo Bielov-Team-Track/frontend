@@ -53,7 +53,7 @@ export default function Modal({
 					</DialogHeader>
 				)}
 
-				<div>{children}</div>
+				<div className="max-h-[80dvh] overflow-auto">{children}</div>
 			</DialogContent>
 		</Dialog>
 	);

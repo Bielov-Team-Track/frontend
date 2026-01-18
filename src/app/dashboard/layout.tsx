@@ -1,11 +1,11 @@
 import { DashboardShell } from "@/components/layout";
 import { ThemeScript } from "@/components/ui/theme-script";
 import { AuthProvider, ClubProvider, QueryProvider, ThemeProvider } from "@/providers";
+import { CreateModalsProvider } from "@/providers/CreateModalsProvider";
 import { NotificationProvider } from "@/providers/NotificationProvider";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
-
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -30,7 +30,9 @@ export default async function RootLayout({
 						<ClubProvider>
 							<QueryProvider>
 								<NotificationProvider>
-									<DashboardShell>{children}</DashboardShell>
+									<CreateModalsProvider>
+										<DashboardShell>{children}</DashboardShell>
+									</CreateModalsProvider>
 								</NotificationProvider>
 							</QueryProvider>
 						</ClubProvider>

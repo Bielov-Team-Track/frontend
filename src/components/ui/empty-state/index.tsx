@@ -12,6 +12,7 @@ interface EmptyStateProps {
 		label: string;
 		onClick: () => void;
 		icon?: LucideIcon;
+		variant?: "secondary" | "outline" | "ghost" | "link" | "default" | "destructive";
 	};
 	className?: string;
 }
@@ -23,7 +24,7 @@ export default function EmptyState({ icon: Icon, title, description, action, cla
 			<h4 className="text-lg font-bold text-white mb-2">{title}</h4>
 			{description && <p className="text-sm text-muted mb-4">{description}</p>}
 			{action && (
-				<Button variant="default" onClick={action.onClick}>
+				<Button variant={action.variant || "outline"} onClick={action.onClick}>
 					{action.icon && <action.icon size={16} />}
 					{action.label}
 				</Button>

@@ -1,5 +1,5 @@
 import { Steps } from "@/components/ui";
-import { getActiveSteps, STEP_CONFIG } from "../config/stepConfig";
+import { STEP_CONFIG, getActiveSteps } from "../config/stepConfig";
 import { useEventFormContext } from "../context/EventFormContext";
 
 export function ProgressIndicator() {

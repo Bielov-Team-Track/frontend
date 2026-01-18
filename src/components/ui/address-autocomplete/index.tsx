@@ -4,10 +4,14 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "
 import { Label } from "@/components/ui/label";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
+import { ParsedAddress, parsePlacesResult } from "@/lib/utils/address";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import { LoaderIcon, MapPin, XIcon } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+
+// Re-export ParsedAddress for backward compatibility
+export type { ParsedAddress } from "@/lib/utils/address";
 
 interface AddressSuggestion {
 	placeId: string;
@@ -22,6 +26,7 @@ interface AddressAutocompleteProps {
 	value?: string;
 	onChange?: (value: string) => void;
 	onPlaceSelected?: (place: google.maps.places.PlaceResult) => void;
+	onAddressSelected?: (address: ParsedAddress) => void;
 	placeholder?: string;
 	label?: string;
 	error?: string;
@@ -29,6 +34,8 @@ interface AddressAutocompleteProps {
 	disabled?: boolean;
 	className?: string;
 	"aria-invalid"?: boolean;
+	searchTypes?: string[];
+	allowedCountries?: string[];
 }
 
 const AddressAutocomplete = React.forwardRef<HTMLInputElement, AddressAutocompleteProps>(
@@ -37,6 +44,7 @@ const AddressAutocomplete = React.forwardRef<HTMLInputElement, AddressAutocomple
 			value = "",
 			onChange,
 			onPlaceSelected,
+			onAddressSelected,
 			placeholder = "Enter address...",
 			label,
 			error,
@@ -44,6 +52,8 @@ const AddressAutocomplete = React.forwardRef<HTMLInputElement, AddressAutocomple
 			disabled = false,
 			className,
 			"aria-invalid": ariaInvalid,
+			searchTypes,
+			allowedCountries = ["uk"],
 		},
 		ref
 	) => {
@@ -102,15 +112,18 @@ const AddressAutocomplete = React.forwardRef<HTMLInputElement, AddressAutocomple
 			setIsLoading(true);
 
 			try {
-				const request = {
+				const request: google.maps.places.AutocompletionRequest = {
 					input,
-					types: ["address"],
-					componentRestrictions: { country: "uk" },
+					componentRestrictions: { country: allowedCountries },
 				};
+
+				if (searchTypes) {
+					request.types = searchTypes;
+				}
 
 				autocompleteService.getPlacePredictions(request, (predictions: any, status: any) => {
 					setIsLoading(false);
-
+					console.log(predictions, status);
 					if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
 						const mappedSuggestions: AddressSuggestion[] = predictions.map((prediction) => ({
 							placeId: prediction.place_id,
@@ -147,15 +160,19 @@ const AddressAutocomplete = React.forwardRef<HTMLInputElement, AddressAutocomple
 			setSuggestions([]);
 			setIsOpen(false);
 
-			if (onPlaceSelected && placesService) {
+			if ((onPlaceSelected || onAddressSelected) && placesService) {
 				const request = {
 					placeId: suggestion.placeId,
-					fields: ["formatted_address", "geometry", "name", "place_id"],
+					fields: ["formatted_address", "geometry", "name", "place_id", "address_components"],
 				};
 
 				placesService.getDetails(request, (place, status) => {
 					if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-						onPlaceSelected(place);
+						onPlaceSelected?.(place);
+						if (onAddressSelected) {
+							const parsedAddress = parsePlacesResult(place);
+							onAddressSelected(parsedAddress);
+						}
 					}
 				});
 			}

@@ -1,13 +1,14 @@
 "use client";
 
 import { Button, Checkbox, Input, TextArea } from "@/components";
+import { VenueForm, VenueFormData } from "@/components/features/venues";
 import ImageCropper from "@/components/ui/image-cropper";
 import Modal from "@/components/ui/modal";
 import Steps from "@/components/ui/steps";
 import { createClub, updateClub, uploadClubImage } from "@/lib/api/clubs";
-import { CreateClubRequest } from "@/lib/models/Club";
+import { CreateClubRequest, CreateVenueRequest } from "@/lib/models/Club";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { ArrowLeft, ArrowRight, Check, Image as ImageIcon, Shield, Trash } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Image as ImageIcon, MapPin, Shield, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -47,10 +48,11 @@ interface CreateClubFormValues {
 	name: string;
 	description: string;
 	is_public: boolean;
-	logo: File | null; // Changed from URL string
-	banner: File | null; // New field
+	logo: File | null;
+	banner: File | null;
 	contact_email: string;
 	contact_phone: string;
+	venues: VenueFormData[];
 }
 
 const clubSchema = yup.object().shape({
@@ -61,18 +63,15 @@ const clubSchema = yup.object().shape({
 	banner: yup.mixed().nullable(),
 	contact_email: yup.string().email("Must be a valid email").nullable(),
 	contact_phone: yup.string().nullable(),
+	venues: yup.array().of(yup.object().shape({})).nullable(),
 });
 
 // --- Steps Configuration ---
 
 const STEPS = [
-	{
-		id: 1,
-		label: "Basic Info",
-		fields: ["name", "description", "is_public"],
-	},
+	{ id: 1, label: "Basic Info", fields: ["name", "description", "is_public"] },
 	{ id: 2, label: "Branding", fields: ["logo", "banner"] },
-	{ id: 3, label: "Contact", fields: ["contact_email", "contact_phone"] },
+	{ id: 3, label: "Contact & Venues", fields: ["contact_email", "contact_phone", "venues"] },
 	{ id: 4, label: "Review", fields: [] },
 ];
 
@@ -115,11 +114,13 @@ export default function CreateClubPage() {
 			banner: null,
 			contact_email: "",
 			contact_phone: "",
+			venues: [],
 		},
 		mode: "onChange",
 	});
 
 	const formData = watch();
+	const venues = watch("venues") || [];
 
 	// Navigation Handlers
 	const handleNext = async () => {
@@ -134,16 +135,38 @@ export default function CreateClubPage() {
 		setCurrentStep((prev) => Math.max(prev - 1, 1));
 	};
 
+	// --- Venue Handlers ---
+	const handleAddVenue = (venue: VenueFormData) => {
+		setValue("venues", [...venues, venue]);
+	};
+
+	const handleRemoveVenue = (tempId: string) => {
+		setValue(
+			"venues",
+			venues.filter((v) => v.tempId !== tempId)
+		);
+	};
+
 	const onSubmit: SubmitHandler<CreateClubFormValues> = async (data) => {
 		setIsSubmitting(true);
 		try {
-			// First create the club without images to get the club ID
+			// Convert venues to API format
+			const venuesRequest: CreateVenueRequest[] = data.venues.map((v) => ({
+				name: v.name,
+				addressLine1: v.addressLine1,
+				city: v.city,
+				country: v.country,
+				latitude: v.latitude,
+				longitude: v.longitude,
+			}));
+
 			const createClubRequest: CreateClubRequest = {
 				name: data.name,
 				description: data.description || undefined,
 				contactEmail: data.contact_email || undefined,
 				contactPhone: data.contact_phone || undefined,
 				isPublic: data.is_public,
+				venues: venuesRequest.length > 0 ? venuesRequest : undefined,
 			};
 
 			const createdClub = await createClub(createClubRequest);
@@ -418,6 +441,7 @@ export default function CreateClubPage() {
 
 	const renderStep3 = () => (
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+			{/* Contact Details */}
 			<div>
 				<h2 className="text-xl font-bold text-white mb-1">Contact Details</h2>
 				<p className="text-muted text-sm">How can members reach you?</p>
@@ -429,7 +453,6 @@ export default function CreateClubPage() {
 					placeholder="contact@club.com"
 					error={errors.contact_email?.message}
 					optional
-					variant="bordered"
 					className="bg-background-light"
 					{...register("contact_email")}
 				/>
@@ -439,10 +462,51 @@ export default function CreateClubPage() {
 					placeholder="+1 (555) 000-0000"
 					error={errors.contact_phone?.message}
 					optional
-					variant="bordered"
 					className="bg-background-light"
 					{...register("contact_phone")}
 				/>
+			</div>
+
+			{/* Venues Section */}
+			<div className="pt-6 border-t border-white/10">
+				<div className="mb-4">
+					<h2 className="text-xl font-bold text-white mb-1">Club Venues</h2>
+					<p className="text-muted text-sm">Add locations where your club hosts activities (optional)</p>
+				</div>
+
+				{/* List of Added Venues */}
+				{venues.length > 0 && (
+					<div className="space-y-2 mb-6">
+						{venues.map((venue) => (
+							<div key={venue.tempId} className="flex items-start justify-between p-4 rounded-lg border border-white/10 bg-white/5">
+								<div className="flex items-start gap-3">
+									<MapPin size={18} className="text-muted mt-0.5 shrink-0" />
+									<div>
+										<div className="font-medium text-white">{venue.name}</div>
+										<div className="text-sm text-muted">{venue.addressLine1}</div>
+										{venue.city && (
+											<div className="text-sm text-muted">
+												{venue.city}
+												{venue.country && `, ${venue.country}`}
+											</div>
+										)}
+									</div>
+								</div>
+								<button
+									type="button"
+									onClick={() => handleRemoveVenue(venue.tempId)}
+									className="p-2 text-muted hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors">
+									<Trash size={16} />
+								</button>
+							</div>
+						))}
+					</div>
+				)}
+
+				{/* Venue Form */}
+				<div className="p-4 rounded-lg border border-dashed border-white/10 bg-white/5">
+					<VenueForm onAddVenue={handleAddVenue} />
+				</div>
 			</div>
 		</div>
 	);
@@ -500,6 +564,22 @@ export default function CreateClubPage() {
 								<span className="text-sm text-white">{formData.contact_phone || "N/A"}</span>
 							</div>
 						</div>
+
+						{/* Venues Summary */}
+						{venues.length > 0 && (
+							<div className="pt-4 border-t border-white/5">
+								<span className="text-xs text-muted block uppercase tracking-wider mb-2">Venues ({venues.length})</span>
+								<div className="space-y-2">
+									{venues.map((venue) => (
+										<div key={venue.tempId} className="flex items-center gap-2 text-sm">
+											<MapPin size={14} className="text-muted shrink-0" />
+											<span className="text-white">{venue.name}</span>
+											<span className="text-muted">- {venue.city || venue.addressLine1}</span>
+										</div>
+									))}
+								</div>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

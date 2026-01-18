@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import HistoryStep, { HistoryEntry } from "./HistoryStep";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import HistoryStep from "./HistoryStep";
 
 const meta: Meta<typeof HistoryStep> = {
 	title: "Features/Profile/Forms/HistoryStep",
@@ -10,7 +10,6 @@ const meta: Meta<typeof HistoryStep> = {
 	tags: ["autodocs"],
 	args: {
 		formId: "history-form",
-		onNext: (data) => console.log("onNext", data),
 	},
 };
 
@@ -26,11 +25,9 @@ export const Filled: Story = {
 				id: "1",
 				year: "2024",
 				clubName: "Newcastle Panthers",
-				clubLogoUrl:
-					"https://api.dicebear.com/7.x/identicon/svg?seed=Newcastle",
+				clubLogoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=Newcastle",
 				teamName: "White Panthers",
-				teamLogoUrl:
-					"https://api.dicebear.com/7.x/identicon/svg?seed=WhitePanthers",
+				teamLogoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=WhitePanthers",
 				role: "Player",
 				positions: ["Outside Hitter", "Opposite Hitter"],
 			},
@@ -38,8 +35,7 @@ export const Filled: Story = {
 				id: "2",
 				year: "2023",
 				clubName: "Marden Volleyball Club",
-				clubLogoUrl:
-					"https://api.dicebear.com/7.x/identicon/svg?seed=Marden",
+				clubLogoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=Marden",
 				role: "Head Coach",
 				positions: [],
 			},

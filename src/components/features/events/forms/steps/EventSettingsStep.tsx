@@ -1,9 +1,9 @@
-import { Controller } from "react-hook-form";
-import { Input, Checkbox, RadioCards } from "@/components/ui";
-import { Users, UserPlus, UsersRound, User, LayoutGrid } from "lucide-react";
+import { Input, RadioCards } from "@/components/ui";
 import { EventFormat } from "@/lib/models/Event";
-import { useEventFormContext } from "../context/EventFormContext";
 import { Unit } from "@/lib/models/EventBudget";
+import { LayoutGrid, User, UserPlus, Users, UsersRound } from "lucide-react";
+import { Controller } from "react-hook-form";
+import { useEventFormContext } from "../context/EventFormContext";
 
 const eventFormatCards = [
 	{
@@ -52,11 +52,9 @@ export function EventSettingsStep() {
 
 	return (
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-			<div>
+			<div className="border-b-2 pb-4">
 				<h2 className="text-xl font-bold text-white mb-1">Event Settings</h2>
-				<p className="text-muted text-sm">
-					Configure teams, participants, and registration settings.
-				</p>
+				<p className="text-muted text-sm">Configure teams, participants, and registration settings.</p>
 			</div>
 
 			<div className="space-y-6">
@@ -126,38 +124,6 @@ export function EventSettingsStep() {
 						)}
 					/>
 				)}
-
-				<div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
-					<span className="text-sm font-medium text-white">Privacy & Access</span>
-
-					<Controller
-						name="isPrivate"
-						control={control}
-						render={({ field: { value, onChange, ...field } }) => (
-							<Checkbox
-								{...field}
-								checked={value}
-								onChange={onChange}
-								label="Private Event"
-								helperText="Private events are only visible to invited participants"
-							/>
-						)}
-					/>
-
-					<Controller
-						name="approveGuests"
-						control={control}
-						render={({ field: { value, onChange, ...field } }) => (
-							<Checkbox
-								{...field}
-								checked={value}
-								onChange={onChange}
-								label="Require approval for new participants"
-								helperText="You'll need to approve each participant before they can join"
-							/>
-						)}
-					/>
-				</div>
 			</div>
 		</div>
 	);

@@ -1,15 +1,8 @@
 "use client";
 
-import {
-	ReactNode,
-	createContext,
-	useCallback,
-	useContext,
-	useEffect,
-	useState,
-} from "react";
-import { Club } from "@/lib/models/Club";
 import { getUserClubs } from "@/lib/api/clubs";
+import { Club } from "@/lib/models/Club";
+import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
 
 interface ClubContextType {
@@ -78,8 +71,7 @@ export function ClubProvider({ children }: { children: ReactNode }) {
 				isLoading,
 				selectClub,
 				refreshClubs,
-			}}
-		>
+			}}>
 			{children}
 		</ClubContext.Provider>
 	);

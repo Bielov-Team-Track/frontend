@@ -1,7 +1,7 @@
 "use client";
 
 import { EditMemberModal, MemberRow } from "@/components/features/clubs";
-import { Avatar, Button, Dropdown, EmptyState, Input } from "@/components/ui";
+import { Avatar, Button, EmptyState, Input, Select } from "@/components/ui";
 import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
 import Skeleton, { SkeletonAvatar } from "@/components/ui/skeleton";
 import {
@@ -12,7 +12,8 @@ import {
 	UpdateClubMemberRequest,
 	updateRegistrationStatus,
 } from "@/lib/api/clubs";
-import { ClubMember, ClubRegistration, ClubRole, RegistrationSortBy, RegistrationStatus, SortDirection } from "@/lib/models/Club";
+import { ClubMember, ClubRegistration, ClubRole, RegistrationSortBy, RegistrationStatus } from "@/lib/models/Club";
+import { SortDirection } from "@/lib/models/filteringAndPagination";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
@@ -140,7 +141,7 @@ function TabButton({ active, onClick, icon: Icon, label, count }: TabButtonProps
 			aria-selected={active}
 			aria-controls={`${label.toLowerCase()}-panel`}
 			className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
-				active ? "bg-accent text-white shadow-md shadow-accent/20" : "text-muted hover:text-white hover:bg-white/5"
+				active ? "bg-neutral-700 text-white shadow-md shadow-neutral-800" : "text-muted hover:text-white hover:bg-white/5"
 			}`}>
 			<Icon size={16} className={active ? "text-white" : "text-muted"} />
 			<span>{label}</span>
@@ -158,9 +159,28 @@ function TabButton({ active, onClick, icon: Icon, label, count }: TabButtonProps
 
 // --- Members List (Existing Logic) ---
 
+// Sort options for members dropdown
+const memberSortOptions = [
+	{ value: "joinedAt", label: "Joined Date" },
+	{ value: "name", label: "Name" },
+	{ value: "role", label: "Role" },
+];
+
+const memberDirectionOptions = [
+	{ value: SortDirection.Descending, label: "Newest First" },
+	{ value: SortDirection.Ascending, label: "Oldest First" },
+];
+
 function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabProps) {
 	const [editingMember, setEditingMember] = useState<ClubMember | null>(null);
 	const [removingMember, setRemovingMember] = useState<ClubMember | null>(null);
+	const [search, setSearch] = useState("");
+	const [sortBy, setSortBy] = useState<string>("joinedAt");
+	const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Descending);
+	const [dateFrom, setDateFrom] = useState("");
+	const [dateTo, setDateTo] = useState("");
+	const [showFilters, setShowFilters] = useState(false);
+
 	const queryClient = useQueryClient();
 
 	const updateMutation = useMutation({
@@ -186,14 +206,154 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 		return "this member";
 	};
 
+	const clearFilters = () => {
+		setDateFrom("");
+		setDateTo("");
+		setSortBy("joinedAt");
+		setSortDirection(SortDirection.Descending);
+	};
+
+	const hasActiveFilters = dateFrom || dateTo || sortBy !== "joinedAt" || sortDirection !== SortDirection.Descending;
+
+	// Filter and sort members
+	const filteredMembers = members
+		.filter((member) => {
+			// Search filter
+			if (search) {
+				const searchLower = search.toLowerCase();
+				const name = getMemberDisplayName(member).toLowerCase();
+				const email = member.userProfile?.email?.toLowerCase() || "";
+				if (!name.includes(searchLower) && !email.includes(searchLower)) {
+					return false;
+				}
+			}
+			// Date filters
+			if (dateFrom && member.joinedAt) {
+				if (new Date(member.joinedAt) < new Date(dateFrom)) return false;
+			}
+			if (dateTo && member.joinedAt) {
+				if (new Date(member.joinedAt) > new Date(dateTo)) return false;
+			}
+			return true;
+		})
+		.sort((a, b) => {
+			let comparison = 0;
+			switch (sortBy) {
+				case "name":
+					comparison = getMemberDisplayName(a).localeCompare(getMemberDisplayName(b));
+					break;
+				case "role":
+					comparison = (a.role || "").localeCompare(b.role || "");
+					break;
+				case "joinedAt":
+				default:
+					comparison = new Date(a.joinedAt || 0).getTime() - new Date(b.joinedAt || 0).getTime();
+					break;
+			}
+			return sortDirection === SortDirection.Ascending ? comparison : -comparison;
+		});
+
 	return (
 		<div className="space-y-4">
-			<div className="flex items-center justify-between">
-				<h3 className="text-lg font-bold text-white">Club Members</h3>
-				<Button variant="default" color="accent" size={"sm"} onClick={onInvite} leftIcon={<Plus size={16} />}>
-					Invite Member
-				</Button>
+			{/* Header with search and filters */}
+			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+				<div>
+					<h3 className="text-lg font-bold text-white">Club Members</h3>
+					<p className="text-sm text-muted mt-0.5">
+						{filteredMembers.length} member{filteredMembers.length !== 1 ? "s" : ""}
+						{filteredMembers.length !== members.length && ` (filtered from ${members.length})`}
+					</p>
+				</div>
+				<div className="flex items-center gap-2 w-full sm:w-auto">
+					<div className="flex-1 sm:flex-initial sm:w-64">
+						<Input
+							placeholder="Search by name or email..."
+							value={search}
+							onChange={(e) => setSearch(e.target.value)}
+							leftIcon={<Search size={16} />}
+							aria-label="Search members"
+						/>
+					</div>
+					<Button
+						variant={"ghost"}
+						className="relative"
+						onClick={() => setShowFilters(!showFilters)}
+						leftIcon={<Filter size={16} />}
+						aria-expanded={showFilters}
+						aria-controls="member-filter-panel">
+						{hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-accent absolute -top-0.5 -right-0.5" />}
+						Filters
+					</Button>
+					<Button variant="outline" size={"sm"} onClick={onInvite} leftIcon={<Plus size={16} />}>
+						Invite
+					</Button>
+				</div>
 			</div>
+
+			{/* Collapsible Filter Panel */}
+			<AnimatePresence>
+				{showFilters && (
+					<motion.div
+						id="member-filter-panel"
+						initial={{ opacity: 0, y: -10 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -10 }}
+						transition={{ duration: 0.2 }}
+						className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
+						<div className="flex h-7 items-center justify-between">
+							<span className="text-sm font-medium text-white">Filter Options</span>
+							{hasActiveFilters && (
+								<Button
+									variant="ghost"
+									size="sm"
+									onClick={clearFilters}
+									leftIcon={<RotateCcw size={14} />}
+									className="text-muted hover:text-white">
+									Clear All
+								</Button>
+							)}
+						</div>
+
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+							{/* Date From */}
+							<Input
+								type="date"
+								inlineLabel="From Date"
+								value={dateFrom}
+								onChange={(e) => setDateFrom(e.target.value)}
+								leftIcon={<Calendar size={16} />}
+							/>
+
+							{/* Date To */}
+							<Input
+								type="date"
+								inlineLabel="To Date"
+								value={dateTo}
+								onChange={(e) => setDateTo(e.target.value)}
+								leftIcon={<Calendar size={16} />}
+							/>
+
+							{/* Sort By */}
+							<Select
+								inlineLabel="Sort By"
+								options={memberSortOptions}
+								value={sortBy}
+								onChange={(val) => setSortBy(val)}
+								leftIcon={<ArrowDownUp size={16} />}
+							/>
+
+							{/* Sort Direction */}
+							<Select
+								inlineLabel="Order"
+								options={memberDirectionOptions}
+								value={sortDirection}
+								onChange={(val) => setSortDirection(val as SortDirection)}
+								leftIcon={<Clock size={16} />}
+							/>
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 
 			{members.length === 0 ? (
 				<EmptyState
@@ -205,6 +365,21 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 						onClick: onInvite,
 						icon: Plus,
 					}}
+				/>
+			) : filteredMembers.length === 0 ? (
+				<EmptyState
+					icon={Search}
+					title="No members found"
+					description={search || hasActiveFilters ? "Try adjusting your filters or search terms." : "No members match your criteria."}
+					action={
+						hasActiveFilters
+							? {
+									label: "Clear Filters",
+									onClick: clearFilters,
+									icon: RotateCcw,
+							  }
+							: undefined
+					}
 				/>
 			) : (
 				<div className="rounded-xl bg-white/5 border border-white/10 overflow-hidden">
@@ -220,7 +395,7 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 							</tr>
 						</thead>
 						<tbody>
-							{members.map((member) => (
+							{filteredMembers.map((member) => (
 								<MemberRow
 									key={member.userId}
 									member={member}
@@ -379,9 +554,8 @@ function RegistrationsList({ clubId, status }: RegistrationsListProps) {
 						/>
 					</div>
 					<Button
-						variant={showFilters ? "ghost" : "ghost"}
-						color={showFilters || hasActiveFilters ? "accent" : "neutral"}
-						size="sm"
+						variant={"ghost"}
+						className="relative"
 						onClick={() => setShowFilters(!showFilters)}
 						leftIcon={<Filter size={16} />}
 						aria-expanded={showFilters}
@@ -402,7 +576,7 @@ function RegistrationsList({ clubId, status }: RegistrationsListProps) {
 						exit={{ opacity: 0, y: -10 }}
 						transition={{ duration: 0.2 }}
 						className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
-						<div className="flex items-center justify-between">
+						<div className="flex h-7 items-center justify-between">
 							<span className="text-sm font-medium text-white">Filter Options</span>
 							{hasActiveFilters && (
 								<Button
@@ -420,33 +594,37 @@ function RegistrationsList({ clubId, status }: RegistrationsListProps) {
 							{/* Date From */}
 							<Input
 								type="date"
-								label="From Date"
+								inlineLabel="From Date"
 								value={dateFrom}
 								onChange={(e) => setDateFrom(e.target.value)}
 								leftIcon={<Calendar size={16} />}
 							/>
 
 							{/* Date To */}
-							<Input type="date" label="To Date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} leftIcon={<Calendar size={16} />} />
+							<Input
+								type="date"
+								inlineLabel="To Date"
+								value={dateTo}
+								onChange={(e) => setDateTo(e.target.value)}
+								leftIcon={<Calendar size={16} />}
+							/>
 
 							{/* Sort By */}
-							<Dropdown
-								label="Sort By"
+							<Select
+								inlineLabel="Sort By"
 								options={sortOptions}
 								value={sortBy}
 								onChange={(val) => setSortBy(val as RegistrationSortBy)}
 								leftIcon={<ArrowDownUp size={16} />}
-								size="sm"
 							/>
 
 							{/* Sort Direction */}
-							<Dropdown
-								label="Order"
+							<Select
+								inlineLabel="Order"
 								options={directionOptions}
 								value={sortDirection}
 								onChange={(val) => setSortDirection(val as SortDirection)}
 								leftIcon={<Clock size={16} />}
-								size="sm"
 							/>
 						</div>
 					</motion.div>

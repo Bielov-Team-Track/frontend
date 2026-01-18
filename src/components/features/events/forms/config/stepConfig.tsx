@@ -1,7 +1,7 @@
 import EventBudgetStep from "../steps/EventBudgetStep";
 import { EventDetailsStep } from "../steps/EventDetailsStep";
-import { EventSettingsStep } from "../steps/EventSettingsStep";
 import { LocationStep } from "../steps/LocationStep";
+import { RegistrationStep } from "../steps/RegistrationStep";
 import { ReviewStep } from "../steps/ReviewStep";
 import { TimeAndDateStep } from "../steps/TimeAndDateStep";
 
@@ -33,9 +33,9 @@ export const STEP_CONFIG: Record<number, StepConfig> = {
 	},
 	4: {
 		id: 4,
-		label: "Settings",
-		key: "settings",
-		component: EventSettingsStep,
+		label: "Registration",
+		key: "registration",
+		component: RegistrationStep,
 	},
 	5: {
 		id: 5,

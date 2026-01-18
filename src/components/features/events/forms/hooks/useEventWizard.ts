@@ -1,12 +1,63 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { EventFormat } from "@/lib/models/Event";
-import { STEP_VALIDATION_FIELDS } from "../constants/eventFormOptions";
+import { EventType } from "@/lib/models/Event";
+import { useEffect, useState } from "react";
 import { TOTAL_STEPS } from "../config/stepConfig";
+import { STEP_VALIDATION_FIELDS } from "../constants/eventFormOptions";
 
 interface UseEventWizardProps {
 	trigger: (fields?: string[]) => Promise<boolean>;
 	watch: (field?: string) => any;
+}
+
+/**
+ * Returns the fields to validate for step 2 based on whether it's a recurring event
+ */
+function getStep2ValidationFields(isRecurring: boolean): string[] {
+	if (isRecurring) {
+		// Recurring event - validate recurring fields only
+		return [
+			"isRecurring",
+			"recurrencePattern",
+			"firstOccurrenceDate",
+			"seriesEndDate",
+			"eventStartTime",
+			"eventEndTime",
+		];
+	}
+	// Single event - validate single event fields only
+	return ["isRecurring", "startTime", "endTime"];
+}
+
+/**
+ * Returns the fields to validate for step 4 based on event type
+ */
+function getStep4ValidationFields(eventType: EventType): string[] {
+	const baseFields = ["registrationType"];
+
+	switch (eventType) {
+		case EventType.CasualPlay:
+			// CasualPlay requires casualPlayFormat selection
+			return [...baseFields, "casualPlayFormat"];
+		case EventType.Match:
+			// Match events may need team-related validation in the future
+			return baseFields;
+		case EventType.Social:
+		case EventType.TrainingSession:
+		default:
+			// Social and Training use list format, only need registrationType
+			return baseFields;
+	}
+}
+
+/**
+ * Returns the fields to validate for step 5 based on whether budget is enabled
+ */
+function getStep5ValidationFields(useBudget: boolean): string[] {
+	if (!useBudget) {
+		// Budget disabled - no validation needed
+		return [];
+	}
+	// Budget enabled - validate required budget fields
+	return ["budget.pricingModel", "budget.cost"];
 }
 
 export function useEventWizard({ trigger, watch }: UseEventWizardProps) {
@@ -29,29 +80,27 @@ export function useEventWizard({ trigger, watch }: UseEventWizardProps) {
 	const nextStep = async (e?: React.MouseEvent) => {
 		e?.preventDefault();
 
-		let fieldsToValidate =
-			STEP_VALIDATION_FIELDS[
-				currentStep as keyof typeof STEP_VALIDATION_FIELDS
-			];
+		let fieldsToValidate: string[];
 
-		// Add dynamic validation for step 4
-		if (currentStep === 4 && values.eventFormat !== EventFormat.Open) {
-			fieldsToValidate = [...fieldsToValidate, "teamsNumber"] as any;
+		switch (currentStep) {
+			case 2:
+				// Time & Date - conditional based on isRecurring
+				fieldsToValidate = getStep2ValidationFields(values.isRecurring);
+				break;
+			case 4:
+				// Registration - conditional based on event type
+				fieldsToValidate = getStep4ValidationFields(values.type as EventType);
+				break;
+			case 5:
+				// Budget - conditional based on useBudget
+				fieldsToValidate = getStep5ValidationFields(values.useBudget);
+				break;
+			default:
+				// Use default fields for other steps
+				fieldsToValidate = [...STEP_VALIDATION_FIELDS[currentStep as keyof typeof STEP_VALIDATION_FIELDS]];
 		}
 
-		// Add dynamic validation for step 5 (budget)
-		if (currentStep === 5) {
-			if (values.useBudget) {
-				// If budget is enabled, validate budget fields
-				fieldsToValidate = [
-					...fieldsToValidate,
-					"budget.pricingModel",
-					"budget.cost",
-				] as any;
-			}
-		}
-
-		const isValid = await trigger(fieldsToValidate as any);
+		const isValid = await trigger(fieldsToValidate);
 
 		if (isValid && currentStep < TOTAL_STEPS) {
 			const newStep = currentStep + 1;

@@ -1,29 +1,19 @@
-import { useState, useCallback, useEffect } from "react";
+import { claimPosition, getPosition, releasePosition, takePositionWithUser } from "@/lib/api/positions";
+import { EVENTS_API_URL } from "@/lib/constants";
 import { Position } from "@/lib/models/Position";
-import {
-	takePositionWithUser,
-	releasePosition,
-	getPosition,
-	claimPosition,
-} from "@/lib/api/positions";
+import { UserProfile } from "@/lib/models/User";
 import { usePositionStore } from "@/lib/realtime/positionStore";
 import signalr from "@/lib/realtime/signalrClient";
-import { UserProfile } from "@/lib/models/User";
 import { redirect } from "next/navigation";
-import { EVENTS_API_URL } from "@/lib/constants";
+import { useCallback, useEffect, useState } from "react";
 
-export function usePosition(
-	defaultPosition: Position,
-	profile: UserProfile | null,
-) {
+export function usePosition(defaultPosition: Position, profile: UserProfile | null) {
 	const [position, setPosition] = useState<Position>(defaultPosition);
 	const [isConfirming, setIsConfirming] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const applyTakenWithRollback = usePositionStore(
-		(s) => s.applyTakenWithRollback,
-	);
+	const applyTakenWithRollback = usePositionStore((s) => s.applyTakenWithRollback);
 	const connectionStatus = usePositionStore((s) => s.connectionStatus);
 	const positionStore = usePositionStore((s) => s.positions);
 
@@ -44,7 +34,6 @@ export function usePosition(
 	};
 
 	const takePosition = useCallback(async () => {
-		console.log("Attempting to take position:", position.id);
 		if (!profile?.userId) {
 			redirect("/login");
 		}
@@ -73,15 +62,9 @@ export function usePosition(
 			rollback();
 
 			let errorMessage = "Failed to take position";
-			if (
-				error.message?.includes("Position already taken") ||
-				error.message?.includes("already claimed")
-			) {
+			if (error.message?.includes("Position already taken") || error.message?.includes("already claimed")) {
 				errorMessage = "Position was just taken by someone else";
-			} else if (
-				error.message?.includes("Connection") ||
-				connectionStatus !== "connected"
-			) {
+			} else if (error.message?.includes("Connection") || connectionStatus !== "connected") {
 				errorMessage = "Connection lost. Please try again.";
 			} else if (error.response?.status === 401) {
 				errorMessage = "You're not authorized to take this position";
@@ -139,12 +122,8 @@ export function usePosition(
 
 			setIsLoading(true);
 			setError(null);
-			console.log("Assigning position to user:", targetUser);
 			try {
-				const newPosition = await takePositionWithUser(
-					position.id,
-					targetUser.userId,
-				);
+				const newPosition = await takePositionWithUser(position.id, targetUser.userId);
 				setPosition(newPosition);
 			} catch (error: any) {
 				let errorMessage = "Failed to assign position";
@@ -160,7 +139,7 @@ export function usePosition(
 				setIsLoading(false);
 			}
 		},
-		[position.id, profile?.userId],
+		[position.id, profile?.userId]
 	);
 
 	const clearError = useCallback(() => {

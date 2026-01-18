@@ -36,7 +36,7 @@ export function EventsCalendar({ events }: EventsCalendarProps) {
 	};
 
 	return (
-		<Tabs className="h-full flex flex-col p-4">
+		<Tabs className="h-full flex flex-col p-4 bg-neutral-900 rounded-2xl border border-white/5">
 			<div className="mb-4 flex flex-wrap gap-2 items-center justify-between">
 				<Button onClick={handleTodayClick} variant="outline">
 					Today

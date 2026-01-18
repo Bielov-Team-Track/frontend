@@ -1,3 +1,4 @@
+import { SortDirection } from "./Pagination";
 import { UserProfile } from "./User";
 
 export interface Club {
@@ -20,6 +21,24 @@ export interface Club {
 	isArchived?: boolean;
 	archivedAt?: string;
 	socialLinks?: ClubSocialLink[];
+	venues?: Venue[];
+}
+
+export interface Venue {
+	id: string;
+	clubId: string;
+	name: string;
+	addressLine1?: string;
+	addressLine2?: string;
+	city?: string;
+	country?: string;
+	region?: string;
+	postalCode?: string;
+	latitude?: number;
+	longitude?: number;
+	howToGetThereInstructions?: string;
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 
 export enum ClubRole {
@@ -72,8 +91,34 @@ export interface CreateClubRequest {
 	contactEmail?: string;
 	contactPhone?: string;
 	isPublic?: boolean;
-	timezone?: string;
-	defaultLanguage?: string;
+	venues?: CreateVenueRequest[];
+}
+
+export interface CreateVenueRequest {
+	clubId?: string;
+	name: string;
+	addressLine1?: string;
+	addressLine2?: string;
+	city?: string;
+	country?: string;
+	region?: string;
+	postalCode?: string;
+	latitude?: number;
+	longitude?: number;
+	howToGetThereInstructions?: string;
+}
+
+export interface UpdateVenueRequest {
+	name: string;
+	addressLine1?: string;
+	addressLine2?: string;
+	city?: string;
+	country?: string;
+	region?: string;
+	postalCode?: string;
+	latitude?: number;
+	longitude?: number;
+	howToGetThereInstructions?: string;
 }
 
 // Team models
@@ -81,8 +126,10 @@ export interface Team {
 	id: string;
 	name: string;
 	clubId: string;
+	club?: Club;
 	description?: string;
 	logoUrl?: string;
+	color?: string;
 	skillLevel?: SkillLevel;
 	createdByUserId: string;
 	isActive: boolean;
@@ -151,6 +198,7 @@ export interface Group {
 	id: string;
 	name: string;
 	clubId: string;
+	club?: Club;
 	description?: string;
 	color?: string;
 	skillLevel?: SkillLevel;
@@ -235,11 +283,6 @@ export enum RegistrationSortBy {
 	SubmittedAt = "SubmittedAt",
 	Status = "Status",
 	UserName = "UserName",
-}
-
-export enum SortDirection {
-	Ascending = "Ascending",
-	Descending = "Descending",
 }
 
 export interface RegistrationFilterRequest {

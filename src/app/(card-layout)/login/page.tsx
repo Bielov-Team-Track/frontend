@@ -48,11 +48,9 @@ function LoginContent() {
 				<h1 className="text-4xl sm:text-5xl font-bold text-accent text-center mb-4">Spike</h1>
 				<div className="text-center text-sm sm:text-base">
 					Do not have an account?{" "}
-					<Button variant={"link"} asChild>
-						<Link href={"/sign-up"} className="link">
-							Register
-						</Link>
-					</Button>
+					<Link href={"/sign-up"} className="text-accent font-medium hover:underline">
+						Register
+					</Link>
 				</div>
 				{error && <div className="text-red-500 text-sm">{error}</div>}
 				{resendSuccess && <div className="text-green-500 text-sm">Verification email sent! Please check your inbox.</div>}
@@ -83,10 +81,10 @@ function LoginContent() {
 						setResendSuccess(false);
 					}}
 				/>
-				<Button variant={"link"} asChild className="w-fit">
-					<Link href={"/forgot-password"}>Forgot your password?</Link>
-				</Button>
-				<Button type="submit" loading={isLoading}>
+				<Link href={"/forgot-password"} className="text-accent hover:underline text-sm sm:text-base">
+					Forgot your password?
+				</Link>
+				<Button type="submit" loading={isLoading} variant={"outline"}>
 					Login
 				</Button>
 			</form>

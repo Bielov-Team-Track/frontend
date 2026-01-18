@@ -5,9 +5,9 @@ import CoachInfoStep from "@/components/features/profile/forms/steps/CoachInfoSt
 import HistoryStep from "@/components/features/profile/forms/steps/HistoryStep";
 import PlayerInfoStep from "@/components/features/profile/forms/steps/PlayerInfoStep";
 import { Button } from "@/components/ui";
-import { CoachProfileDto, CreateOrUpdateCoachProfileDto, CreateOrUpdatePlayerProfileDto, FullProfileDto, PlayerProfileDto } from "@/lib/models/Profile";
 import { createNotificationSubscription } from "@/lib/api/subscriptions";
 import { createOrUpdateCoachProfile, createOrUpdatePlayerProfile, updateCurrentProfile } from "@/lib/api/user";
+import { CoachProfileDto, CreateOrUpdateCoachProfileDto, CreateOrUpdatePlayerProfileDto, FullProfileDto, PlayerProfileDto } from "@/lib/models/Profile";
 import { Activity, ClipboardList, History, Save, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -49,15 +49,13 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 			navigator.serviceWorker
 				.register("/scripts/notifications_worker.js")
 				.then(function (swReg) {
-					console.log("Service Worker is registered", swReg);
-
 					swReg.pushManager
 						.subscribe({
 							userVisibleOnly: true,
 							applicationServerKey: "BDoqxWXp2K97_Wuk4s2On7aeqBus_ZvJuGLrOn_moB3LCElqnweRINPhgwL0byp8ktqCSCorTxPJSGpcZR7y02o",
 						})
 						.then(async function (subscription) {
-							await createNotificationSubscription(user?.userProfile?.userId, subscription);
+							await createNotificationSubscription(user?.userProfile?.userId!, subscription);
 							showSuccess("Notifications enabled successfully!");
 						});
 				})
@@ -105,9 +103,6 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 					qualifications: data.qualifications || [],
 				};
 				await createOrUpdateCoachProfile(coachPayload);
-			} else if (section === "history") {
-				// History is handled separately via createHistory/updateHistory/deleteHistory
-				setHistoryBio(data.bio);
 			}
 
 			showSuccess("Profile updated successfully!");

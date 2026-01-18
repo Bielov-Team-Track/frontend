@@ -141,7 +141,6 @@ client.interceptors.response.use(
 			const refreshToken = getRefreshToken();
 
 			if (!refreshToken) {
-				console.log("No refresh token available, redirecting to login");
 				clearTokens();
 				window.location.href = "/login";
 				return Promise.reject(error);

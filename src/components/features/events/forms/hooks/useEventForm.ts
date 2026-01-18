@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { createEvent } from "@/lib/api/events";
+import { createEvent, createEventSeries } from "@/lib/api/events";
 import { Event } from "@/lib/models/Event";
 import {
 	eventValidationSchema,
@@ -10,6 +10,7 @@ import {
 } from "../validation/eventValidationSchema";
 import {
 	transformFormDataToCreateEvent,
+	transformFormDataToCreateEventSeries,
 	getDefaultFormValues,
 } from "../utils/eventFormUtils";
 
@@ -31,11 +32,22 @@ export function useEventForm(event?: Event) {
 
 	const mutation = useMutation({
 		mutationFn: async (eventData: EventFormData) => {
-			const payload = transformFormDataToCreateEvent(eventData);
-			return await createEvent(payload);
+			// Check if this is a recurring event series or a single event
+			if (eventData.isRecurring) {
+				const seriesPayload = transformFormDataToCreateEventSeries(eventData);
+				return await createEventSeries(seriesPayload);
+			} else {
+				const payload = transformFormDataToCreateEvent(eventData);
+				return await createEvent(payload);
+			}
 		},
-		onSuccess: () => {
+		onSuccess: (result) => {
+			// Navigate to the appropriate page
+			// For series, we might want to show a success message with event count
 			router.push("/dashboard/events/my");
+		},
+		onError: (error) => {
+			console.error("Failed to create event:", error);
 		},
 	});
 
@@ -49,5 +61,6 @@ export function useEventForm(event?: Event) {
 		isPending: mutation.isPending,
 		isError: mutation.isError,
 		error: mutation.error,
+		isRecurringSeries: form.watch("isRecurring"),
 	};
 }

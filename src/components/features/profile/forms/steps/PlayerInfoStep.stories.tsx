@@ -1,5 +1,5 @@
-import { DominantHand } from "@/lib/models/Profile";
-import type { Meta, StoryObj } from "@storybook/react";
+import { DominantHand, SkillLevel, VolleyballPosition } from "@/lib/models/Profile";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import PlayerInfoStep from "./PlayerInfoStep";
 
 const meta: Meta<typeof PlayerInfoStep> = {
@@ -11,7 +11,6 @@ const meta: Meta<typeof PlayerInfoStep> = {
 	tags: ["autodocs"],
 	args: {
 		formId: "player-info-form",
-		onNext: (data) => console.log("onNext", data),
 	},
 };
 
@@ -26,9 +25,9 @@ export const Filled: Story = {
 			heightCm: 185,
 			verticalJumpCm: 70,
 			dominantHand: DominantHand.Right,
-			preferredPosition: "Outside Hitter",
-			secondaryPositions: ["Opposite Hitter"],
-			highestLevelPlayed: "Advanced",
+			preferredPosition: VolleyballPosition.OutsideHitter,
+			secondaryPositions: [VolleyballPosition.OppositeHitter, VolleyballPosition.MiddleBlocker],
+			highestLevelPlayed: SkillLevel.Advanced,
 		},
 	},
 };

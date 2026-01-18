@@ -1,12 +1,13 @@
 "use client";
 
 import SocialLinksEditor from "@/components/features/clubs/settings/SocialLinksEditor";
+import { VenueForm, VenueFormData } from "@/components/features/venues";
 import { SettingsAlert, SettingsCard, SettingsHeader } from "@/components/layout/settings-layout";
-import { ImageCropper, Input, Modal, TextArea } from "@/components/ui";
-import { getClub, updateClub, updateClubSocialLinks, uploadClubImage } from "@/lib/api/clubs";
-import { SocialPlatform } from "@/lib/models/Club";
+import { Button, EmptyState, ImageCropper, Input, Loader, Modal, TextArea } from "@/components/ui";
+import { createVenue, deleteVenue, getClub, updateClub, updateClubSocialLinks, uploadClubImage } from "@/lib/api/clubs";
+import { SocialPlatform, Venue } from "@/lib/models/Club";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Camera, ImageIcon, Shield } from "lucide-react";
+import { Building, Camera, ImageIcon, MapPin, Plus, Shield, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -30,6 +31,8 @@ export default function ClubGeneralSettingsPage() {
 		queryKey: ["club", clubId],
 		queryFn: () => getClub(clubId),
 	});
+
+	const [addVenueModalOpen, setAddVenueModalOpen] = useState(false);
 
 	// Image state
 	const [logoBlob, setLogoBlob] = useState<Blob | null>(null);
@@ -61,7 +64,7 @@ export default function ClubGeneralSettingsPage() {
 					websiteUrl: club.websiteUrl || "",
 					isPublic: club.isPublic,
 					socialLinks: club.socialLinks?.map((l) => ({ platform: l.platform, url: l.url })) || [],
-				}
+			  }
 			: undefined,
 	});
 
@@ -103,6 +106,42 @@ export default function ClubGeneralSettingsPage() {
 			setBannerBlob(null);
 		},
 	});
+
+	const addVenueMutation = useMutation({
+		mutationFn: async (venue: VenueFormData) => {
+			return createVenue({
+				clubId,
+				name: venue.name,
+				addressLine1: venue.addressLine1,
+				city: venue.city,
+				postalCode: venue.postalCode,
+				country: venue.country,
+				latitude: venue.latitude,
+				longitude: venue.longitude,
+			});
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["club", clubId] });
+			setAddVenueModalOpen(false);
+		},
+	});
+
+	const deleteVenueMutation = useMutation({
+		mutationFn: async (venueId: string) => {
+			return deleteVenue(venueId);
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["club", clubId] });
+		},
+	});
+
+	const handleAddVenue = (venue: VenueFormData) => {
+		addVenueMutation.mutate(venue);
+	};
+
+	const handleRemoveVenue = (venueId: string) => {
+		deleteVenueMutation.mutate(venueId);
+	};
 
 	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, field: "logo" | "banner") => {
 		if (e.target.files && e.target.files[0]) {
@@ -157,7 +196,7 @@ export default function ClubGeneralSettingsPage() {
 			<SettingsCard title="Club Branding">
 				<div className="rounded-xl overflow-hidden border border-white/10">
 					{/* Banner */}
-					<div className="relative h-32 bg-gradient-to-r from-accent/20 to-primary/20 group">
+					<div className="relative h-32 bg-linear-to-r from-accent/20 to-primary/20 group">
 						{currentBannerPreview ? (
 							<img src={currentBannerPreview} alt="Club banner" className="w-full h-full object-cover" />
 						) : (
@@ -208,6 +247,46 @@ export default function ClubGeneralSettingsPage() {
 				<TextArea {...register("description")} label="Description" rows={3} placeholder="Tell people about your club..." />
 			</SettingsCard>
 
+			<SettingsCard title="Venues">
+				{!club.venues || club.venues.length === 0 ? (
+					<EmptyState
+						icon={Building}
+						title="No venues"
+						description="Add venues for people to find you via search, and to add them to events"
+						action={{
+							label: "Add Venue",
+							onClick: () => setAddVenueModalOpen(true),
+						}}
+					/>
+				) : (
+					<div className="space-y-4">
+						<ul className="space-y-2">
+							{club.venues.map((venue: Venue) => (
+								<li key={venue.id} className="flex items-start justify-between p-4 rounded-lg bg-white/5 border border-white/10">
+									<div className="flex items-start gap-3">
+										<MapPin size={18} className="text-muted mt-0.5 shrink-0" />
+										<div>
+											<p className="text-sm text-white font-medium">{venue.name}</p>
+											<p className="text-xs text-muted">{[venue.addressLine1, venue.city, venue.country].filter(Boolean).join(", ")}</p>
+										</div>
+									</div>
+									<button
+										type="button"
+										onClick={() => handleRemoveVenue(venue.id)}
+										disabled={deleteVenueMutation.isPending}
+										className="p-2 text-muted hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors disabled:opacity-50">
+										<Trash2 size={16} />
+									</button>
+								</li>
+							))}
+						</ul>
+						<Button type="button" variant="outline" onClick={() => setAddVenueModalOpen(true)} leftIcon={<Plus size={16} />} className="w-full">
+							Add Venue
+						</Button>
+					</div>
+				)}
+			</SettingsCard>
+
 			{/* Contact & Social */}
 			<SettingsCard title="Contact & Social">
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -238,8 +317,21 @@ export default function ClubGeneralSettingsPage() {
 					setActiveField(null);
 				}}
 				title={`Adjust ${activeField === "banner" ? "Banner" : "Logo"}`}>
-				<div className="w-[80vw] max-w-[500px] p-4">
+				<div className="w-[80vw] max-w-125 p-4">
 					{selectedFile && <ImageCropper imageFile={selectedFile} onImageSave={onCropSave} aspect={activeField === "banner" ? 3 / 1 : 1} />}
+				</div>
+			</Modal>
+
+			{/* Add venue modal */}
+			<Modal isOpen={addVenueModalOpen} onClose={() => setAddVenueModalOpen(false)} title="Add Venue">
+				<div className="p-4 min-w-100">
+					<VenueForm onAddVenue={handleAddVenue} title="" />
+					{addVenueMutation.isError && <p className="text-sm text-red-400 mt-4">Failed to add venue. Please try again.</p>}
+					{addVenueMutation.isPending && (
+						<div className="mt-4 text-center text-sm text-muted">
+							<Loader /> Adding venue
+						</div>
+					)}
 				</div>
 			</Modal>
 		</form>

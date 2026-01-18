@@ -1,16 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import BackButton from "./index";
 
-// Mock useRouter for Storybook
-const mockRouter = {
-	back: () => console.log("Router back clicked"),
-	forward: () => console.log("Router forward clicked"),
-	refresh: () => console.log("Router refresh clicked"),
-	push: (href: string) => console.log("Router push to:", href),
-	replace: (href: string) => console.log("Router replace to:", href),
-	prefetch: (href: string) => console.log("Router prefetch:", href),
-};
-
 const meta: Meta<typeof BackButton> = {
 	title: "UI/BackButton",
 	component: BackButton,
@@ -18,8 +8,7 @@ const meta: Meta<typeof BackButton> = {
 		layout: "centered",
 		docs: {
 			description: {
-				component:
-					"A back button component that uses Next.js router to navigate back to the previous page.",
+				component: "A back button component that uses Next.js router to navigate back to the previous page.",
 			},
 		},
 		nextjs: {
@@ -38,8 +27,7 @@ const meta: Meta<typeof BackButton> = {
 					width: "300px",
 					height: "200px",
 					border: "1px solid #ccc",
-				}}
-			>
+				}}>
 				<Story />
 			</div>
 		),
@@ -53,8 +41,7 @@ export const Default: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story:
-					"Default back button positioned absolutely in the top-left corner.",
+				story: "Default back button positioned absolutely in the top-left corner.",
 			},
 		},
 	},
@@ -69,14 +56,11 @@ export const InContext: Story = {
 				height: "300px",
 				backgroundColor: "#f5f5f5",
 				padding: "20px",
-			}}
-		>
+			}}>
 			<BackButton />
 			<div style={{ marginTop: "60px", textAlign: "center" }}>
 				<h2>Page Content</h2>
-				<p>
-					This shows how the back button appears in context with other content.
-				</p>
+				<p>This shows how the back button appears in context with other content.</p>
 			</div>
 		</div>
 	),

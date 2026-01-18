@@ -4,6 +4,7 @@ import { Button, Input } from "@/components";
 import { EventsCalendar } from "@/components/ui/calendar/EventsCalendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Event } from "@/lib/models/Event";
+import { useCreateModals } from "@/providers/CreateModalsProvider";
 import { Calendar as CalendarIcon, Clock, Filter, Grid, List, MapPin, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -25,9 +26,8 @@ interface EventsPageClientProps {
 
 function EventsPageClient({ events }: EventsPageClientProps) {
 	const searchParams = useSearchParams();
-	const initialView = searchParams.get("view") as ViewType | null;
 	const [searchQuery, setSearchQuery] = useState("");
-
+	const { openCreateEvent } = useCreateModals();
 	// Filter logic placeholder
 	const filteredEvents = events.filter((e) => e.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -66,17 +66,15 @@ function EventsPageClient({ events }: EventsPageClientProps) {
 						</TabsTrigger>
 					</TabsList>
 
-					<Button asChild variant="default" size={"lg"}>
+					<Button asChild variant="default" size={"lg"} onClick={() => openCreateEvent({ source: "events" })}>
 						<Plus />
-						<Link href="/dashboard/events/create">
-							<span className="hidden sm:inline">Create Event</span>
-						</Link>
+						<span className="hidden sm:inline">Create Event</span>
 					</Button>
 				</div>
 			</div>
 
 			{/* --- Content Area --- */}
-			<div className="flex-1 bg-neutral-900 rounded-2xl">
+			<div className="flex-1 rounded-2xl">
 				<TabsContent value={"calendar"} className="h-[calc(100vh-12rem)]">
 					<EventsCalendar events={filteredEvents} />
 				</TabsContent>

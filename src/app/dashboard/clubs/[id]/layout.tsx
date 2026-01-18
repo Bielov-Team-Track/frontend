@@ -5,7 +5,7 @@ import { InviteMemberModal } from "@/components/features/clubs";
 import { getClub, getClubMembers, getGroupsByClub, getPendingRegistrationsCount, getTeamsByClub, inviteMember } from "@/lib/api/clubs";
 import { Club } from "@/lib/models/Club";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Building2, Calendar, ImageOff, Layers, Settings, Shield, UserPlus, Users } from "lucide-react";
+import { ArrowLeft, Building2, Calendar, ImageOff, Layers, Newspaper, Settings, Shield, UserPlus, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -32,10 +32,10 @@ export function useClubContext() {
 	return context;
 }
 
-type TabType = "overview" | "events" | "teams" | "groups" | "members" | "settings";
+type TabType = "posts" | "events" | "teams" | "groups" | "members" | "settings";
 
 const TABS: { id: TabType; label: string; icon: typeof Building2 }[] = [
-	{ id: "overview", label: "Overview", icon: Building2 },
+	{ id: "posts", label: "Posts", icon: Newspaper },
 	{ id: "events", label: "Events", icon: Calendar },
 	{ id: "teams", label: "Teams", icon: Users },
 	{ id: "groups", label: "Groups", icon: Layers },
@@ -49,7 +49,6 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 	const clubId = params.id as string;
 	const queryClient = useQueryClient();
 
-	const [logoError, setLogoError] = useState(false);
 	const [bannerError, setBannerError] = useState(false);
 	const [showInviteModal, setShowInviteModal] = useState(false);
 
@@ -60,7 +59,7 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 		if (pathname.includes("/teams")) return "teams";
 		if (pathname.includes("/groups")) return "groups";
 		if (pathname.includes("/members")) return "members";
-		return "overview";
+		return "posts";
 	};
 
 	const activeTab = getActiveTab();
@@ -121,7 +120,7 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 	// Get tab href
 	const getTabHref = (tabId: TabType): string => {
 		const base = `/dashboard/clubs/${clubId}`;
-		if (tabId === "overview") return base;
+
 		return `${base}/${tabId}`;
 	};
 

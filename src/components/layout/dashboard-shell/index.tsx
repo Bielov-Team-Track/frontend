@@ -25,7 +25,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
 					{/* Main content - centered with max-width */}
 					<main className="flex-1 min-h-full">
-						<div className="mx-auto py-6 px-2">{children}</div>
+						<div className="mx-auto py-6 px-2 h-full">{children}</div>
 					</main>
 				</div>
 			</div>

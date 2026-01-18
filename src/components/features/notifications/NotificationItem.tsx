@@ -40,7 +40,6 @@ export function NotificationItem({ notification, variant = "compact", onRead, on
 	const iconConfig = getNotificationIconConfig(notification);
 
 	const handleClick = useCallback(() => {
-		console.log("Notification clicked:", notification);
 		if (!notification.isRead && onRead) {
 			onRead();
 		}

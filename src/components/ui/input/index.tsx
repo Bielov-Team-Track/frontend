@@ -2,12 +2,13 @@
 
 import { cn } from "@/lib/utils";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
-import React, { forwardRef, useId, useState } from "react";
+import React, { forwardRef, useEffect, useId, useRef, useState } from "react";
 import { Input as InputPrimitive } from "../input";
 import { Label } from "../label";
 
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
 	label?: string;
+	inlineLabel?: string;
 	error?: string;
 	helperText?: string;
 	leftIcon?: React.ReactNode;
@@ -20,6 +21,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 	(
 		{
 			label,
+			inlineLabel,
 			error,
 			helperText,
 			leftIcon,
@@ -31,6 +33,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 			required,
 			className,
 			id: providedId,
+			onClick,
 			...props
 		},
 		ref
@@ -38,11 +41,78 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 		const generatedId = useId();
 		const id = providedId || generatedId;
 		const [showPassword, setShowPassword] = useState(false);
+		const internalRef = useRef<HTMLInputElement>(null);
+
+		// Combine refs for datetime picker functionality
+		const setRefs = (element: HTMLInputElement | null) => {
+			internalRef.current = element;
+			if (typeof ref === "function") {
+				ref(element);
+			} else if (ref) {
+				ref.current = element;
+			}
+		};
+
+		// Check if this is a datetime-related input
+		const isDateTimeInput = ["date", "datetime-local", "time", "month", "week"].includes(type);
+
+		// Handle click to open native picker for datetime inputs
+		const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
+			if (isDateTimeInput && internalRef.current && !disabled) {
+				internalRef.current.showPicker?.();
+			}
+			onClick?.(e);
+		};
+
+		// Ref to measure inline label width
+		const inlineLabelRef = useRef<HTMLDivElement>(null);
+		const [inlineLabelWidth, setInlineLabelWidth] = useState(0);
+
+		// Measure inline label width on mount and when inlineLabel changes
+		useEffect(() => {
+			if (inlineLabelRef.current && inlineLabel) {
+				const width = inlineLabelRef.current.offsetWidth;
+				setInlineLabelWidth(width);
+			} else {
+				setInlineLabelWidth(0);
+			}
+		}, [inlineLabel]);
+
+		// Also handle resize cases with ResizeObserver
+		useEffect(() => {
+			if (!inlineLabelRef.current || !inlineLabel) return;
+
+			const resizeObserver = new ResizeObserver((entries) => {
+				for (const entry of entries) {
+					setInlineLabelWidth(entry.target.clientWidth);
+				}
+			});
+
+			resizeObserver.observe(inlineLabelRef.current);
+
+			return () => {
+				resizeObserver.disconnect();
+			};
+		}, [inlineLabel]);
 
 		const isPasswordType = type === "password";
 		const inputType = isPasswordType && showPassword ? "text" : type;
 		const showToggle = isPasswordType && showPasswordToggle;
 		const hasError = Boolean(error);
+
+		// Calculate left padding
+		const getLeftPadding = () => {
+			if (inlineLabel && inlineLabelWidth > 0) {
+				// Add a small gap (4px) after the inline label
+				return inlineLabelWidth + 8;
+			}
+			if (leftIcon) {
+				return 40; // pl-10 equivalent
+			}
+			return undefined;
+		};
+
+		const leftPadding = getLeftPadding();
 
 		return (
 			<div className="flex flex-col gap-1.5 w-full" data-disabled={disabled}>
@@ -58,22 +128,39 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 				{/* Input Container */}
 				<div className="relative">
 					{/* Left Icon */}
-					{leftIcon && <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">{leftIcon}</div>}
+					{leftIcon && !inlineLabel && (
+						<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">{leftIcon}</div>
+					)}
+
+					{/* Inline Label */}
+					{inlineLabel && (
+						<div
+							ref={inlineLabelRef}
+							className="text-muted-foreground bg-neutral-800 absolute top-1/2 -translate-y-1/2 left-0 flex items-center pointer-events-none px-2.5 py-2 rounded-l-lg text-xs gap-1">
+							{leftIcon && <span className="text-muted-foreground mr-1 [&>svg]:size-4">{leftIcon}</span>}
+							<span className="whitespace-nowrap">{inlineLabel}</span>
+						</div>
+					)}
 
 					<InputPrimitive
-						ref={ref}
+						ref={setRefs}
 						id={id}
 						type={inputType}
 						disabled={disabled}
 						aria-invalid={hasError}
 						aria-describedby={error ? `${id}-error` : helperText ? `${id}-helper` : undefined}
+						onClick={handleClick}
+						style={{
+							paddingLeft: leftPadding ? `${leftPadding}px` : undefined,
+						}}
 						className={cn(
 							"outline-none border-none ring-2 ring-white/10 focus:ring-primary transition-colors",
 							// Error state
 							hasError && "border-destructive focus-visible:ring-destructive/30",
-							// Icon padding
-							leftIcon && "pl-10",
+							// Only apply class-based padding if no inline label (for leftIcon)
+							!inlineLabel && leftIcon && "pl-10",
 							(rightIcon || showToggle) && "pr-10",
+							// Hide native datetime picker icons and make full field clickable
 							className
 						)}
 						{...props}

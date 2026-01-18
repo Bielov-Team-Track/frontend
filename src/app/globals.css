@@ -207,6 +207,17 @@
 		background: oklch(0.4 0 0 / 40%);
 		background-clip: content-box;
 	}
+
+	input::-webkit-inner-spin-button,
+	input::-webkit-calendar-picker-indicator {
+		display: none;
+		-webkit-appearance: none;
+	}
+	input[type="date"],
+	input[type="time"],
+	input[type="datetime-local"] {
+		cursor: pointer;
+	}
 }
 
 @utility text-balance {

@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import { SkillLevel } from "@/lib/models/Profile";
+import { Meta, StoryObj } from "@storybook/nextjs-vite";
 import CoachInfoStep from "./CoachInfoStep";
 
 const meta: Meta<typeof CoachInfoStep> = {
@@ -10,7 +11,6 @@ const meta: Meta<typeof CoachInfoStep> = {
 	tags: ["autodocs"],
 	args: {
 		formId: "coach-info-form",
-		onNext: (data) => console.log("onNext", data),
 	},
 };
 
@@ -23,8 +23,11 @@ export const Filled: Story = {
 	args: {
 		defaultValues: {
 			yearsOfExperience: 5,
-			highestLevelCoached: "Advanced",
-			certifications: ["FIVB Level 1 (2020)", "National Coaching (2018)"],
+			highestLevelCoached: SkillLevel.Advanced,
+			qualifications: [
+				{ name: "FIVB Level 1", year: 2020 },
+				{ name: "National Coaching (2018)", year: 2018 },
+			],
 		},
 	},
 };

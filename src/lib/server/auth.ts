@@ -3,12 +3,10 @@ import { PROFILES_API_V1 } from "../constants";
 
 export const getUserProfile = async () => {
 	const cookieStore = cookies();
-	console.log("cookieStore:", (await cookieStore).getAll());
 	const token = (await cookieStore).get("token")?.value;
 
 	// If no token, return null to indicate unauthenticated
 	if (!token) {
-		console.log("getUserProfile - no token found");
 		return null;
 	}
 
@@ -24,17 +22,13 @@ export const getUserProfile = async () => {
 	};
 
 	try {
-		console.log("getUserProfile - making request to:", backendUrl);
 		const response = await fetch(backendUrl, fetchOptions);
-		console.log("getUserProfile - response status:", response.status);
 
 		if (response.ok) {
 			const userData = await response.json();
-			console.log("getUserProfile - success:", userData);
 			return userData;
 		} else if (response.status === 401 || response.status === 403) {
 			// Token is invalid, return null to indicate unauthenticated
-			console.log("getUserProfile - unauthorized");
 			return null;
 		} else {
 			console.error("Error fetching user profile:", response.statusText);
@@ -70,7 +64,7 @@ export const getFullUserProfile = async () => {
 			fetch(`${PROFILES_API_V1}/profiles/me`, fetchOptions),
 			fetch(`${PROFILES_API_V1}/profiles/me/player`, fetchOptions).catch(() => null),
 			fetch(`${PROFILES_API_V1}/profiles/me/coach`, fetchOptions).catch(() => null),
-			fetch(`${PROFILES_API_V1}/profiles/me/history`, fetchOptions).catch(() => null)
+			fetch(`${PROFILES_API_V1}/profiles/me/history`, fetchOptions).catch(() => null),
 		]);
 
 		if (!profileRes.ok) {
@@ -90,7 +84,7 @@ export const getFullUserProfile = async () => {
 			...profile,
 			playerProfile,
 			coachProfile,
-			historyEntries
+			historyEntries,
 		};
 	} catch (error) {
 		console.error("Error fetching full user profile:", error);

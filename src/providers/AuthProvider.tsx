@@ -1,22 +1,8 @@
 "use client";
 
-import {
-	ReactNode,
-	createContext,
-	useCallback,
-	useContext,
-	useEffect,
-	useRef,
-	useState,
-} from "react";
+import { AuthResponse, login as apiLogin, logout as apiLogout, refreshToken as apiRefreshToken, getCurrentUserProfile } from "@/lib/api/auth";
 import { UserProfile } from "@/lib/models/User";
-import {
-	AuthResponse,
-	login as apiLogin,
-	logout as apiLogout,
-	refreshToken as apiRefreshToken,
-	getCurrentUserProfile,
-} from "@/lib/api/auth";
+import { ReactNode, createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 interface AuthContextType {
 	userProfile: UserProfile | null;
@@ -33,9 +19,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Cookie utility functions
 const getCookie = (name: string): string | null => {
 	if (typeof window === "undefined") return null;
-	const row = document.cookie
-		.split("; ")
-		.find((row) => row.startsWith(`${name}=`));
+	const row = document.cookie.split("; ").find((row) => row.startsWith(`${name}=`));
 	if (!row) return null;
 	// Use slice(1).join("=") to handle values containing "=" characters (like JWT tokens)
 	return row.split("=").slice(1).join("=") || null;
@@ -74,11 +58,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	// Token management utilities (cookies only)
 	const saveTokens = useCallback((authResponse: AuthResponse) => {
-		console.log("Saving tokens:", {
-			token: authResponse.token.substring(0, 20) + "...",
-			expiry: authResponse.expiresAt,
-		});
-
 		// Calculate token expiration time
 		const expiresAt = new Date(authResponse.expiresAt);
 		const now = new Date();
@@ -88,18 +67,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		// Subtract 60s from maxAge to ensure cookie expires before token (preventing race conditions)
 		const maxAge = Math.max(0, Math.floor(timeUntilExpiry / 1000) - 60);
 		setCookie("token", authResponse.token, maxAge);
-		console.log("Access token cookie set with max-age:", maxAge, "seconds");
 
 		// Set refresh token cookie (7 days)
 		const refreshTokenMaxAge = 7 * 24 * 60 * 60;
 		setCookie("refreshToken", authResponse.refreshToken, refreshTokenMaxAge);
-		console.log("Refresh token cookie set with max-age:", refreshTokenMaxAge, "seconds");
 
 		// Schedule proactive token refresh (60 seconds before expiry)
 		const refreshBuffer = 60000; // 60 seconds buffer
 		const refreshIn = Math.max(0, timeUntilExpiry - refreshBuffer);
-
-		console.log(`Scheduling token refresh in ${refreshIn}ms (${refreshIn / 1000}s)`);
 
 		// Clear any existing timer
 		if (refreshTimerRef.current) {
@@ -108,7 +83,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 		// Set new timer for proactive refresh
 		refreshTimerRef.current = setTimeout(() => {
-			console.log("Proactive token refresh triggered");
 			refreshAuth();
 		}, refreshIn);
 	}, []);
@@ -196,16 +170,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			setUserProfile(profile ?? null);
 		} catch (error) {
 			console.error("Token refresh failed:", error);
-			console.error(
-				"Full error details:",
-				JSON.stringify(error, Object.getOwnPropertyNames(error))
-			);
+			console.error("Full error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
 			clearTokens();
 			setUserProfile(null);
 
 			// Redirect to login on refresh failure
 			if (typeof window !== "undefined") {
-				console.log("Redirecting to login page");
 				window.location.href = "/login";
 			}
 		}
@@ -275,9 +245,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		refreshAuth,
 	};
 
-	return (
-		<AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-	);
+	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextType {

@@ -1,9 +1,8 @@
 "use client";
 
-import { Team } from "@/lib/models/Team";
-import React from "react";
-import { default as TeamComponent } from "./Team";
 import { Unit } from "@/lib/models/EventBudget";
+import { Team } from "@/lib/models/Team";
+import { default as TeamComponent } from "./Team";
 
 type TeamsListProps = {
 	teams: Team[];
@@ -12,13 +11,7 @@ type TeamsListProps = {
 	registrationType: Unit;
 };
 
-function TeamsList({
-	teams,
-	isAdmin,
-	registrationType,
-	userId,
-}: TeamsListProps) {
-	console.log("Rendering TeamsList with teams", isAdmin);
+function TeamsList({ teams, isAdmin, registrationType, userId }: TeamsListProps) {
 	return (
 		teams &&
 		teams.length > 0 && (

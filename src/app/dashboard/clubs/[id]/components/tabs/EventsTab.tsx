@@ -3,17 +3,17 @@
 import { Button } from "@/components";
 import ClubEventFormModal, { ClubEvent } from "@/components/features/clubs/forms/ClubEventFormModal";
 import EmptyState from "@/components/ui/empty-state";
-import { Group, Team } from "@/lib/models/Club";
+import { Club, Group, Team } from "@/lib/models/Club";
 import { Calendar, Clock, MapPin, Plus, Users } from "lucide-react";
 import { useState } from "react";
 
 interface EventsTabProps {
-	clubId: string;
+	club: Club;
 	teams: Team[];
 	groups: Group[];
 }
 
-export default function EventsTab({ clubId, teams, groups }: EventsTabProps) {
+export default function EventsTab({ club, teams, groups }: EventsTabProps) {
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [events, setEvents] = useState<ClubEvent[]>([]);
 
@@ -106,7 +106,7 @@ export default function EventsTab({ clubId, teams, groups }: EventsTabProps) {
 			)}
 
 			{/* Create Event Modal */}
-			<ClubEventFormModal isOpen={showCreateModal} teams={teams} groups={groups} onClose={() => setShowCreateModal(false)} onSubmit={handleCreateEvent} />
+			<ClubEventFormModal isOpen={showCreateModal} context={club} onClose={() => setShowCreateModal(false)} onSubmit={handleCreateEvent} />
 		</div>
 	);
 }

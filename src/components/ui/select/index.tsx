@@ -6,18 +6,19 @@ import React, { useId } from "react";
 import { Label } from "../label";
 import { SelectContent, SelectItem, Select as SelectRoot, SelectTrigger, SelectValue } from "../select";
 
-export interface SelectOption {
+export interface SelectOption<T = any> {
 	value: string;
 	label: string;
+	data?: T;
 	disabled?: boolean;
 }
 
-export interface SelectProps {
+export interface SelectProps<T = any> {
 	label?: string;
 	inlineLabel?: string;
 	error?: string;
 	helperText?: string;
-	options: SelectOption[];
+	options: SelectOption<T>[];
 	placeholder?: string;
 	leftIcon?: React.ReactNode;
 	value?: string;
@@ -29,9 +30,11 @@ export interface SelectProps {
 	id?: string;
 	name?: string;
 	fullWidth?: boolean;
+	renderOption?: (option: SelectOption<T>) => React.ReactNode;
+	renderValue?: (option: SelectOption<T>) => React.ReactNode;
 }
 
-function Select({
+function Select<T = any>({
 	label,
 	inlineLabel,
 	error,
@@ -48,7 +51,9 @@ function Select({
 	required,
 	id: providedId,
 	name,
-}: SelectProps) {
+	renderOption,
+	renderValue,
+}: SelectProps<T>) {
 	const generatedId = useId();
 	const id = providedId || generatedId;
 	const hasError = Boolean(error);
@@ -58,7 +63,8 @@ function Select({
 			onChange(newValue === null ? undefined : newValue);
 		}
 	};
-	console.log("Select value:", value === "" ? "Empty string" : value);
+
+	const selectedOption = options.find((opt) => opt.value === value);
 
 	return (
 		<div className={cn("flex flex-col gap-1.5", fullWidth ? "w-full" : "")} data-disabled={disabled}>
@@ -75,14 +81,20 @@ function Select({
 					className={cn("w-full", hasError && "border-destructive focus-visible:ring-destructive/30 aria-invalid:border-destructive", className)}
 					aria-invalid={hasError}
 					aria-describedby={error ? `${id}-error` : helperText ? `${id}-helper` : undefined}>
-					{leftIcon && <span className="text-muted-foreground mr-1">{leftIcon}</span>}
+					{leftIcon && !inlineLabel && <span className="text-muted-foreground mr-1">{leftIcon}</span>}
 					{inlineLabel && (
-						<span className="text-muted-foreground bg-neutral-800 -ml-2.5 -my-2 px-2.5 py-2 mr-2 rounded-l-lg text-xs">{inlineLabel}</span>
+						<div className="text-muted-foreground bg-neutral-800 -ml-2.5 -my-2 px-2.5 py-2 mr-2 rounded-l-lg text-xs flex gap-1">
+							{leftIcon && <span className="text-muted-foreground mr-1">{leftIcon}</span>} {inlineLabel}
+						</div>
 					)}
 					<SelectValue>
 						{(selectedValue: string | null) =>
-							selectedValue ? (
-								options.find((opt) => opt.value === selectedValue)?.label
+							selectedValue && selectedOption ? (
+								renderValue ? (
+									renderValue(selectedOption)
+								) : (
+									selectedOption.label
+								)
 							) : (
 								<span className="text-muted-foreground">{placeholder || "Select an option"}</span>
 							)
@@ -97,7 +109,7 @@ function Select({
 					)}
 					{options.map((option) => (
 						<SelectItem key={option.value} value={option.value} disabled={option.disabled}>
-							{option.label}
+							{renderOption ? renderOption(option) : option.label}
 						</SelectItem>
 					))}
 				</SelectContent>

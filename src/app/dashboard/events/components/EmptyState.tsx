@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function EventsListEmptyState() {
 	return (
-		<div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/2">
+		<div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-white/5 rounded-2xl bg-neutral-900">
 			<div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 text-muted">
 				<Calendar size={32} />
 			</div>

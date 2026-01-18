@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { createLocation as createLocationRequest } from "@/lib/api/locations";
 import { useRouter } from "next/navigation";
 import Map from "@/components/features/locations/components/Map";
 import { useDebounce } from "@/hooks/useDebounce";
+import { ParsedAddress } from "@/lib/utils/address";
 
 function LocationForm() {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -19,6 +20,13 @@ function LocationForm() {
 		setAddress(address);
 		setMapAddressDebounced(address);
 	};
+
+	const handleMapAddressSelected = useCallback((parsedAddress: ParsedAddress) => {
+		setAddress(parsedAddress.formattedAddress);
+		if (parsedAddress.latitude && parsedAddress.longitude) {
+			setLocation({ lat: parsedAddress.latitude, lng: parsedAddress.longitude });
+		}
+	}, []);
 
 	const router = useRouter();
 	const createLocation = async (formData: FormData) => {
@@ -58,8 +66,7 @@ function LocationForm() {
 			<div className={`text-error ${mapError || "hidden"}`}>{mapError}</div>
 			<Map
 				onError={setMapError}
-				onAddressSelected={setAddress}
-				onLocationCalculated={(lat, lng) => setLocation({ lat, lng })}
+				onAddressSelected={handleMapAddressSelected}
 				defaultAddress={mapAddress}
 			></Map>
 			<button

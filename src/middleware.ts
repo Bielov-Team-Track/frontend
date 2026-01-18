@@ -48,7 +48,6 @@ export default async function authMiddleware(request: NextRequest) {
 	// 3. No token - redirect to login
 	// The client-side axios interceptor will handle token refresh
 	if (!accessToken) {
-		console.log("Middleware - No access token, redirecting to login");
 		const response = NextResponse.redirect(new URL("/login", request.url));
 		response.cookies.delete("token");
 		response.cookies.delete("refreshToken");
@@ -61,7 +60,6 @@ export default async function authMiddleware(request: NextRequest) {
 	// 5. Invalid token - redirect to login
 	// The client-side will attempt refresh on the login page or via axios interceptor
 	if (!validation?.isValid) {
-		console.log("Middleware - Token invalid, redirecting to login");
 		const response = NextResponse.redirect(new URL("/login", request.url));
 		response.cookies.delete("token");
 		response.cookies.delete("refreshToken");

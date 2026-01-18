@@ -22,8 +22,6 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 	const { userProfile } = useAuth();
 	const [bannerError, setBannerError] = useState(false);
 
-	console.log("Club ID:", clubId);
-
 	const { data: club, isLoading: isLoadingClub } = useQuery({
 		queryKey: ["club", clubId],
 		queryFn: () => getClub(clubId),

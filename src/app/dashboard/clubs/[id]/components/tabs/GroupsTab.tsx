@@ -70,7 +70,7 @@ export default function GroupsTab({ groups, clubId, clubMembers }: GroupsTabProp
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<h3 className="text-lg font-bold text-white">Groups ({groups.length})</h3>
-				<Button variant="default" color="accent" onClick={() => setShowCreateModal(true)} leftIcon={<Plus size={16} />}>
+				<Button variant="outline" onClick={() => setShowCreateModal(true)} leftIcon={<Plus size={16} />}>
 					Create Group
 				</Button>
 			</div>

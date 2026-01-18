@@ -1,5 +1,5 @@
 import client from "./client";
-import { CreateEvent, Event, EventFilterRequest } from "../models/Event";
+import { CreateEvent, CreateEventSeries, Event, EventFilterRequest, EventSeries } from "../models/Event";
 import { EventParticipant } from "../models/EventParticipant";
 import { getParamsFromObject } from "../utils/request";
 
@@ -102,4 +102,73 @@ export async function leaveEventWaitlist(eventId: string) {
 export async function cancelEvent(eventId: string) {
 	const endpoint = `/v1/events/${eventId}/cancel`;
 	await client.post(PREFIX + endpoint);
+}
+
+// Event Series API
+
+/**
+ * Create a new recurring event series.
+ * The backend will generate all individual events based on the recurrence pattern.
+ */
+export async function createEventSeries(series: CreateEventSeries): Promise<EventSeries> {
+	const endpoint = "/v1/events/series";
+	return (await client.post<EventSeries>(PREFIX + endpoint, series)).data;
+}
+
+/**
+ * Load an event series by ID, including all its events.
+ */
+export async function loadEventSeries(seriesId: string): Promise<EventSeries> {
+	const endpoint = `/v1/events/series/${seriesId}`;
+	return (await client.get<EventSeries>(PREFIX + endpoint)).data;
+}
+
+/**
+ * Load all events in a series.
+ */
+export async function loadSeriesEvents(seriesId: string): Promise<Event[]> {
+	const endpoint = `/v1/events/series/${seriesId}/events`;
+	return (await client.get<Event[]>(PREFIX + endpoint)).data;
+}
+
+/**
+ * Load all series created by the current user.
+ */
+export async function loadMySeries(): Promise<EventSeries[]> {
+	const endpoint = "/v1/me/events/series";
+	return (await client.get<EventSeries[]>(PREFIX + endpoint)).data;
+}
+
+/**
+ * Cancel an entire event series.
+ */
+export async function cancelEventSeries(seriesId: string): Promise<void> {
+	const endpoint = `/v1/events/series/${seriesId}/cancel`;
+	await client.post(PREFIX + endpoint);
+}
+
+/**
+ * Update an event within a series with a specified scope.
+ */
+export type SeriesUpdateScope = "thisEventOnly" | "allFutureEvents" | "allEvents";
+
+export interface UpdateSeriesEventRequest {
+	eventUpdate: Partial<Event>;
+	scope: SeriesUpdateScope;
+}
+
+export async function updateSeriesEvent(
+	eventId: string,
+	request: UpdateSeriesEventRequest
+): Promise<Event> {
+	const endpoint = `/v1/events/${eventId}/series`;
+	return (await client.put<Event>(PREFIX + endpoint, request)).data;
+}
+
+/**
+ * Detach an event from its series, allowing independent modification.
+ */
+export async function detachFromSeries(eventId: string): Promise<Event> {
+	const endpoint = `/v1/events/${eventId}/detach`;
+	return (await client.post<Event>(PREFIX + endpoint)).data;
 }

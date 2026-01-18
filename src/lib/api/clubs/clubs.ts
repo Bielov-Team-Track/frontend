@@ -1,38 +1,37 @@
+import client from "@/lib/api/client";
+import { CLUBS_API_V1 } from "@/lib/constants";
 import {
+	Club,
 	ClubInvitation,
+	ClubMember,
 	ClubRegistration,
+	ClubSearchFilters,
 	ClubSettings,
+	ClubSocialLink,
+	CreateClubRequest,
 	CreateFormTemplateRequest,
+	CreateGroupRequest,
 	CreateInvitationRequest,
 	CreateRegistrationRequest,
+	CreateTeamRequest,
 	FormFieldAnswerDto,
 	FormTemplate,
+	Group,
+	GroupMember,
 	InvitationPreview,
 	InvitationStatus,
 	RegistrationFilterRequest,
 	RegistrationStatus,
 	RegistrationStatusCounts,
-	UpdateFormTemplateRequest,
-	UpdateRegistrationStatusRequest,
-} from "@/lib/models/Club";
-import { CLUBS_API_V1 } from "../constants";
-import {
-	Club,
-	ClubMember,
-	ClubSearchFilters,
-	ClubSocialLink,
-	CreateClubRequest,
-	CreateGroupRequest,
-	CreateTeamRequest,
-	Group,
 	Team,
 	TeamMember,
+	UpdateFormTemplateRequest,
 	UpdateGroupRequest,
+	UpdateRegistrationStatusRequest,
 	UpdateTeamMemberRequest,
 	UpdateTeamRequest,
-} from "../models/Club";
-import { CursorPagedResult } from "../models/Pagination";
-import client from "./client";
+} from "@/lib/models/Club";
+import { CursorPagedResult } from "@/lib/models/Pagination";
 
 export async function getClubs(): Promise<Club[]> {
 	const endpoint = "/clubs";
@@ -172,14 +171,28 @@ export async function deleteGroup(groupId: string): Promise<void> {
 	await client.delete(CLUBS_API_V1 + endpoint);
 }
 
-export async function addGroupMember(groupId: string, userId: string): Promise<void> {
+export async function addGroupMember(groupId: string, userId: string, role?: string): Promise<void> {
 	const endpoint = `/groups/${groupId}/members`;
-	await client.post(CLUBS_API_V1 + endpoint, userId);
+	await client.post(CLUBS_API_V1 + endpoint, { userId, role });
 }
 
 export async function removeGroupMember(groupId: string, userId: string): Promise<void> {
 	const endpoint = `/groups/${groupId}/members/${userId}`;
 	await client.delete(CLUBS_API_V1 + endpoint);
+}
+
+export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
+	const endpoint = `/groups/${groupId}/members`;
+	return (await client.get<GroupMember[]>(CLUBS_API_V1 + endpoint)).data;
+}
+
+export interface UpdateGroupMemberRequest {
+	role?: string;
+}
+
+export async function updateGroupMember(groupId: string, memberId: string, data: UpdateGroupMemberRequest): Promise<GroupMember> {
+	const endpoint = `/groups/${groupId}/members/${memberId}`;
+	return (await client.put<GroupMember>(CLUBS_API_V1 + endpoint, data)).data;
 }
 
 // Club Image Upload Functions

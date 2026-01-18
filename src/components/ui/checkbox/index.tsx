@@ -11,15 +11,30 @@ export interface CheckboxProps {
 	error?: string;
 	helperText?: string;
 	checked?: boolean;
+	indeterminate?: boolean;
 	onChange?: (checked: boolean) => void;
 	disabled?: boolean;
 	required?: boolean;
 	className?: string;
 	id?: string;
 	name?: string;
+	tabIndex?: number;
 }
 
-function Checkbox({ label, error, helperText, checked, onChange, disabled, required, className, id: providedId, name }: CheckboxProps) {
+function Checkbox({
+	label,
+	error,
+	helperText,
+	checked,
+	indeterminate,
+	onChange,
+	disabled,
+	required,
+	className,
+	id: providedId,
+	name,
+	tabIndex,
+}: CheckboxProps) {
 	const generatedId = useId();
 	const id = providedId || generatedId;
 	const hasError = Boolean(error);
@@ -36,10 +51,12 @@ function Checkbox({ label, error, helperText, checked, onChange, disabled, requi
 					)}>
 					<CheckboxPrimitive
 						id={id}
+						indeterminate={indeterminate}
 						checked={checked}
 						onCheckedChange={onChange}
 						disabled={disabled}
 						name={name}
+						tabIndex={tabIndex}
 						aria-invalid={hasError}
 						aria-describedby={error ? `${id}-error` : helperText ? `${id}-helper` : undefined}
 						className={cn(hasError && "border-destructive aria-invalid:border-destructive", className)}

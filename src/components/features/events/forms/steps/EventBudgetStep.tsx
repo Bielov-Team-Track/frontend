@@ -1,7 +1,6 @@
 import { Checkbox, Input, RadioCards } from "@/components/ui";
 import { PricingModel } from "@/lib/models/EventBudget";
 import { Calculator, Clock, Coins, User, Users } from "lucide-react";
-import { useState } from "react";
 import { Controller } from "react-hook-form";
 import PaymentMethodsSelector from "../components/PaymentMethodsSelector";
 import { useEventFormContext } from "../context/EventFormContext";
@@ -29,7 +28,6 @@ const pricingModelCards = [
 ];
 
 const EventBudgetStep = () => {
-	const [useBudget, setIgnoreBudget] = useState(false);
 	const { form } = useEventFormContext();
 	const { account, status, canAcceptPayments, isLoading } = usePaymentAccount();
 	const {
@@ -38,10 +36,11 @@ const EventBudgetStep = () => {
 		watch,
 	} = form;
 	const values = watch();
+	const useBudget = values.useBudget;
 
 	return (
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-			<div>
+			<div className="border-b-2 pb-4">
 				<h2 className="text-xl font-bold text-white mb-1">Event Budget</h2>
 				<p className="text-muted text-sm">Configure payment settings. Without budget you cannot collect payments or audit the event.</p>
 			</div>
@@ -56,10 +55,7 @@ const EventBudgetStep = () => {
 							checked={value}
 							label="Enable budget management"
 							helperText="Track payments and manage event finances"
-							onChange={(value) => {
-								onChange(value);
-								setIgnoreBudget(value);
-							}}
+							onChange={onChange}
 						/>
 					)}
 				/>

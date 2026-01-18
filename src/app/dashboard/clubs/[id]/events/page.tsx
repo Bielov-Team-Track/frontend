@@ -4,7 +4,7 @@ import { EventsTab } from "../components/tabs";
 import { useClubContext } from "../layout";
 
 export default function ClubEventsPage() {
-	const { clubId, teams, groups } = useClubContext();
+	const { club, teams, groups } = useClubContext();
 
-	return <EventsTab clubId={clubId} teams={teams} groups={groups} />;
+	return <EventsTab club={club!} teams={teams} groups={groups} />;
 }

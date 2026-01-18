@@ -1,6 +1,7 @@
-import React, { createContext, useContext, ReactNode } from "react";
+import { Club, Group, Team } from "@/lib/models/Club";
+import { Event } from "@/lib/models/Event";
+import React, { createContext, ReactNode, useContext } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { Event, Location } from "@/lib/models/Event";
 import { useEventForm } from "../hooks/useEventForm";
 import { useEventWizard } from "../hooks/useEventWizard";
 import { EventFormData } from "../validation/eventValidationSchema";
@@ -21,24 +22,18 @@ interface EventFormContextType {
 		isLastStep: boolean;
 		totalSteps: number;
 	};
-	locations: Location[];
+	context?: Club | Group | Team | null;
 }
 
-const EventFormContext = createContext<EventFormContextType | undefined>(
-	undefined,
-);
+const EventFormContext = createContext<EventFormContextType | undefined>(undefined);
 
 interface EventFormProviderProps {
 	children: ReactNode;
 	event?: Event;
-	locations: Location[];
+	context?: Club | Group | Team | null;
 }
 
-export function EventFormProvider({
-	children,
-	event,
-	locations,
-}: EventFormProviderProps) {
+export function EventFormProvider({ children, event, context }: EventFormProviderProps) {
 	const form = useEventForm(event);
 	const wizard = useEventWizard({
 		trigger: form.trigger as any,
@@ -48,22 +43,16 @@ export function EventFormProvider({
 	const value: EventFormContextType = {
 		form,
 		wizard,
-		locations,
+		context,
 	};
 
-	return (
-		<EventFormContext.Provider value={value}>
-			{children}
-		</EventFormContext.Provider>
-	);
+	return <EventFormContext.Provider value={value}>{children}</EventFormContext.Provider>;
 }
 
 export function useEventFormContext(): EventFormContextType {
 	const context = useContext(EventFormContext);
 	if (context === undefined) {
-		throw new Error(
-			"useEventFormContext must be used within an EventFormProvider",
-		);
+		throw new Error("useEventFormContext must be used within an EventFormProvider");
 	}
 	return context;
 }

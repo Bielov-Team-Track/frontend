@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 import React from "react";
 
@@ -16,19 +14,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
-	(
-		{
-			variant = "soft",
-			color = "neutral",
-			size = "sm",
-			icon,
-			iconPosition = "left",
-			className,
-			children,
-			...props
-		},
-		ref
-	) => {
+	({ variant = "soft", color = "neutral", size = "sm", icon, iconPosition = "left", className, children, ...props }, ref) => {
 		// Map variant to DaisyUI style class
 		const variantClass = {
 			solid: "",
@@ -45,18 +31,7 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
 		const sizeClass = `badge-${size}`;
 
 		return (
-			<span
-				ref={ref}
-				className={cn(
-					"badge",
-					colorClass,
-					variantClass,
-					sizeClass,
-					"gap-1",
-					className
-				)}
-				{...props}
-			>
+			<span ref={ref} className={cn("badge", colorClass, variantClass, sizeClass, "gap-1", className)} {...props}>
 				{icon && iconPosition === "left" && <span className="shrink-0">{icon}</span>}
 				{children}
 				{icon && iconPosition === "right" && <span className="shrink-0">{icon}</span>}

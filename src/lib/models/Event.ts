@@ -1,17 +1,18 @@
+import { EventBudget as EventPaymentsConfig, Unit } from "./EventBudget";
 import { Team } from "./Team";
-import { UserProfile } from "./User";
-import { EventBudget, Unit } from "./EventBudget";
 
 export enum EventType {
+	Match = "Match",
 	CasualPlay = "CasualPlay",
-	Tournament = "Tournament",
+	Social = "Social",
 	TrainingSession = "TrainingSession",
 }
 
 export const EventTypeOptions = [
 	{ value: EventType.CasualPlay, label: "Casual" },
-	{ value: EventType.Tournament, label: "Tournament" },
+	{ value: EventType.Social, label: "Tournament" },
 	{ value: EventType.TrainingSession, label: "Training Session" },
+	{ value: EventType.Match, label: "Match" },
 ];
 
 export enum EventFormat {
@@ -21,9 +22,9 @@ export enum EventFormat {
 }
 
 export enum PlayingSurface {
-	Grass = 0,
-	Indoor = 1,
-	Beach = 2,
+	Grass = "Grass",
+	Indoor = "Indoor",
+	Beach = "Beach",
 }
 
 export const SurfaceOptions = [
@@ -45,7 +46,7 @@ export interface Event {
 
 	// Registration and pricing
 	registrationUnit: Unit; // How people register for this event
-	budget?: EventBudget; // Budget configuration (new approach)
+	budget?: EventPaymentsConfig; // Budget configuration (new approach)
 	budgetId?: string; // Reference to budget if using separate budget entity
 
 	// Legacy pricing fields (for backward compatibility)
@@ -57,10 +58,11 @@ export interface Event {
 	surface: PlayingSurface;
 	isPrivate: boolean;
 	teamsNumber: number;
-
-	// Optional for some UIs
-	admins?: UserProfile[];
 	teams?: Team[]; // Array of team IDs
+
+	// Recurring event series
+	seriesId?: string;
+	seriesOccurrenceNumber?: number;
 }
 
 export interface EventAdmin {}
@@ -80,27 +82,21 @@ export interface EventFilterRequest {
 }
 
 export interface CreateEvent {
-	id?: string | undefined;
 	name: string;
+	description?: string;
 	startTime: Date;
-	endTime: Date;
+	endTime?: Date;
+	isPublic: boolean;
 	location: Location;
-	approveGuests: boolean;
-	teamsNumber: number;
-	eventFormat: EventFormat;
-
-	// Registration and pricing
-	registrationUnit: Unit;
-	budget?: EventBudget; // Inline budget configuration
-	budgetId?: string; // Or reference to existing budget template
 
 	type: EventType;
 	surface: PlayingSurface;
-	isPrivate: boolean;
+	eventFormat: EventFormat;
+	registrationConfig?: RegistrationConfig;
+	paymentsConfig?: EventPaymentsConfig;
 }
 
 export interface Location {
-	id?: string | undefined;
 	name: string;
 	address?: string;
 	city?: string;
@@ -108,4 +104,79 @@ export interface Location {
 	postalCode?: string;
 	latitude?: number;
 	longitude?: number;
+}
+
+export interface RegistrationConfig {
+	isOpen: boolean;
+	capacity?: number;
+	registrationType: RegistrationType;
+	deadline?: Date;
+	openDate?: Date;
+}
+
+export enum RegistrationType {
+	Individuals = "Individuals",
+	Teams = "Teams",
+}
+
+// Recurring Events Types
+export enum RecurrencePattern {
+	Weekly = "weekly",
+	Biweekly = "biweekly",
+	Monthly = "monthly",
+	Semiannually = "semiannually",
+	Annually = "annually",
+}
+
+export const RecurrencePatternOptions = [
+	{ value: RecurrencePattern.Weekly, label: "Every Week" },
+	{ value: RecurrencePattern.Biweekly, label: "Every 2 Weeks" },
+	{ value: RecurrencePattern.Monthly, label: "Every Month" },
+	{ value: RecurrencePattern.Semiannually, label: "Every 6 Months" },
+	{ value: RecurrencePattern.Annually, label: "Every Year" },
+];
+
+export enum TimeOffsetUnit {
+	Minutes = "minutes",
+	Hours = "hours",
+	Days = "days",
+}
+
+export const TimeOffsetUnitOptions = [
+	{ value: TimeOffsetUnit.Minutes, label: "minutes" },
+	{ value: TimeOffsetUnit.Hours, label: "hours" },
+	{ value: TimeOffsetUnit.Days, label: "days" },
+];
+
+export interface TimeOffset {
+	value: number;
+	unit: TimeOffsetUnit;
+}
+
+export interface CreateEventSeries {
+	name: string;
+	description?: string;
+	recurrencePattern: RecurrencePattern;
+	firstOccurrenceDate: Date;
+	seriesEndDate: Date;
+	eventStartTime: string; // "HH:mm" format
+	eventEndTime: string; // "HH:mm" format
+	type: EventType;
+	surface?: PlayingSurface;
+	eventFormat: EventFormat;
+	isPublic: boolean;
+	location?: Location;
+	paymentsConfig?: EventPaymentsConfig;
+	registrationOpenOffset?: TimeOffset;
+	registrationDeadlineOffset?: TimeOffset;
+}
+
+export interface EventSeries {
+	id: string;
+	name: string;
+	recurrencePattern: RecurrencePattern;
+	firstOccurrenceDate: Date;
+	seriesEndDate: Date;
+	totalEventsCount: number;
+	events: Event[];
 }

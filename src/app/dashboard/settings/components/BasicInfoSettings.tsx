@@ -2,9 +2,9 @@
 
 import BasicInfoStep from "@/components/features/profile/forms/steps/BasicInfoStep";
 import { Button } from "@/components/ui";
-import { FullProfileDto } from "@/lib/models/Profile";
 import { createNotificationSubscription } from "@/lib/api/subscriptions";
 import { updateCurrentProfile } from "@/lib/api/user";
+import { FullProfileDto } from "@/lib/models/Profile";
 import { Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -30,15 +30,13 @@ export default function BasicInfoSettings({ user }: BasicInfoSettingsProps) {
 			navigator.serviceWorker
 				.register("/scripts/notifications_worker.js")
 				.then(function (swReg) {
-					console.log("Service Worker is registered", swReg);
-
 					swReg.pushManager
 						.subscribe({
 							userVisibleOnly: true,
 							applicationServerKey: "BDoqxWXp2K97_Wuk4s2On7aeqBus_ZvJuGLrOn_moB3LCElqnweRINPhgwL0byp8ktqCSCorTxPJSGpcZR7y02o",
 						})
 						.then(async function (subscription) {
-							await createNotificationSubscription(user?.userProfile?.userId, subscription);
+							await createNotificationSubscription(user?.userProfile?.userId!, subscription);
 							showSuccess("Notifications enabled successfully!");
 						});
 				})

@@ -1,5 +1,6 @@
-import client from "./client";
+import { CursorRequest, QueryRequest, SortRequest } from "@/lib/models/filteringAndPagination";
 import { AuthData } from "../models/Auth";
+import { CursorPagedResult } from "../models/Pagination";
 import { PositionPayment } from "../models/Position";
 import {
 	CoachProfileDto,
@@ -15,6 +16,7 @@ import {
 } from "../models/Profile";
 import { BaseUser, GoogleUserCreate, Suspension, UserProfile } from "../models/User";
 import { AuthResponse } from "./auth";
+import client from "./client";
 
 const PREFIX = "/profiles/v1";
 
@@ -251,11 +253,24 @@ export async function unfollowUser(userId: string) {
 
 	return await client.post(PREFIX + endpoint);
 }
+export interface UserSearchRequest extends SortRequest, CursorRequest, QueryRequest {
+	teamId?: string;
+	groupId?: string;
+	excludeCurrentUser?: boolean;
+}
 
-export async function searchUsers(query: string): Promise<UserProfile[]> {
-	const processedQuery = encodeURIComponent(query.trim());
+export async function searchUsers(request: UserSearchRequest): Promise<CursorPagedResult<UserProfile>> {
+	const params = new URLSearchParams();
+	if (request.query) params.append("Query", encodeURIComponent(request.query.trim()));
+	if (request.teamId) params.append("TeamId", request.teamId);
+	if (request.groupId) params.append("GroupId", request.groupId);
+	if (request.sortBy) params.append("SortBy", request.sortBy);
+	if (request.sortDirection) params.append("SortDirection", request.sortDirection);
+	if (request.cursor) params.append("Cursor", request.cursor);
+	if (request.limit) params.append("Limit", request.limit.toString());
+	if (request.excludeCurrentUser) params.append("ExcludeCurrentUser", "true");
 
-	const endpoint = `/profiles?query=${processedQuery}`;
+	const endpoint = `/profiles/search?` + params.toString();
 
-	return (await client.get<UserProfile[]>(PREFIX + endpoint)).data;
+	return (await client.get<CursorPagedResult<UserProfile>>(PREFIX + endpoint)).data;
 }

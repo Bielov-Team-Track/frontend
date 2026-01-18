@@ -1,13 +1,11 @@
-import { ApprovalSection } from "@/components/features/events";
 import PositionsRealtimeClient from "@/components/features/teams/components/PositionsRealtimeClient";
-import { checkUserApproval } from "@/lib/api/approvals";
 import { loadEvent } from "@/lib/api/events";
 import { loadTeams } from "@/lib/api/teams";
+import { UserProfile } from "@/lib/models/User";
 import { getUserProfile } from "@/lib/server/auth";
 import { notFound } from "next/navigation";
-import { UserProfile } from "@/lib/models/User";
-import PaymentsSection from "./components/PaymentsSection";
 import EventDetailsV2 from "./components/EventDetailsV2";
+import PaymentsSection from "./components/PaymentsSection";
 
 type EventPageParams = {
 	params: Promise<{
@@ -28,22 +26,6 @@ async function EventPage({ params }: EventPageParams) {
 		notFound();
 	}
 
-	const isAdmin = !!event.admins!.find((a) => a.userId == user?.userId);
-
-	if ((event as any).approveGuests && !isAdmin) {
-		const userApproval = await checkUserApproval(event.id!, user?.userId!);
-
-		if (!userApproval || !userApproval.approved) {
-			return (
-				<ApprovalSection
-					defaultApproval={userApproval}
-					userId={user?.userId!}
-					eventId={event.id!}
-				/>
-			);
-		}
-	}
-
 	const teams = await loadTeams(parameters.id);
 	teams.forEach((team) => {
 		team.event = event;
@@ -53,11 +35,9 @@ async function EventPage({ params }: EventPageParams) {
 		<EventDetailsV2
 			event={event}
 			user={user}
-			isAdmin={isAdmin}
+			isAdmin={true}
 			teams={teams}
-			paymentsSection={
-				<PaymentsSection event={event} teams={teams} userProfile={user} />
-			}
+			paymentsSection={<PaymentsSection event={event} teams={teams} userProfile={user} />}
 			positionsRealtime={<PositionsRealtimeClient />}
 		/>
 	);

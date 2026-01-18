@@ -44,7 +44,6 @@ export default function NotificationsClient() {
 	const observerRef = useRef<IntersectionObserver | null>(null);
 	const loadMoreRef = useCallback(
 		(node: HTMLDivElement | null) => {
-			console.log("Load more ref callback triggered", { node });
 			if (isFetchingNextPage) return;
 
 			if (observerRef.current) {
