@@ -2,10 +2,12 @@
 
 import { AttendanceEvent, AttendanceMatrix, AttendanceMember, AttendanceRecord, AttendanceStatus, PaymentStatus } from "@/lib/models/Attendance";
 import { stringToColor } from "@/lib/utils/color";
-import { AlertTriangle, Check, HelpCircle, Minus, User, Users, X } from "lucide-react";
+import { AlertTriangle, Check, CheckSquare, HelpCircle, Minus, Square, User, Users, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import AttendanceCell from "./AttendanceCell";
-import CellPopover from "./CellPopover";
+import QuickStatusPopover from "./QuickStatusPopover";
+import BulkActionBar from "./BulkActionBar";
+import MemberDetailModal from "./MemberDetailModal";
 
 interface AttendanceTableProps {
 	data: AttendanceMatrix;
@@ -17,7 +19,15 @@ export default function AttendanceTable({ data, onUpdateAttendance, isUpdating =
 	const [selectedCell, setSelectedCell] = useState<{
 		event: AttendanceEvent;
 		member: AttendanceMember;
+		anchorRect: DOMRect | null;
 	} | null>(null);
+
+	// Bulk mode state
+	const [isBulkMode, setIsBulkMode] = useState(false);
+	const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
+
+	// Member detail modal state
+	const [selectedMember, setSelectedMember] = useState<AttendanceMember | null>(null);
 
 	// Build a lookup map for quick record access
 	const recordMap = useMemo(() => {
@@ -32,8 +42,59 @@ export default function AttendanceTable({ data, onUpdateAttendance, isUpdating =
 		return recordMap.get(`${eventId}-${userId}`) || null;
 	};
 
-	const handleCellClick = (event: AttendanceEvent, member: AttendanceMember) => {
-		setSelectedCell({ event, member });
+	// Use a delimiter that won't appear in UUIDs
+	const CELL_KEY_DELIMITER = "::";
+
+	const handleCellClick = (event: AttendanceEvent, member: AttendanceMember, buttonElement: HTMLButtonElement) => {
+		if (isBulkMode) {
+			// Toggle selection in bulk mode
+			const key = `${event.id}${CELL_KEY_DELIMITER}${member.userId}`;
+			setSelectedCells((prev) => {
+				const next = new Set(prev);
+				if (next.has(key)) {
+					next.delete(key);
+				} else {
+					next.add(key);
+				}
+				return next;
+			});
+		} else {
+			// Normal mode - show popover
+			const rect = buttonElement.getBoundingClientRect();
+			setSelectedCell({ event, member, anchorRect: rect });
+		}
+	};
+
+	const handleBulkUpdate = (status: AttendanceStatus, paymentStatus?: PaymentStatus) => {
+		// Apply status to all selected cells
+		selectedCells.forEach((key) => {
+			const [eventId, userId] = key.split(CELL_KEY_DELIMITER);
+			onUpdateAttendance(eventId, userId, status, undefined, paymentStatus);
+		});
+		// Clear selection after bulk update
+		setSelectedCells(new Set());
+	};
+
+	const toggleBulkMode = () => {
+		setIsBulkMode((prev) => !prev);
+		if (isBulkMode) {
+			// Clear selection when exiting bulk mode
+			setSelectedCells(new Set());
+		}
+	};
+
+	const selectAll = () => {
+		const allKeys = new Set<string>();
+		data.events.forEach((event) => {
+			data.members.forEach((member) => {
+				allKeys.add(`${event.id}${CELL_KEY_DELIMITER}${member.userId}`);
+			});
+		});
+		setSelectedCells(allKeys);
+	};
+
+	const clearSelection = () => {
+		setSelectedCells(new Set());
 	};
 
 	const handleUpdate = (status: AttendanceStatus, note?: string, paymentStatus?: PaymentStatus) => {
@@ -58,15 +119,33 @@ export default function AttendanceTable({ data, onUpdateAttendance, isUpdating =
 	return (
 		<>
 			<div className="overflow-x-auto">
-				<table className="w-full border-collapse">
+				<table className="border-collapse table-fixed">
 					{/* Header */}
 					<thead>
 						<tr>
 							{/* Member column header */}
-							<th className="sticky left-0 z-20 bg-background px-4 py-3 text-left min-w-[200px]">
-								<div className="flex items-center gap-2 text-xs font-semibold text-muted uppercase tracking-wider">
-									<User size={14} />
-									Member
+							<th className="sticky left-0 z-20 bg-background px-3 py-2 text-left w-[200px]">
+								<div className="flex items-center gap-2">
+									<div className="flex items-center gap-1.5 text-xs font-semibold text-muted uppercase tracking-wider flex-1">
+										<User size={14} />
+										Member
+									</div>
+									{/* Bulk mode toggle */}
+									<button
+										onClick={toggleBulkMode}
+										className={`
+											flex items-center gap-1 px-2 py-1 rounded text-xs font-medium
+											transition-all duration-150
+											${isBulkMode
+												? "bg-primary text-white"
+												: "bg-white/5 text-muted hover:bg-white/10 hover:text-white"
+											}
+										`}
+										title={isBulkMode ? "Exit bulk mode" : "Enter bulk mode"}
+									>
+										{isBulkMode ? <CheckSquare size={12} /> : <Square size={12} />}
+										<span className="hidden sm:inline">Bulk</span>
+									</button>
 								</div>
 							</th>
 							{/* Event column headers */}
@@ -77,17 +156,15 @@ export default function AttendanceTable({ data, onUpdateAttendance, isUpdating =
 								const weekday = date.toLocaleString("default", { weekday: "short" });
 
 								return (
-									<th key={event.id} className="px-2 py-3 text-center min-w-[70px] border-l border-white/5">
+									<th key={event.id} className="px-2 py-2 text-center w-[72px] border-l border-white/5" title={event.name}>
 										<div className="flex flex-col items-center gap-1">
-											<div className="flex flex-col items-center justify-center w-10 h-10 rounded-lg bg-white/5 border border-white/10">
+											<div className="flex flex-col items-center justify-center w-10 h-10 rounded-md bg-white/5 border border-white/10">
 												<span className="text-sm font-bold text-white leading-none">{day}</span>
-												<span className="text-[9px] font-semibold text-muted uppercase">{month}</span>
+												<span className="text-xs font-semibold text-muted uppercase">{month}</span>
 											</div>
-											<span className="text-[10px] text-muted font-medium">{weekday}</span>
-											<span className="text-[10px] text-white/70 font-medium truncate max-w-[60px]" title={event.name}>
-												{event.name.length > 8 ? event.name.slice(0, 8) + "…" : event.name}
+											<span className="text-xs text-white/60 font-medium truncate max-w-[60px]">
+												{event.name}
 											</span>
-											{event.isFree && <span className="text-[9px] text-success font-bold">FREE</span>}
 										</div>
 									</th>
 								);
@@ -109,17 +186,19 @@ export default function AttendanceTable({ data, onUpdateAttendance, isUpdating =
                                         ${idx !== data.members.length - 1 ? "border-b border-white/5" : ""}
                                     `}>
 									{/* Member cell */}
-									<td className="sticky left-0 z-10 bg-background px-4 py-3">
-										<div className="flex items-center gap-3">
+									<td className="sticky left-0 z-10 bg-background px-3 py-2 w-[200px]">
+										<button
+											onClick={() => setSelectedMember(member)}
+											className="flex items-center gap-2 w-full text-left hover:bg-white/5 -mx-2 px-2 py-1 rounded-md transition-colors">
 											{/* Warning indicator */}
-											{member.highlightWarning && <div className="absolute left-0 top-0 bottom-0 w-1 bg-warning" />}
+											{member.highlightWarning && <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-warning" />}
 
 											{/* Avatar */}
 											<div
-												className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold text-background-dark shrink-0"
+												className="w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold text-background-dark shrink-0"
 												style={{ backgroundColor: bgColor }}>
 												{member.avatarUrl ? (
-													<img src={member.avatarUrl} alt={member.name} className="w-full h-full rounded-lg object-cover" />
+													<img src={member.avatarUrl} alt={member.name} className="w-full h-full rounded-md object-cover" />
 												) : (
 													member.name
 														.split(" ")
@@ -132,32 +211,36 @@ export default function AttendanceTable({ data, onUpdateAttendance, isUpdating =
 
 											{/* Name and warning */}
 											<div className="min-w-0 flex-1">
-												<div className="flex items-center gap-2">
+												<div className="flex items-center gap-1.5">
 													<span className="font-medium text-white text-sm truncate">{member.name}</span>
 													{member.highlightWarning && (
-														<span className="flex items-center gap-1 text-[10px] font-semibold text-warning bg-warning/10 px-1.5 py-0.5 rounded">
+														<span className="flex items-center gap-0.5 text-xs font-semibold text-warning bg-warning/10 px-1.5 py-0.5 rounded">
 															<AlertTriangle size={10} />
 															{member.declineStreak}
 														</span>
 													)}
 												</div>
-												{member.highlightWarning && (
-													<span className="text-[10px] text-warning/70">{member.declineStreak} consecutive declines</span>
-												)}
 											</div>
-										</div>
+										</button>
 									</td>
 
 									{/* Attendance cells */}
-									{data.events.map((event) => (
-										<td key={event.id} className="px-2 py-3 text-center border-l border-white/5">
-											<AttendanceCell
-												record={getRecord(event.id, member.userId)}
-												event={event}
-												onClick={() => handleCellClick(event, member)}
-											/>
-										</td>
-									))}
+									{data.events.map((event) => {
+										const cellKey = `${event.id}${CELL_KEY_DELIMITER}${member.userId}`;
+										return (
+											<td key={event.id} className="px-2 py-2 border-l border-white/5 w-[72px]">
+												<div className="flex items-center justify-center">
+													<AttendanceCell
+														record={getRecord(event.id, member.userId)}
+														event={event}
+														onClick={(e) => handleCellClick(event, member, e.currentTarget)}
+														isBulkMode={isBulkMode}
+														isSelected={selectedCells.has(cellKey)}
+													/>
+												</div>
+											</td>
+										);
+									})}
 								</tr>
 							);
 						})}
@@ -166,48 +249,77 @@ export default function AttendanceTable({ data, onUpdateAttendance, isUpdating =
 			</div>
 
 			{/* Legend */}
-			<div className="flex flex-wrap items-center justify-center gap-4 lg:gap-6 py-4 border-t border-white/5 text-xs text-muted">
+			<div className="flex flex-wrap items-center justify-center gap-4 lg:gap-5 py-3 border-t border-white/5 text-xs text-muted">
 				<div className="flex items-center gap-2">
-					<div className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-muted">
+					<div className="w-5 h-5 rounded flex items-center justify-center text-white/20">
+						<span className="text-[10px] font-medium">/</span>
+					</div>
+					<span>N/A</span>
+				</div>
+				<div className="flex items-center gap-2">
+					<div className="w-5 h-5 rounded bg-white/10 flex items-center justify-center text-muted">
 						<HelpCircle size={12} />
 					</div>
 					<span>Invited</span>
 				</div>
 				<div className="flex items-center gap-2">
-					<div className="w-5 h-5 rounded-md bg-info/20 flex items-center justify-center text-info">
+					<div className="w-5 h-5 rounded bg-info/20 flex items-center justify-center text-info">
 						<Check size={12} strokeWidth={3} />
 					</div>
 					<span>Accepted</span>
 				</div>
 				<div className="flex items-center gap-2">
-					<div className="w-5 h-5 rounded-md bg-success/20 flex items-center justify-center text-success">
+					<div className="w-5 h-5 rounded bg-success/20 flex items-center justify-center text-success">
 						<Check size={12} strokeWidth={3} />
 					</div>
 					<span>Attended</span>
 				</div>
 				<div className="flex items-center gap-2">
-					<div className="w-5 h-5 rounded-md bg-error/20 flex items-center justify-center text-error">
+					<div className="w-5 h-5 rounded bg-error/20 flex items-center justify-center text-error">
 						<X size={12} strokeWidth={3} />
 					</div>
 					<span>Declined</span>
 				</div>
 				<div className="flex items-center gap-2">
-					<div className="w-5 h-5 rounded-md bg-warning/20 flex items-center justify-center text-warning">
+					<div className="w-5 h-5 rounded bg-warning/20 flex items-center justify-center text-warning">
 						<Minus size={12} strokeWidth={3} />
 					</div>
 					<span>No-show</span>
 				</div>
 			</div>
 
-			{/* Popover */}
+			{/* Quick Status Popover */}
 			{selectedCell && (
-				<CellPopover
+				<QuickStatusPopover
 					record={getRecord(selectedCell.event.id, selectedCell.member.userId)}
 					event={selectedCell.event}
 					member={selectedCell.member}
+					anchorRect={selectedCell.anchorRect}
 					onClose={() => setSelectedCell(null)}
 					onUpdate={handleUpdate}
 					isLoading={isUpdating}
+				/>
+			)}
+
+			{/* Bulk Action Bar */}
+			{isBulkMode && (
+				<BulkActionBar
+					selectedCount={selectedCells.size}
+					onApplyStatus={handleBulkUpdate}
+					onSelectAll={selectAll}
+					onClearSelection={clearSelection}
+					onExitBulkMode={toggleBulkMode}
+					isLoading={isUpdating}
+				/>
+			)}
+
+			{/* Member Detail Modal */}
+			{selectedMember && (
+				<MemberDetailModal
+					member={selectedMember}
+					events={data.events}
+					records={data.records}
+					onClose={() => setSelectedMember(null)}
 				/>
 			)}
 		</>

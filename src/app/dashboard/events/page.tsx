@@ -1,5 +1,5 @@
-import { loadEventsByFilter } from "@/lib/api/events";
 import { getUserProfile } from "@/lib/server/auth";
+import { loadEventsByFilterServer } from "@/lib/server/events";
 import { redirect } from "next/navigation";
 import EventsPageClient from "./EventsPageClient";
 
@@ -8,9 +8,9 @@ async function EventsPage() {
 	if (!userProfile) {
 		redirect("/login");
 	}
-	const events = await loadEventsByFilter({ organizerId: userProfile.userId! });
+	const events = await loadEventsByFilterServer({ organizerId: userProfile.id! });
 
-	return <EventsPageClient events={events} />;
+	return <EventsPageClient events={events} title="Your Events" />;
 }
 
 export default EventsPage;

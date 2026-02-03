@@ -1,10 +1,10 @@
 import { Button, Modal } from "@/components";
 import UserProfileModal from "@/components/features/user/UserProfileModal";
-import { useAuth } from "@/providers";
+import { addParticipants, removeParticipant } from "@/lib/api/messages";
 import { Chat } from "@/lib/models/Messages";
 import { UserProfile } from "@/lib/models/User";
-import { addParticipants, removeParticipant } from "@/lib/api/messages";
 import { stringToColor } from "@/lib/utils/color";
+import { useAuth } from "@/providers";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bell, LogOut, Search, Trash, UserPlus, X } from "lucide-react";
 import Image from "next/image";
@@ -56,7 +56,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 		if (!participantSearchQuery.trim()) return participants;
 		const query = participantSearchQuery.toLowerCase();
 		return participants.filter(
-			(p) => p.name?.toLowerCase().includes(query) || p.surname?.toLowerCase().includes(query) || p.email?.toLowerCase().includes(query)
+			(p) => p.name?.toLowerCase().includes(query) || p.surname?.toLowerCase().includes(query) || p.email?.toLowerCase().includes(query),
 		);
 	}, [participants, participantSearchQuery]);
 
@@ -67,7 +67,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 		try {
 			await addParticipants(
 				chat.id,
-				selectedUsersToAdd.map((u) => u.userId)
+				selectedUsersToAdd.map((u) => u.id),
 			);
 			setIsAdding(false);
 			setSelectedUsersToAdd([]);
@@ -82,7 +82,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 	};
 
 	const handleRemoveParticipant = async (userId: string) => {
-		const userToRemove = participants.find((p) => p.userId === userId);
+		const userToRemove = participants.find((p) => p.id === userId);
 		const userName = userToRemove ? `${userToRemove.name} ${userToRemove.surname}` : "this user";
 
 		if (!confirm(`Are you sure you want to remove ${userName}?`)) return;
@@ -169,13 +169,13 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 								{chat.participants.length > 2 ? (
 									<div className="w-24 h-24 rounded-full bg-white/5 p-1 grid grid-cols-2 gap-1 overflow-hidden border-2 border-white/5 shadow-inner">
 										{participants.slice(0, 4).map((p) => (
-											<div key={p.userId} className="w-full h-full relative overflow-hidden rounded-full">
+											<div key={p.id} className="w-full h-full relative overflow-hidden rounded-full">
 												{p.imageUrl ? (
 													<Image src={p.imageUrl} alt={p.name} fill className="object-cover" />
 												) : (
 													<div
 														className="w-full h-full flex items-center justify-center text-[10px] font-bold text-black/60"
-														style={{ backgroundColor: stringToColor(p.email || p.userId) }}>
+														style={{ backgroundColor: stringToColor(p.email || p.id) }}>
 														{p.name?.[0]}
 													</div>
 												)}
@@ -253,7 +253,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 								) : (
 									filteredParticipants.map((user) => (
 										<div
-											key={user.userId}
+											key={user.id}
 											className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors group cursor-pointer"
 											onClick={() => handleParticipantClick(user)}>
 											<div className="flex items-center gap-3">
@@ -262,17 +262,17 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 													<span className="text-sm font-medium text-white group-hover:text-accent transition-colors">
 														{user.name} {user.surname}
 													</span>
-													{user.userId === currentUser?.userId && (
+													{user.id === currentUser?.id && (
 														<span className="text-[10px] text-accent font-medium uppercase tracking-wider">You</span>
 													)}
 												</div>
 											</div>
 
-											{user.userId !== currentUser?.userId && (
+											{user.id !== currentUser?.id && (
 												<button
 													onClick={(e) => {
 														e.stopPropagation();
-														handleRemoveParticipant(user.userId);
+														handleRemoveParticipant(user.id);
 													}}
 													className="opacity-0 group-hover:opacity-100 p-2 text-muted hover:text-error transition-all"
 													title="Remove participant">

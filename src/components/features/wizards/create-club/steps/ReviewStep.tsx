@@ -81,7 +81,7 @@ export function ReviewStep({ form }: WizardStepProps<ClubFormData>) {
 						<div className="text-sm font-medium mb-2">Inviting {values.invitees.length} members</div>
 						<div className="flex -space-x-2">
 							{values.invitees.slice(0, 5).map((user: UserProfile) => (
-								<Avatar key={user.userId} src={user.imageUrl} name={user.name + " " + user.surname} size="sm" className="ring-2 ring-card" />
+								<Avatar key={user.id} src={user.imageUrl} name={user.name + " " + user.surname} size="sm" className="ring-2 ring-card" />
 							))}
 							{values.invitees.length > 5 && (
 								<div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium ring-2 ring-card">

@@ -20,7 +20,7 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
         className="[&>svg]:size-3.5 grid place-content-center text-current transition-none"
         keepMounted
       >
-        {({ indeterminate }) => (indeterminate ? <MinusIcon /> : <CheckIcon />)}
+        <CheckIcon />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   )

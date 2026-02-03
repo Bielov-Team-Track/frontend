@@ -2,7 +2,10 @@
 
 import { DashboardHeader, Sidebar } from "@/components/layout";
 import { useAuth } from "@/providers";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+const PROFILE_SETUP_ROUTE = "/complete-profile-setup";
 
 interface DashboardShellProps {
 	children: React.ReactNode;
@@ -10,7 +13,21 @@ interface DashboardShellProps {
 
 export function DashboardShell({ children }: DashboardShellProps) {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated, isProfileComplete, isLoading } = useAuth();
+	const router = useRouter();
+	const pathname = usePathname();
+
+	// Redirect to profile setup if profile is incomplete
+	useEffect(() => {
+		if (isLoading) return;
+
+		const isOnProfileSetup = pathname?.startsWith(PROFILE_SETUP_ROUTE);
+
+		// If authenticated but profile incomplete, redirect to setup
+		if (isAuthenticated && !isProfileComplete && !isOnProfileSetup) {
+			router.replace(PROFILE_SETUP_ROUTE);
+		}
+	}, [isAuthenticated, isProfileComplete, isLoading, pathname, router]);
 
 	return (
 		<div className="flex flex-col h-screen overflow-hidden">
@@ -24,7 +41,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
 					{isAuthenticated && <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />}
 
 					{/* Main content - centered with max-width */}
-					<main className="flex-1 min-h-full">
+					<main className="flex-1 min-h-full min-w-0">
 						<div className="mx-auto py-6 px-2 h-full">{children}</div>
 					</main>
 				</div>

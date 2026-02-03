@@ -1,97 +1,215 @@
 "use client";
 
-import { Button, Input } from "@/components";
-import { EventsCalendar } from "@/components/ui/calendar/EventsCalendar";
+import { Button } from "@/components";
+import { ListToolbar } from "@/components/ui/list-toolbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Loader from "@/components/ui/loader";
 import { Event } from "@/lib/models/Event";
 import { useCreateModals } from "@/providers/CreateModalsProvider";
-import { Calendar as CalendarIcon, Clock, Filter, Grid, List, MapPin, Plus, Search } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Grid, List, MapPin, Plus } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+// Lazy load calendar - only loaded when calendar tab is selected
+const EventsCalendar = dynamic(
+	() => import("@/components/ui/calendar/EventsCalendar").then((mod) => mod.EventsCalendar),
+	{
+		ssr: false,
+		loading: () => (
+			<div className="h-full flex items-center justify-center">
+				<Loader size="lg" />
+			</div>
+		),
+	}
+);
 import EventsListEmptyState from "./components/EmptyState";
 import { EventListView } from "./components/EventListView";
 
-const VIEWS = [
-	{ value: "list", label: "List", icon: List },
-	{ value: "grid", label: "Grid", icon: Grid },
-	{ value: "calendar", label: "Calendar", icon: CalendarIcon },
-] as const;
+// Event type filter options
+const EVENT_TYPES = ["Casual Play", "Tournament", "Practice", "Training"] as const;
+type EventType = (typeof EVENT_TYPES)[number];
 
-type ViewType = (typeof VIEWS)[number]["value"];
+// Time filter options
+const TIME_FILTERS = [
+	{ value: "all", label: "All Time" },
+	{ value: "today", label: "Today" },
+	{ value: "week", label: "This Week" },
+	{ value: "month", label: "This Month" },
+	{ value: "upcoming", label: "Upcoming" },
+] as const;
+type TimeFilterValue = (typeof TIME_FILTERS)[number]["value"];
 
 interface EventsPageClientProps {
 	events: Event[];
+	title?: string;
 }
 
-function EventsPageClient({ events }: EventsPageClientProps) {
-	const searchParams = useSearchParams();
+function EventsPageClient({ events, title = "Events" }: EventsPageClientProps) {
 	const [searchQuery, setSearchQuery] = useState("");
+	const [selectedTypes, setSelectedTypes] = useState<EventType[]>([]);
+	const [timeFilter, setTimeFilter] = useState<TimeFilterValue>("all");
 	const { openCreateEvent } = useCreateModals();
-	// Filter logic placeholder
-	const filteredEvents = events.filter((e) => e.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-	return (
-		<Tabs className="h-full flex flex-col space-y-4">
-			{/* --- Toolbar --- */}
-			<div className="flex flex-col bg-neutral-900 sm:flex-row justify-between items-start sm:items-center gap-4 backdrop-blur-md p-4 rounded-2xl border border-white/5">
-				{/* Search & Filter */}
-				<div className="flex items-center gap-3 w-full sm:w-auto flex-1 max-w-lg">
-					<div className="relative flex-1 group">
-						<Input
-							type="text"
-							placeholder="Find events..."
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							leftIcon={<Search size={18} />}
-						/>
-					</div>
-					<Button leftIcon={<Filter size={18} />} variant="outline">
-						<span className="hidden sm:inline">Filters</span>
-					</Button>
-				</div>
+	// Filter logic - always sort by date ascending (soonest first)
+	const filteredEvents = events
+		.filter((e) => {
+			// Search filter
+			if (searchQuery && !e.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+				return false;
+			}
+			// Type filter
+			if (selectedTypes.length > 0 && !selectedTypes.includes(e.type as EventType)) {
+				return false;
+			}
+			// Time filter
+			if (timeFilter !== "all") {
+				const eventDate = new Date(e.startTime);
+				const now = new Date();
+				const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+				const endOfWeek = new Date(today);
+				endOfWeek.setDate(today.getDate() + (7 - today.getDay()));
+				const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-				{/* View Toggles & Action */}
-				<div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-					{/* View Switcher */}
-					<TabsList className="border rounded-xl">
-						<TabsTrigger value="list">
-							<List size={18} />
-						</TabsTrigger>
-						<TabsTrigger value="calendar">
-							<CalendarIcon size={18} />
-						</TabsTrigger>
-						<TabsTrigger value="grid">
-							<Grid size={18} />
-						</TabsTrigger>
-					</TabsList>
+				switch (timeFilter) {
+					case "today":
+						if (eventDate.toDateString() !== today.toDateString()) return false;
+						break;
+					case "week":
+						if (eventDate < today || eventDate > endOfWeek) return false;
+						break;
+					case "month":
+						if (eventDate < today || eventDate > endOfMonth) return false;
+						break;
+					case "upcoming":
+						if (eventDate < now) return false;
+						break;
+				}
+			}
+			return true;
+		})
+		.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
-					<Button asChild variant="default" size={"lg"} onClick={() => openCreateEvent({ source: "events" })}>
-						<Plus />
-						<span className="hidden sm:inline">Create Event</span>
-					</Button>
+	const activeFilterCount = selectedTypes.length + (timeFilter !== "all" ? 1 : 0);
+
+	const clearFilters = () => {
+		setSelectedTypes([]);
+		setTimeFilter("all");
+	};
+
+	const toggleType = (type: EventType) => {
+		setSelectedTypes((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]));
+	};
+
+	// Filter content for ListToolbar
+	const filterContent = (
+		<div className="space-y-4">
+			{/* Time Filter */}
+			<div className="space-y-2">
+				<p className="text-xs font-medium text-muted-foreground">Time Period</p>
+				<div className="flex flex-wrap gap-2">
+					{TIME_FILTERS.map((filter) => (
+						<button
+							key={filter.value}
+							type="button"
+							onClick={() => setTimeFilter(filter.value)}
+							className={cn(
+								"px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
+								timeFilter === filter.value
+									? "bg-foreground/10 text-foreground border-foreground/30"
+									: "bg-card/50 text-muted-foreground border-border hover:bg-card hover:text-foreground hover:border-foreground/20"
+							)}>
+							{filter.label}
+						</button>
+					))}
 				</div>
 			</div>
 
+			{/* Event Type Filter */}
+			<div className="space-y-2">
+				<p className="text-xs font-medium text-muted-foreground">Event Type</p>
+				<div className="flex flex-wrap gap-2">
+					{EVENT_TYPES.map((type) => (
+						<button
+							key={type}
+							type="button"
+							onClick={() => toggleType(type)}
+							className={cn(
+								"px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
+								selectedTypes.includes(type)
+									? "bg-foreground/10 text-foreground border-foreground/30"
+									: "bg-card/50 text-muted-foreground border-border hover:bg-card hover:text-foreground hover:border-foreground/20"
+							)}>
+							{type}
+						</button>
+					))}
+				</div>
+			</div>
+		</div>
+	);
+
+	return (
+		<Tabs defaultValue="list" className="h-[calc(100vh-8rem)] flex flex-col gap-4 overflow-hidden">
+			{/* Header Row: Title + Create Button */}
+			<div className="flex items-center justify-between shrink-0">
+				<h2 className="text-lg font-semibold text-foreground">{title}</h2>
+				<Button variant="outline" leftIcon={<Plus size={16} />} onClick={() => openCreateEvent({ source: "events" })}>
+					Create Event
+				</Button>
+			</div>
+
+			{/* Toolbar Row */}
+			<div className="flex items-center gap-3 shrink-0">
+				<div className="flex-1">
+					<ListToolbar
+						search={searchQuery}
+						onSearchChange={setSearchQuery}
+						searchPlaceholder="Search events..."
+						filterContent={filterContent}
+						activeFilterCount={activeFilterCount}
+						onClearFilters={clearFilters}
+						count={filteredEvents.length}
+						itemLabel="event"
+						showViewToggle={false}
+					/>
+				</div>
+
+				{/* View Switch */}
+				<TabsList size="sm" className="border rounded-xl shrink-0">
+					<TabsTrigger value="list">
+						<List size={16} />
+					</TabsTrigger>
+					<TabsTrigger value="calendar">
+						<CalendarIcon size={16} />
+					</TabsTrigger>
+					<TabsTrigger value="grid">
+						<Grid size={16} />
+					</TabsTrigger>
+				</TabsList>
+			</div>
+
 			{/* --- Content Area --- */}
-			<div className="flex-1 rounded-2xl">
-				<TabsContent value={"calendar"} className="h-[calc(100vh-12rem)]">
+			<div className="flex-1 min-h-0 overflow-hidden">
+				<TabsContent value="calendar" className="h-full">
 					<EventsCalendar events={filteredEvents} />
 				</TabsContent>
 
-				<TabsContent value={"list"}>
+				<TabsContent value="list" className="h-full">
 					<EventListView events={filteredEvents} />
 				</TabsContent>
 
-				<TabsContent value={"grid"} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-					{filteredEvents.map((event) => (
-						<EventGridCard key={event.id} event={event} />
-					))}
-					{filteredEvents.length === 0 && (
-						<div className="col-span-full">
-							<EventsListEmptyState />
-						</div>
-					)}
+				<TabsContent value="grid" className="h-full overflow-y-auto scrollbar-thin pr-2">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-4">
+						{filteredEvents.map((event) => (
+							<EventGridCard key={event.id} event={event} />
+						))}
+						{filteredEvents.length === 0 && (
+							<div className="col-span-full">
+								<EventsListEmptyState />
+							</div>
+						)}
+					</div>
 				</TabsContent>
 			</div>
 		</Tabs>

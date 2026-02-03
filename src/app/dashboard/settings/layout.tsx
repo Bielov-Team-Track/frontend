@@ -9,11 +9,11 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 				<p className="text-muted mt-1">Manage your profile and preferences.</p>
 			</div>
 
-			{/* Content with sidebar */}
-			<div className="flex flex-col md:flex-row gap-8">
-				<UserSettingsSidebar />
-				<div className="flex-1 min-w-0">{children}</div>
-			</div>
+			{/* Navigation tabs */}
+			<UserSettingsSidebar />
+
+			{/* Content */}
+			<div className="min-w-0">{children}</div>
 		</div>
 	);
 }

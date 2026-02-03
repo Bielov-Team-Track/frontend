@@ -1,4 +1,4 @@
-import GroupDetailClient from "./GroupDetailClient";
+import { redirect } from "next/navigation";
 
 interface Props {
 	params: Promise<{ id: string }>;
@@ -6,5 +6,5 @@ interface Props {
 
 export default async function GroupDetailPage({ params }: Props) {
 	const { id } = await params;
-	return <GroupDetailClient groupId={id} />;
+	redirect(`/dashboard/groups/${id}/events`);
 }

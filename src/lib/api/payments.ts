@@ -68,6 +68,14 @@ export async function createCheckoutSession(
 	return response.data.url;
 }
 
+export async function createEventCheckoutSession(
+	eventId: string,
+): Promise<string> {
+	const endpoint = `/events/${eventId}/checkout`;
+	const response = await client.post<{ url: string }>(PREFIX + endpoint);
+	return response.data.url;
+}
+
 export async function getAccountBalance(): Promise<AccountBalance> {
 	const endpoint = `/payments/account/balance`;
 	return (await client.get<AccountBalance>(PREFIX + endpoint)).data;

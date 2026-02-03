@@ -85,15 +85,16 @@ export function EventListView({ events }: EventListViewProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [activeSection, setActiveSection] = useState<string>("");
 	const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set());
+	const [hasScrolledInitially, setHasScrolledInitially] = useState(false);
 
 	const groupedEvents = useMemo(() => groupEventsByTime(events), [events]);
 
-	// Initialize with current year expanded
+	// Initialize with current year expanded and find current week
 	useEffect(() => {
 		const currentYear = new Date().getFullYear();
 		setExpandedYears(new Set([currentYear]));
 
-		// Find and scroll to current/next upcoming week
+		// Find current/next upcoming week for highlighting (no auto-scroll)
 		const now = new Date();
 		for (const yearGroup of groupedEvents) {
 			for (const monthGroup of yearGroup.months) {
@@ -101,12 +102,6 @@ export function EventListView({ events }: EventListViewProps) {
 					if (weekGroup.weekEnd >= now) {
 						const sectionId = `week-${yearGroup.year}-${monthGroup.month}-${weekGroup.weekNumber}`;
 						setActiveSection(sectionId);
-						setTimeout(() => {
-							document.getElementById(sectionId)?.scrollIntoView({
-								behavior: "smooth",
-								block: "start",
-							});
-						}, 100);
 						return;
 					}
 				}
@@ -114,9 +109,38 @@ export function EventListView({ events }: EventListViewProps) {
 		}
 	}, [groupedEvents]);
 
+	// Scroll to current week only once after initial render (within container only)
+	useEffect(() => {
+		if (hasScrolledInitially || !containerRef.current || !activeSection) return;
+
+		const targetElement = document.getElementById(activeSection);
+		if (targetElement && containerRef.current) {
+			// Calculate scroll position relative to container
+			const containerRect = containerRef.current.getBoundingClientRect();
+			const targetRect = targetElement.getBoundingClientRect();
+			const scrollOffset = targetRect.top - containerRect.top + containerRef.current.scrollTop - 100;
+
+			containerRef.current.scrollTo({
+				top: Math.max(0, scrollOffset),
+				behavior: "smooth",
+			});
+			setHasScrolledInitially(true);
+		}
+	}, [activeSection, hasScrolledInitially]);
+
 	const scrollToSection = (sectionId: string) => {
 		setActiveSection(sectionId);
-		document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+		const targetElement = document.getElementById(sectionId);
+		if (targetElement && containerRef.current) {
+			const containerRect = containerRef.current.getBoundingClientRect();
+			const targetRect = targetElement.getBoundingClientRect();
+			const scrollOffset = targetRect.top - containerRect.top + containerRef.current.scrollTop - 100;
+
+			containerRef.current.scrollTo({
+				top: Math.max(0, scrollOffset),
+				behavior: "smooth",
+			});
+		}
 	};
 
 	const toggleYear = (year: number) => {
@@ -136,20 +160,20 @@ export function EventListView({ events }: EventListViewProps) {
 	}
 
 	return (
-		<div className="flex gap-6 p-4 h-[calc(100vh-14rem)]">
+		<div className="flex gap-6 h-full">
 			{/* Events List */}
 			<div ref={containerRef} className="flex-1 overflow-y-auto space-y-6 pr-2 scrollbar-thin">
 				{groupedEvents.map((yearGroup) => (
 					<div key={yearGroup.year}>
 						{/* Year Header */}
-						<div id={`year-${yearGroup.year}`} className="sticky top-0 z-20 backdrop-blur-xs py-2">
+						<div id={`year-${yearGroup.year}`} className="sticky top-0 z-20 bg-background py-2">
 							<h2 className="text-2xl font-bold text-white">{yearGroup.year}</h2>
 						</div>
 
 						{yearGroup.months.map((monthGroup) => (
 							<div key={monthGroup.month} className="mb-8">
 								{/* Month Header */}
-								<div id={`month-${yearGroup.year}-${monthGroup.month}`} className="sticky top-12 z-10 backdrop-blur-xs py-2">
+								<div id={`month-${yearGroup.year}-${monthGroup.month}`} className="sticky top-10 z-10 bg-background pt-4 pb-2">
 									<h3 className="text-lg font-semibold">{monthGroup.monthName}</h3>
 								</div>
 
@@ -190,7 +214,7 @@ export function EventListView({ events }: EventListViewProps) {
 
 			{/* Timeline Navigation Sidebar */}
 			<div className="w-48 shrink-0 hidden lg:block">
-				<div className="sticky top-0 space-y-1 max-h-[calc(100vh-14rem)] overflow-y-auto pr-2 scrollbar-thin">
+				<div className="sticky top-0 space-y-1 h-full overflow-y-auto pr-2 scrollbar-thin">
 					{groupedEvents.map((yearGroup) => (
 						<div key={yearGroup.year}>
 							{/* Year Header */}

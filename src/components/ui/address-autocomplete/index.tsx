@@ -64,7 +64,17 @@ const AddressAutocomplete = React.forwardRef<HTMLInputElement, AddressAutocomple
 		const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
 
 		const containerRef = useRef<HTMLDivElement>(null);
+		const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 		const placesLib = useMapsLibrary("places");
+
+		// Cleanup blur timeout on unmount
+		useEffect(() => {
+			return () => {
+				if (blurTimeoutRef.current) {
+					clearTimeout(blurTimeoutRef.current);
+				}
+			};
+		}, []);
 
 		const updateDropdownPosition = useCallback(() => {
 			if (containerRef.current) {
@@ -121,22 +131,27 @@ const AddressAutocomplete = React.forwardRef<HTMLInputElement, AddressAutocomple
 					request.types = searchTypes;
 				}
 
-				autocompleteService.getPlacePredictions(request, (predictions: any, status: any) => {
-					setIsLoading(false);
-					console.log(predictions, status);
-					if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-						const mappedSuggestions: AddressSuggestion[] = predictions.map((prediction) => ({
-							placeId: prediction.place_id,
-							description: prediction.description,
-							structured_formatting: prediction.structured_formatting,
-						}));
-						setSuggestions(mappedSuggestions);
-						setIsOpen(true);
-					} else {
-						setSuggestions([]);
-						setIsOpen(false);
+				autocompleteService.getPlacePredictions(
+					request,
+					(
+						predictions: google.maps.places.AutocompletePrediction[] | null,
+						status: google.maps.places.PlacesServiceStatus
+					) => {
+						setIsLoading(false);
+						if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+							const mappedSuggestions: AddressSuggestion[] = predictions.map((prediction) => ({
+								placeId: prediction.place_id,
+								description: prediction.description,
+								structured_formatting: prediction.structured_formatting,
+							}));
+							setSuggestions(mappedSuggestions);
+							setIsOpen(true);
+						} else {
+							setSuggestions([]);
+							setIsOpen(false);
+						}
 					}
-				});
+				);
 			} catch (error) {
 				console.error("Error fetching address suggestions:", error);
 				setIsLoading(false);
@@ -192,7 +207,7 @@ const AddressAutocomplete = React.forwardRef<HTMLInputElement, AddressAutocomple
 		};
 
 		const handleBlur = () => {
-			setTimeout(() => {
+			blurTimeoutRef.current = setTimeout(() => {
 				setIsOpen(false);
 			}, 150);
 		};

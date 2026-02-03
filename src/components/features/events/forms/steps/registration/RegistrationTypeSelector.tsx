@@ -23,6 +23,7 @@ export function RegistrationTypeSelector() {
 	const { form } = useEventFormContext();
 	const {
 		control,
+		setValue,
 		formState: { errors },
 	} = form;
 
@@ -35,7 +36,11 @@ export function RegistrationTypeSelector() {
 					label="Registration Type"
 					options={registrationTypeCards}
 					value={field.value}
-					onChange={field.onChange}
+					onChange={(value) => {
+						field.onChange(value);
+						// Also set isPublic based on registration type
+						setValue("isPublic", value === "open");
+					}}
 					error={errors.registrationType?.message}
 					columns={2}
 				/>

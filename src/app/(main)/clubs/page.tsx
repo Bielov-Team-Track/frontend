@@ -1,10 +1,10 @@
 "use client";
 
-import { Badge, Button, FilterDropdown, Input } from "@/components";
+import { Avatar, Badge, Button, FilterDropdown, Input } from "@/components";
 import { Card, CardContent } from "@/components/ui/card";
 import { getClubs } from "@/lib/api/clubs";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowUpRight, ImageOff, MapPin, Search, Shield, Sun, Trophy, Users, X } from "lucide-react";
+import { ArrowUpRight, ImageOff, MapPin, Search, Sun, Trophy, Users, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -66,10 +66,7 @@ export default function ClubsDirectory() {
 			id: club.id,
 			name: club.name,
 			location: "Unknown",
-			members: 0,
-			level: "Social",
-			surface: "Indoor",
-			gender: "Mixed",
+			members: club.memberCount,
 			banner: club.bannerUrl,
 			logo: club.logoUrl,
 			isVerified: false,
@@ -205,7 +202,6 @@ interface ClubData {
 
 function ClubCard({ club }: { club: ClubData }) {
 	const [bannerError, setBannerError] = useState(false);
-	const [logoError, setLogoError] = useState(false);
 
 	return (
 		<Link href={`/clubs/${club.id}`}>
@@ -224,14 +220,16 @@ function ClubCard({ club }: { club: ClubData }) {
 						/>
 					) : (
 						<div className="w-full h-full flex items-center justify-center text-base-content/20">
-							<ImageOff size={32} />
+							<ImageOff className="text-muted" size={32} />
 						</div>
 					)}
 
 					{/* Level Badge */}
-					<div className="absolute top-3 right-3 z-20">
-						<Badge variant={"secondary"}>{club.level}</Badge>
-					</div>
+					{club.level && (
+						<div className="absolute top-3 right-3 z-20">
+							<Badge variant={"secondary"}>{club.level}</Badge>
+						</div>
+					)}
 				</figure>
 
 				{/* Content */}
@@ -239,20 +237,7 @@ function ClubCard({ club }: { club: ClubData }) {
 					<div className="flex justify-between items-end mb-3">
 						{/* Logo */}
 						<div className="relative">
-							<div className="w-16 h-16 rounded-xl bg-base-200 border-4 border-base-100 overflow-hidden flex items-center justify-center">
-								{club.logo && !logoError ? (
-									<Image
-										src={club.logo}
-										alt={`${club.name} Logo`}
-										width={64}
-										height={64}
-										className="w-full h-full object-cover"
-										onError={() => setLogoError(true)}
-									/>
-								) : (
-									<Shield className="text-base-content/30 w-8 h-8" />
-								)}
-							</div>
+							<Avatar size="lg" variant="club" src={club.logo || undefined} name={club.name} />
 							{club.isVerified && (
 								<div className="absolute -bottom-1 -right-1 bg-primary text-primary-content p-0.5 rounded-full border-2 border-base-100">
 									<Trophy size={10} />
@@ -263,24 +248,12 @@ function ClubCard({ club }: { club: ClubData }) {
 
 					<h3 className="card-title text-lg group-hover:text-accent transition-colors">{club.name}</h3>
 
-					<div className="flex items-center gap-4 text-xs text-base-content/60 mb-4">
+					<div className="flex items-center gap-4 text-muted text-xs text-base-content/60">
 						<span className="flex items-center gap-1">
 							<MapPin size={12} /> {club.location}
 						</span>
 						<span className="w-1 h-1 rounded-full bg-base-content/30"></span>
 						<span>{club.members} Members</span>
-					</div>
-
-					{/* Tags Row */}
-					<div className="flex flex-wrap gap-2 pt-3 border-t border-base-content/5">
-						<Badge variant="ghost" color="neutral">
-							<Sun size={10} />
-							{club.surface}
-						</Badge>
-						<Badge variant="ghost" color="neutral">
-							<Users size={10} />
-							{club.gender}
-						</Badge>
 					</div>
 				</CardContent>
 			</Card>

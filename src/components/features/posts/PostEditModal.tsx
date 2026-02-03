@@ -1,10 +1,9 @@
 "use client";
 
-import { Button, Modal, Select } from "@/components";
+import { Button, Modal, RichTextEditor, Select } from "@/components";
 import { useUpdatePost } from "@/hooks/usePosts";
 import { Post, Visibility, VisibilityOptions } from "@/lib/models/Post";
 import { useEffect, useState } from "react";
-import PostEditor from "./PostEditor";
 
 interface PostEditModalProps {
 	isOpen: boolean;
@@ -45,7 +44,7 @@ export default function PostEditModal({ isOpen, onClose, post }: PostEditModalPr
 		<Modal isOpen={isOpen} onClose={onClose} title="Edit Post" size="lg">
 			<div className="space-y-4">
 				{/* Editor */}
-				<PostEditor content={content} onChange={setContent} />
+				<RichTextEditor content={content} onChange={setContent} />
 
 				{/* Visibility */}
 				<div className="flex items-center gap-4">

@@ -2,27 +2,22 @@
 
 import { Avatar, Button, Input, Loader } from "@/components";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getClubs } from "@/lib/api/clubs";
+import { getUserClubs } from "@/lib/api/clubs";
 import { Club } from "@/lib/models/Club";
+import { useAuth } from "@/providers";
 import { useQuery } from "@tanstack/react-query";
 import { Filter, Grid, List, MapPin, Plus, Search, Shield, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-const VIEWS = [
-	{ value: "grid", label: "Grid", icon: Grid },
-	{ value: "list", label: "List", icon: List },
-] as const;
-
-type ViewType = (typeof VIEWS)[number]["value"];
-
 export default function ClubsPageClient() {
-	const [currentView, setCurrentView] = useState<ViewType>("grid");
 	const [searchQuery, setSearchQuery] = useState("");
+	const { userProfile } = useAuth();
 
 	const { data: clubs = [], isLoading } = useQuery({
-		queryKey: ["clubs"],
-		queryFn: getClubs,
+		queryKey: ["my-clubs"],
+		queryFn: () => getUserClubs(userProfile?.id!),
+		enabled: !!userProfile?.id,
 	});
 
 	const filteredClubs = clubs.filter((club) => club.name.toLowerCase().includes(searchQuery.toLowerCase()));

@@ -27,7 +27,7 @@ function UserMenu({ user, isLoading }: UserMenuProps) {
 			label: "Dashboard",
 			icon: LayoutDashboard,
 		},
-		{ href: "/profile/" + user?.userId, label: "Profile", icon: UserIcon },
+		{ href: "/profile/" + user?.id, label: "Profile", icon: UserIcon },
 		{ href: "/profile/settings", label: "Settings", icon: SettingsIcon },
 	];
 

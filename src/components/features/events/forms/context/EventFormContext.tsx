@@ -2,6 +2,7 @@ import { Club, Group, Team } from "@/lib/models/Club";
 import { Event } from "@/lib/models/Event";
 import React, { createContext, ReactNode, useContext } from "react";
 import { UseFormReturn } from "react-hook-form";
+import { ContextSelection } from "../components/ContextSelector";
 import { useEventForm } from "../hooks/useEventForm";
 import { useEventWizard } from "../hooks/useEventWizard";
 import { EventFormData } from "../validation/eventValidationSchema";
@@ -23,6 +24,7 @@ interface EventFormContextType {
 		totalSteps: number;
 	};
 	context?: Club | Group | Team | null;
+	contextSelection?: ContextSelection;
 }
 
 const EventFormContext = createContext<EventFormContextType | undefined>(undefined);
@@ -30,11 +32,12 @@ const EventFormContext = createContext<EventFormContextType | undefined>(undefin
 interface EventFormProviderProps {
 	children: ReactNode;
 	event?: Event;
-	context?: Club | Group | Team | null;
+	contextSelection?: ContextSelection;
+	onSuccess?: () => void;
 }
 
-export function EventFormProvider({ children, event, context }: EventFormProviderProps) {
-	const form = useEventForm(event);
+export function EventFormProvider({ children, event, contextSelection, onSuccess }: EventFormProviderProps) {
+	const form = useEventForm(event, contextSelection, onSuccess);
 	const wizard = useEventWizard({
 		trigger: form.trigger as any,
 		watch: form.watch,
@@ -43,7 +46,8 @@ export function EventFormProvider({ children, event, context }: EventFormProvide
 	const value: EventFormContextType = {
 		form,
 		wizard,
-		context,
+		context: contextSelection?.context,
+		contextSelection,
 	};
 
 	return <EventFormContext.Provider value={value}>{children}</EventFormContext.Provider>;

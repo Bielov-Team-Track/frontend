@@ -2,7 +2,7 @@
 
 import { CreateEventForm } from "@/components";
 import Modal from "@/components/ui/modal";
-import { Club, Group, Team } from "@/lib/models/Club";
+import { ContextSelection } from "@/components/features/events/forms/components/ContextSelector";
 
 export interface ClubEvent {
 	id: string;
@@ -19,15 +19,15 @@ export interface ClubEvent {
 
 interface ClubEventFormModalProps {
 	isOpen: boolean;
-	context: Club | Group | Team | undefined;
+	contextSelection?: ContextSelection;
 	onClose: () => void;
 	onSubmit: (event: Omit<ClubEvent, "id" | "createdAt">) => void;
 }
 
-export default function ClubEventFormModal({ isOpen, context, onClose, onSubmit }: ClubEventFormModalProps) {
+export default function ClubEventFormModal({ isOpen, contextSelection, onClose, onSubmit }: ClubEventFormModalProps) {
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} title="Create Event" size="lg">
-			<CreateEventForm variant="embedded" context={context} />
+			<CreateEventForm variant="embedded" contextSelection={contextSelection} />
 		</Modal>
 	);
 }

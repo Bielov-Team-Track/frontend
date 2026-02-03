@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { PROFILES_API_V1 } from "../constants";
+import { UserProfile } from "../models/User";
 
 export const getUserProfile = async () => {
 	const cookieStore = cookies();
@@ -26,7 +27,7 @@ export const getUserProfile = async () => {
 
 		if (response.ok) {
 			const userData = await response.json();
-			return userData;
+			return userData as UserProfile;
 		} else if (response.status === 401 || response.status === 403) {
 			// Token is invalid, return null to indicate unauthenticated
 			return null;

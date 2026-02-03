@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/components";
-import { AddTeamMemberModal, EditTeamMemberModal, RosterSidebar, VolleyballCourt } from "@/components/features/teams";
+import { Button, UserSelectorModal } from "@/components";
+import { EditTeamMemberModal, RosterSidebar, VolleyballCourt } from "@/components/features/teams";
 import { PlayerDragOverlay } from "@/components/features/teams/components/RosterSidebar";
 import { addTeamMember, updateTeamMember } from "@/lib/api/clubs";
 import { ClubMember, PositionAssignment, Team, TeamMember, VolleyballPosition } from "@/lib/models/Club";
@@ -46,11 +46,11 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 			activationConstraint: {
 				distance: 8,
 			},
-		})
+		}),
 	);
 
 	const addMemberMutation = useMutation({
-		mutationFn: ({ userId, positions, jerseyNumber }: { userId: string; positions: string[]; jerseyNumber?: string }) =>
+		mutationFn: ({ userId, positions }: { userId: string; positions: string[]; jerseyNumber?: string }) =>
 			addTeamMember(teamId, userId, positions, jerseyNumber),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["team", teamId] });
@@ -84,15 +84,18 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 		(positionId: string): string[] => {
 			return (courtAssignments[positionId] || []).sort((a, b) => a.priority - b.priority).map((a) => a.memberId);
 		},
-		[courtAssignments]
+		[courtAssignments],
 	);
 
 	// Convert assignments to the format VolleyballCourt expects
 	const courtAssignmentsForCourt = useMemo(() => {
-		return Object.keys(courtAssignments).reduce((acc, posId) => {
-			acc[posId] = getAssignmentMemberIds(posId);
-			return acc;
-		}, {} as Record<string, string[]>);
+		return Object.keys(courtAssignments).reduce(
+			(acc, posId) => {
+				acc[posId] = getAssignmentMemberIds(posId);
+				return acc;
+			},
+			{} as Record<string, string[]>,
+		);
 	}, [courtAssignments, getAssignmentMemberIds]);
 
 	const togglePlayerAssignment = useCallback(
@@ -146,7 +149,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 				}
 			});
 		},
-		[assigningPosition, team.members, updatePositionMutation]
+		[assigningPosition, team.members, updatePositionMutation],
 	);
 
 	const handleDragStart = (event: DragStartEvent) => {
@@ -291,7 +294,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 
 			// TODO: Optionally persist this order to the backend
 		},
-		[team.members, sidebarPriorities]
+		[team.members, sidebarPriorities],
 	);
 
 	// Remove a player from a court position (used by VolleyballCourt)
@@ -319,7 +322,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 				}
 			}
 		},
-		[team.members, updatePositionMutation]
+		[team.members, updatePositionMutation],
 	);
 
 	// Remove a player from a position (used by RosterSidebar)
@@ -335,7 +338,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 				positions: newPositions,
 			});
 		},
-		[updatePositionMutation]
+		[updatePositionMutation],
 	);
 
 	return (
@@ -352,7 +355,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 					{/* Mobile Title */}
 					<h3 className="lg:hidden text-lg font-bold text-white">Team Roster</h3>
 
-					<Button variant="default" color="accent" onClick={() => setShowAddModal(true)} leftIcon={<UserPlus size={16} />}>
+					<Button variant="outline" onClick={() => setShowAddModal(true)} leftIcon={<UserPlus size={16} />}>
 						Add Member
 					</Button>
 				</div>
@@ -390,13 +393,18 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 				</div>
 
 				{/* Add Member Modal */}
-				<AddTeamMemberModal
+				<UserSelectorModal
 					isOpen={showAddModal}
-					clubMembers={clubMembers}
-					currentMemberIds={team.members?.map((m) => m.clubMemberId) || []}
 					onClose={() => setShowAddModal(false)}
-					onAdd={(data) => addMemberMutation.mutate(data)}
-					isLoading={addMemberMutation.isPending}
+					selectedUsers={[]}
+					onConfirm={(selectedUsers) => {
+						if (selectedUsers.length === 0) return;
+						const userToAdd = selectedUsers[0];
+						addMemberMutation.mutate({ userId: userToAdd.id, positions: [] });
+					}}
+					restrictToClub={team.club}
+					excludeUserIds={team.members?.map((u) => u.userId)}
+					title="Add Team Member"
 				/>
 
 				{/* Edit Member Modal */}

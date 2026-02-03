@@ -36,7 +36,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 			onClick,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const generatedId = useId();
 		const id = providedId || generatedId;
@@ -161,7 +161,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 							!inlineLabel && leftIcon && "pl-10",
 							(rightIcon || showToggle) && "pr-10",
 							// Hide native datetime picker icons and make full field clickable
-							className
+							className,
 						)}
 						{...props}
 					/>
@@ -202,7 +202,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 				)}
 			</div>
 		);
-	}
+	},
 );
 
 Input.displayName = "Input";

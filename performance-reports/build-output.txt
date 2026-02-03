@@ -1,0 +1,113 @@
+
+> team-track@0.1.0 build
+> next build
+
+▲ Next.js 16.1.1 (Turbopack)
+- Environments: .env
+- Experiments (use with caution):
+  · optimizePackageImports
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 5 errors:
+./src/app/dashboard/locations/create/page.tsx:1:17
+Ecmascript file had an error
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m [33mReact[39m[33m,[39m { useState } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m   |[39m                 [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 2 |[39m [36mimport[39m [33mLocationForm[39m [36mfrom[39m [32m"@/components/features/locations/forms/LocationForm"[39m[33m;[39m
+ [90m 3 |[39m [36mimport[39m [33mBackButton[39m [36mfrom[39m [32m"@/components/ui/back-button"[39m[33m;[39m
+ [90m 4 |[39m[0m
+
+You're importing a component that needs `useState`. This React Hook only works in a Client Component. To fix, mark the file (or its parent) with the `"use client"` directive.
+
+ Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+
+
+
+
+./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx:10:1
+Export updateCoachProfile doesn't exist in target module
+[0m [90m  8 |[39m [36mimport[39m { [33mCreateOrUpdateCoachProfileDto[39m[33m,[39m [33mCreateOrUpdatePlayerProfileDto[39m } [36mfrom[39m [32m"@/lib/models/Profile"[39m[33m;[39m
+ [90m  9 |[39m [36mimport[39m { acceptInvitation[33m,[39m declineInvitation[33m,[39m getInvitationByToken } [36mfrom[39m [32m"@/lib/api/clubs"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { getCoachProfile[33m,[39m getPlayerProfile[33m,[39m updateCoachProfile[33m,[39m updatePlayerProfile } [36mfrom[39m [32m"@/lib/api/user"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 11 |[39m [36mimport[39m { useMutation[33m,[39m useQuery } [36mfrom[39m [32m"@tanstack/react-query"[39m[33m;[39m
+ [90m 12 |[39m [36mimport[39m { [33mAlertCircle[39m[33m,[39m [33mLogIn[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 13 |[39m [36mimport[39m { useRouter } [36mfrom[39m [32m"next/navigation"[39m[33m;[39m[0m
+
+The export updateCoachProfile was not found in module [project]/src/lib/api/user.ts [app-client] (ecmascript).
+Did you mean to import getCoachProfile?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx
+    ./src/app/(main)/clubs/[id]/invitations/[token]/page.tsx
+
+
+./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx:10:1
+Export updateCoachProfile doesn't exist in target module
+[0m [90m  8 |[39m [36mimport[39m { [33mCreateOrUpdateCoachProfileDto[39m[33m,[39m [33mCreateOrUpdatePlayerProfileDto[39m } [36mfrom[39m [32m"@/lib/models/Profile"[39m[33m;[39m
+ [90m  9 |[39m [36mimport[39m { acceptInvitation[33m,[39m declineInvitation[33m,[39m getInvitationByToken } [36mfrom[39m [32m"@/lib/api/clubs"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { getCoachProfile[33m,[39m getPlayerProfile[33m,[39m updateCoachProfile[33m,[39m updatePlayerProfile } [36mfrom[39m [32m"@/lib/api/user"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 11 |[39m [36mimport[39m { useMutation[33m,[39m useQuery } [36mfrom[39m [32m"@tanstack/react-query"[39m[33m;[39m
+ [90m 12 |[39m [36mimport[39m { [33mAlertCircle[39m[33m,[39m [33mLogIn[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 13 |[39m [36mimport[39m { useRouter } [36mfrom[39m [32m"next/navigation"[39m[33m;[39m[0m
+
+The export updateCoachProfile was not found in module [project]/src/lib/api/user.ts [app-ssr] (ecmascript).
+Did you mean to import getCoachProfile?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx
+    ./src/app/(main)/clubs/[id]/invitations/[token]/page.tsx
+
+
+./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx:10:1
+Export updatePlayerProfile doesn't exist in target module
+[0m [90m  8 |[39m [36mimport[39m { [33mCreateOrUpdateCoachProfileDto[39m[33m,[39m [33mCreateOrUpdatePlayerProfileDto[39m } [36mfrom[39m [32m"@/lib/models/Profile"[39m[33m;[39m
+ [90m  9 |[39m [36mimport[39m { acceptInvitation[33m,[39m declineInvitation[33m,[39m getInvitationByToken } [36mfrom[39m [32m"@/lib/api/clubs"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { getCoachProfile[33m,[39m getPlayerProfile[33m,[39m updateCoachProfile[33m,[39m updatePlayerProfile } [36mfrom[39m [32m"@/lib/api/user"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 11 |[39m [36mimport[39m { useMutation[33m,[39m useQuery } [36mfrom[39m [32m"@tanstack/react-query"[39m[33m;[39m
+ [90m 12 |[39m [36mimport[39m { [33mAlertCircle[39m[33m,[39m [33mLogIn[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 13 |[39m [36mimport[39m { useRouter } [36mfrom[39m [32m"next/navigation"[39m[33m;[39m[0m
+
+The export updatePlayerProfile was not found in module [project]/src/lib/api/user.ts [app-client] (ecmascript).
+Did you mean to import getPlayerProfile?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx
+    ./src/app/(main)/clubs/[id]/invitations/[token]/page.tsx
+
+
+./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx:10:1
+Export updatePlayerProfile doesn't exist in target module
+[0m [90m  8 |[39m [36mimport[39m { [33mCreateOrUpdateCoachProfileDto[39m[33m,[39m [33mCreateOrUpdatePlayerProfileDto[39m } [36mfrom[39m [32m"@/lib/models/Profile"[39m[33m;[39m
+ [90m  9 |[39m [36mimport[39m { acceptInvitation[33m,[39m declineInvitation[33m,[39m getInvitationByToken } [36mfrom[39m [32m"@/lib/api/clubs"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 10 |[39m [36mimport[39m { getCoachProfile[33m,[39m getPlayerProfile[33m,[39m updateCoachProfile[33m,[39m updatePlayerProfile } [36mfrom[39m [32m"@/lib/api/user"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 11 |[39m [36mimport[39m { useMutation[33m,[39m useQuery } [36mfrom[39m [32m"@tanstack/react-query"[39m[33m;[39m
+ [90m 12 |[39m [36mimport[39m { [33mAlertCircle[39m[33m,[39m [33mLogIn[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 13 |[39m [36mimport[39m { useRouter } [36mfrom[39m [32m"next/navigation"[39m[33m;[39m[0m
+
+The export updatePlayerProfile was not found in module [project]/src/lib/api/user.ts [app-ssr] (ecmascript).
+Did you mean to import getPlayerProfile?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx
+    ./src/app/(main)/clubs/[id]/invitations/[token]/page.tsx
+
+
+    at <unknown> (./src/app/dashboard/locations/create/page.tsx:1:17)
+    at <unknown> (./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx:10:1)
+    at <unknown> (./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx:10:1)
+    at <unknown> (./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx:10:1)
+    at <unknown> (./src/app/(main)/clubs/[id]/invitations/[token]/InvitationPageClient.tsx:10:1)

@@ -28,7 +28,20 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
 	return (
 		<>
 			{children}
-			<Toaster position="top-right" offset={16} style={{ top: 72 }} />
+			<Toaster
+				position="top-right"
+				offset={16}
+				style={{ top: 72 }}
+				theme="dark"
+				toastOptions={{
+					className: "!bg-popover !text-popover-foreground !border-white/10",
+					style: {
+						background: "var(--popover)",
+						border: "1px solid rgba(255, 255, 255, 0.1)",
+						boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+					},
+				}}
+			/>
 		</>
 	);
 }

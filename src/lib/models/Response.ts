@@ -1,5 +1,5 @@
-export type Response = {
+export type Response<T = unknown> = {
 	errorCode: number;
-	result: any;
+	result: T;
 	errorMessage: string;
 };

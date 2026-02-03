@@ -13,8 +13,9 @@ import {
 	transformFormDataToCreateEventSeries,
 	getDefaultFormValues,
 } from "../utils/eventFormUtils";
+import { ContextSelection } from "../components/ContextSelector";
 
-export function useEventForm(event?: Event) {
+export function useEventForm(event?: Event, contextSelection?: ContextSelection, onSuccess?: () => void) {
 	const router = useRouter();
 
 	const form = useForm<EventFormData>({
@@ -34,17 +35,21 @@ export function useEventForm(event?: Event) {
 		mutationFn: async (eventData: EventFormData) => {
 			// Check if this is a recurring event series or a single event
 			if (eventData.isRecurring) {
-				const seriesPayload = transformFormDataToCreateEventSeries(eventData);
+				const seriesPayload = transformFormDataToCreateEventSeries(eventData, contextSelection);
 				return await createEventSeries(seriesPayload);
 			} else {
-				const payload = transformFormDataToCreateEvent(eventData);
+				const payload = transformFormDataToCreateEvent(eventData, contextSelection);
 				return await createEvent(payload);
 			}
 		},
 		onSuccess: (result) => {
-			// Navigate to the appropriate page
-			// For series, we might want to show a success message with event count
-			router.push("/dashboard/events/my");
+			// Call the onSuccess callback if provided (e.g., to close modal first)
+			if (onSuccess) {
+				onSuccess();
+			} else {
+				// Default: navigate to the events page
+				router.push("/dashboard/events");
+			}
 		},
 		onError: (error) => {
 			console.error("Failed to create event:", error);

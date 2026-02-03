@@ -49,28 +49,18 @@ function Team({ team: defaultTeam, open = false, editable = false, audit = false
 	useEffect(() => {
 		const connection = signalr.getConnection(EVENTS_API_URL, "position");
 		if (connection && team.event?.id && connectionStatus === "connected") {
-			const joinGroup = async () => {
-				try {
-					await connection.invoke("JoinEventGroup", team.event.id);
-				} catch (error) {
-					console.error("Failed to join event group:", error);
-				}
-			};
+			// Join the event group
+			connection.invoke("JoinEventGroup", team.event.id).catch((error) => {
+				console.error("Failed to join event group:", error);
+			});
 
-			const leaveGroup = async () => {
-				try {
-					if (connection && connectionStatus === "connected") {
-						await connection.invoke("LeaveEventGroup", team.event.id);
-					}
-				} catch (error) {
-					console.error("Failed to leave event group:", error);
-				}
-			};
-
-			joinGroup();
-
+			// Cleanup: leave the group
 			return () => {
-				leaveGroup();
+				if (connection && connectionStatus === "connected") {
+					connection.invoke("LeaveEventGroup", team.event.id).catch((error) => {
+						console.error("Failed to leave event group:", error);
+					});
+				}
 			};
 		}
 	}, [team.event?.id, connectionStatus]);
@@ -115,7 +105,7 @@ function Team({ team: defaultTeam, open = false, editable = false, audit = false
 								{captain && (
 									<div className="tooltip tooltip-bottom" data-tip="Captain">
 										<Link
-											href={"/profiles/" + captain.userId}
+											href={"/profiles/" + captain.id}
 											className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-accent/10 border border-accent/20 hover:bg-accent/20 transition-colors">
 											<Crown size={12} className="text-accent" />
 											<span className="text-xs font-bold text-accent truncate max-w-[80px]">{captain.name}</span>
@@ -150,7 +140,7 @@ function Team({ team: defaultTeam, open = false, editable = false, audit = false
 			<div className="p-2 space-y-1">
 				{filteredPositions && filteredPositions.length !== 0 ? (
 					positions?.map((p) => (
-						<div key={p.id + p.eventParticipant?.userProfile?.userId} className="transform transition-all duration-200">
+						<div key={p.id + p.eventParticipant?.userProfile?.id} className="transform transition-all duration-200">
 							<PositionComponent
 								open={open}
 								audit={audit}

@@ -64,10 +64,10 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 				});
 		} else {
 			// For group, toggle selection
-			const isSelected = selectedUsers.some((u) => u.userId === user.userId);
+			const isSelected = selectedUsers.some((u) => u.id === user.id);
 
 			if (isSelected) {
-				setSelectedUsers(selectedUsers.filter((u) => u.userId !== user.userId));
+				setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
 			} else {
 				setSelectedUsers([...selectedUsers, user]);
 			}
@@ -76,7 +76,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 
 	const removeSelected = (userId: string, e: React.MouseEvent) => {
 		e.stopPropagation();
-		setSelectedUsers(selectedUsers.filter((u) => u.userId !== userId));
+		setSelectedUsers(selectedUsers.filter((u) => u.id !== userId));
 	};
 
 	const handleCreateGroup = () => {
@@ -146,12 +146,12 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 						<div className="flex flex-wrap gap-2 mb-2">
 							{selectedUsers.map((user) => (
 								<div
-									key={user.userId}
+									key={user.id}
 									className="flex items-center gap-1 pl-2 pr-1 py-1 rounded-full bg-accent/20 text-accent text-xs font-medium border border-accent/20">
 									<span>
 										{user.name} {user.surname}
 									</span>
-									<button onClick={(e) => removeSelected(user.userId, e)} className="p-0.5 hover:bg-black/20 rounded-full">
+									<button onClick={(e) => removeSelected(user.id, e)} className="p-0.5 hover:bg-black/20 rounded-full">
 										<X size={12} />
 									</button>
 								</div>
@@ -189,11 +189,11 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 				{!isSearching &&
 					!searchError &&
 					users?.map((user) => {
-						const isSelected = selectedUsers.some((u) => u.userId === user.userId);
+						const isSelected = selectedUsers.some((u) => u.id === user.id);
 
 						return (
 							<div
-								key={user.userId}
+								key={user.id}
 								onClick={() => toggleUser(user)}
 								className={`
                    flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all group

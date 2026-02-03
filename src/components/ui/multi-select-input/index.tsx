@@ -161,7 +161,7 @@ function MultiSelectInputInner<T>(
 				className={[
 					baseClasses,
 					variantClasses[variant],
-					sizeClasses[inputSize],
+					sizeClass,
 					error ? stateClasses.error : "",
 					isFocused && !error ? stateClasses.focused : "",
 					disabled ? stateClasses.disabled : "",

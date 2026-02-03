@@ -16,7 +16,6 @@ export interface ClubMembersSearchRequest extends SortRequest, CursorRequest, Qu
 
 export async function searchClubMembers(clubId: string, request: ClubMembersSearchRequest): Promise<CursorPagedResult<ClubMember>> {
 	const params = new URLSearchParams();
-	console.log(request);
 	if (request.query) params.append("Query", encodeURIComponent(request.query.trim()));
 	if (request.teamId) params.append("TeamId", request.teamId);
 	if (request.groupId) params.append("GroupId", request.groupId);

@@ -1,15 +1,16 @@
 "use client";
 
 import CommentsSection from "@/components/features/comments/components/CommentsSection";
+import { EventPaymentCard } from "@/components/features/events";
 import { Map } from "@/components/features/locations";
 import { TeamsList } from "@/components/features/teams";
-import { Avatar } from "@/components/ui";
 import { Event } from "@/lib/models/Event";
 import { Unit } from "@/lib/models/EventBudget";
+import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { Team } from "@/lib/models/Team";
 import { UserProfile } from "@/lib/models/User";
 import { getDuration, getFormattedDateWithDay, getFormattedTime } from "@/lib/utils/date";
-import { AlertTriangle, Clock, MapPin, Share2, Shield, Users } from "lucide-react";
+import { AlertTriangle, Clock, MapPin, Share2, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import EventPageButtons from "./EventPageButtons";
@@ -19,11 +20,12 @@ type EventDetailsV2Props = {
 	user: UserProfile;
 	isAdmin: boolean;
 	teams: Team[];
+	userParticipant?: EventParticipant | null;
 	paymentsSection: React.ReactNode;
 	positionsRealtime: React.ReactNode;
 };
 
-export default function EventDetailsV2({ event, user, isAdmin, teams, paymentsSection, positionsRealtime }: EventDetailsV2Props) {
+export default function EventDetailsV2({ event, user, isAdmin, teams, userParticipant, paymentsSection, positionsRealtime }: EventDetailsV2Props) {
 	const [activeTab, setActiveTab] = useState("overview");
 
 	// Helpers
@@ -144,28 +146,6 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, paymentsSe
 						</div>
 						{event.location?.address && <div className="p-3 text-xs text-muted bg-background/50">{event.location.address}</div>}
 					</div>
-
-					{/* Admins */}
-					{event.admins && event.admins.length > 0 && (
-						<div className="p-6 rounded-2xl bg-white/5 border border-white/5">
-							<h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-								<Shield size={16} className="text-accent" /> Organizers
-							</h3>
-							<div className="flex flex-col gap-3">
-								{event.admins.map((admin) => (
-									<Link key={admin.userId} href={`/profiles/${admin.userId}`} className="flex items-center gap-3 group">
-										<Avatar name={admin.name + " " + admin.surname} src={admin.imageUrl} />
-										<div>
-											<div className="text-sm font-bold text-white group-hover:text-accent transition-colors">
-												{admin.name} {admin.surname}
-											</div>
-											<div className="text-xs text-muted">Admin</div>
-										</div>
-									</Link>
-								))}
-							</div>
-						</div>
-					)}
 				</div>
 
 				{/* --- RIGHT MAIN CONTENT (Tabs) --- */}
@@ -191,6 +171,15 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, paymentsSe
 						{/* OVERVIEW TAB */}
 						{activeTab === "overview" && (
 							<>
+								{/* Pay to Join Card - shown when payment is required and user hasn't paid */}
+								{event.budget?.payToJoin && (
+									<EventPaymentCard
+										event={event}
+										userParticipant={userParticipant}
+										isInvited={userParticipant?.status === ParticipationStatus.Invited}
+									/>
+								)}
+
 								<div className="p-6 rounded-2xl bg-white/5 border border-white/5">
 									<h3 className="text-lg font-bold text-white mb-3">About Event</h3>
 									<div className="prose prose-invert max-w-none text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
@@ -231,7 +220,7 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, paymentsSe
 									<h3 className="text-lg font-bold text-white">Registered Teams</h3>
 								</div>
 								{teams && teams.length > 0 ? (
-									<TeamsList teams={teams} userId={user?.userId} isAdmin={isAdmin} registrationType={event.registrationUnit} />
+									<TeamsList teams={teams} userId={user?.id} isAdmin={isAdmin} registrationType={event.registrationUnit} />
 								) : (
 									<div className="text-center py-12 bg-white/5 rounded-2xl border border-white/5 border-dashed text-muted">
 										<Users size={48} className="mx-auto mb-4 opacity-50" />

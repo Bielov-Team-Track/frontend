@@ -1,10 +1,18 @@
-import { Checkbox, Input, RadioCards } from "@/components/ui";
+import { Checkbox, Input, RadioCards, Select } from "@/components/ui";
 import { PricingModel } from "@/lib/models/EventBudget";
-import { Calculator, Clock, Coins, User, Users } from "lucide-react";
+import { Bell, Calculator, Clock, Coins, User, Users } from "lucide-react";
 import { Controller } from "react-hook-form";
 import PaymentMethodsSelector from "../components/PaymentMethodsSelector";
 import { useEventFormContext } from "../context/EventFormContext";
 import { usePaymentAccount } from "../hooks/usePaymentAccount";
+
+const reminderOptions = [
+	{ value: "", label: "No reminder" },
+	{ value: "1", label: "1 day before" },
+	{ value: "3", label: "3 days before" },
+	{ value: "7", label: "7 days before" },
+	{ value: "14", label: "14 days before" },
+];
 
 const pricingModelCards = [
 	{
@@ -39,7 +47,7 @@ const EventBudgetStep = () => {
 	const useBudget = values.useBudget;
 
 	return (
-		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300" data-testid="budget-step">
 			<div className="border-b-2 pb-4">
 				<h2 className="text-xl font-bold text-white mb-1">Event Budget</h2>
 				<p className="text-muted text-sm">Configure payment settings. Without budget you cannot collect payments or audit the event.</p>
@@ -56,6 +64,7 @@ const EventBudgetStep = () => {
 							label="Enable budget management"
 							helperText="Track payments and manage event finances"
 							onChange={onChange}
+							data-testid="use-budget-checkbox"
 						/>
 					)}
 				/>
@@ -129,7 +138,7 @@ const EventBudgetStep = () => {
 			/>
 
 			{values.budget?.pricingModel === PricingModel.Individual && (
-				<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+				<div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
 					<Controller
 						name="budget.payToJoin"
 						control={control}
@@ -144,6 +153,25 @@ const EventBudgetStep = () => {
 							/>
 						)}
 					/>
+
+					{values.budget?.payToJoin && (
+						<Controller
+							name="budget.paymentReminderDaysBefore"
+							control={control}
+							render={({ field }) => (
+								<Select
+									{...field}
+									value={field.value?.toString() || ""}
+									onChange={(val) => field.onChange(val ? parseInt(val, 10) : null)}
+									options={reminderOptions}
+									disabled={!useBudget}
+									label="Payment Reminder"
+									leftIcon={<Bell size={16} />}
+									helperText="Send a reminder email to unpaid participants before the event"
+								/>
+							)}
+						/>
+					)}
 				</div>
 			)}
 		</div>

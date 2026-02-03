@@ -13,7 +13,7 @@ export interface GoogleUserCreate {
 }
 
 export interface UserProfile {
-	userId: string;
+	id: string;
 	email: string;
 	name: string;
 	surname: string;

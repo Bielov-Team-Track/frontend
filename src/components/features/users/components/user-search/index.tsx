@@ -34,7 +34,7 @@ const UserSearch = ({ onUserSelect }: UserSearchProps) => {
 				{searchResults.length > 0 &&
 					searchResults.map((user) => (
 						<div
-							key={user.userId}
+							key={user.id}
 							onClick={() => onUserSelect && onUserSelect(user)}
 							className="flex gap-2 p-2 items-center cursor-pointer hover:bg-primary/10 rounded-lg">
 							<Avatar profile={user} />

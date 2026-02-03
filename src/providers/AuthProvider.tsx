@@ -2,12 +2,13 @@
 
 import { AuthResponse, login as apiLogin, logout as apiLogout, refreshToken as apiRefreshToken, getCurrentUserProfile } from "@/lib/api/auth";
 import { UserProfile } from "@/lib/models/User";
-import { ReactNode, createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 interface AuthContextType {
 	userProfile: UserProfile | null;
 	isLoading: boolean;
 	isAuthenticated: boolean;
+	isProfileComplete: boolean;
 	login: (email: string, password: string) => Promise<void>;
 	loginFromTokens: (authResponse: AuthResponse) => Promise<void>;
 	logout: () => Promise<void>;
@@ -27,7 +28,7 @@ const getCookie = (name: string): string | null => {
 
 const setCookie = (name: string, value: string, maxAge: number): void => {
 	if (typeof window === "undefined") return;
-	document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Lax`;
+	document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Strict`;
 };
 
 const deleteCookie = (name: string): void => {
@@ -55,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
 
 	const isAuthenticated = !!userProfile;
+	const isProfileComplete = !!(userProfile?.name && userProfile?.surname);
 
 	// Token management utilities (cookies only)
 	const saveTokens = useCallback((authResponse: AuthResponse) => {
@@ -176,7 +178,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 			// Redirect to login on refresh failure
 			if (typeof window !== "undefined") {
-				window.location.href = "/login";
+				const returnUrl = window.location.pathname + window.location.search;
+				window.location.href = `/login?callback=${encodeURIComponent(returnUrl)}`;
 			}
 		}
 	}, [saveTokens, clearTokens]);
@@ -235,15 +238,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		};
 	}, []);
 
-	const value: AuthContextType = {
-		userProfile,
-		isLoading,
-		isAuthenticated,
-		login,
-		loginFromTokens,
-		logout,
-		refreshAuth,
-	};
+	const value: AuthContextType = useMemo(
+		() => ({
+			userProfile,
+			isLoading,
+			isAuthenticated,
+			isProfileComplete,
+			login,
+			loginFromTokens,
+			logout,
+			refreshAuth,
+		}),
+		[userProfile, isLoading, isAuthenticated, isProfileComplete, login, loginFromTokens, logout, refreshAuth]
+	);
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

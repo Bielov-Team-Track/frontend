@@ -61,52 +61,26 @@ export default function UserSettingsSidebar() {
 	const activeSection = getActiveSection();
 
 	return (
-		<>
-			{/* Mobile: Horizontal scrollable tabs */}
-			<nav className="md:hidden overflow-x-auto no-scrollbar border-b border-white/10 -mx-4 px-4">
-				<div className="flex gap-1 min-w-max pb-px">
-					{navItems.map((item) => {
-						const active = activeSection === item.id;
-						return (
-							<Link
-								key={item.id}
-								href={item.href}
-								className={cn(
-									"flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 whitespace-nowrap",
-									active
-										? "border-accent text-accent"
-										: "border-transparent text-muted hover:text-white hover:border-white/20"
-								)}>
-								<item.icon size={16} />
-								{item.label}
-							</Link>
-						);
-					})}
-				</div>
-			</nav>
-
-			{/* Desktop: Vertical sidebar */}
-			<nav className="hidden md:block w-52 shrink-0">
-				<div className="sticky top-24 space-y-1">
-					{navItems.map((item) => {
-						const active = activeSection === item.id;
-						return (
-							<Link
-								key={item.id}
-								href={item.href}
-								className={cn(
-									"flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
-									active
-										? "bg-accent/20 text-accent"
-										: "text-muted hover:bg-white/5 hover:text-white"
-								)}>
-								<item.icon size={18} />
-								{item.label}
-							</Link>
-						);
-					})}
-				</div>
-			</nav>
-		</>
+		<nav className="overflow-x-auto no-scrollbar">
+			<div className="inline-flex items-center gap-1 p-1 rounded-xl bg-neutral-800 min-w-max">
+				{navItems.map((item) => {
+					const active = activeSection === item.id;
+					return (
+						<Link
+							key={item.id}
+							href={item.href}
+							className={cn(
+								"flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
+								active
+									? "bg-background text-white shadow-sm"
+									: "text-muted-foreground hover:text-white"
+							)}>
+							<item.icon size={16} />
+							{item.label}
+						</Link>
+					);
+				})}
+			</div>
+		</nav>
 	);
 }

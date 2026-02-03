@@ -6,7 +6,7 @@ import { createRegistration, getClub, getClubSettings, getFormTemplate, getMyReg
 import { createOrUpdateCoachProfile, createOrUpdatePlayerProfile, getCoachProfile, getPlayerProfile } from "@/lib/api/user";
 import { ClubRegistration, FormFieldAnswerDto, RegistrationStatus } from "@/lib/models/Club";
 import { useAuth } from "@/providers";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Clock, ImageOff, MapPin, PartyPopper, Shield, Users, XCircle } from "lucide-react";
 import Link from "next/link";
@@ -21,6 +21,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 	const router = useRouter();
 	const { userProfile } = useAuth();
 	const [bannerError, setBannerError] = useState(false);
+	const queryClient = useQueryClient();
 
 	const { data: club, isLoading: isLoadingClub } = useQuery({
 		queryKey: ["club", clubId],
@@ -41,13 +42,13 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 
 	const { data: playerProfile } = useQuery({
 		queryKey: ["playerProfile"],
-		queryFn: () => getPlayerProfile(userProfile?.userId!),
+		queryFn: () => getPlayerProfile(userProfile?.id!),
 		enabled: !!userProfile,
 	});
 
 	const { data: coachProfile } = useQuery({
 		queryKey: ["coachProfile"],
-		queryFn: () => getCoachProfile(userProfile?.userId!),
+		queryFn: () => getCoachProfile(userProfile?.id!),
 		enabled: !!userProfile,
 	});
 
@@ -60,7 +61,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 	const submitMutation = useMutation({
 		mutationFn: (formAnswers?: FormFieldAnswerDto[]) => createRegistration(club!.id, { formAnswers }),
 		onSuccess: () => {
-			router.push(`/clubs/${clubId}?registered=true`);
+			queryClient.invalidateQueries({ queryKey: ["club-members", clubId] });
 		},
 	});
 

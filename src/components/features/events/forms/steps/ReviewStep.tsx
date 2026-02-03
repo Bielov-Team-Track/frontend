@@ -47,14 +47,19 @@ export function ReviewStep() {
 	};
 
 	const getDateDisplay = () => {
-		if (getFormattedDate(values.startTime) === getFormattedDate(values.endTime)) {
-			return getFormattedDateWithDay(new Date(values.startTime));
+		if (values.isRecurring) {
+			const first = getFormattedDateWithDay(new Date(values.firstOccurrenceDate!));
+			const last = getFormattedDateWithDay(new Date(values.seriesEndDate!));
+			return `${first} - ${last} (recurring)`;
 		}
-		return `${getFormattedDateWithDay(new Date(values.startTime))} - ${getFormattedDateWithDay(new Date(values.endTime))}`;
+		if (getFormattedDate(values.startTime!) === getFormattedDate(values.endTime!)) {
+			return getFormattedDateWithDay(new Date(values.startTime!));
+		}
+		return `${getFormattedDateWithDay(new Date(values.startTime!))} - ${getFormattedDateWithDay(new Date(values.endTime!))}`;
 	};
 
 	return (
-		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300" data-testid="review-step">
 			<div className="border-b-2 pb-4">
 				<h2 className="text-xl font-bold text-white mb-1">Review & Create</h2>
 				<p className="text-muted text-sm">Double check everything before creating your event.</p>
@@ -91,9 +96,18 @@ export function ReviewStep() {
 
 						<ReviewSection title="Time" icon={Clock} onEdit={() => goToStep(2)}>
 							<p className="text-sm text-white font-medium">
-								{getFormattedTime(new Date(values.startTime))} - {getFormattedTime(new Date(values.endTime))}
+								{values.isRecurring
+									? `${values.eventStartTime} - ${values.eventEndTime}`
+									: `${getFormattedTime(new Date(values.startTime))} - ${getFormattedTime(new Date(values.endTime))}`}
 							</p>
-							<p className="text-xs text-muted mt-0.5">{getDuration(values.startTime, values.endTime)}</p>
+							<p className="text-xs text-muted mt-0.5">
+								{values.isRecurring
+									? getDuration(
+											new Date(`2000-01-01T${values.eventStartTime}`),
+											new Date(`2000-01-01T${values.eventEndTime}`),
+										)
+									: getDuration(values.startTime, values.endTime)}
+							</p>
 						</ReviewSection>
 
 						{/* Location */}
@@ -115,13 +129,13 @@ export function ReviewStep() {
 							{/* Payment Badge */}
 							<div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
 								<Coins size={12} className="text-accent" />
-								<span className="text-xs text-white">{!values.useBudget ? "Self-managed payments" : getBudgetSummary()}</span>
+								<span className="text-xs text-white">{!values.usePayments ? "Self-managed payments" : getBudgetSummary()}</span>
 							</div>
 
 							{/* Privacy Badge */}
 							<div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-								{values.isPrivate ? <EyeOff size={12} className="text-muted" /> : <Eye size={12} className="text-accent" />}
-								<span className="text-xs text-white">{values.isPrivate ? "Private event" : "Public event"}</span>
+								{values.isPublic ? <EyeOff size={12} className="text-muted" /> : <Eye size={12} className="text-accent" />}
+								<span className="text-xs text-white">{values.isPublic ? "Private event" : "Public event"}</span>
 							</div>
 						</div>
 					</div>
@@ -133,7 +147,7 @@ export function ReviewStep() {
 				<CheckCircle2 size={18} className="text-accent mt-0.5 shrink-0" />
 				<p className="text-sm text-white/80">
 					By clicking &quot;Create Event&quot;, your event will be published and visible to{" "}
-					{values.isPrivate ? "invited participants only" : "all users"}. You can edit details later.
+					{values.isPublic ? "invited participants only" : "all users"}. You can edit details later.
 				</p>
 			</div>
 		</div>

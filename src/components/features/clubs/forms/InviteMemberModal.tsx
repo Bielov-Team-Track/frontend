@@ -37,7 +37,7 @@ export default function InviteMemberModal({ isOpen, onClose, onInvite, isLoading
 
 	const handleInvite = () => {
 		if (!selectedUser) return;
-		onInvite({ userId: selectedUser.userId, role });
+		onInvite({ userId: selectedUser.id, role });
 	};
 
 	const handleClose = () => {
@@ -76,7 +76,7 @@ export default function InviteMemberModal({ isOpen, onClose, onInvite, isLoading
 							{searchResults.length > 0 ? (
 								searchResults.map((user) => (
 									<button
-										key={user.userId}
+										key={user.id}
 										onClick={() => setSelectedUser(user)}
 										className="w-full flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-accent hover:bg-accent/10 transition-colors text-left">
 										<Avatar profile={user} />

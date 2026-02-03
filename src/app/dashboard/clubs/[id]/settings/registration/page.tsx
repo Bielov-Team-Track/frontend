@@ -1,14 +1,28 @@
 "use client";
 
-import FormBuilderInline from "@/components/features/clubs/settings/forms/FormBuilderInline";
 import FormsListView from "@/components/features/clubs/settings/forms/FormsListView";
 import { SettingsAlert, SettingsCard, SettingsHeader } from "@/components/layout/settings-layout";
 import { Checkbox, TextArea } from "@/components/ui";
+import Loader from "@/components/ui/loader";
 import { getClub, getClubFormTemplates, updateClubSettings } from "@/lib/api/clubs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+
+// Lazy load FormBuilder - heavy component with drag-and-drop
+const FormBuilderInline = dynamic(
+	() => import("@/components/features/clubs/settings/forms/FormBuilderInline"),
+	{
+		ssr: false,
+		loading: () => (
+			<div className="flex items-center justify-center py-12">
+				<Loader size="lg" />
+			</div>
+		),
+	}
+);
 
 interface FormValues {
 	requirePlayerProfile: boolean;

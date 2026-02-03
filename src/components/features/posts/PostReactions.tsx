@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactionPicker } from "@/components/ui";
+import { EmojiPicker } from "@/components/ui";
 import { useAddPostReaction, useRemovePostReaction } from "@/hooks/usePosts";
 import { ReactionSummary } from "@/lib/models/Post";
 import { cn } from "@/lib/utils";
@@ -66,7 +66,7 @@ export default function PostReactions({ postId, reactions }: PostReactionsProps)
 			</button>
 
 			{/* Reaction picker */}
-			{showPicker && <ReactionPicker triggerRef={triggerRef} onSelect={handleAddReaction} onClose={() => setShowPicker(false)} />}
+			{showPicker && <EmojiPicker triggerRef={triggerRef} onSelect={handleAddReaction} onClose={() => setShowPicker(false)} />}
 		</div>
 	);
 }

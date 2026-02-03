@@ -14,7 +14,7 @@ import {
 	subMonths,
 } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { ViewComponentProps } from "./ViewProps";
 
 function MonthView({
@@ -34,26 +34,28 @@ function MonthView({
 	const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
 	const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
 
-	// Always show 6 weeks (42 days)
-	const days = eachDayOfInterval({
-		start: calendarStart,
-		end: calendarStart,
-	});
-	const allDays = [] as Date[];
-	for (let i = 0; i < 42; i++) {
-		const day = new Date(calendarStart);
-		day.setDate(calendarStart.getDate() + i);
-		allDays.push(day);
-	}
+	// Always show 6 weeks (42 days) - memoized
+	const allDays = useMemo(() => {
+		const days = [] as Date[];
+		for (let i = 0; i < 42; i++) {
+			const day = new Date(calendarStart);
+			day.setDate(calendarStart.getDate() + i);
+			days.push(day);
+		}
+		return days;
+	}, [calendarStart]);
 
 	const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-	const getEventsForDay = (day: Date) => {
-		return events.filter((event) => {
-			const eventStart = new Date(event.startTime);
-			return isSameDay(eventStart, day);
-		});
-	};
+	const getEventsForDay = useCallback(
+		(day: Date) => {
+			return events.filter((event) => {
+				const eventStart = new Date(event.startTime);
+				return isSameDay(eventStart, day);
+			});
+		},
+		[events]
+	);
 
 	const handlePrevMonth = () => {
 		setCurrentDate(subMonths(currentDate, 1));
@@ -141,7 +143,7 @@ function MonthView({
 	);
 }
 
-function DayCell({
+const DayCell = memo(function DayCell({
 	day,
 	events,
 	isCurrentMonth,
@@ -226,6 +228,6 @@ function DayCell({
 			</div>
 		</div>
 	);
-}
+});
 
 export default MonthView;

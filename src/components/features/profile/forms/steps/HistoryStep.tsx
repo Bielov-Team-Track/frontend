@@ -1,12 +1,14 @@
 import { Button, Input, MultiSelectPills, Select } from "@/components/ui";
+import { getTeamsByClub, searchClubs } from "@/lib/api/clubs/clubs";
+import { Club, Team } from "@/lib/models/Club";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Calendar, Plus, Shield, Trash2 } from "lucide-react";
+import { Calendar, Loader2, Plus, Shield, Trash2 } from "lucide-react";
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
-// Mock Data Types
+// Suggestion type for autocomplete
 type Suggestion = {
 	id: string;
 	name: string;
@@ -14,52 +16,37 @@ type Suggestion = {
 	clubId?: string; // For teams to link to a club
 };
 
-// Mock Data
-const sampleClubs: Suggestion[] = [
-	{
-		id: "1",
-		name: "Newcastle Panthers",
-		logoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=Newcastle",
-	},
-	{
-		id: "2",
-		name: "Marden Volleyball Club",
-		logoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=Marden",
-	},
-	{ id: "3", name: "Gateshead Giants" }, // No logo
-	{
-		id: "4",
-		name: "Sunderland Spikers",
-		logoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=Sunderland",
-	},
-	{ id: "5", name: "Durham Dynamos" },
-	{
-		id: "6",
-		name: "Polonia London",
-		logoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=Polonia",
-	},
-	{
-		id: "7",
-		name: "Malory Eagles",
-		logoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=Malory",
-	},
-];
+// Debounce hook for search
+function useDebounce<T>(value: T, delay: number): T {
+	const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-const sampleTeams: Suggestion[] = [
-	{
-		id: "t1",
-		name: "White Panthers",
-		logoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=WhitePanthers",
-		clubId: "1",
-	},
-	{ id: "t2", name: "Black Panthers", clubId: "1" },
-	{ id: "t3", name: "Marden Seniors", clubId: "2" },
-	{ id: "t4", name: "Marden Juniors", clubId: "2" },
-	{ id: "t5", name: "Gateshead A Team", clubId: "3" },
-	{ id: "t6", name: "Sunderland U18", clubId: "4" },
-	{ id: "t7", name: "Men's 1st Team", clubId: "7" },
-	{ id: "t8", name: "Women's 1st Team", clubId: "7" },
-];
+	useEffect(() => {
+		const handler = setTimeout(() => {
+			setDebouncedValue(value);
+		}, delay);
+
+		return () => {
+			clearTimeout(handler);
+		};
+	}, [value, delay]);
+
+	return debouncedValue;
+}
+
+// Convert Club to Suggestion
+const clubToSuggestion = (club: Club): Suggestion => ({
+	id: club.id,
+	name: club.name,
+	logoUrl: club.logoUrl,
+});
+
+// Convert Team to Suggestion
+const teamToSuggestion = (team: Team): Suggestion => ({
+	id: team.id,
+	name: team.name,
+	logoUrl: team.logoUrl,
+	clubId: team.clubId,
+});
 
 const schema = yup.object().shape({
 	bio: yup.string().nullable(),
@@ -72,7 +59,7 @@ type FormData = {
 type Props = {
 	defaultValues?: { bio?: string };
 	initialEntries?: HistoryEntry[];
-	onNext: (data: { bio: string }) => void;
+	onNext: (data: { bio: string; entries: HistoryEntry[] }) => void;
 	formId: string;
 };
 
@@ -105,11 +92,16 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 	// Suggestions State
 	const [showClubSuggestions, setShowClubSuggestions] = useState(false);
 	const [filteredClubSuggestions, setFilteredClubSuggestions] = useState<Suggestion[]>([]);
+	const [isLoadingClubs, setIsLoadingClubs] = useState(false);
 	const clubInputRef = useRef<HTMLDivElement>(null);
 
 	const [showTeamSuggestions, setShowTeamSuggestions] = useState(false);
 	const [filteredTeamSuggestions, setFilteredTeamSuggestions] = useState<Suggestion[]>([]);
+	const [isLoadingTeams, setIsLoadingTeams] = useState(false);
 	const teamInputRef = useRef<HTMLDivElement>(null);
+
+	// Debounced search queries
+	const debouncedClubSearch = useDebounce(clubName, 300);
 
 	const currentYear = new Date().getFullYear();
 	const yearOptions = Array.from({ length: 50 }, (_, i) => {
@@ -153,6 +145,43 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 		};
 	}, []);
 
+	// Fetch clubs when debounced search changes
+	useEffect(() => {
+		const fetchClubs = async () => {
+			if (debouncedClubSearch.length < 2) {
+				setFilteredClubSuggestions([]);
+				return;
+			}
+
+			setIsLoadingClubs(true);
+			try {
+				const clubs = await searchClubs({ query: debouncedClubSearch });
+				setFilteredClubSuggestions(clubs.map(clubToSuggestion));
+			} catch (error) {
+				console.error("Failed to search clubs:", error);
+				setFilteredClubSuggestions([]);
+			} finally {
+				setIsLoadingClubs(false);
+			}
+		};
+
+		fetchClubs();
+	}, [debouncedClubSearch]);
+
+	// Fetch teams when a club is selected
+	const fetchTeamsForClub = useCallback(async (clubId: string) => {
+		setIsLoadingTeams(true);
+		try {
+			const teams = await getTeamsByClub(clubId);
+			setFilteredTeamSuggestions(teams.map(teamToSuggestion));
+		} catch (error) {
+			console.error("Failed to fetch teams:", error);
+			setFilteredTeamSuggestions([]);
+		} finally {
+			setIsLoadingTeams(false);
+		}
+	}, []);
+
 	const handleClubNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setClubName(value);
@@ -161,9 +190,9 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 		// Also reset selected team as club changed context
 		setSelectedTeam(null);
 		setTeamName("");
+		setFilteredTeamSuggestions([]);
 
-		if (value.length > 0) {
-			setFilteredClubSuggestions(sampleClubs.filter((club) => club.name.toLowerCase().includes(value.toLowerCase())));
+		if (value.length >= 2) {
 			setShowClubSuggestions(true);
 		} else {
 			setShowClubSuggestions(false);
@@ -177,15 +206,7 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 		// Reset selected team if user types manually
 		setSelectedTeam(null);
 
-		if (value.length > 0) {
-			let matches = sampleTeams;
-
-			// Filter by selected club if available
-			if (selectedClub) {
-				matches = matches.filter((t) => t.clubId === selectedClub.id);
-			}
-
-			setFilteredTeamSuggestions(matches.filter((team) => team.name.toLowerCase().includes(value.toLowerCase())));
+		if (value.length > 0 && filteredTeamSuggestions.length > 0) {
 			setShowTeamSuggestions(true);
 		} else {
 			setShowTeamSuggestions(false);
@@ -201,6 +222,9 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 
 		setShowClubSuggestions(false);
 		if (addError) setAddError(null);
+
+		// Fetch teams for this club
+		fetchTeamsForClub(club.id);
 	};
 
 	const handleSelectTeamSuggestion = (team: Suggestion) => {
@@ -215,17 +239,16 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 			return;
 		}
 
-		// Use selected club/team logo if available, or check if name matches exactly a sample
-		// (handle case where user typed exact name but didn't click suggestion)
+		// Use selected club/team logo if available, or check from current suggestions
 		let finalClubLogo = selectedClub?.logoUrl;
 		if (!finalClubLogo) {
-			const match = sampleClubs.find((c) => c.name.toLowerCase() === clubName.toLowerCase());
+			const match = filteredClubSuggestions.find((c) => c.name.toLowerCase() === clubName.toLowerCase());
 			if (match) finalClubLogo = match.logoUrl;
 		}
 
 		let finalTeamLogo = selectedTeam?.logoUrl;
 		if (!finalTeamLogo) {
-			const match = sampleTeams.find((t) => t.name.toLowerCase() === teamName.toLowerCase());
+			const match = filteredTeamSuggestions.find((t) => t.name.toLowerCase() === teamName.toLowerCase());
 			if (match) finalTeamLogo = match.logoUrl;
 		}
 
@@ -248,6 +271,8 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 		setTeamName("");
 		setSelectedClub(null);
 		setSelectedTeam(null);
+		setFilteredClubSuggestions([]);
+		setFilteredTeamSuggestions([]);
 		setRole(undefined);
 		setPositions([]);
 		setAddError(null);
@@ -293,7 +318,7 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 			})
 			.join("\n\n");
 
-		onNext({ bio: bioString });
+		onNext({ bio: bioString, entries });
 	};
 
 	const renderSuggestionItem = (item: Suggestion, onSelect: (item: Suggestion) => void) => (
@@ -335,19 +360,30 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 					/>
 					<div className="relative" ref={clubInputRef}>
 						<Input
-							placeholder="Club Name"
+							placeholder="Club Name (min 2 chars)"
 							value={clubName}
 							onChange={handleClubNameChange}
 							onFocus={() => {
-								if (clubName.length > 0) setShowClubSuggestions(true);
+								if (clubName.length >= 2) setShowClubSuggestions(true);
 							}}
 							onBlur={() => setTimeout(() => setShowClubSuggestions(false), 200)}
 							required
 						/>
-						{showClubSuggestions && filteredClubSuggestions.length > 0 && (
+						{showClubSuggestions && filteredClubSuggestions.length > 0 && !isLoadingClubs && (
 							<ul className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
 								{filteredClubSuggestions.map((club) => renderSuggestionItem(club, handleSelectClubSuggestion))}
 							</ul>
+						)}
+						{showClubSuggestions && isLoadingClubs && (
+							<div className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg p-3 mt-1 flex items-center justify-center gap-2 text-muted text-sm">
+								<Loader2 size={14} className="animate-spin" />
+								Searching clubs...
+							</div>
+						)}
+						{showClubSuggestions && !isLoadingClubs && filteredClubSuggestions.length === 0 && clubName.length >= 2 && (
+							<div className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg p-3 mt-1 text-muted text-sm text-center">
+								No clubs found. You can still enter manually.
+							</div>
 						)}
 					</div>
 					<Select
@@ -366,20 +402,24 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 							value={teamName}
 							onChange={handleTeamNameChange}
 							onFocus={() => {
-								if (teamName.length > 0) {
-									setShowTeamSuggestions(true);
-								} else if (selectedClub) {
-									// Show all teams for this club if focused empty
-									setFilteredTeamSuggestions(sampleTeams.filter((t) => t.clubId === selectedClub.id));
+								// Show teams if we have a selected club and teams are loaded
+								if (selectedClub && filteredTeamSuggestions.length > 0) {
 									setShowTeamSuggestions(true);
 								}
 							}}
 							onBlur={() => setTimeout(() => setShowTeamSuggestions(false), 200)}
+							disabled={!selectedClub}
 						/>
 						{showTeamSuggestions && filteredTeamSuggestions.length > 0 && (
 							<ul className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
 								{filteredTeamSuggestions.map((team) => renderSuggestionItem(team, handleSelectTeamSuggestion))}
 							</ul>
+						)}
+						{isLoadingTeams && (
+							<div className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg p-3 mt-1 flex items-center justify-center gap-2 text-muted text-sm">
+								<Loader2 size={14} className="animate-spin" />
+								Loading teams...
+							</div>
 						)}
 					</div>
 				</div>

@@ -24,7 +24,7 @@ export async function updateAttendance(
     userId: string,
     data: UpdateAttendanceRequest
 ): Promise<AttendanceRecord> {
-    const endpoint = `/v1/attendance/${eventId}/users/${userId}`;
+    const endpoint = `/v1/events/${eventId}/participants/${userId}`;
     return (
         await client.patch<AttendanceRecord>(PREFIX + endpoint, data)
     ).data;

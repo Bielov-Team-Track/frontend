@@ -78,7 +78,7 @@ export function LocationStep() {
 	);
 
 	return (
-		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300" data-testid="location-step">
 			<div className="border-b-2 pb-4">
 				<h2 className="text-xl font-bold text-white mb-1">Location</h2>
 				<p className="text-muted text-sm">Where will your event take place?</p>
@@ -140,6 +140,7 @@ export function LocationStep() {
 								placeholder="e.g., 12 Taylors Court, London"
 								error={errors.location?.address?.message}
 								required
+								data-testid="location-address-input"
 							/>
 						</APIProvider>
 					)}

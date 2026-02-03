@@ -1,8 +1,8 @@
 import { Button } from "@/components";
-import { useAuth } from "@/providers";
 import { Chat, Message } from "@/lib/models/Messages";
 import { stringToColor } from "@/lib/utils/color";
 import { getFormattedDate } from "@/lib/utils/date";
+import { useAuth } from "@/providers";
 import { ChevronDown, Image as ImageIcon, Info, Paperclip, Send, Smile } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -30,7 +30,7 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdat
 
 	// Determine chat title and image
 	const isGroup = (chat.participants?.length || 0) > 2;
-	const otherParticipant = chat.participants?.find((p) => p.userId !== currentUser?.userId);
+	const otherParticipant = chat.participants?.find((p) => p.userId !== currentUser?.id);
 	const chatTitle = chat.title || otherParticipant?.userProfile?.name || "Unknown Chat";
 	const chatSubtitle = isGroup ? `${chat.participants?.length} participants` : otherParticipant?.role || "Active now";
 
@@ -212,9 +212,7 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdat
 							onClick={handleSend}
 							disabled={isSending || !messageText.trim()}
 							className={`ml-1 p-2.5 rounded-full transition-all ${
-								messageText.trim()
-									? "bg-accent text-white hover:bg-accent/90"
-									: "text-muted hover:text-white hover:bg-white/10"
+								messageText.trim() ? "bg-accent text-white hover:bg-accent/90" : "text-muted hover:text-white hover:bg-white/10"
 							} disabled:opacity-50`}>
 							<Send size={18} />
 						</button>

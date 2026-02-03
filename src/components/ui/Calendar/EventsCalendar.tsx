@@ -3,7 +3,7 @@
 import { Button } from "@/components";
 import { Event } from "@/lib/models/Event";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../tabs";
 import MonthView from "./views/MonthView";
 import WeekView from "./views/WeekView";
@@ -25,15 +25,18 @@ export function EventsCalendar({ events }: EventsCalendarProps) {
 	const [date, setDate] = useState(new Date());
 	const [scrollToNow, setScrollToNow] = useState(false);
 
-	const handleEventClick = (eventId: string) => {
-		router.push(`/events/${eventId}`);
-	};
+	const handleEventClick = useCallback(
+		(eventId: string) => {
+			router.push(`/events/${eventId}`);
+		},
+		[router]
+	);
 
-	const handleTodayClick = () => {
+	const handleTodayClick = useCallback(() => {
 		setDate(new Date());
 		setScrollToNow(true);
 		setTimeout(() => setScrollToNow(false), 100);
-	};
+	}, []);
 
 	return (
 		<Tabs className="h-full flex flex-col p-4 bg-neutral-900 rounded-2xl border border-white/5">

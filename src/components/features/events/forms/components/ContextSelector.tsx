@@ -3,13 +3,19 @@
 import { Button, Loader, Select } from "@/components";
 import { renderClubOption, renderGroupOption, renderTeamOption } from "@/components/features/clubs/utils";
 import { Club, Group, Team } from "@/lib/models/Club";
+import { ContextType } from "@/lib/models/shared/models";
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { ContextIndicator } from "./ContextIndicator";
 
+export type ContextSelection = {
+	context: Club | Group | Team;
+	contextType: ContextType;
+} | null;
+
 export type ContextSelectorProps = {
 	clubs: Club[];
-	onSelect: (context: Club | Group | Team | null) => void;
+	onSelect: (selection: ContextSelection) => void;
 };
 
 const ContextSelector = ({ onSelect, clubs }: ContextSelectorProps) => {
@@ -44,7 +50,7 @@ const ContextSelector = ({ onSelect, clubs }: ContextSelectorProps) => {
 			data: team,
 		}));
 
-	const getSelectedContext = () => {
+	const getSelectedContext = (): ContextSelection => {
 		if (selectedTeamId) {
 			const team = teamOptions?.find((t) => t.value === selectedTeamId)?.data;
 
@@ -52,7 +58,7 @@ const ContextSelector = ({ onSelect, clubs }: ContextSelectorProps) => {
 
 			team.club = clubs.find((c) => c.id === team?.clubId);
 
-			return team || null;
+			return { context: team, contextType: "team" };
 		}
 		if (selectedGroupId) {
 			const group = groupOptions?.find((g) => g.value === selectedGroupId)?.data;
@@ -60,11 +66,12 @@ const ContextSelector = ({ onSelect, clubs }: ContextSelectorProps) => {
 			if (!group) return null;
 
 			group.club = clubs.find((c) => c.id === group?.clubId);
-			return group;
+			return { context: group, contextType: "group" };
 		}
 		if (selectedClubId) {
 			const club = clubOptions.find((c) => c.value === selectedClubId)?.data;
-			return club || null;
+			if (!club) return null;
+			return { context: club, contextType: "club" };
 		}
 		return null;
 	};
@@ -146,7 +153,7 @@ const ContextSelector = ({ onSelect, clubs }: ContextSelectorProps) => {
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: 8 }}
 							transition={{ duration: 0.2 }}>
-							<ContextIndicator context={getSelectedContext()} />
+							<ContextIndicator context={getSelectedContext()?.context} />
 						</motion.div>
 					)}
 				</AnimatePresence>

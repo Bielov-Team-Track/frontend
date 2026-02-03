@@ -55,7 +55,7 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 							applicationServerKey: "BDoqxWXp2K97_Wuk4s2On7aeqBus_ZvJuGLrOn_moB3LCElqnweRINPhgwL0byp8ktqCSCorTxPJSGpcZR7y02o",
 						})
 						.then(async function (subscription) {
-							await createNotificationSubscription(user?.userProfile?.userId!, subscription);
+							await createNotificationSubscription(user?.userProfile?.id!, subscription);
 							showSuccess("Notifications enabled successfully!");
 						});
 				})

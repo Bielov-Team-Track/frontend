@@ -1,10 +1,6 @@
 // Core
 export * from "./core";
 
-// Create Event
-export { CreateEventModal } from "./create-event";
-export type { EventFormData } from "./create-event";
-
 // Create Club
 export { CreateClubModal } from "./create-club";
 export type { ClubFormData } from "./create-club";

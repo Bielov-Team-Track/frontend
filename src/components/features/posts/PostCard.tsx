@@ -2,10 +2,11 @@
 
 import { Avatar, DropdownMenu, DropdownMenuItem } from "@/components/ui";
 import { Post } from "@/lib/models/Post";
+import { sanitizeHtmlWithSafeLinks } from "@/lib/utils/sanitize";
 import { useAuth } from "@/providers";
 import { formatDistanceToNow } from "date-fns";
 import { Flag, MessageCircle, Pencil, Pin, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { memo, useState } from "react";
 import PostMedia from "./PostMedia";
 import PostReactions from "./PostReactions";
 import { CommentsList } from "./comments";
@@ -23,12 +24,12 @@ interface PostCardProps {
 	isAdmin?: boolean;
 }
 
-export default function PostCard({ post, onEdit, onDelete, showUnpin, isAdmin, onPin, onUnpin, onHide }: PostCardProps) {
+const PostCard = memo(function PostCard({ post, onEdit, onDelete, showUnpin, isAdmin, onPin, onUnpin, onHide }: PostCardProps) {
 	const { userProfile } = useAuth();
 	const [showReportModal, setShowReportModal] = useState(false);
 	const [showComments, setShowComments] = useState(false);
 
-	const isAuthor = userProfile?.userId === post.authorId;
+	const isAuthor = userProfile?.id === post.authorId;
 	const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 	// Show hidden post variant
 	if (post.isHidden) {
@@ -40,7 +41,7 @@ export default function PostCard({ post, onEdit, onDelete, showUnpin, isAdmin, o
 	if (isAuthor) {
 		menuItems.push(
 			{ icon: <Pencil size={16} />, label: "Edit", onClick: () => onEdit?.(post) },
-			{ icon: <Trash2 size={16} />, label: "Delete", variant: "destructive", onClick: () => onDelete?.(post.id) }
+			{ icon: <Trash2 size={16} />, label: "Delete", variant: "destructive", onClick: () => onDelete?.(post.id) },
 		);
 	}
 	if (isAdmin && !post.isPinned) {
@@ -87,7 +88,7 @@ export default function PostCard({ post, onEdit, onDelete, showUnpin, isAdmin, o
 
 			{/* Content */}
 			<div className="px-4 pb-3">
-				<div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
+				<div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithSafeLinks(post.content) }} />
 			</div>
 
 			{/* Media */}
@@ -127,4 +128,6 @@ export default function PostCard({ post, onEdit, onDelete, showUnpin, isAdmin, o
 			<ReportModal isOpen={showReportModal} onClose={() => setShowReportModal(false)} postId={post.id} />
 		</article>
 	);
-}
+});
+
+export default PostCard;

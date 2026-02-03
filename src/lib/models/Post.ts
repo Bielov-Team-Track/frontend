@@ -1,17 +1,29 @@
+import {
+	ContextType,
+	Media,
+	MediaType,
+	ReactionSummary,
+	UploadUrlResponse as BaseUploadUrlResponse,
+} from "./shared/models";
 import { UserProfile } from "./User";
 
-export type ContextType = "club" | "group" | "team";
+// Re-export shared types for backwards compatibility
+export type { ContextType, Media, MediaType, ReactionSummary };
+
+// Alias for backwards compatibility
+export type PostMedia = Media;
+
 export const ContextTypeOptions = [
 	{ value: "club", label: "Club" },
 	{ value: "group", label: "Group" },
 	{ value: "team", label: "Team" },
+	{ value: "event", label: "Event" },
 ];
 export type Visibility = "membersOnly" | "public";
 export const VisibilityOptions = [
 	{ value: "membersOnly", label: "Members Only" },
 	{ value: "public", label: "Public" },
 ];
-export type MediaType = "image" | "video" | "document" | "videoEmbed";
 
 export interface Post {
 	id: string;
@@ -33,24 +45,6 @@ export interface Post {
 	updatedAt: string;
 }
 
-export interface PostMedia {
-	id: string;
-	type: MediaType;
-	url: string;
-	thumbnailUrl?: string;
-	fileName?: string;
-	fileSize?: number;
-	mimeType?: string;
-	embedProvider?: "youtube" | "vimeo";
-	embedId?: string;
-	displayOrder: number;
-}
-
-export interface ReactionSummary {
-	emoji: string;
-	count: number;
-	hasReacted: boolean;
-}
 
 export interface PostsResponse {
 	items: Post[];
@@ -65,6 +59,7 @@ export interface CreatePostRequest {
 	visibility: Visibility;
 	mediaIds?: string[];
 	poll?: CreatePollRequest;
+	isPinned?: boolean;
 }
 
 export interface UpdatePostRequest {
@@ -73,9 +68,7 @@ export interface UpdatePostRequest {
 	mediaIds?: string[];
 }
 
-export interface UploadUrlResponse {
-	mediaId: string;
-	uploadUrl: string;
+export interface UploadUrlResponse extends BaseUploadUrlResponse {
 	expiresAt: string;
 }
 

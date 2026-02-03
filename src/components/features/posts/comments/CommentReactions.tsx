@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactionPicker } from "@/components/ui";
+import { EmojiPicker } from "@/components/ui";
 import { useAddCommentReaction, useRemoveCommentReaction } from "@/hooks/usePosts";
 import { ReactionSummary } from "@/lib/models/Post";
 import { cn } from "@/lib/utils";
@@ -61,7 +61,7 @@ export default function CommentReactions({ commentId, reactions, compact = true 
 				<SmilePlus size={14} />
 			</button>
 
-			{showPicker && <ReactionPicker triggerRef={triggerRef} onSelect={handleAddReaction} onClose={() => setShowPicker(false)} />}
+			{showPicker && <EmojiPicker triggerRef={triggerRef} onSelect={handleAddReaction} onClose={() => setShowPicker(false)} />}
 		</div>
 	);
 }

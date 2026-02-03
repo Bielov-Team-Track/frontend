@@ -1,4 +1,5 @@
 import { CursorRequest, QueryRequest, SortRequest } from "@/lib/models/filteringAndPagination";
+import { AxiosError } from "axios";
 import { AuthData } from "../models/Auth";
 import { CursorPagedResult } from "../models/Pagination";
 import { PositionPayment } from "../models/Position";
@@ -27,8 +28,8 @@ export async function getUserProfile(userId: string): Promise<UserProfile | unde
 
 	try {
 		return (await client.get<UserProfile>(PREFIX + endpoint)).data;
-	} catch (error: any) {
-		if (error.response?.status === 404) {
+	} catch (error) {
+		if (error instanceof AxiosError && error.response?.status === 404) {
 			return undefined;
 		}
 		throw error;
@@ -53,8 +54,8 @@ export async function getFullUserProfile(userId: string): Promise<FullProfileDto
 			coachProfile,
 			historyEntries: history,
 		};
-	} catch (error: any) {
-		if (error.response?.status === 404) {
+	} catch (error) {
+		if (error instanceof AxiosError && error.response?.status === 404) {
 			return undefined;
 		}
 		throw error;
@@ -77,8 +78,8 @@ export async function getCurrentPlayerProfile(): Promise<PlayerProfileDto | unde
 	const endpoint = `/profiles/me/player`;
 	try {
 		return (await client.get<PlayerProfileDto>(PREFIX + endpoint)).data;
-	} catch (error: any) {
-		if (error.response?.status === 404) {
+	} catch (error) {
+		if (error instanceof AxiosError && error.response?.status === 404) {
 			return undefined;
 		}
 		throw error;
@@ -89,8 +90,8 @@ export async function getPlayerProfile(userId: string): Promise<PlayerProfileDto
 	const endpoint = `/profiles/${userId}/player`;
 	try {
 		return (await client.get<PlayerProfileDto>(PREFIX + endpoint)).data;
-	} catch (error: any) {
-		if (error.response?.status === 404) {
+	} catch (error) {
+		if (error instanceof AxiosError && error.response?.status === 404) {
 			return undefined;
 		}
 		throw error;
@@ -113,8 +114,8 @@ export async function getCurrentCoachProfile(): Promise<CoachProfileDto | undefi
 	const endpoint = `/profiles/me/coach`;
 	try {
 		return (await client.get<CoachProfileDto>(PREFIX + endpoint)).data;
-	} catch (error: any) {
-		if (error.response?.status === 404) {
+	} catch (error) {
+		if (error instanceof AxiosError && error.response?.status === 404) {
 			return undefined;
 		}
 		throw error;
@@ -125,8 +126,8 @@ export async function getCoachProfile(userId: string): Promise<CoachProfileDto |
 	const endpoint = `/profiles/${userId}/coach`;
 	try {
 		return (await client.get<CoachProfileDto>(PREFIX + endpoint)).data;
-	} catch (error: any) {
-		if (error.response?.status === 404) {
+	} catch (error) {
+		if (error instanceof AxiosError && error.response?.status === 404) {
 			return undefined;
 		}
 		throw error;

@@ -45,6 +45,9 @@ export function TimeAndDateStep() {
 			setValue("startTime", undefined);
 			setValue("endTime", undefined);
 			// Set default recurring values if not set
+			if (!values.recurrencePattern) {
+				setValue("recurrencePattern", "weekly");
+			}
 			if (!values.firstOccurrenceDate) {
 				setValue("firstOccurrenceDate", new Date(Date.now() + 24 * 60 * 60 * 1000));
 			}
@@ -67,7 +70,7 @@ export function TimeAndDateStep() {
 	};
 
 	return (
-		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300" data-testid="time-date-step">
 			<div className="border-b-2 pb-4">
 				<h2 className="text-xl font-bold text-white mb-1">Time & Date</h2>
 				<p className="text-muted text-sm">When will your event take place?</p>
@@ -80,11 +83,11 @@ export function TimeAndDateStep() {
 					onValueChange={handleModeChange}
 				>
 					<TabsList className="w-full">
-						<TabsTrigger value="single" className="flex-1 gap-2">
+						<TabsTrigger value="single" className="flex-1 gap-2" data-testid="single-event-tab">
 							<Calendar size={16} />
 							Single Event
 						</TabsTrigger>
-						<TabsTrigger value="recurring" className="flex-1 gap-2">
+						<TabsTrigger value="recurring" className="flex-1 gap-2" data-testid="recurring-event-tab">
 							<Repeat size={16} />
 							Recurring Event
 						</TabsTrigger>
@@ -108,6 +111,7 @@ export function TimeAndDateStep() {
 										onChange={(e) => field.onChange(new Date(e.target.value))}
 										required
 										className="bg-background-light"
+										data-testid="start-datetime-input"
 									/>
 								)}
 							/>
@@ -127,6 +131,7 @@ export function TimeAndDateStep() {
 										onChange={(e) => field.onChange(new Date(e.target.value))}
 										required
 										className="bg-background-light"
+										data-testid="end-datetime-input"
 									/>
 								)}
 							/>
@@ -150,7 +155,7 @@ export function TimeAndDateStep() {
 								control={control}
 								render={({ field }) => (
 									<Select
-										value={field.value}
+										value={field.value ?? ""}
 										onValueChange={field.onChange}
 									>
 										<SelectTrigger className="w-full bg-background-light">

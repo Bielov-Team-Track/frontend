@@ -7,7 +7,7 @@ export function NavigationButtons() {
 	const { wizard, form } = useEventFormContext();
 	const { nextStep, prevStep, isFirstStep, isLastStep } = wizard;
 	const { isPending, handleSubmit, saveEvent, formState } = form;
-	console.log("formState.errors", formState.errors);
+
 	return (
 		<div className="relative z-10 mt-10 pt-6 border-t border-white/10">
 			{Object.keys(formState.errors).length > 0 && (
@@ -23,13 +23,14 @@ export function NavigationButtons() {
 						onClick={prevStep}
 						color={"neutral"}
 						disabled={isFirstStep || isPending}
-						leftIcon={<ArrowLeft size={16} />}>
+						leftIcon={<ArrowLeft size={16} />}
+						data-testid="back-button">
 						Back
 					</Button>
 				)}
 
 				{!isLastStep ? (
-					<Button type="button" variant={"outline"} onClick={nextStep} rightIcon={<ArrowRight size={16} />}>
+					<Button type="button" variant={"outline"} onClick={nextStep} rightIcon={<ArrowRight size={16} />} data-testid="next-step-button">
 						Next Step
 					</Button>
 				) : (
@@ -38,7 +39,8 @@ export function NavigationButtons() {
 						disabled={isPending}
 						loading={isPending}
 						onClick={handleSubmit(saveEvent)}
-						rightIcon={!isPending ? <Check size={16} /> : undefined}>
+						rightIcon={!isPending ? <Check size={16} /> : undefined}
+						data-testid="create-event-button">
 						{isPending ? "Creating..." : "Create Event"}
 					</Button>
 				)}

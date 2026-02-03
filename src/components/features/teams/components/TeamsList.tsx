@@ -21,7 +21,7 @@ function TeamsList({ teams, isAdmin, registrationType, userId }: TeamsListProps)
 						<TeamComponent
 							team={t}
 							open={registrationType == Unit.Individual && !t.captain}
-							editable={(t.captain && t.captain?.userId == userId) || isAdmin}
+							editable={(t.captain && t.captain?.id == userId) || isAdmin}
 						/>
 					</div>
 				))}

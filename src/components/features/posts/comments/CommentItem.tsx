@@ -21,7 +21,7 @@ export default function CommentItem({ comment, onReply, onEdit, onDelete, onRetr
 	const { userProfile } = useAuth();
 	const [showMenu, setShowMenu] = useState(false);
 
-	const isAuthor = userProfile?.userId === comment.authorId;
+	const isAuthor = userProfile?.id === comment.authorId;
 	const timeAgo = formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true });
 
 	// Sending state

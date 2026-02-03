@@ -37,14 +37,14 @@ function PositionWithUser({ position, userId, team, onPositionLeave, open = fals
 		});
 	};
 
-	const collapsable = open || editable || position.eventParticipant?.userProfile?.userId === userId;
+	const collapsable = open || editable || position.eventParticipant?.userProfile?.id === userId;
 
 	const userProfile = position.eventParticipant?.userProfile;
 
 	if (!collapsable) {
 		return (
 			<div className="p-3 rounded-xl bg-background-light border border-white/5 w-full flex justify-between items-center transition-all hover:bg-white/5">
-				<Link href={`/profiles/${userProfile?.userId}`} className="flex gap-3 items-center z-50 group">
+				<Link href={`/profiles/${userProfile?.id}`} className="flex gap-3 items-center z-50 group">
 					<Avatar profile={userProfile!} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors" />
 					<div className="flex flex-col">
 						<span className="whitespace-nowrap font-bold text-sm text-white group-hover:text-accent transition-colors">
@@ -71,7 +71,7 @@ function PositionWithUser({ position, userId, team, onPositionLeave, open = fals
 					if (newValue) collapseOtherPositions(position.id);
 				}}>
 				<Link
-					href={`/profiles/${userProfile?.userId}`}
+					href={`/profiles/${userProfile?.id}`}
 					className="flex gap-3 items-center group flex-1 min-w-0"
 					onClick={(e) => e.stopPropagation()} // Prevent expansion when clicking profile
 				>
@@ -81,7 +81,7 @@ function PositionWithUser({ position, userId, team, onPositionLeave, open = fals
 							<span className="whitespace-nowrap font-bold text-sm text-white group-hover:text-accent transition-colors truncate">
 								{userProfile?.name} {userProfile?.surname}
 							</span>
-							{team.captain?.userId === userProfile?.userId && <Crown size={12} className="text-accent shrink-0 fill-accent" />}
+							{team.captain?.id === userProfile?.id && <Crown size={12} className="text-accent shrink-0 fill-accent" />}
 						</div>
 						<span className="text-muted text-[10px] uppercase font-bold tracking-wider truncate">{position.name}</span>
 					</div>
@@ -99,7 +99,7 @@ function PositionWithUser({ position, userId, team, onPositionLeave, open = fals
 					isExpanded ? "max-h-96 opacity-100 border-t border-white/5" : "max-h-0 opacity-0 border-none"
 				}`}>
 				<div className="p-3 bg-black/20">
-					{(userProfile?.userId === userId || editable) && (
+					{(userProfile?.id === userId || editable) && (
 						<button
 							onClick={(e) => {
 								e.stopPropagation();

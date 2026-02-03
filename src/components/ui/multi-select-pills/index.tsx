@@ -20,9 +20,10 @@ export interface MultiSelectPillsProps {
 	onSelectedItemsChange: (items: string[]) => void;
 	disabled?: boolean;
 	optional?: boolean;
+	error?: string;
 }
 
-const MultiSelectPills = ({ label, helperText, options, selectedItems, onSelectedItemsChange, disabled = false, optional = false }: MultiSelectPillsProps) => {
+const MultiSelectPills = ({ label, helperText, options, selectedItems, onSelectedItemsChange, disabled = false, optional = false, error }: MultiSelectPillsProps) => {
 	const handleToggleItem = (itemValue: string) => {
 		if (disabled) return;
 
@@ -64,7 +65,11 @@ const MultiSelectPills = ({ label, helperText, options, selectedItems, onSelecte
 				})}
 			</div>
 
-			{helperText && <p className="mt-1.5 text-xs text-muted">{helperText}</p>}
+			{error ? (
+				<p className="mt-1.5 text-xs text-error">{error}</p>
+			) : (
+				helperText && <p className="mt-1.5 text-xs text-muted">{helperText}</p>
+			)}
 		</div>
 	);
 };

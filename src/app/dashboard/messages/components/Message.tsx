@@ -1,4 +1,4 @@
-import { ReactionPicker } from "@/components";
+import { EmojiPicker } from "@/components";
 import { addReaction } from "@/lib/api/messages";
 import { Message } from "@/lib/models/Messages";
 import { stringToColor } from "@/lib/utils/color";
@@ -23,12 +23,12 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 	const user = useAuth().userProfile;
 	const uknownUser = getUknownUser();
 	const queryClient = useQueryClient();
-	const [showReactionPicker, setShowReactionPicker] = useState(false);
+	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 	const [reactionError, setReactionError] = useState<string | null>(null);
 	const reactionTriggerRef = useRef<HTMLButtonElement>(null);
 
-	const currentUserMessage = message?.sender?.userId === user?.userId;
-	const currentUserId = user?.userId || "";
+	const currentUserMessage = message?.sender?.id === user?.id;
+	const currentUserId = user?.id || "";
 	const sender = message.sender ?? uknownUser;
 
 	const senderColor = stringToColor(sender.email || "default");
@@ -169,11 +169,11 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 					<div
 						className={clsx(
 							"absolute top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 bg-background/80 backdrop-blur-xs rounded-full border border-white/5 p-0.5 shadow-xs",
-							currentUserMessage ? "left-0 -translate-x-full mr-2" : "right-0 translate-x-full ml-2"
+							currentUserMessage ? "left-0 -translate-x-full mr-2" : "right-0 translate-x-full ml-2",
 						)}>
 						<button
 							ref={reactionTriggerRef}
-							onClick={() => setShowReactionPicker(!showReactionPicker)}
+							onClick={() => setShowEmojiPicker(!showEmojiPicker)}
 							className="p-1.5 rounded-full hover:bg-muted/20 text-muted-foreground hover:text-foreground transition-colors"
 							title="Add reaction">
 							<SmilePlus size={16} />
@@ -197,8 +197,8 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 					</div>
 
 					{/* Reaction picker */}
-					{showReactionPicker && (
-						<ReactionPicker triggerRef={reactionTriggerRef} onSelect={handleAddReaction} onClose={() => setShowReactionPicker(false)} />
+					{showEmojiPicker && (
+						<EmojiPicker triggerRef={reactionTriggerRef} onSelect={handleAddReaction} onClose={() => setShowEmojiPicker(false)} />
 					)}
 				</div>
 

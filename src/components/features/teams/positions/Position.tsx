@@ -1,24 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-    Plus,
-    X,
-    MoreHorizontal,
-    UserPlus,
-    Trash2
-} from "lucide-react";
-import { Loader } from "@/components/ui";
-import { usePosition } from "@/hooks/usePosition";
-import { useAuth } from "@/providers";
-import PositionWithUser from "./PositionWithUser";
-import { Position as PositionModel } from "@/lib/models/Position";
-import { Team } from "@/lib/models/Team";
-import { Modal } from "@/components/ui";
 import { UserSearch } from "@/components/features/users";
+import { Loader, Modal } from "@/components/ui";
+import { usePosition } from "@/hooks/usePosition";
 import { deletePosition } from "@/lib/api/positions";
 import { Unit } from "@/lib/models/EventBudget";
+import { Position as PositionModel } from "@/lib/models/Position";
+import { Team } from "@/lib/models/Team";
+import { UserProfile } from "@/lib/models/User";
+import { useAuth } from "@/providers";
+import { MoreHorizontal, Plus, Trash2, UserPlus } from "lucide-react";
+import { useState } from "react";
 import AuditPosition from "../../audit/components/AuditPosition";
+import PositionWithUser from "./PositionWithUser";
 
 type PositionProps = {
 	position: PositionModel;
@@ -30,18 +24,10 @@ type PositionProps = {
 	onPositionRemoved?: (positionId: string) => void;
 };
 
-function Position({
-	position: defaultPosition,
-	team,
-	open = false,
-	editable = false,
-	audit = false,
-	onPositionRemoved,
-}: PositionProps) {
+function Position({ position: defaultPosition, team, open = false, editable = false, audit = false, onPositionRemoved }: PositionProps) {
 	const { userProfile } = useAuth();
 
-	const { position, isLoading, assignPosition, takePosition, leavePosition } =
-		usePosition(defaultPosition, userProfile);
+	const { position, isLoading, assignPosition, takePosition, leavePosition } = usePosition(defaultPosition, userProfile);
 
 	const handlePayment = async () => {
 		// Implement payment logic here
@@ -51,9 +37,7 @@ function Position({
 
 	return (
 		<div className="relative group/position">
-			{isLoading && (
-				<Loader className="absolute inset-0 bg-black/55 rounded-xl z-50" />
-			)}
+			{isLoading && <Loader className="absolute inset-0 bg-black/55 rounded-xl z-50" />}
 			{position.eventParticipant?.userProfile ? (
 				audit ? (
 					<AuditPosition position={position} team={team} />
@@ -61,7 +45,7 @@ function Position({
 					<PositionWithUser
 						onPositionLeave={leavePosition}
 						position={position}
-						userId={userProfile?.userId!}
+						userId={userProfile?.id!}
 						editable={editable}
 						open={open}
 						team={team}
@@ -84,26 +68,17 @@ function Position({
 }
 
 type PositionMenuProps = {
-	position: any;
-	team: any;
+	position: PositionModel;
+	team: Team;
 	editable: boolean;
 	open: boolean;
 	takePosition: () => void;
 	handlePayment: () => void;
-	assignPosition: (user: any) => void;
+	assignPosition: (user: UserProfile) => void;
 	onPositionRemoved?: (positionId: string) => void;
 };
 
-const AvailablePosition = ({
-	position,
-	team,
-	editable,
-	open,
-	takePosition,
-	handlePayment,
-	assignPosition,
-	onPositionRemoved,
-}: PositionMenuProps) => {
+const AvailablePosition = ({ position, team, editable, open, takePosition, handlePayment, assignPosition, onPositionRemoved }: PositionMenuProps) => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 	const [isRemoving, setIsRemoving] = useState(false);
@@ -130,37 +105,24 @@ const AvailablePosition = ({
 				<div
 					tabIndex={0}
 					role="button"
-					className="p-3 rounded-xl bg-white/5 border border-white/5 w-full flex justify-between items-center cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all group-hover/position:border-white/10"
-				>
+					className="p-3 rounded-xl bg-white/5 border border-white/5 w-full flex justify-between items-center cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all group-hover/position:border-white/10">
 					<span className="text-gray-300 text-sm font-medium">{position.name}</span>
 					<div className="flex items-center gap-2">
-                        {(open || editable) && (
-                            <span className="text-muted text-[10px] uppercase font-bold tracking-wider">Available</span>
-                        )}
-                        <MoreHorizontal size={14} className="text-muted opacity-0 group-hover/position:opacity-100 transition-opacity" />
-                    </div>
+						{(open || editable) && <span className="text-muted text-[10px] uppercase font-bold tracking-wider">Available</span>}
+						<MoreHorizontal size={14} className="text-muted opacity-0 group-hover/position:opacity-100 transition-opacity" />
+					</div>
 				</div>
 
-				<ul
-					tabIndex={0}
-					className="dropdown-content z-1 menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-52 mt-1"
-				>
+				<ul tabIndex={0} className="dropdown-content z-1 menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-52 mt-1">
 					{!showRemoveConfirm ? (
 						<>
 							{/* Take position option for all users */}
 							<li>
 								<button
-									onClick={
-										team.event.budget?.payToJoin &&
-										team.event.registrationUnit === Unit.Individual
-											? handlePayment
-											: takePosition
-									}
-                                    className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2"
-								>
+									onClick={team.event.budget?.payToJoin && team.event.registrationUnit === Unit.Individual ? handlePayment : takePosition}
+									className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2">
 									<Plus size={14} />
-									{team.event.budget?.payToJoin &&
-									team.event.registrationUnit === Unit.Individual
+									{team.event.budget?.payToJoin && team.event.registrationUnit === Unit.Individual
 										? `Pay ${team.event.budget.cost} to join`
 										: "Take position"}
 								</button>
@@ -170,11 +132,8 @@ const AvailablePosition = ({
 							{editable && (
 								<>
 									<li>
-										<button 
-                                            onClick={() => setIsModalOpen(true)}
-                                            className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2"
-                                        >
-                                            <UserPlus size={14} /> Assign player
+										<button onClick={() => setIsModalOpen(true)} className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2">
+											<UserPlus size={14} /> Assign player
 										</button>
 									</li>
 									<li>
@@ -186,14 +145,11 @@ const AvailablePosition = ({
 												setShowRemoveConfirm(true);
 												// Keep dropdown open by refocusing
 												const dropdown = e.currentTarget.closest(".dropdown");
-												const trigger = dropdown?.querySelector(
-													'[tabindex="0"]',
-												) as HTMLElement;
+												const trigger = dropdown?.querySelector('[tabindex="0"]') as HTMLElement;
 												if (trigger) {
 													setTimeout(() => trigger.focus(), 0);
 												}
-											}}
-										>
+											}}>
 											<Trash2 size={14} /> Remove position
 										</button>
 									</li>
@@ -207,19 +163,12 @@ const AvailablePosition = ({
 								<span className="text-error text-xs font-bold">Remove position?</span>
 							</li>
 							<li>
-								<button
-									className="text-xs bg-red-500/10 text-error hover:bg-red-500/20"
-									onClick={handlePositionRemoval}
-									disabled={isRemoving}
-								>
+								<button className="text-xs bg-red-500/10 text-error hover:bg-red-500/20" onClick={handlePositionRemoval} disabled={isRemoving}>
 									{isRemoving ? "Removing..." : "Yes, remove"}
 								</button>
 							</li>
 							<li>
-								<button 
-                                    onClick={() => setShowRemoveConfirm(false)}
-                                    className="text-xs text-gray-400 hover:text-white"
-                                >
+								<button onClick={() => setShowRemoveConfirm(false)} className="text-xs text-gray-400 hover:text-white">
 									Cancel
 								</button>
 							</li>
@@ -229,14 +178,11 @@ const AvailablePosition = ({
 			</div>
 
 			{/* User Assignment Modal */}
-			<Modal
-				isLoading={false}
-				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-                title="Assign Player"
-			>
+			<Modal isLoading={false} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Assign Player">
 				<div className="p-4">
-                    <p className="text-sm text-muted mb-4">Select a player to assign to the <span className="text-white font-bold">{position.name}</span> position.</p>
+					<p className="text-sm text-muted mb-4">
+						Select a player to assign to the <span className="text-white font-bold">{position.name}</span> position.
+					</p>
 					<UserSearch onUserSelect={assignPosition} />
 				</div>
 			</Modal>

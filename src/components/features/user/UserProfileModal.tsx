@@ -1,10 +1,10 @@
 "use client";
 
 import { Button, Modal } from "@/components";
-import { UserProfile } from "@/lib/models/User";
 import { createChat } from "@/lib/api/messages";
+import { UserProfile } from "@/lib/models/User";
 import { stringToColor } from "@/lib/utils/color";
-import { ExternalLink, Mail, MessageSquare } from "lucide-react";
+import { ExternalLink, MessageSquare } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -39,10 +39,15 @@ export default function UserProfileModal({ user, isOpen, onClose, onChatCreated 
 
 	const handleViewProfile = () => {
 		onClose();
-		router.push(`/dashboard/profile/${user.userId}`);
+		router.push(`/dashboard/profile/${user.id}`);
 	};
 
-	const initials = (user.name || "?").split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+	const initials = (user.name || "?")
+		.split(" ")
+		.map((w) => w[0])
+		.join("")
+		.slice(0, 2)
+		.toUpperCase();
 	const bgColor = stringToColor(user.email || "default");
 
 	return (
@@ -52,10 +57,9 @@ export default function UserProfileModal({ user, isOpen, onClose, onChatCreated 
 				<div className="relative">
 					<div className="h-24 w-full bg-linear-to-r from-blue-900 to-purple-900 rounded-xl overflow-hidden opacity-80" />
 					<div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
-						<div 
+						<div
 							className="w-20 h-20 rounded-full border-4 border-[#141414] flex items-center justify-center overflow-hidden bg-[#141414]"
-							style={{ backgroundColor: !user.imageUrl ? bgColor : undefined }}
-						>
+							style={{ backgroundColor: !user.imageUrl ? bgColor : undefined }}>
 							{user.imageUrl ? (
 								<Image src={user.imageUrl} alt={user.name} fill className="object-cover" />
 							) : (
@@ -87,22 +91,20 @@ export default function UserProfileModal({ user, isOpen, onClose, onChatCreated 
 
 				{/* Actions */}
 				<div className="flex flex-col gap-2">
-					<Button 
-						onClick={handleCreateChat} 
+					<Button
+						onClick={handleCreateChat}
 						loading={isCreatingChat}
-						fullWidth 
+						fullWidth
 						leftIcon={<MessageSquare size={18} />}
-						className="bg-accent text-white hover:bg-accent/90"
-					>
+						className="bg-accent text-white hover:bg-accent/90">
 						Direct Message
 					</Button>
-					<Button 
-						onClick={handleViewProfile} 
-						fullWidth 
-						variant="ghost" 
+					<Button
+						onClick={handleViewProfile}
+						fullWidth
+						variant="ghost"
 						leftIcon={<ExternalLink size={18} />}
-						className="text-white hover:bg-white/10"
-					>
+						className="text-white hover:bg-white/10">
 						View Full Profile
 					</Button>
 				</div>

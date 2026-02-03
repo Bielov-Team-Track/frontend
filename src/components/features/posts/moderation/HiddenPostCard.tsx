@@ -3,6 +3,7 @@
 import { Avatar, Button } from "@/components/ui";
 import { useRestorePost } from "@/hooks/usePosts";
 import { Post } from "@/lib/models/Post";
+import { sanitizeHtmlWithSafeLinks } from "@/lib/utils/sanitize";
 import { formatDistanceToNow } from "date-fns";
 import { AlertTriangle, Eye, EyeOff, Flag, RefreshCw } from "lucide-react";
 import { useState } from "react";
@@ -81,7 +82,7 @@ export default function HiddenPostCard({ post, reportCount, isAdmin = false, onV
 				<div className="px-4 pb-4">
 					<div className="p-3 rounded-lg bg-white/5 border border-white/10">
 						<p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Hidden Content Preview</p>
-						<div className="prose prose-invert prose-sm max-w-none opacity-70" dangerouslySetInnerHTML={{ __html: post.content }} />
+						<div className="prose prose-invert prose-sm max-w-none opacity-70" dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithSafeLinks(post.content) }} />
 					</div>
 				</div>
 			)}

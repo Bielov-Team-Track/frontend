@@ -123,19 +123,21 @@ export const getFormattedTime = (date: Date | string) => {
 
 const isoDateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d*)?$/;
 
-function isIsoDateString(value: any): boolean {
-	return value && typeof value === "string" && isoDateFormat.test(value);
+function isIsoDateString(value: unknown): boolean {
+	return typeof value === "string" && isoDateFormat.test(value);
 }
 
-export function handleDates(body: any) {
+export function handleDates(body: unknown): unknown {
 	if (body === null || body === undefined || typeof body !== "object")
 		return body;
 
-	for (const key of Object.keys(body)) {
-		const value = body[key];
+	const record = body as Record<string, unknown>;
+	for (const key of Object.keys(record)) {
+		const value = record[key];
 
 		if (isIsoDateString(value)) {
-			body[key] = new Date(value);
+			record[key] = new Date(value as string);
 		} else if (typeof value === "object") handleDates(value);
 	}
+	return body;
 }

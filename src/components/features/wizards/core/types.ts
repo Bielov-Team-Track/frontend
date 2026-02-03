@@ -1,4 +1,5 @@
 import { FieldValues, UseFormReturn } from "react-hook-form";
+import type { ObjectSchema } from "yup";
 
 // Wizard context passed to determine conditional steps and behavior
 export interface WizardContext {
@@ -38,7 +39,7 @@ export interface WizardConfig<TData extends FieldValues> {
 	subtitle: string;
 	steps: WizardStep<TData>[];
 	defaultValues: TData;
-	validationSchema: any; // Yup schema
+	validationSchema: ObjectSchema<TData>;
 	onSubmit: (data: TData, context: WizardContext) => Promise<void>;
 	successConfig: WizardSuccessConfig;
 }

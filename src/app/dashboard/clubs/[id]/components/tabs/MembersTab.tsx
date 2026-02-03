@@ -1,8 +1,9 @@
 "use client";
 
 import { EditMemberModal, MemberRow } from "@/components/features/clubs";
-import { Avatar, Button, EmptyState, Input, Select } from "@/components/ui";
+import { Avatar, Button, EmptyState } from "@/components/ui";
 import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
+import { ListToolbar, StatusTabs } from "@/components/ui/list-toolbar";
 import Skeleton, { SkeletonAvatar } from "@/components/ui/skeleton";
 import {
 	getClubRegistrationsPaged,
@@ -14,10 +15,11 @@ import {
 } from "@/lib/api/clubs";
 import { ClubMember, ClubRegistration, ClubRole, RegistrationSortBy, RegistrationStatus } from "@/lib/models/Club";
 import { SortDirection } from "@/lib/models/filteringAndPagination";
+import { cn } from "@/lib/utils";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowDownUp, Calendar, Check, Clock, Filter, Loader2, Plus, RotateCcw, Search, UserCheck, UserMinus, UserPlus, Users, X } from "lucide-react";
+import { ArrowDownAZ, Calendar, Check, Clock, Loader2, Plus, RotateCcw, Search, UserCheck, UserMinus, UserPlus, Users, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -39,12 +41,12 @@ function useInfiniteScroll(fetchNextPage: () => void, hasNextPage: boolean | und
 						fetchNextPage();
 					}
 				},
-				{ threshold: 0.1, rootMargin: "100px" }
+				{ threshold: 0.1, rootMargin: "100px" },
 			);
 
 			observerRef.current.observe(node);
 		},
-		[fetchNextPage, hasNextPage, isFetchingNextPage]
+		[fetchNextPage, hasNextPage, isFetchingNextPage],
 	);
 
 	useEffect(() => {
@@ -74,46 +76,39 @@ export default function MembersTab({ members, clubId, currentUserRole, onInvite 
 		queryFn: () => getRegistrationStatusCounts(clubId),
 	});
 
+	// Build tabs for StatusTabs component
+	const tabs = [
+		{ id: "members", label: "Members", count: members.length, icon: <Users size={16} /> },
+		{ id: "registrations", label: "Pending", count: statusCounts?.pending, icon: <UserPlus size={16} /> },
+		{ id: "waitlist", label: "Waitlist", count: statusCounts?.waitlist, icon: <UserCheck size={16} /> },
+		{ id: "declined", label: "Declined", count: statusCounts?.declined, icon: <UserMinus size={16} /> },
+	];
+
 	return (
-		<div className="flex flex-col gap-6">
-			{/* Horizontal Tabs Navigation */}
-			<nav
-				role="tablist"
-				aria-label="Member categories"
-				className="flex gap-1 p-1 bg-white/5 rounded-xl border border-white/10 overflow-x-auto scrollbar-none">
-				<TabButton active={activeSubTab === "members"} onClick={() => setActiveSubTab("members")} icon={Users} label="Members" count={members.length} />
-				<TabButton
-					active={activeSubTab === "registrations"}
-					onClick={() => setActiveSubTab("registrations")}
-					icon={UserPlus}
-					label="Registrations"
-					count={statusCounts?.pending}
-				/>
-				<TabButton
-					active={activeSubTab === "waitlist"}
-					onClick={() => setActiveSubTab("waitlist")}
-					icon={UserCheck}
-					label="Waitlist"
-					count={statusCounts?.waitlist}
-				/>
-				<TabButton
-					active={activeSubTab === "declined"}
-					onClick={() => setActiveSubTab("declined")}
-					icon={UserMinus}
-					label="Declined"
-					count={statusCounts?.declined}
-				/>
-			</nav>
+		<div className="flex flex-col gap-4 h-full">
+			{/* Header Row: Title + Invite Button */}
+			<div className="flex items-center justify-between shrink-0">
+				<h2 className="text-lg font-semibold text-foreground">Members</h2>
+				<Button variant="outline" onClick={onInvite} leftIcon={<Plus size={16} />}>
+					Invite
+				</Button>
+			</div>
+
+			{/* Status Tabs */}
+			<div className="shrink-0">
+				<StatusTabs tabs={tabs} activeTab={activeSubTab} onTabChange={(id) => setActiveSubTab(id as SubTab)} />
+			</div>
 
 			{/* Main Content */}
-			<main className="flex-1 min-w-0" role="tabpanel" aria-label={`${activeSubTab} content`}>
+			<main className="flex-1 min-h-0" role="tabpanel" aria-label={`${activeSubTab} content`}>
 				<AnimatePresence mode="wait">
 					<motion.div
 						key={activeSubTab}
 						initial={{ opacity: 0, y: 10 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -10 }}
-						transition={{ duration: 0.15 }}>
+						transition={{ duration: 0.15 }}
+						className="h-full">
 						{activeSubTab === "members" && <MembersList members={members} clubId={clubId} currentUserRole={currentUserRole} onInvite={onInvite} />}
 						{activeSubTab === "registrations" && <RegistrationsList clubId={clubId} status={RegistrationStatus.Pending} />}
 						{activeSubTab === "waitlist" && <RegistrationsList clubId={clubId} status={RegistrationStatus.Waitlist} />}
@@ -125,61 +120,30 @@ export default function MembersTab({ members, clubId, currentUserRole, onInvite 
 	);
 }
 
-interface TabButtonProps {
-	active: boolean;
-	onClick: () => void;
-	icon: React.ComponentType<{ size?: number; className?: string }>;
-	label: string;
-	count?: number;
-}
+// --- Members List ---
 
-function TabButton({ active, onClick, icon: Icon, label, count }: TabButtonProps) {
-	return (
-		<button
-			onClick={onClick}
-			role="tab"
-			aria-selected={active}
-			aria-controls={`${label.toLowerCase()}-panel`}
-			className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
-				active ? "bg-neutral-700 text-white shadow-md shadow-neutral-800" : "text-muted hover:text-white hover:bg-white/5"
-			}`}>
-			<Icon size={16} className={active ? "text-white" : "text-muted"} />
-			<span>{label}</span>
-			{count !== undefined && (
-				<span
-					className={`min-w-5 h-5 flex items-center justify-center text-xs rounded-full px-1.5 ${
-						active ? "bg-white/20 text-white" : "bg-white/10 text-muted"
-					}`}>
-					{count}
-				</span>
-			)}
-		</button>
-	);
-}
-
-// --- Members List (Existing Logic) ---
-
-// Sort options for members dropdown
-const memberSortOptions = [
-	{ value: "joinedAt", label: "Joined Date" },
-	{ value: "name", label: "Name" },
-	{ value: "role", label: "Role" },
+// Sort options for members
+const MEMBER_SORT_OPTIONS = [
+	{ value: "joined-desc", label: "Newest First", icon: <Clock size={14} /> },
+	{ value: "joined-asc", label: "Oldest First", icon: <Clock size={14} /> },
+	{ value: "name-asc", label: "Name (A-Z)", icon: <ArrowDownAZ size={14} /> },
 ];
 
-const memberDirectionOptions = [
-	{ value: SortDirection.Descending, label: "Newest First" },
-	{ value: SortDirection.Ascending, label: "Oldest First" },
+// Role filter options
+const ROLE_FILTERS = [
+	{ value: "all", label: "All Roles" },
+	{ value: "Owner", label: "Owner" },
+	{ value: "Admin", label: "Admin" },
+	{ value: "Coach", label: "Coach" },
+	{ value: "Member", label: "Member" },
 ];
 
 function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabProps) {
 	const [editingMember, setEditingMember] = useState<ClubMember | null>(null);
 	const [removingMember, setRemovingMember] = useState<ClubMember | null>(null);
 	const [search, setSearch] = useState("");
-	const [sortBy, setSortBy] = useState<string>("joinedAt");
-	const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Descending);
-	const [dateFrom, setDateFrom] = useState("");
-	const [dateTo, setDateTo] = useState("");
-	const [showFilters, setShowFilters] = useState(false);
+	const [sortBy, setSortBy] = useState<string>("joined-desc");
+	const [roleFilter, setRoleFilter] = useState<string>("all");
 
 	const queryClient = useQueryClient();
 
@@ -207,13 +171,10 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 	};
 
 	const clearFilters = () => {
-		setDateFrom("");
-		setDateTo("");
-		setSortBy("joinedAt");
-		setSortDirection(SortDirection.Descending);
+		setRoleFilter("all");
 	};
 
-	const hasActiveFilters = dateFrom || dateTo || sortBy !== "joinedAt" || sortDirection !== SortDirection.Descending;
+	const activeFilterCount = roleFilter !== "all" ? 1 : 0;
 
 	// Filter and sort members
 	const filteredMembers = members
@@ -227,134 +188,67 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 					return false;
 				}
 			}
-			// Date filters
-			if (dateFrom && member.joinedAt) {
-				if (new Date(member.joinedAt) < new Date(dateFrom)) return false;
-			}
-			if (dateTo && member.joinedAt) {
-				if (new Date(member.joinedAt) > new Date(dateTo)) return false;
+			// Role filter
+			if (roleFilter !== "all" && member.role !== roleFilter) {
+				return false;
 			}
 			return true;
 		})
 		.sort((a, b) => {
-			let comparison = 0;
 			switch (sortBy) {
-				case "name":
-					comparison = getMemberDisplayName(a).localeCompare(getMemberDisplayName(b));
-					break;
-				case "role":
-					comparison = (a.role || "").localeCompare(b.role || "");
-					break;
-				case "joinedAt":
+				case "name-asc":
+					return getMemberDisplayName(a).localeCompare(getMemberDisplayName(b));
+				case "joined-asc":
+					return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+				case "joined-desc":
 				default:
-					comparison = new Date(a.joinedAt || 0).getTime() - new Date(b.joinedAt || 0).getTime();
-					break;
+					return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
 			}
-			return sortDirection === SortDirection.Ascending ? comparison : -comparison;
 		});
 
-	return (
-		<div className="space-y-4">
-			{/* Header with search and filters */}
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-				<div>
-					<h3 className="text-lg font-bold text-white">Club Members</h3>
-					<p className="text-sm text-muted mt-0.5">
-						{filteredMembers.length} member{filteredMembers.length !== 1 ? "s" : ""}
-						{filteredMembers.length !== members.length && ` (filtered from ${members.length})`}
-					</p>
-				</div>
-				<div className="flex items-center gap-2 w-full sm:w-auto">
-					<div className="flex-1 sm:flex-initial sm:w-64">
-						<Input
-							placeholder="Search by name or email..."
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
-							leftIcon={<Search size={16} />}
-							aria-label="Search members"
-						/>
-					</div>
-					<Button
-						variant={"ghost"}
-						className="relative"
-						onClick={() => setShowFilters(!showFilters)}
-						leftIcon={<Filter size={16} />}
-						aria-expanded={showFilters}
-						aria-controls="member-filter-panel">
-						{hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-accent absolute -top-0.5 -right-0.5" />}
-						Filters
-					</Button>
-					<Button variant="outline" size={"sm"} onClick={onInvite} leftIcon={<Plus size={16} />}>
-						Invite
-					</Button>
-				</div>
+	// Filter content for ListToolbar
+	const filterContent = (
+		<div className="space-y-2">
+			<p className="text-xs font-medium text-muted-foreground">Role</p>
+			<div className="flex flex-wrap gap-2">
+				{ROLE_FILTERS.map((filter) => (
+					<button
+						key={filter.value}
+						type="button"
+						onClick={() => setRoleFilter(filter.value)}
+						className={cn(
+							"px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
+							roleFilter === filter.value
+								? "bg-foreground/10 text-foreground border-foreground/30"
+								: "bg-card/50 text-muted-foreground border-border hover:bg-card hover:text-foreground hover:border-foreground/20"
+						)}>
+						{filter.label}
+					</button>
+				))}
 			</div>
+		</div>
+	);
 
-			{/* Collapsible Filter Panel */}
-			<AnimatePresence>
-				{showFilters && (
-					<motion.div
-						id="member-filter-panel"
-						initial={{ opacity: 0, y: -10 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -10 }}
-						transition={{ duration: 0.2 }}
-						className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
-						<div className="flex h-7 items-center justify-between">
-							<span className="text-sm font-medium text-white">Filter Options</span>
-							{hasActiveFilters && (
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={clearFilters}
-									leftIcon={<RotateCcw size={14} />}
-									className="text-muted hover:text-white">
-									Clear All
-								</Button>
-							)}
-						</div>
+	return (
+		<div className="flex flex-col gap-4 h-full">
+			{/* Toolbar */}
+			<ListToolbar
+				search={search}
+				onSearchChange={setSearch}
+				searchPlaceholder="Search by name or email..."
+				sortOptions={MEMBER_SORT_OPTIONS}
+				sortBy={sortBy}
+				onSortChange={setSortBy}
+				filterContent={filterContent}
+				activeFilterCount={activeFilterCount}
+				onClearFilters={clearFilters}
+				count={filteredMembers.length}
+				itemLabel="member"
+				showViewToggle={false}
+			/>
 
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-							{/* Date From */}
-							<Input
-								type="date"
-								inlineLabel="From Date"
-								value={dateFrom}
-								onChange={(e) => setDateFrom(e.target.value)}
-								leftIcon={<Calendar size={16} />}
-							/>
-
-							{/* Date To */}
-							<Input
-								type="date"
-								inlineLabel="To Date"
-								value={dateTo}
-								onChange={(e) => setDateTo(e.target.value)}
-								leftIcon={<Calendar size={16} />}
-							/>
-
-							{/* Sort By */}
-							<Select
-								inlineLabel="Sort By"
-								options={memberSortOptions}
-								value={sortBy}
-								onChange={(val) => setSortBy(val)}
-								leftIcon={<ArrowDownUp size={16} />}
-							/>
-
-							{/* Sort Direction */}
-							<Select
-								inlineLabel="Order"
-								options={memberDirectionOptions}
-								value={sortDirection}
-								onChange={(val) => setSortDirection(val as SortDirection)}
-								leftIcon={<Clock size={16} />}
-							/>
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
-
+			{/* Content Area */}
+			<div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
 			{members.length === 0 ? (
 				<EmptyState
 					icon={UserPlus}
@@ -370,15 +264,21 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 				<EmptyState
 					icon={Search}
 					title="No members found"
-					description={search || hasActiveFilters ? "Try adjusting your filters or search terms." : "No members match your criteria."}
+					description={search || activeFilterCount > 0 ? "Try adjusting your filters or search terms." : "No members match your criteria."}
 					action={
-						hasActiveFilters
+						activeFilterCount > 0
 							? {
 									label: "Clear Filters",
 									onClick: clearFilters,
 									icon: RotateCcw,
-							  }
-							: undefined
+								}
+							: search
+								? {
+										label: "Clear Search",
+										onClick: () => setSearch(""),
+										icon: Search,
+									}
+								: undefined
 					}
 				/>
 			) : (
@@ -409,6 +309,7 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 					</table>
 				</div>
 			)}
+			</div>
 
 			<EditMemberModal
 				isOpen={!!editingMember}
@@ -436,22 +337,18 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 	);
 }
 
-// --- Registrations List (New Logic) ---
+// --- Registrations List ---
 
 interface RegistrationsListProps {
 	clubId: string;
 	status: RegistrationStatus;
 }
 
-// Sort options for dropdown
-const sortOptions = [
-	{ value: RegistrationSortBy.SubmittedAt, label: "Submitted Date" },
-	{ value: RegistrationSortBy.UserName, label: "Name" },
-];
-
-const directionOptions = [
-	{ value: SortDirection.Descending, label: "Newest First" },
-	{ value: SortDirection.Ascending, label: "Oldest First" },
+// Sort options for registrations
+const REGISTRATION_SORT_OPTIONS = [
+	{ value: "submitted-desc", label: "Newest First", icon: <Clock size={14} /> },
+	{ value: "submitted-asc", label: "Oldest First", icon: <Clock size={14} /> },
+	{ value: "name-asc", label: "Name (A-Z)", icon: <ArrowDownAZ size={14} /> },
 ];
 
 // Loading skeleton for registration cards
@@ -475,22 +372,20 @@ function RegistrationCardSkeleton() {
 
 function RegistrationsList({ clubId, status }: RegistrationsListProps) {
 	const [search, setSearch] = useState("");
-	const [sortBy, setSortBy] = useState<RegistrationSortBy>(RegistrationSortBy.SubmittedAt);
-	const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Descending);
-	const [dateFrom, setDateFrom] = useState("");
-	const [dateTo, setDateTo] = useState("");
-	const [showFilters, setShowFilters] = useState(false);
+	const [sortBy, setSortBy] = useState<string>("submitted-desc");
+
+	// Convert sortBy to API params
+	const apiSortBy = sortBy.startsWith("name") ? RegistrationSortBy.UserName : RegistrationSortBy.SubmittedAt;
+	const apiSortDirection = sortBy.endsWith("-asc") ? SortDirection.Ascending : SortDirection.Descending;
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
-		queryKey: ["club-registrations", clubId, status, search, sortBy, sortDirection, dateFrom, dateTo],
+		queryKey: ["club-registrations", clubId, status, search, apiSortBy, apiSortDirection],
 		queryFn: ({ pageParam }) =>
 			getClubRegistrationsPaged(clubId, {
 				status,
 				search,
-				sortBy,
-				sortDirection,
-				submittedFrom: dateFrom || undefined,
-				submittedTo: dateTo || undefined,
+				sortBy: apiSortBy,
+				sortDirection: apiSortDirection,
 				cursor: pageParam as string | undefined,
 				limit: 20,
 			}),
@@ -515,15 +410,6 @@ function RegistrationsList({ clubId, status }: RegistrationsListProps) {
 		statusMutation.mutate({ id, status: newStatus });
 	};
 
-	const clearFilters = () => {
-		setDateFrom("");
-		setDateTo("");
-		setSortBy(RegistrationSortBy.SubmittedAt);
-		setSortDirection(SortDirection.Descending);
-	};
-
-	const hasActiveFilters = dateFrom || dateTo || sortBy !== RegistrationSortBy.SubmittedAt || sortDirection !== SortDirection.Descending;
-
 	const registrations = data?.pages.flatMap((page) => page.items ?? []).filter((item): item is ClubRegistration => item != null) || [];
 
 	const statusLabels: Record<RegistrationStatus, string> = {
@@ -534,163 +420,82 @@ function RegistrationsList({ clubId, status }: RegistrationsListProps) {
 	};
 
 	return (
-		<div className="space-y-4">
-			{/* Header with search and filters */}
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-				<div>
-					<h3 className="text-lg font-bold text-white">{statusLabels[status]} Registrations</h3>
-					<p className="text-sm text-muted mt-0.5">
-						{isLoading ? "Loading..." : `${registrations.length} registration${registrations.length !== 1 ? "s" : ""}`}
-					</p>
-				</div>
-				<div className="flex items-center gap-2 w-full sm:w-auto">
-					<div className="flex-1 sm:flex-initial sm:w-64">
-						<Input
-							placeholder="Search by name or email..."
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
-							leftIcon={<Search size={16} />}
-							aria-label="Search registrations"
-						/>
-					</div>
-					<Button
-						variant={"ghost"}
-						className="relative"
-						onClick={() => setShowFilters(!showFilters)}
-						leftIcon={<Filter size={16} />}
-						aria-expanded={showFilters}
-						aria-controls="filter-panel">
-						{hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-accent absolute -top-0.5 -right-0.5" />}
-						Filters
-					</Button>
-				</div>
-			</div>
+		<div className="flex flex-col gap-4 h-full">
+			{/* Toolbar */}
+			<ListToolbar
+				search={search}
+				onSearchChange={setSearch}
+				searchPlaceholder="Search by name or email..."
+				sortOptions={REGISTRATION_SORT_OPTIONS}
+				sortBy={sortBy}
+				onSortChange={setSortBy}
+				count={isLoading ? 0 : registrations.length}
+				itemLabel="registration"
+				showViewToggle={false}
+			/>
 
-			{/* Collapsible Filter Panel */}
-			<AnimatePresence>
-				{showFilters && (
-					<motion.div
-						id="filter-panel"
-						initial={{ opacity: 0, y: -10 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -10 }}
-						transition={{ duration: 0.2 }}
-						className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
-						<div className="flex h-7 items-center justify-between">
-							<span className="text-sm font-medium text-white">Filter Options</span>
-							{hasActiveFilters && (
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={clearFilters}
-									leftIcon={<RotateCcw size={14} />}
-									className="text-muted hover:text-white">
-									Clear All
-								</Button>
-							)}
-						</div>
-
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-							{/* Date From */}
-							<Input
-								type="date"
-								inlineLabel="From Date"
-								value={dateFrom}
-								onChange={(e) => setDateFrom(e.target.value)}
-								leftIcon={<Calendar size={16} />}
-							/>
-
-							{/* Date To */}
-							<Input
-								type="date"
-								inlineLabel="To Date"
-								value={dateTo}
-								onChange={(e) => setDateTo(e.target.value)}
-								leftIcon={<Calendar size={16} />}
-							/>
-
-							{/* Sort By */}
-							<Select
-								inlineLabel="Sort By"
-								options={sortOptions}
-								value={sortBy}
-								onChange={(val) => setSortBy(val as RegistrationSortBy)}
-								leftIcon={<ArrowDownUp size={16} />}
-							/>
-
-							{/* Sort Direction */}
-							<Select
-								inlineLabel="Order"
-								options={directionOptions}
-								value={sortDirection}
-								onChange={(val) => setSortDirection(val as SortDirection)}
-								leftIcon={<Clock size={16} />}
-							/>
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
-
-			{/* Loading State with Skeletons */}
-			{isLoading && registrations.length === 0 ? (
-				<div className="space-y-2" role="status" aria-label="Loading registrations">
-					{[...Array(5)].map((_, i) => (
-						<RegistrationCardSkeleton key={i} />
-					))}
-				</div>
-			) : registrations.length === 0 ? (
-				<EmptyState
-					icon={UserPlus}
-					title="No registrations found"
-					description={
-						search || hasActiveFilters
-							? "Try adjusting your filters or search terms."
-							: `No ${statusLabels[status].toLowerCase()} registrations yet.`
-					}
-					action={
-						hasActiveFilters
-							? {
-									label: "Clear Filters",
-									onClick: clearFilters,
-									icon: RotateCcw,
-							  }
-							: undefined
-					}
-				/>
-			) : (
-				<div className="space-y-2" role="list" aria-label={`${statusLabels[status]} registrations list`}>
-					<AnimatePresence mode="popLayout">
-						{registrations.map((reg, index) => (
-							<motion.div
-								key={reg.id}
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, scale: 0.95 }}
-								transition={{ duration: 0.2, delay: index * 0.03 }}
-								layout>
-								<RegistrationCard
-									registration={reg}
-									clubId={clubId}
-									onStatusChange={handleStatusChange}
-									isUpdating={statusMutation.isPending}
-									updatingId={statusMutation.variables?.id}
-								/>
-							</motion.div>
+			{/* Content Area */}
+			<div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
+				{isLoading && registrations.length === 0 ? (
+					<div className="space-y-2" role="status" aria-label="Loading registrations">
+						{[...Array(5)].map((_, i) => (
+							<RegistrationCardSkeleton key={i} />
 						))}
-					</AnimatePresence>
-
-					{/* Infinite Scroll Trigger */}
-					<div ref={loadMoreRef} className="h-12 flex items-center justify-center">
-						{isFetchingNextPage && (
-							<div className="flex items-center gap-2 text-muted">
-								<Loader2 className="w-5 h-5 animate-spin" />
-								<span className="text-sm">Loading more...</span>
-							</div>
-						)}
-						{!hasNextPage && registrations.length > 0 && <span className="text-xs text-muted">All registrations loaded</span>}
 					</div>
-				</div>
-			)}
+				) : registrations.length === 0 ? (
+					<EmptyState
+						icon={UserPlus}
+						title="No registrations found"
+						description={
+							search
+								? "Try adjusting your search terms."
+								: `No ${statusLabels[status].toLowerCase()} registrations yet.`
+						}
+						action={
+							search
+								? {
+										label: "Clear Search",
+										onClick: () => setSearch(""),
+										icon: Search,
+									}
+								: undefined
+						}
+					/>
+				) : (
+					<div className="space-y-2 pb-4" role="list" aria-label={`${statusLabels[status]} registrations list`}>
+						<AnimatePresence mode="popLayout">
+							{registrations.map((reg, index) => (
+								<motion.div
+									key={reg.id}
+									initial={{ opacity: 0, y: 20 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, scale: 0.95 }}
+									transition={{ duration: 0.2, delay: index * 0.03 }}
+									layout>
+									<RegistrationCard
+										registration={reg}
+										clubId={clubId}
+										onStatusChange={handleStatusChange}
+										isUpdating={statusMutation.isPending}
+										updatingId={statusMutation.variables?.id}
+									/>
+								</motion.div>
+							))}
+						</AnimatePresence>
+
+						{/* Infinite Scroll Trigger */}
+						<div ref={loadMoreRef} className="h-12 flex items-center justify-center">
+							{isFetchingNextPage && (
+								<div className="flex items-center gap-2 text-muted">
+									<Loader2 className="w-5 h-5 animate-spin" />
+									<span className="text-sm">Loading more...</span>
+								</div>
+							)}
+							{!hasNextPage && registrations.length > 0 && <span className="text-xs text-muted">All registrations loaded</span>}
+						</div>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }

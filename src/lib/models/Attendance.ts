@@ -1,9 +1,10 @@
 export enum AttendanceStatus {
-    Invited = 0,
-    Accepted = 1,
-    Declined = 2,
-    Attended = 3,
-    NoShow = 4,
+    Invited = "Invited",
+    Waitlisted = "Waitlisted",
+    Accepted = "Accepted",
+    Declined = "Declined",
+    Attended = "Attended",
+    NoShow = "NoShow",
 }
 
 export enum PaymentStatus {
@@ -49,6 +50,7 @@ export interface AttendanceFilter {
     organizerId?: string;
     groupId?: string;
     teamId?: string;
+    seriesId?: string;
     startDate: string;
     endDate: string;
 }

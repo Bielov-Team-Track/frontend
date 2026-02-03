@@ -1,12 +1,11 @@
 "use client";
 
 import { Loader } from "@/components/ui";
-import { Club, Group, Team } from "@/lib/models/Club";
 import { Event } from "@/lib/models/Event";
 import { useClub } from "@/providers";
 import React from "react";
 import { ContextIndicator } from "./components/ContextIndicator";
-import ContextSelector from "./components/ContextSelector";
+import ContextSelector, { ContextSelection } from "./components/ContextSelector";
 import { NavigationButtons } from "./components/NavigationButtons";
 import { ProgressIndicator } from "./components/ProgressIndicator";
 import { StepRenderer } from "./components/StepRenderer";
@@ -41,11 +40,11 @@ function CreateEventFormContent({ onClearContext, onChageContext }: CreateEventF
 	);
 }
 
-function CreateEventForm({ event, variant, context }: CreateEventFormProps) {
-	const [defaultContext, setDefaultContext] = React.useState<Club | Group | Team | null | undefined>(context);
+function CreateEventForm({ event, variant, contextSelection, onSuccess }: CreateEventFormProps) {
+	const [selection, setSelection] = React.useState<ContextSelection | undefined>(contextSelection);
 	const clubs = useClub().clubs;
 
-	const showContextSelector = defaultContext === undefined && clubs && clubs.length > 0;
+	const showContextSelector = selection === undefined && clubs && clubs.length > 0;
 
 	const variants = {
 		default: "relative bg-card/50 border border-white/10 rounded-3xl p-8 shadow-lg",
@@ -55,8 +54,8 @@ function CreateEventForm({ event, variant, context }: CreateEventFormProps) {
 	const containerClasses = variants[variant || "default"];
 
 	return (
-		<EventFormProvider event={event} context={defaultContext}>
-			<div className="w-full max-w-3xl mx-auto py-8 px-4 text-white">
+		<EventFormProvider event={event} contextSelection={selection} onSuccess={onSuccess}>
+			<div className="w-full max-w-3xl mx-auto py-8 px-4 text-white" data-testid="create-event-form">
 				{/* Header */}
 				{variant !== "embedded" && (
 					<div className="mb-10 text-center">
@@ -73,9 +72,9 @@ function CreateEventForm({ event, variant, context }: CreateEventFormProps) {
 					{/* Decorative Gradient Blob */}
 					<div className="absolute -top-20 -right-20 w-60 h-60 bg-accent/15 rounded-full blur-[100px] pointer-events-none" />
 					{!showContextSelector ? (
-						<CreateEventFormContent onChageContext={() => setDefaultContext(undefined)} onClearContext={() => setDefaultContext(null)} />
+						<CreateEventFormContent onChageContext={() => setSelection(undefined)} onClearContext={() => setSelection(null)} />
 					) : (
-						<ContextSelector clubs={clubs} onSelect={(ctx) => setDefaultContext(ctx)} />
+						<ContextSelector clubs={clubs} onSelect={(sel) => setSelection(sel)} />
 					)}
 				</div>
 			</div>
@@ -85,9 +84,9 @@ function CreateEventForm({ event, variant, context }: CreateEventFormProps) {
 
 type CreateEventFormProps = {
 	event?: Event;
-	availalbeClubs?: Club[];
 	variant?: "default" | "embedded";
-	context?: Club | Group | Team | undefined;
+	contextSelection?: ContextSelection;
+	onSuccess?: () => void;
 } & React.PropsWithChildren;
 
 export default CreateEventForm;

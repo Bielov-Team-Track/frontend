@@ -1,4 +1,5 @@
 import { EventBudget as EventPaymentsConfig, Unit } from "./EventBudget";
+import { ContextType } from "./shared/models";
 import { Team } from "./Team";
 
 export enum EventType {
@@ -63,6 +64,10 @@ export interface Event {
 	// Recurring event series
 	seriesId?: string;
 	seriesOccurrenceNumber?: number;
+
+	// Context association (club, team, or group)
+	contextId?: string;
+	contextType?: ContextType;
 }
 
 export interface EventAdmin {}
@@ -79,6 +84,8 @@ export interface EventFilterRequest {
 	limit?: number; // Number of items per page (default: 20)
 	sortBy?: "startDate" | "createdAt"; // Sort field
 	sortOrder?: "asc" | "desc"; // Sort order (default: asc)
+	contextId?: string; // Filter by context (club, team, group)
+	contextType?: ContextType; // Type of context
 }
 
 export interface CreateEvent {
@@ -94,6 +101,9 @@ export interface CreateEvent {
 	eventFormat: EventFormat;
 	registrationConfig?: RegistrationConfig;
 	paymentsConfig?: EventPaymentsConfig;
+
+	contextType?: ContextType;
+	contextId?: string;
 }
 
 export interface Location {
@@ -169,6 +179,8 @@ export interface CreateEventSeries {
 	paymentsConfig?: EventPaymentsConfig;
 	registrationOpenOffset?: TimeOffset;
 	registrationDeadlineOffset?: TimeOffset;
+	contextType?: ContextType;
+	contextId?: string;
 }
 
 export interface EventSeries {

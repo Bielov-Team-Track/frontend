@@ -36,7 +36,7 @@ export function InvitePeopleStep({
 		try {
 			const results = await searchUsers(value);
 			// Filter out already selected users
-			const filtered = results.filter((user) => !selectedUsers.some((s) => s.userId === user.userId));
+			const filtered = results.filter((user) => !selectedUsers.some((s) => s.id === user.userId));
 			setSearchResults(filtered);
 		} finally {
 			setIsSearching(false);
@@ -67,7 +67,7 @@ export function InvitePeopleStep({
 				<div className="border border-border rounded-lg max-h-50 overflow-y-auto">
 					{searchResults.map((user) => (
 						<button
-							key={user.userId}
+							key={user.id}
 							type="button"
 							onClick={() => handleSelect(user)}
 							className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors text-left">
@@ -90,14 +90,14 @@ export function InvitePeopleStep({
 					<label className="text-sm font-medium text-muted-foreground">Selected ({selectedUsers.length})</label>
 					<div className="flex flex-wrap gap-2">
 						{selectedUsers.map((user) => (
-							<div key={user.userId} className="flex items-center gap-2 bg-muted/50 rounded-full pl-1 pr-2 py-1">
+							<div key={user.id} className="flex items-center gap-2 bg-muted/50 rounded-full pl-1 pr-2 py-1">
 								<Avatar src={user.imageUrl} name={user.name + " " + user.surname} variant="user" size="xs" />
 								<span className="text-sm">
 									{user.name} {user.surname}
 								</span>
 								<button
 									type="button"
-									onClick={() => onUserRemove(user.userId!)}
+									onClick={() => onUserRemove(user.id!)}
 									className="text-muted-foreground hover:text-destructive transition-colors">
 									<X size={14} />
 								</button>

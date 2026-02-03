@@ -60,7 +60,7 @@ export function EventDetailsStep() {
 	} = form;
 
 	return (
-		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300" data-testid="event-details-step">
 			<div className="border-b-2 pb-4">
 				<h2 className="text-xl font-bold text-white mb-1">Event Details</h2>
 				<p className="text-muted text-sm">Let&apos;s start with the basic information about your event.</p>
@@ -71,7 +71,7 @@ export function EventDetailsStep() {
 					name="name"
 					control={control}
 					render={({ field }) => (
-						<Input {...field} label="Name" placeholder="e.g., Sunday Beach Volleyball Tournament" error={errors.name?.message} required />
+						<Input {...field} label="Name" placeholder="e.g., Sunday Beach Volleyball Tournament" error={errors.name?.message} required data-testid="event-name-input" />
 					)}
 				/>
 
@@ -87,6 +87,7 @@ export function EventDetailsStep() {
 							showCharCount
 							minRows={4}
 							optional
+							data-testid="event-description-input"
 						/>
 					)}
 				/>
@@ -101,6 +102,7 @@ export function EventDetailsStep() {
 								onChange={onChange}
 								label="Public Event"
 								helperText="Public events are visible to non-members and can be found via search."
+								data-testid="event-public-checkbox"
 							/>
 						)}
 					/>
@@ -117,6 +119,7 @@ export function EventDetailsStep() {
 							onChange={field.onChange}
 							error={errors.type?.message}
 							columns={2}
+							data-testid="event-type-selector"
 						/>
 					)}
 				/>
@@ -132,6 +135,7 @@ export function EventDetailsStep() {
 							onChange={field.onChange}
 							error={errors.surface?.message}
 							columns={3}
+							data-testid="event-surface-selector"
 						/>
 					)}
 				/>

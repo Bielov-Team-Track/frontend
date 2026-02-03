@@ -46,25 +46,23 @@ export async function deletePost(postId: string): Promise<void> {
 }
 
 // Media
-export async function getUploadUrl(fileType: string, fileName: string, fileSize: number): Promise<UploadUrlResponse> {
+export async function getUploadUrl(contentType: string, fileName: string, fileSize: number): Promise<UploadUrlResponse> {
 	const response = await client.post<UploadUrlResponse>(`${PREFIX}/media/upload-url`, {
-		fileType,
+		contentType,
 		fileName,
 		fileSize,
 	});
 	return response.data;
 }
 
-export async function confirmUpload(mediaId: string): Promise<void> {
-	await client.post(`${PREFIX}/media/${mediaId}/confirm`);
-}
+// Note: No confirmUpload function - media is confirmed internally when creating a post
 
-export async function uploadFileToS3(uploadUrl: string, file: File): Promise<void> {
+export async function uploadFileToS3(uploadUrl: string, file: File, contentType?: string): Promise<void> {
 	await fetch(uploadUrl, {
 		method: "PUT",
 		body: file,
 		headers: {
-			"Content-Type": file.type,
+			"Content-Type": contentType || file.type || "application/octet-stream",
 		},
 	});
 }

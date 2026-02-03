@@ -1,7 +1,7 @@
 import { Input, Loader } from "@/components";
 import { useDebounce } from "@/hooks/useDebounce";
-import { UserProfile } from "@/lib/models/User";
 import { searchUsers as searchUsersAPI } from "@/lib/api/user";
+import { UserProfile } from "@/lib/models/User";
 import { stringToColor } from "@/lib/utils/color";
 import { Check, Search, X } from "lucide-react";
 import Image from "next/image";
@@ -47,10 +47,10 @@ const UserSelector = ({ selectedUsers, onSelectedUsersChange, excludedUserIds = 
 	};
 
 	const toggleUser = (user: UserProfile) => {
-		const isSelected = selectedUsers.some((u) => u.userId === user.userId);
+		const isSelected = selectedUsers.some((u) => u.id === user.id);
 
 		if (isSelected) {
-			onSelectedUsersChange(selectedUsers.filter((u) => u.userId !== user.userId));
+			onSelectedUsersChange(selectedUsers.filter((u) => u.id !== user.id));
 		} else {
 			onSelectedUsersChange([...selectedUsers, user]);
 		}
@@ -58,18 +58,22 @@ const UserSelector = ({ selectedUsers, onSelectedUsersChange, excludedUserIds = 
 
 	const removeSelected = (userId: string, e: React.MouseEvent) => {
 		e.stopPropagation();
-		onSelectedUsersChange(selectedUsers.filter((u) => u.userId !== userId));
+		onSelectedUsersChange(selectedUsers.filter((u) => u.id !== userId));
 	};
 
 	const UserAvatar = ({ profile }: { profile: UserProfile }) => {
-		const initials = (profile.name || "?").split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+		const initials = (profile.name || "?")
+			.split(" ")
+			.map((w) => w[0])
+			.join("")
+			.slice(0, 2)
+			.toUpperCase();
 		const bgColor = stringToColor(profile.email || "default");
 
 		return (
-			<div 
+			<div
 				className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden shrink-0 relative select-none"
-				style={{ backgroundColor: !profile.imageUrl ? bgColor : undefined }}
-			>
+				style={{ backgroundColor: !profile.imageUrl ? bgColor : undefined }}>
 				{profile.imageUrl ? (
 					<Image src={profile.imageUrl} alt={profile.name} fill className="object-cover" />
 				) : (
@@ -88,14 +92,12 @@ const UserSelector = ({ selectedUsers, onSelectedUsersChange, excludedUserIds = 
 					<div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
 						{selectedUsers.map((user) => (
 							<div
-								key={user.userId}
-								className="flex items-center gap-1 pl-2 pr-1 py-1 rounded-full bg-accent/20 text-accent text-xs font-medium border border-accent/20 animate-in fade-in zoom-in duration-200"
-							>
-								<span>{user.name} {user.surname}</span>
-								<button
-									onClick={(e) => removeSelected(user.userId, e)}
-									className="p-0.5 hover:bg-black/20 rounded-full transition-colors"
-								>
+								key={user.id}
+								className="flex items-center gap-1 pl-2 pr-1 py-1 rounded-full bg-accent/20 text-accent text-xs font-medium border border-accent/20 animate-in fade-in zoom-in duration-200">
+								<span>
+									{user.name} {user.surname}
+								</span>
+								<button onClick={(e) => removeSelected(user.id, e)} className="p-0.5 hover:bg-black/20 rounded-full transition-colors">
 									<X size={12} />
 								</button>
 							</div>
@@ -123,11 +125,7 @@ const UserSelector = ({ selectedUsers, onSelectedUsersChange, excludedUserIds = 
 					</div>
 				)}
 
-				{error && (
-					<div className="text-center py-8 text-error text-sm">
-						{error}
-					</div>
-				)}
+				{error && <div className="text-center py-8 text-error text-sm">{error}</div>}
 
 				{!isLoading && !error && searchQuery.length >= 3 && users.length === 0 && (
 					<div className="text-center py-8 text-muted text-sm flex flex-col items-center gap-2">
@@ -137,52 +135,42 @@ const UserSelector = ({ selectedUsers, onSelectedUsersChange, excludedUserIds = 
 				)}
 
 				{!isLoading && !error && searchQuery.length < 3 && selectedUsers.length === 0 && (
-					<div className="text-center py-12 text-muted text-sm opacity-50">
-						Type name to search
-					</div>
+					<div className="text-center py-12 text-muted text-sm opacity-50">Type name to search</div>
 				)}
 
-				{!isLoading && !error && users.map((user) => {
-					const isSelected = selectedUsers.some((u) => u.userId === user.userId);
+				{!isLoading &&
+					!error &&
+					users.map((user) => {
+						const isSelected = selectedUsers.some((u) => u.id === user.id);
 
-					return (
-						<div
-							key={user.userId}
-							onClick={() => toggleUser(user)}
-							className={`
+						return (
+							<div
+								key={user.id}
+								onClick={() => toggleUser(user)}
+								className={`
 								flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all group
-								${isSelected 
-									? "bg-accent/10 border border-accent/30" 
-									: "hover:bg-white/5 border border-transparent"
-								}
-							`}
-						>
-							<div className="flex items-center gap-3">
-								<UserAvatar profile={user} />
-								<div className="flex flex-col">
-									<span className={`text-sm font-medium transition-colors ${isSelected ? "text-white" : "text-gray-200"}`}>
-										{user.name} {user.surname}
-									</span>
-									<span className="text-xs text-muted truncate max-w-[180px]">
-										{user.email}
-									</span>
+								${isSelected ? "bg-accent/10 border border-accent/30" : "hover:bg-white/5 border border-transparent"}
+							`}>
+								<div className="flex items-center gap-3">
+									<UserAvatar profile={user} />
+									<div className="flex flex-col">
+										<span className={`text-sm font-medium transition-colors ${isSelected ? "text-white" : "text-gray-200"}`}>
+											{user.name} {user.surname}
+										</span>
+										<span className="text-xs text-muted truncate max-w-[180px]">{user.email}</span>
+									</div>
+								</div>
+
+								<div
+									className={`
+									w-5 h-5 rounded-full border flex items-center justify-center transition-all
+									${isSelected ? "bg-accent border-accent scale-110" : "border-white/20 group-hover:border-white/40"}
+								`}>
+									{isSelected && <Check size={12} className="text-white" />}
 								</div>
 							</div>
-
-							<div
-								className={`
-									w-5 h-5 rounded-full border flex items-center justify-center transition-all
-									${isSelected 
-										? "bg-accent border-accent scale-110" 
-										: "border-white/20 group-hover:border-white/40"
-									}
-								`}
-							>
-								{isSelected && <Check size={12} className="text-white" />}
-							</div>
-						</div>
-					);
-				})}
+						);
+					})}
 			</div>
 		</div>
 	);

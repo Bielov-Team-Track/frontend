@@ -1,10 +1,10 @@
 "use client";
 
-import { useAccessToken } from "@/providers";
 import { MESSAGES_API_URL } from "@/lib/constants";
 import { Chat, ChatParticipant, Message, MessageReaction } from "@/lib/models/Messages";
 import { useChatConnectionStore } from "@/lib/realtime/chatsConnectionStore";
 import signalr from "@/lib/realtime/signalrClient";
+import { useAccessToken } from "@/providers";
 import { HubConnection, HubConnectionState } from "@microsoft/signalr";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
@@ -21,7 +21,7 @@ export function useRealtimeChats() {
 			console.error("SignalR chat connection error:", error);
 			setConnectionStatus("disconnected");
 		},
-		[setConnectionStatus]
+		[setConnectionStatus],
 	);
 
 	const addReaction = useCallback(
@@ -38,7 +38,7 @@ export function useRealtimeChats() {
 					// Don't add if user already reacted
 					if (existingReaction.userIds.includes(messageReaction.userId)) return oldMessages;
 					updatedReactions = message.reactions.map((r) =>
-						r.emoji === messageReaction.emoji ? { ...r, userIds: [...r.userIds, messageReaction.userId] } : r
+						r.emoji === messageReaction.emoji ? { ...r, userIds: [...r.userIds, messageReaction.userId] } : r,
 					);
 				} else {
 					updatedReactions = [...message.reactions, { emoji: messageReaction.emoji, userIds: [messageReaction.userId] }];
@@ -46,7 +46,7 @@ export function useRealtimeChats() {
 				return oldMessages.map((msg) => (msg.id === messageReaction.messageId ? { ...msg, reactions: updatedReactions } : msg));
 			});
 		},
-		[queryClient]
+		[queryClient],
 	);
 
 	// Update reactions in React Query cache
@@ -72,7 +72,7 @@ export function useRealtimeChats() {
 				return oldMessages.map((msg) => (msg.id === messageReaction.messageId ? { ...msg, reactions: updatedReactions } : msg));
 			});
 		},
-		[queryClient]
+		[queryClient],
 	);
 
 	// Update message content when edited
@@ -86,11 +86,11 @@ export function useRealtimeChats() {
 			queryClient.setQueryData(["chats"], (oldChats: Chat[] | undefined) => {
 				if (!oldChats) return oldChats;
 				return oldChats.map((chat) =>
-					chat.lastMessage?.id === messageId ? { ...chat, lastMessage: { ...chat.lastMessage, content, isEdited: true, editedAt } } : chat
+					chat.lastMessage?.id === messageId ? { ...chat, lastMessage: { ...chat.lastMessage, content, isEdited: true, editedAt } } : chat,
 				);
 			});
 		},
-		[queryClient]
+		[queryClient],
 	);
 
 	// Remove message when deleted
@@ -101,7 +101,7 @@ export function useRealtimeChats() {
 				return oldMessages.map((msg) => (msg.id === messageId ? { ...msg, isDeleted: true, content: "" } : msg));
 			});
 		},
-		[queryClient]
+		[queryClient],
 	);
 
 	// Add participant to chat
@@ -111,16 +111,16 @@ export function useRealtimeChats() {
 				if (!oldChats) return oldChats;
 				return oldChats.map((chat) => {
 					if (chat.id !== chatId) return chat;
-					if (chat.participantIds.includes(participant.userId)) return chat;
+					// Check if participant already exists
+					if (chat.participants.some((p) => p.userId === participant.userId)) return chat;
 					return {
 						...chat,
-						participantIds: [...chat.participantIds, participant.userId],
-						participants: participant.userProfile ? [...chat.participants, participant.userProfile] : chat.participants,
+						participants: [...chat.participants, participant],
 					};
 				});
 			});
 		},
-		[queryClient]
+		[queryClient],
 	);
 
 	// Remove participant from chat
@@ -132,13 +132,12 @@ export function useRealtimeChats() {
 					if (chat.id !== chatId) return chat;
 					return {
 						...chat,
-						participantIds: chat.participantIds.filter((id) => id !== userId),
 						participants: chat.participants.filter((p) => p.userId !== userId),
 					};
 				});
 			});
 		},
-		[queryClient]
+		[queryClient],
 	);
 
 	// Remove chat from list
@@ -151,7 +150,7 @@ export function useRealtimeChats() {
 			// Also invalidate messages for that chat
 			queryClient.removeQueries({ queryKey: ["messages", chatId] });
 		},
-		[queryClient]
+		[queryClient],
 	);
 
 	useEffect(() => {
@@ -176,7 +175,7 @@ export function useRealtimeChats() {
 							setConnectionStatus("connected");
 						},
 						onClose: handleConnectionError,
-					}
+					},
 				);
 
 				connectionRef.current = connection;
@@ -214,7 +213,7 @@ export function useRealtimeChats() {
 					});
 
 					// Clear typing indicator for sender
-					setUserTyping(message.chatId, message.sender.userId, false);
+					setUserTyping(message.chatId, message.sender.id, false);
 				});
 
 				// User read messages

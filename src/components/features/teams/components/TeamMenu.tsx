@@ -1,23 +1,13 @@
 "use client";
 
+import { UserSearch } from "@/components/features/users";
+import { Modal } from "@/components/ui";
+import useUser from "@/hooks/useUser";
+import { assignCaptain as assignCaptainRequest, removeCaptain as removeCaptainRequest } from "@/lib/api/teams";
 import { Team } from "@/lib/models/Team";
 import { UserProfile } from "@/lib/models/User";
-import { useAuth } from "@/providers";
-import React, { useState } from "react";
-import { 
-    MoreHorizontal, 
-    Crown, 
-    UserMinus, 
-    UserPlus, 
-    Trash2
-} from "lucide-react";
-import { Modal } from "@/components/ui";
-import { UserSearch } from "@/components/features/users";
-import {
-	assignCaptain as assignCaptainRequest,
-	removeCaptain as removeCaptainRequest,
-} from "@/lib/api/teams";
-import useUser from "@/hooks/useUser";
+import { Crown, MoreHorizontal, UserMinus, UserPlus } from "lucide-react";
+import { useState } from "react";
 
 type TeamMenuProps = {
 	team: Team;
@@ -25,18 +15,12 @@ type TeamMenuProps = {
 	onCaptainRemoved: () => void;
 };
 
-function TeamMenu({
-	team,
-	onCaptainAssigned,
-	onCaptainRemoved,
-}: TeamMenuProps) {
+function TeamMenu({ team, onCaptainAssigned, onCaptainRemoved }: TeamMenuProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const { userProfile } = useUser();
 
-	const isAdmin = !!team.event.admins?.find(
-		(a) => a.userId == userProfile?.userId,
-	);
+	const isAdmin = !!team.event.admins?.find((a) => a.userId == userProfile?.id);
 
 	if (!isAdmin) {
 		return null;
@@ -48,7 +32,7 @@ function TeamMenu({
 
 	const assignCaptain = (selectedUser: UserProfile) => {
 		setIsLoading(true);
-		assignCaptainRequest(team.id!, selectedUser?.userId!)
+		assignCaptainRequest(team.id!, selectedUser?.id!)
 			.then(() => {
 				setIsLoading(false);
 				setIsModalOpen(false);
@@ -73,44 +57,32 @@ function TeamMenu({
 
 	return (
 		<>
-            <div className="dropdown dropdown-end">
-                <div tabIndex={0} role="button" className="btn btn-ghost btn-xs btn-circle text-muted hover:text-white">
-                    <MoreHorizontal size={16} />
-                </div>
-                <ul
-                    tabIndex={0}
-                    className="dropdown-content z-1 menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-48 mt-1"
-                >
-                    <li>
-                        <button 
-                            onClick={() => setIsModalOpen(true)}
-                            className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2"
-                        >
-                            {team.captain ? <UserPlus size={14} /> : <Crown size={14} />} 
-                            {team.captain ? "Change Captain" : "Assign Captain"}
-                        </button>
-                    </li>
-                    {team.captain && (
-                        <li>
-                            <button 
-                                onClick={() => removeCaptain()}
-                                className="text-xs hover:bg-red-500/10 hover:text-error text-error gap-2"
-                            >
-                                <UserMinus size={14} /> Remove Captain
-                            </button>
-                        </li>
-                    )}
-                </ul>
-            </div>
+			<div className="dropdown dropdown-end">
+				<div tabIndex={0} role="button" className="btn btn-ghost btn-xs btn-circle text-muted hover:text-white">
+					<MoreHorizontal size={16} />
+				</div>
+				<ul tabIndex={0} className="dropdown-content z-1 menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-48 mt-1">
+					<li>
+						<button onClick={() => setIsModalOpen(true)} className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2">
+							{team.captain ? <UserPlus size={14} /> : <Crown size={14} />}
+							{team.captain ? "Change Captain" : "Assign Captain"}
+						</button>
+					</li>
+					{team.captain && (
+						<li>
+							<button onClick={() => removeCaptain()} className="text-xs hover:bg-red-500/10 hover:text-error text-error gap-2">
+								<UserMinus size={14} /> Remove Captain
+							</button>
+						</li>
+					)}
+				</ul>
+			</div>
 
-			<Modal
-				isLoading={isLoading}
-				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-                title="Assign Captain"
-			>
+			<Modal isLoading={isLoading} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Assign Captain">
 				<div className="p-4">
-                    <p className="text-sm text-muted mb-4">Search for a user to make them the captain of <span className="text-white font-bold">{team.name}</span>.</p>
+					<p className="text-sm text-muted mb-4">
+						Search for a user to make them the captain of <span className="text-white font-bold">{team.name}</span>.
+					</p>
 					<UserSearch onUserSelect={assignCaptain} />
 				</div>
 			</Modal>

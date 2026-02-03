@@ -8,13 +8,14 @@ import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar as CalendarIcon, Map as MapIcon, Clock as ClockIcon, Circle as VolleyballIcon } from "lucide-react";
+import { memo } from "react";
 
 type EventCardProps = {
 	event: Event;
 	variant?: "vertical" | "horizontal";
 };
 
-const EventCard = ({ event, variant = "horizontal" }: EventCardProps) => {
+const EventCard = memo(function EventCard({ event, variant = "horizontal" }: EventCardProps) {
 	const variantClasses = {
 		vertical: "flex flex-col max-w-60",
 		horizontal: "flex flex-row max-w-96 h-32 grow",
@@ -103,6 +104,6 @@ const EventCard = ({ event, variant = "horizontal" }: EventCardProps) => {
 			</div>
 		</Link>
 	);
-};
+});
 
 export default EventCard;

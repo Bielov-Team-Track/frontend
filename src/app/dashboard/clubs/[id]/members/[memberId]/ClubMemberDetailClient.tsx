@@ -147,7 +147,12 @@ function MemberBannerCard({ profile, clubMember, activeTab, onTabChange, teamsCo
 			<div className="p-6 flex items-center gap-6">
 				{/* Avatar */}
 				<div className="w-24 h-24 rounded-xl bg-background border-4 border-background-light overflow-hidden -mt-12 relative z-10 flex items-center justify-center shadow-lg">
-					<Avatar profile={profile.userProfile} size="lg" />
+					<Avatar
+						src={profile.userProfile?.imageUrl}
+						variant={"user"}
+						name={profile.userProfile?.name + " " + profile.userProfile?.surname}
+						size="lg"
+					/>
 				</div>
 
 				{/* Details */}

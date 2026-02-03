@@ -1,6 +1,7 @@
 import client from "./client";
 import { CreateEvent, CreateEventSeries, Event, EventFilterRequest, EventSeries } from "../models/Event";
 import { EventParticipant } from "../models/EventParticipant";
+import { UploadUrlResponse } from "../models/shared/models";
 import { getParamsFromObject } from "../utils/request";
 
 const PREFIX = "/events";
@@ -55,6 +56,34 @@ export async function loadParticipants(
 ): Promise<EventParticipant[]> {
 	const endpoint = `/v1/events/${eventId}/participants`;
 	return (await client.get<EventParticipant[]>(PREFIX + endpoint)).data;
+}
+
+export async function getMyParticipation(
+	eventId: string,
+): Promise<EventParticipant | null> {
+	const endpoint = `/v1/events/${eventId}/participants/me`;
+	try {
+		return (await client.get<EventParticipant>(PREFIX + endpoint)).data;
+	} catch {
+		return null;
+	}
+}
+
+export async function inviteUsers(
+	eventId: string,
+	userIds: string[],
+): Promise<EventParticipant[]> {
+	const endpoint = `/v1/events/${eventId}/participants/invite`;
+	return (await client.post<EventParticipant[]>(PREFIX + endpoint, { userIds })).data;
+}
+
+export async function respondToInvitation(
+	eventId: string,
+	accept: boolean,
+	declineNote?: string,
+): Promise<EventParticipant> {
+	const endpoint = `/v1/events/${eventId}/participants/respond`;
+	return (await client.post<EventParticipant>(PREFIX + endpoint, { accept, declineNote })).data;
 }
 
 export async function removeParticipant(eventId: string, userId: string) {
@@ -171,4 +200,36 @@ export async function updateSeriesEvent(
 export async function detachFromSeries(eventId: string): Promise<Event> {
 	const endpoint = `/v1/events/${eventId}/detach`;
 	return (await client.post<Event>(PREFIX + endpoint)).data;
+}
+
+// =============================================================================
+// MEDIA UPLOAD
+// =============================================================================
+
+export async function getEventMediaUploadUrl(
+	contentType: string,
+	fileName: string,
+	fileSize: number
+): Promise<UploadUrlResponse> {
+	const endpoint = "/v1/media/upload-url";
+	const response = await client.post<UploadUrlResponse>(PREFIX + endpoint, {
+		contentType,
+		fileName,
+		fileSize,
+	});
+	return response.data;
+}
+
+export async function uploadFileToStorage(
+	uploadUrl: string,
+	file: File,
+	contentType?: string
+): Promise<void> {
+	await fetch(uploadUrl, {
+		method: "PUT",
+		body: file,
+		headers: {
+			"Content-Type": contentType || file.type || "application/octet-stream",
+		},
+	});
 }

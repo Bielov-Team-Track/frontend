@@ -1,11 +1,14 @@
 "use client";
 
 import { Button, EmptyState } from "@/components/";
+import { ListToolbar } from "@/components/ui/list-toolbar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDeletePost, useHidePost, usePinPost, usePostsFeed, useRestorePost, useUnpinPost } from "@/hooks/usePosts";
-import { ContextType, Post } from "@/lib/models/Post";
-import { Loader2, Newspaper, Plus } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import PinnedPostsCarousel from "./PinnedPostsCarousel";
+import { Post } from "@/lib/models/Post";
+import { ContextType } from "@/lib/models/shared/models";
+import { Calendar, Clock, Loader2, Newspaper, Paperclip, Plus, User } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import PinnedPostsList from "./PinnedPostsCarousel";
 import PostCard from "./PostCard";
 import PostCreateModal from "./PostCreateModal";
 import PostEditModal from "./PostEditModal";
@@ -16,9 +19,21 @@ interface PostFeedProps {
 	contextName: string;
 }
 
+type SortOption = "newest" | "oldest" | "author";
+
+const SORT_OPTIONS = [
+	{ value: "newest", label: "Newest First", icon: <Clock size={14} /> },
+	{ value: "oldest", label: "Oldest First", icon: <Calendar size={14} /> },
+	{ value: "author", label: "By Author", icon: <User size={14} /> },
+];
+
 export default function PostFeed({ contextType, contextId, contextName }: PostFeedProps) {
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [editingPost, setEditingPost] = useState<Post | null>(null);
+	const [search, setSearch] = useState("");
+	const [sortBy, setSortBy] = useState<SortOption>("newest");
+	const [authorFilter, setAuthorFilter] = useState<string>("all");
+	const [withAttachments, setWithAttachments] = useState(false);
 	const pinPost = usePinPost();
 	const unpinPost = useUnpinPost();
 	const { data, isLoading, isError, hasNextPage, fetchNextPage, isFetchingNextPage } = usePostsFeed(contextType, contextId);
@@ -26,9 +41,62 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 	const hidePost = useHidePost();
 	const restorePost = useRestorePost();
 	const deletePost = useDeletePost();
-	const allPosts = data?.pages.flatMap((page) => page.items) ?? [];
-	const pinnedPosts = allPosts.filter((post) => post.isPinned).sort((a, b) => (a.pinOrder ?? 0) - (b.pinOrder ?? 0));
-	const regularPosts = allPosts.filter((post) => !post.isPinned);
+
+	const { allPosts, pinnedPosts, regularPosts, uniqueAuthors } = useMemo(() => {
+		const all = data?.pages.flatMap((page) => page.items) ?? [];
+		const pinned = all.filter((post) => post.isPinned).sort((a, b) => (a.pinOrder ?? 0) - (b.pinOrder ?? 0));
+
+		// Get unique authors for filter
+		const authorsMap = new Map<string, string>();
+		all.forEach((post) => {
+			if (post.author?.id && !authorsMap.has(post.author.id)) {
+				authorsMap.set(post.author.id, `${post.author.name || ""} ${post.author.surname || ""}`.trim() || "Unknown");
+			}
+		});
+		const authors = Array.from(authorsMap.entries()).map(([id, name]) => ({ value: id, label: name }));
+
+		let regular = all.filter((post) => !post.isPinned);
+
+		// Apply search filter
+		if (search) {
+			const searchLower = search.toLowerCase();
+			regular = regular.filter(
+				(post) =>
+					post.title?.toLowerCase().includes(searchLower) ||
+					post.content?.toLowerCase().includes(searchLower) ||
+					`${post.author?.name || ""} ${post.author?.surname || ""}`.toLowerCase().includes(searchLower)
+			);
+		}
+
+		// Apply author filter
+		if (authorFilter !== "all") {
+			regular = regular.filter((post) => post.author?.id === authorFilter);
+		}
+
+		// Apply attachments filter
+		if (withAttachments) {
+			regular = regular.filter((post) => post.media && post.media.length > 0);
+		}
+
+		// Apply sorting
+		regular.sort((a, b) => {
+			switch (sortBy) {
+				case "newest":
+					return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+				case "oldest":
+					return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+				case "author":
+					const authorA = `${a.author?.name || ""} ${a.author?.surname || ""}`.toLowerCase();
+					const authorB = `${b.author?.name || ""} ${b.author?.surname || ""}`.toLowerCase();
+					return authorA.localeCompare(authorB);
+				default:
+					return 0;
+			}
+		});
+
+		return { allPosts: all, pinnedPosts: pinned, regularPosts: regular, uniqueAuthors: authors };
+	}, [data, search, sortBy, authorFilter, withAttachments]);
+
 	// Native IntersectionObserver for infinite scroll
 	const observerRef = useRef<IntersectionObserver | null>(null);
 	const loadMoreRef = useCallback(
@@ -49,7 +117,7 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 				observerRef.current.observe(node);
 			}
 		},
-		[isFetchingNextPage, hasNextPage, fetchNextPage]
+		[isFetchingNextPage, hasNextPage, fetchNextPage],
 	);
 
 	const handlePin = useCallback(
@@ -60,7 +128,7 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 				console.error("Failed to pin post:", error);
 			}
 		},
-		[pinPost]
+		[pinPost],
 	);
 
 	const handleUnpin = useCallback(
@@ -71,7 +139,7 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 				console.error("Failed to unpin post:", error);
 			}
 		},
-		[unpinPost]
+		[unpinPost],
 	);
 
 	const handleHide = useCallback(
@@ -83,7 +151,7 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 				console.error("Failed to hide post:", error);
 			}
 		},
-		[hidePost]
+		[hidePost],
 	);
 
 	const handleRestore = useCallback(
@@ -94,7 +162,7 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 				console.error("Failed to restore post:", error);
 			}
 		},
-		[restorePost]
+		[restorePost],
 	);
 
 	// Cleanup observer on unmount
@@ -102,6 +170,7 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 		return () => {
 			if (observerRef.current) {
 				observerRef.current.disconnect();
+				observerRef.current = null;
 			}
 		};
 	}, []);
@@ -115,24 +184,88 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 				console.error("Failed to delete post:", error);
 			}
 		},
-		[deletePost]
+		[deletePost],
 	);
 
-	const posts = data?.pages.flatMap((page) => page.items) ?? [];
+	const activeFilterCount = (authorFilter !== "all" ? 1 : 0) + (withAttachments ? 1 : 0);
+
+	const clearFilters = () => {
+		setAuthorFilter("all");
+		setWithAttachments(false);
+	};
+
+	// Filter content for the ListToolbar - author dropdown
+	const authorOptions = uniqueAuthors;
+	const selectedAuthorLabel = authorFilter === "all"
+		? "All Authors"
+		: uniqueAuthors.find(a => a.value === authorFilter)?.label ?? "All Authors";
+
+	const filterContent = (
+		<div className="flex flex-wrap items-center gap-2">
+			{uniqueAuthors.length > 0 && (
+				<Select value={authorFilter} onValueChange={(val) => setAuthorFilter(val ?? "all")}>
+					<SelectTrigger className="w-auto min-w-[160px]">
+						<User size={14} className="text-muted-foreground" />
+						<SelectValue placeholder="All Authors">{selectedAuthorLabel}</SelectValue>
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">
+							<User size={14} className="text-muted-foreground" />
+							All Authors
+						</SelectItem>
+						{authorOptions.map((option) => (
+							<SelectItem key={option.value} value={option.value}>
+								<User size={14} className="text-muted-foreground" />
+								{option.label}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			)}
+			<Button
+				variant="outline"
+				size="sm"
+				onClick={() => setWithAttachments(!withAttachments)}
+				leftIcon={<Paperclip size={14} className={withAttachments ? "text-primary" : ""} />}
+				className={withAttachments ? "border-primary/50 bg-primary/15 text-primary hover:bg-primary/20" : ""}
+			>
+				With Attachments
+			</Button>
+		</div>
+	);
 
 	return (
-		<div className="space-y-4">
-			{/* Header */}
-			<div className="flex items-center justify-between">
-				<h2 className="text-xl font-bold text-white">Posts</h2>
-				<Button onClick={() => setShowCreateModal(true)} variant={"outline"} leftIcon={<Plus size={16} />}>
+		<div className="flex flex-col gap-4 h-full">
+			{/* Header Row: Title + Create Button */}
+			<div className="flex items-center justify-between shrink-0">
+				<h2 className="text-lg font-semibold text-foreground">Posts</h2>
+				<Button onClick={() => setShowCreateModal(true)} variant="outline" leftIcon={<Plus size={16} />}>
 					Create Post
 				</Button>
 			</div>
-			{/* Pinned Posts Carousel */}
-			{pinnedPosts.length > 0 && <PinnedPostsCarousel posts={pinnedPosts} onEdit={setEditingPost} onDelete={handleDelete} onUnpin={handleUnpin} />}
-			{/* Posts List */}
-			{isLoading ? (
+
+			{/* Toolbar with collapsible search/filters */}
+			<ListToolbar
+				search={search}
+				onSearchChange={setSearch}
+				searchPlaceholder="Search posts..."
+				sortOptions={SORT_OPTIONS}
+				sortBy={sortBy}
+				onSortChange={(val) => setSortBy(val as SortOption)}
+				filterContent={filterContent}
+				activeFilterCount={activeFilterCount}
+				onClearFilters={clearFilters}
+				count={isLoading ? 0 : regularPosts.length + pinnedPosts.length}
+				itemLabel="post"
+				showViewToggle={false}
+			/>
+
+			{/* Content Area */}
+			<div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin space-y-4">
+				{/* Pinned Posts Carousel */}
+				{pinnedPosts.length > 0 && <PinnedPostsList posts={pinnedPosts} onEdit={setEditingPost} onDelete={handleDelete} onUnpin={handleUnpin} />}
+				{/* Posts List */}
+				{isLoading ? (
 				<div className="flex justify-center py-12">
 					<Loader2 className="animate-spin text-muted-foreground" size={32} />
 				</div>
@@ -141,15 +274,28 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 				<div className="text-center py-12">
 					<p className="text-destructive">Failed to load posts</p>
 				</div>
-			) : posts.length === 0 ? (
+			) : allPosts.length === 0 ? (
 				<EmptyState
 					icon={Newspaper}
 					title="No posts yet"
 					description="Be the first to create one!"
 					action={{ icon: Plus, onClick: () => setShowCreateModal(true), label: "Create post" }}
 				/>
+			) : regularPosts.length === 0 && pinnedPosts.length === 0 ? (
+				<EmptyState
+					icon={Newspaper}
+					title="No posts found"
+					description="Try adjusting your search or filters"
+					action={{
+						label: "Clear Filters",
+						onClick: () => {
+							setSearch("");
+							clearFilters();
+						},
+					}}
+				/>
 			) : (
-				<div className="space-y-4">
+				<div className="space-y-4 pb-4">
 					{regularPosts.map((post) => (
 						<PostCard
 							key={post.id}
@@ -170,6 +316,7 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 					</div>
 				</div>
 			)}
+			</div>
 
 			{/* Modals */}
 			<PostCreateModal

@@ -58,6 +58,8 @@ export interface EventBudget {
 	minUnitsForBudget?: number | undefined; // Safety minimum for budget split
 	// Timing rules
 	dropoutDeadlineHours?: number | undefined; // Hours before event when registrations lock (for budget split)
+	// Payment reminder (for pay-to-join events)
+	paymentReminderDaysBefore?: number | null; // Days before event to send payment reminder
 }
 
 export interface CreateEventBudget {

@@ -3,21 +3,24 @@
 import { Select } from "@/components";
 import { DropdownOption } from "@/components/ui/dropdown";
 import { SelectOption } from "@/components/ui/select/index";
-import { getClubs } from "@/lib/api/clubs";
-import { loadGroups } from "@/lib/api/groups";
+import { getClubs, getGroupsByClub } from "@/lib/api/clubs";
+import { loadMySeries } from "@/lib/api/events";
 import { Club } from "@/lib/models/Club";
+import { EventSeries } from "@/lib/models/Event";
 import { useQuery } from "@tanstack/react-query";
-import { Building2, Shield, User, Users, UsersRound } from "lucide-react";
+import { Building2, CalendarDays, Shield, User, Users, UsersRound } from "lucide-react";
 
 interface AttendanceFiltersProps {
 	clubId: string | null;
 	organizerId: string | null;
 	groupId: string | null;
 	teamId: string | null;
+	seriesId: string | null;
 	onClubChange: (clubId: string | null) => void;
 	onOrganizerChange: (organizerId: string | null) => void;
 	onGroupChange: (groupId: string | null) => void;
 	onTeamChange: (teamId: string | null) => void;
+	onSeriesChange: (seriesId: string | null) => void;
 }
 
 export default function AttendanceFilters({
@@ -25,10 +28,12 @@ export default function AttendanceFilters({
 	organizerId,
 	groupId,
 	teamId,
+	seriesId,
 	onClubChange,
 	onOrganizerChange,
 	onGroupChange,
 	onTeamChange,
+	onSeriesChange,
 }: AttendanceFiltersProps) {
 	const { data: clubs = [] } = useQuery({
 		queryKey: ["clubs"],
@@ -36,12 +41,17 @@ export default function AttendanceFilters({
 	});
 
 	const { data: groups = [] } = useQuery({
-		queryKey: ["groups"],
-		queryFn: loadGroups,
+		queryKey: ["groups", clubId],
+		queryFn: () => (clubId ? getGroupsByClub(clubId) : Promise.resolve([])),
+		enabled: !!clubId,
 	});
 
-	// Client-side filter for groups if clubId is selected and group has clubId
-	const relevantGroups = clubId ? groups.filter((g: any) => !g.clubId || g.clubId === clubId) : groups;
+	const { data: series = [] } = useQuery({
+		queryKey: ["mySeries"],
+		queryFn: loadMySeries,
+	});
+
+	const relevantGroups = groups;
 
 	const clubOptions: SelectOption[] = [
 		{ value: "", label: "All Clubs" },
@@ -63,6 +73,15 @@ export default function AttendanceFilters({
 
 	const organizerOptions: SelectOption[] = [{ value: "", label: "All Organizers" }];
 	const teamOptions: SelectOption[] = [{ value: "", label: "All Teams" }];
+
+	const seriesOptions: SelectOption[] = [
+		{ value: "", label: "All Series" },
+		...series.map((s: EventSeries) => ({
+			value: s.id,
+			label: s.name,
+			data: s,
+		})),
+	];
 
 	// Renderers
 	const renderClubOption = (option: DropdownOption<Club>) => {
@@ -154,6 +173,19 @@ export default function AttendanceFilters({
 					leftIcon={<UsersRound size={14} />}
 					renderOption={(opt) => renderUserOption(opt, <UsersRound size={12} className="text-muted" />)}
 					renderValue={(opt) => renderUserOption(opt, <UsersRound size={12} className="text-muted" />)}
+				/>
+			</div>
+
+			{/* Series Filter */}
+			<div className="w-full sm:w-50 flex-1 min-w-40">
+				<Select
+					label="Series"
+					options={seriesOptions}
+					value={seriesId || ""}
+					onChange={(val) => onSeriesChange(val ? String(val) : null)}
+					leftIcon={<CalendarDays size={14} />}
+					renderOption={(opt) => renderUserOption(opt, <CalendarDays size={12} className="text-muted" />)}
+					renderValue={(opt) => renderUserOption(opt, <CalendarDays size={12} className="text-muted" />)}
 				/>
 			</div>
 		</div>

@@ -1,8 +1,8 @@
 "use client";
 
 import { Avatar } from "@/components";
-import { InviteMemberModal } from "@/components/features/clubs";
-import { getClub, getClubMembers, getGroupsByClub, getPendingRegistrationsCount, getTeamsByClub, inviteMember } from "@/lib/api/clubs";
+import { InviteeSelectorModal } from "@/components/features/events/forms/steps/registration";
+import { getClub, getClubMembers, getGroupsByClub, getPendingRegistrationsCount, getTeamsByClub, inviteMembers } from "@/lib/api/clubs";
 import { Club } from "@/lib/models/Club";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Building2, Calendar, ImageOff, Layers, Newspaper, Settings, Shield, UserPlus, Users } from "lucide-react";
@@ -96,7 +96,7 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 
 	// Mutations
 	const inviteMutation = useMutation({
-		mutationFn: ({ userId, role }: { userId: string; role: string }) => inviteMember(clubId, userId, role),
+		mutationFn: (userIds: string[]) => inviteMembers(clubId, userIds),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["club-members", clubId] });
 			setShowInviteModal(false);
@@ -195,7 +195,7 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 						{/* Details */}
 						<div className="flex-1 min-w-0">
 							<h2 className="text-xl font-bold text-white truncate">{club.name}</h2>
-							{club.description && <p className="text-sm text-muted truncate">{club.description}</p>}
+							{club.description && <p className="text-sm text-muted wrap-normal">{club.description}</p>}
 						</div>
 
 						{/* Quick Stats */}
@@ -244,11 +244,11 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 				<div className="min-h-100">{children}</div>
 
 				{/* Invite Modal */}
-				<InviteMemberModal
+				<InviteeSelectorModal
 					isOpen={showInviteModal}
 					onClose={() => setShowInviteModal(false)}
-					onInvite={(data) => inviteMutation.mutate(data)}
-					isLoading={inviteMutation.isPending}
+					onConfirm={(data) => inviteMutation.mutate(data.map((u) => u.id))}
+					selectedUsers={[]}
 				/>
 			</div>
 		</ClubContext.Provider>

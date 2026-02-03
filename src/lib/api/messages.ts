@@ -1,6 +1,6 @@
-import client from "./client";
 import { Chat, Message, MessageReaction } from "../models/Messages";
 import { UserProfile } from "../models/User";
+import client from "./client";
 
 const PREFIX = "messages/v1";
 
@@ -15,7 +15,7 @@ export async function createChat(users: UserProfile[]): Promise<Chat> {
 
 	return (
 		await client.post(PREFIX + endpoint, {
-			participantIds: users.map((u) => u.userId),
+			participantIds: users.map((u) => u.id),
 		})
 	).data;
 }

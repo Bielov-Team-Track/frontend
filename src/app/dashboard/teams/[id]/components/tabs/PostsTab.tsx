@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components";
+import { PostFeed } from "@/components/features/posts";
 import { TeamPost } from "@/components/features/teams/types";
 import EmptyState from "@/components/ui/empty-state";
 import { MessageSquare } from "lucide-react";
@@ -50,28 +51,7 @@ export default function PostsTab() {
 			{posts.length === 0 ? (
 				<EmptyState icon={MessageSquare} title="No posts yet" description="Be the first to post in this team" />
 			) : (
-				<div className="space-y-4">
-					{posts.map((post) => (
-						<div key={post.id} className="rounded-2xl bg-white/5 border border-white/10 p-6">
-							<div className="flex items-center gap-3 mb-4">
-								<div className="w-10 h-10 rounded-full bg-background-light flex items-center justify-center text-sm font-bold text-muted">
-									{post.authorName[0]}
-								</div>
-								<div>
-									<div className="font-bold text-white">{post.authorName}</div>
-									<div className="text-xs text-muted">
-										{new Date(post.createdAt).toLocaleDateString()} at{" "}
-										{new Date(post.createdAt).toLocaleTimeString([], {
-											hour: "2-digit",
-											minute: "2-digit",
-										})}
-									</div>
-								</div>
-							</div>
-							<p className="text-white whitespace-pre-wrap">{post.content}</p>
-						</div>
-					))}
-				</div>
+				<PostFeed posts={posts} />
 			)}
 		</div>
 	);

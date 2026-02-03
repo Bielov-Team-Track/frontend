@@ -1,0 +1,2 @@
+npm warn exec The following package was not found and will be installed: npm-check-updates@19.3.2
+Invalid option value: --format json. Valid values are: dep, group, ownerChanged, repo, time, lines, installedVersion.

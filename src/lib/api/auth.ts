@@ -51,15 +51,12 @@ export async function refreshToken(
 }
 
 export async function logout(refreshTokenValue: string): Promise<void> {
-	// Note: Current backend doesn't implement logout, so we'll just clear local storage
+	// Note: Current backend doesn't implement logout, so we'll just clear cookies
 	// const endpoint = "/v1/auth/logout"
 	// await client.post(PREFIX + endpoint, { refreshToken: refreshTokenValue })
 
-	// Clear local storage and cookies
+	// Clear cookies
 	if (typeof window !== "undefined") {
-		localStorage.removeItem("accessToken");
-		localStorage.removeItem("refreshToken");
-		localStorage.removeItem("accessTokenExpiry");
 		document.cookie =
 			"token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 		document.cookie =

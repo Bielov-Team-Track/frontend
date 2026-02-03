@@ -2,7 +2,6 @@ import {
 	addCommentReaction,
 	addPostReaction,
 	closePoll,
-	confirmUpload,
 	createComment,
 	createPost,
 	deleteComment,
@@ -71,9 +70,28 @@ export function useCreatePost() {
 	return useMutation({
 		mutationFn: createPost,
 		onSuccess: (newPost) => {
-			// Invalidate the feed for this context
+			// Normalize contextType to lowercase to match query keys
+			const normalizedContextType = newPost.contextType.toLowerCase() as ContextType;
+
+			// Optimistically add the new post to the beginning of the feed
+			queryClient.setQueriesData<InfiniteData<PostsResponse>>(
+				{ queryKey: postKeys.feed(normalizedContextType, newPost.contextId) },
+				(old) => {
+					if (!old) return old;
+					return {
+						...old,
+						pages: old.pages.map((page, index) =>
+							index === 0
+								? { ...page, items: [newPost, ...page.items] }
+								: page
+						),
+					};
+				}
+			);
+
+			// Also invalidate to ensure consistency with server
 			queryClient.invalidateQueries({
-				queryKey: postKeys.feed(newPost.contextType, newPost.contextId),
+				queryKey: postKeys.feed(normalizedContextType, newPost.contextId),
 			});
 		},
 	});
@@ -99,25 +117,71 @@ export function useDeletePost() {
 
 	return useMutation({
 		mutationFn: deletePost,
-		onSuccess: () => {
-			// Invalidate all feeds (we don't know which context)
-			queryClient.invalidateQueries({ queryKey: postKeys.feeds() });
+		onSuccess: (_, deletedPostId) => {
+			// Remove from cache instead of invalidating all
+			queryClient.setQueriesData<InfiniteData<PostsResponse>>(
+				{ queryKey: postKeys.feeds() },
+				(old) => {
+					if (!old) return old;
+					return {
+						...old,
+						pages: old.pages.map((page) => ({
+							...page,
+							items: page.items.filter((post) => post.id !== deletedPostId),
+						})),
+					};
+				}
+			);
 		},
 	});
 }
 
 // Media upload hook
+// Helper to get MIME type from file extension when file.type is empty
+function getMimeType(file: File): string {
+	if (file.type) return file.type;
+
+	const ext = file.name.split(".").pop()?.toLowerCase();
+	const mimeTypes: Record<string, string> = {
+		// Images
+		jpg: "image/jpeg",
+		jpeg: "image/jpeg",
+		png: "image/png",
+		gif: "image/gif",
+		webp: "image/webp",
+		svg: "image/svg+xml",
+		// Videos
+		mp4: "video/mp4",
+		webm: "video/webm",
+		mov: "video/quicktime",
+		avi: "video/x-msvideo",
+		// Documents
+		pdf: "application/pdf",
+		doc: "application/msword",
+		docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+		xls: "application/vnd.ms-excel",
+		xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		ppt: "application/vnd.ms-powerpoint",
+		pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+		txt: "text/plain",
+	};
+
+	return mimeTypes[ext || ""] || "application/octet-stream";
+}
+
 export function useMediaUpload() {
 	return useMutation({
 		mutationFn: async (file: File) => {
+			const fileType = getMimeType(file);
+
 			// 1. Get presigned URL
-			const { mediaId, uploadUrl } = await getUploadUrl(file.type, file.name, file.size);
+			const { mediaId, uploadUrl } = await getUploadUrl(fileType, file.name, file.size);
 
 			// 2. Upload to S3
-			await uploadFileToS3(uploadUrl, file);
+			await uploadFileToS3(uploadUrl, file, fileType);
 
-			// 3. Confirm upload
-			await confirmUpload(mediaId);
+			// Note: No confirm call here - the backend confirms media internally
+			// when creating a post with mediaIds
 
 			return mediaId;
 		},
@@ -236,10 +300,10 @@ export function useDeleteComment() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: deleteComment,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: postKeys.comments() });
-			queryClient.invalidateQueries({ queryKey: postKeys.feeds() });
+		mutationFn: ({ commentId }: { commentId: string; postId: string }) => deleteComment(commentId),
+		onSuccess: (_, { postId }) => {
+			// Only invalidate comments for this specific post
+			queryClient.invalidateQueries({ queryKey: postKeys.postComments(postId) });
 		},
 	});
 }

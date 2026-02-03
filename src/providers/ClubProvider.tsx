@@ -2,7 +2,7 @@
 
 import { getUserClubs } from "@/lib/api/clubs";
 import { Club } from "@/lib/models/Club";
-import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./AuthProvider";
 
 interface ClubContextType {
@@ -23,13 +23,13 @@ export function ClubProvider({ children }: { children: ReactNode }) {
 	const [selectedClub, setSelectedClub] = useState<Club | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const selectClub = (club: Club) => {
+	const selectClub = useCallback((club: Club) => {
 		setSelectedClub(club);
 		localStorage.setItem(SELECTED_CLUB_STORAGE_KEY, club.id);
-	};
+	}, []);
 
 	const refreshClubs = useCallback(async () => {
-		if (!userProfile?.userId) {
+		if (!userProfile?.id) {
 			setClubs([]);
 			setSelectedClub(null);
 			return;
@@ -37,7 +37,7 @@ export function ClubProvider({ children }: { children: ReactNode }) {
 
 		setIsLoading(true);
 		try {
-			const userClubs = await getUserClubs(userProfile.userId);
+			const userClubs = await getUserClubs(userProfile.id);
 			setClubs(userClubs);
 
 			// Restore selected club or select the first one
@@ -57,21 +57,25 @@ export function ClubProvider({ children }: { children: ReactNode }) {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [userProfile?.userId]);
+	}, [userProfile?.id]);
 
 	useEffect(() => {
 		refreshClubs();
 	}, [refreshClubs]);
 
+	const value = useMemo(
+		() => ({
+			clubs,
+			selectedClub,
+			isLoading,
+			selectClub,
+			refreshClubs,
+		}),
+		[clubs, selectedClub, isLoading, selectClub, refreshClubs]
+	);
+
 	return (
-		<ClubContext.Provider
-			value={{
-				clubs,
-				selectedClub,
-				isLoading,
-				selectClub,
-				refreshClubs,
-			}}>
+		<ClubContext.Provider value={value}>
 			{children}
 		</ClubContext.Provider>
 	);

@@ -6,7 +6,7 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { ArrowUpDown, ChevronDown, ChevronUp, GripVertical, Pencil, Star, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { VOLLEYBALL_POSITIONS_OPTIONS } from "../constants";
 
 interface RosterSidebarProps {
@@ -76,7 +76,10 @@ export default function RosterSidebar({
 	const [showArrowControls, setShowArrowControls] = useState(false);
 
 	// Group members by their position
-	const groupedMembers = groupMembersByPosition(members, positionPriorities);
+	const groupedMembers = useMemo(
+		() => groupMembersByPosition(members, positionPriorities),
+		[members, positionPriorities]
+	);
 
 	const hasMembers = members.length > 0;
 

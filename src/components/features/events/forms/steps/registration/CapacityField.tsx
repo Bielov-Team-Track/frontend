@@ -22,6 +22,7 @@ export function CapacityField() {
 					min="1"
 					helperText="Leave empty for unlimited participants"
 					optional
+					data-testid="capacity-input"
 				/>
 			)}
 		/>

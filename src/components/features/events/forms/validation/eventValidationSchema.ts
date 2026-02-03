@@ -117,12 +117,11 @@ export const eventValidationSchema = yup.object().shape({
 			then: (schema) => schema.required("Registration unit is required"),
 			otherwise: (schema) => schema.optional(),
 		}),
-	courtsNumber: yup.number().min(1, "There must be at least one court").required("Number of courts is required"),
 	surface: yup
 		.mixed<PlayingSurface>()
 		.oneOf(Object.values(PlayingSurface) as PlayingSurface[])
 		.required("Surface is required"),
-	isPrivate: yup.boolean().required(),
+	isPublic: yup.boolean().required(),
 	registrationType: yup
 		.mixed<RegistrationType>()
 		.oneOf(["open", "closed"] as const)
@@ -145,8 +144,8 @@ export const eventValidationSchema = yup.object().shape({
 		.transform((v, o) => (o === "" ? null : v))
 		.min(1, "Must be at least 1")
 		.optional(),
-	useBudget: yup.boolean().default(false),
-	budget: yup
+	usePayments: yup.boolean().default(false),
+	paymentsConfig: yup
 		.object()
 		.shape({
 			paymentMethods: yup
@@ -155,7 +154,7 @@ export const eventValidationSchema = yup.object().shape({
 					yup
 						.mixed<PaymentMethod>()
 						.oneOf(Object.values(PaymentMethod) as PaymentMethod[])
-						.required()
+						.required(),
 				)
 				.optional(),
 			pricingModel: yup

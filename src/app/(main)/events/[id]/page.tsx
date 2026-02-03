@@ -1,5 +1,5 @@
 import PositionsRealtimeClient from "@/components/features/teams/components/PositionsRealtimeClient";
-import { loadEvent } from "@/lib/api/events";
+import { getMyParticipation, loadEvent } from "@/lib/api/events";
 import { loadTeams } from "@/lib/api/teams";
 import { UserProfile } from "@/lib/models/User";
 import { getUserProfile } from "@/lib/server/auth";
@@ -26,7 +26,10 @@ async function EventPage({ params }: EventPageParams) {
 		notFound();
 	}
 
-	const teams = await loadTeams(parameters.id);
+	const [teams, userParticipant] = await Promise.all([
+		loadTeams(parameters.id),
+		user?.id ? getMyParticipation(parameters.id) : Promise.resolve(null),
+	]);
 	teams.forEach((team) => {
 		team.event = event;
 	});
@@ -37,6 +40,7 @@ async function EventPage({ params }: EventPageParams) {
 			user={user}
 			isAdmin={true}
 			teams={teams}
+			userParticipant={userParticipant}
 			paymentsSection={<PaymentsSection event={event} teams={teams} userProfile={user} />}
 			positionsRealtime={<PositionsRealtimeClient />}
 		/>

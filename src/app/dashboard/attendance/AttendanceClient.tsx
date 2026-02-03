@@ -4,7 +4,7 @@ import { Loader } from "@/components/ui";
 import { getAttendanceMatrix, updateAttendance } from "@/lib/api/attendance";
 import { AttendanceStatus, PaymentStatus, TimeRange } from "@/lib/models/Attendance";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Calendar, CheckCircle, TrendingDown, Users, XCircle } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle, DollarSign, Search, TrendingDown, Users, XCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import AttendanceFilters from "./components/AttendanceFilters";
@@ -49,7 +49,7 @@ function getDateRange(range: TimeRange, customStart?: Date, customEnd?: Date) {
 	};
 }
 
-// Stat card component matching dashboard style
+// Stat card component
 function StatCard({
 	label,
 	value,
@@ -64,13 +64,13 @@ function StatCard({
 	bgClass?: string;
 }) {
 	return (
-		<div className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
-			<div className={`p-2.5 rounded-lg ${bgClass}`}>
+		<div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 border border-white/10">
+			<div className={`p-2 rounded-md ${bgClass}`}>
 				<Icon size={18} className={colorClass} />
 			</div>
 			<div>
-				<div className="text-2xl font-bold text-white">{value}</div>
-				<div className="text-xs text-muted">{label}</div>
+				<div className="text-xl font-semibold text-white leading-tight">{value}</div>
+				<div className="text-sm text-muted">{label}</div>
 			</div>
 		</div>
 	);
@@ -89,6 +89,12 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 	const [organizerId, setOrganizerId] = useState<string | null>(searchParams.get("organizerId"));
 	const [groupId, setGroupId] = useState<string | null>(searchParams.get("groupId"));
 	const [teamId, setTeamId] = useState<string | null>(searchParams.get("teamId"));
+	const [seriesId, setSeriesId] = useState<string | null>(searchParams.get("seriesId"));
+
+	// Member search and filters
+	const [memberSearch, setMemberSearch] = useState("");
+	const [showOnlyAttention, setShowOnlyAttention] = useState(false);
+	const [showOnlyUnpaid, setShowOnlyUnpaid] = useState(false);
 
 	// Build filter object
 	const filter = useMemo(() => {
@@ -99,8 +105,9 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 			organizerId: organizerId || undefined,
 			groupId: groupId || undefined,
 			teamId: teamId || undefined,
+			seriesId: seriesId || undefined,
 		};
-	}, [timeRange, customStartDate, customEndDate, clubId, organizerId, groupId, teamId]);
+	}, [timeRange, customStartDate, customEndDate, clubId, organizerId, groupId, teamId, seriesId]);
 
 	// Fetch attendance data
 	const { data, isLoading, error } = useQuery({
@@ -156,7 +163,44 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 		router.push(`?${newParams.toString()}`, { scroll: false });
 	};
 
-	// Calculate stats from data
+	// Filter members based on search and filters
+	const filteredData = useMemo(() => {
+		if (!data) return null;
+
+		let filteredMembers = data.members;
+
+		// Search filter (name)
+		if (memberSearch.trim()) {
+			const searchLower = memberSearch.toLowerCase().trim();
+			filteredMembers = filteredMembers.filter((m) => m.name.toLowerCase().includes(searchLower));
+		}
+
+		// Attention filter
+		if (showOnlyAttention) {
+			filteredMembers = filteredMembers.filter((m) => m.highlightWarning);
+		}
+
+		// Unpaid filter - check if member has any unpaid records for non-free events
+		if (showOnlyUnpaid) {
+			const nonFreeEventIds = new Set(data.events.filter((e) => !e.isFree).map((e) => e.id));
+			filteredMembers = filteredMembers.filter((m) => {
+				return data.records.some(
+					(r) =>
+						r.userId === m.userId &&
+						nonFreeEventIds.has(r.eventId) &&
+						r.paymentStatus === PaymentStatus.Unpaid &&
+						(r.status === AttendanceStatus.Accepted || r.status === AttendanceStatus.Attended || r.status === AttendanceStatus.NoShow)
+				);
+			});
+		}
+
+		return {
+			...data,
+			members: filteredMembers,
+		};
+	}, [data, memberSearch, showOnlyAttention, showOnlyUnpaid]);
+
+	// Calculate stats from data (use original data for stats)
 	const stats = useMemo(() => {
 		if (!data) return null;
 
@@ -168,7 +212,20 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 		const declined = data.records.filter((r) => r.status === AttendanceStatus.Declined || r.status === AttendanceStatus.NoShow).length;
 		const pending = data.records.filter((r) => r.status === AttendanceStatus.Invited).length;
 
-		return { totalMembers, totalEvents, warningMembers, attended, declined, pending };
+		// Calculate unpaid count
+		const nonFreeEventIds = new Set(data.events.filter((e) => !e.isFree).map((e) => e.id));
+		const unpaidMembers = new Set(
+			data.records
+				.filter(
+					(r) =>
+						nonFreeEventIds.has(r.eventId) &&
+						r.paymentStatus === PaymentStatus.Unpaid &&
+						(r.status === AttendanceStatus.Accepted || r.status === AttendanceStatus.Attended || r.status === AttendanceStatus.NoShow)
+				)
+				.map((r) => r.userId)
+		).size;
+
+		return { totalMembers, totalEvents, warningMembers, attended, declined, pending, unpaidMembers };
 	}, [data]);
 
 	return (
@@ -204,6 +261,7 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 					organizerId={organizerId}
 					groupId={groupId}
 					teamId={teamId}
+					seriesId={seriesId}
 					onClubChange={(v) => {
 						setClubId(v);
 						updateUrl({ clubId: v });
@@ -220,21 +278,79 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 						setTeamId(v);
 						updateUrl({ teamId: v });
 					}}
+					onSeriesChange={(v) => {
+						setSeriesId(v);
+						updateUrl({ seriesId: v });
+					}}
 				/>
 			</div>
 
 			{/* --- STATS ROW --- */}
 			{stats && (
-				<div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-					<StatCard label="Total Events" value={stats.totalEvents} icon={Calendar} colorClass="text-accent" bgClass="bg-accent/10" />
+				<div className="flex flex-wrap gap-2">
+					<StatCard label="Events" value={stats.totalEvents} icon={Calendar} colorClass="text-accent" bgClass="bg-accent/10" />
 					<StatCard label="Members" value={stats.totalMembers} icon={Users} colorClass="text-primary" bgClass="bg-primary/10" />
 					<StatCard label="Attended" value={stats.attended} icon={CheckCircle} colorClass="text-success" bgClass="bg-success/10" />
-					<StatCard label="Declined/No-show" value={stats.declined} icon={XCircle} colorClass="text-error" bgClass="bg-error/10" />
+					<StatCard label="Declined" value={stats.declined} icon={XCircle} colorClass="text-error" bgClass="bg-error/10" />
 					{stats.warningMembers > 0 && (
-						<StatCard label="Need Attention" value={stats.warningMembers} icon={TrendingDown} colorClass="text-warning" bgClass="bg-warning/10" />
+						<StatCard label="Attention" value={stats.warningMembers} icon={TrendingDown} colorClass="text-warning" bgClass="bg-warning/10" />
+					)}
+					{stats.unpaidMembers > 0 && (
+						<StatCard label="Unpaid" value={stats.unpaidMembers} icon={DollarSign} colorClass="text-error" bgClass="bg-error/10" />
 					)}
 				</div>
 			)}
+
+			{/* --- MEMBER SEARCH & FILTERS --- */}
+			<div className="flex flex-wrap items-center gap-4">
+				{/* Search input */}
+				<div className="relative flex-1 min-w-[200px] max-w-md">
+					<Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+					<input
+						type="text"
+						placeholder="Search members by name..."
+						value={memberSearch}
+						onChange={(e) => setMemberSearch(e.target.value)}
+						className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors"
+					/>
+				</div>
+
+				{/* Filter toggles */}
+				<div className="flex items-center gap-3">
+					<label className="flex items-center gap-2 cursor-pointer select-none">
+						<input
+							type="checkbox"
+							checked={showOnlyAttention}
+							onChange={(e) => setShowOnlyAttention(e.target.checked)}
+							className="w-4 h-4 rounded border-white/20 bg-white/5 text-warning focus:ring-warning/50 focus:ring-offset-0"
+						/>
+						<span className="flex items-center gap-1.5 text-sm text-white/80">
+							<AlertTriangle size={14} className="text-warning" />
+							Needs attention
+						</span>
+					</label>
+
+					<label className="flex items-center gap-2 cursor-pointer select-none">
+						<input
+							type="checkbox"
+							checked={showOnlyUnpaid}
+							onChange={(e) => setShowOnlyUnpaid(e.target.checked)}
+							className="w-4 h-4 rounded border-white/20 bg-white/5 text-error focus:ring-error/50 focus:ring-offset-0"
+						/>
+						<span className="flex items-center gap-1.5 text-sm text-white/80">
+							<DollarSign size={14} className="text-error" />
+							Unpaid only
+						</span>
+					</label>
+				</div>
+
+				{/* Active filters indicator */}
+				{(memberSearch || showOnlyAttention || showOnlyUnpaid) && filteredData && (
+					<div className="text-xs text-muted">
+						Showing {filteredData.members.length} of {data?.members.length} members
+					</div>
+				)}
+			</div>
 
 			{/* --- TABLE --- */}
 			<div className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
@@ -248,8 +364,8 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 						<p className="text-error font-medium">Failed to load attendance data</p>
 						<p className="text-sm text-muted mt-1">Please try again later</p>
 					</div>
-				) : data ? (
-					<AttendanceTable data={data} onUpdateAttendance={handleUpdateAttendance} isUpdating={updateMutation.isPending} />
+				) : filteredData ? (
+					<AttendanceTable data={filteredData} onUpdateAttendance={handleUpdateAttendance} isUpdating={updateMutation.isPending} />
 				) : null}
 			</div>
 		</div>

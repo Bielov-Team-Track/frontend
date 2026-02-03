@@ -22,7 +22,10 @@ const getCookie = (name: string): string | null => {
 const setCookie = (name: string, value: string, maxAge: number): void => {
 	if (typeof window === "undefined") return;
 	// Encode the value to handle special characters in Base64 tokens (+, /, =)
-	document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+	// Use Secure flag in production (HTTPS), SameSite=Strict for CSRF protection
+	const isSecure = window.location.protocol === "https:";
+	const secureFlag = isSecure ? "; Secure" : "";
+	document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Strict${secureFlag}`;
 };
 
 const deleteCookie = (name: string): void => {
@@ -67,11 +70,11 @@ const clearTokens = (): void => {
 // Refresh token state management
 let isRefreshing = false;
 let failedQueue: Array<{
-	resolve: (value?: any) => void;
-	reject: (error?: any) => void;
+	resolve: (value: string | null) => void;
+	reject: (error: Error) => void;
 }> = [];
 
-const processQueue = (error: any = null, token: string | null = null) => {
+const processQueue = (error: Error | null = null, token: string | null = null) => {
 	failedQueue.forEach((prom) => {
 		if (error) {
 			prom.reject(error);
@@ -142,7 +145,8 @@ client.interceptors.response.use(
 
 			if (!refreshToken) {
 				clearTokens();
-				window.location.href = "/login";
+				const returnUrl = window.location.pathname + window.location.search;
+				window.location.href = `/login?callback=${encodeURIComponent(returnUrl)}`;
 				return Promise.reject(error);
 			}
 
@@ -170,9 +174,11 @@ client.interceptors.response.use(
 				return client(originalRequest);
 			} catch (refreshError) {
 				console.error("Token refresh failed:", refreshError);
-				processQueue(refreshError, null);
+				const error = refreshError instanceof Error ? refreshError : new Error("Token refresh failed");
+				processQueue(error, null);
 				clearTokens();
-				window.location.href = "/login";
+				const returnUrl = window.location.pathname + window.location.search;
+				window.location.href = `/login?callback=${encodeURIComponent(returnUrl)}`;
 				return Promise.reject(refreshError);
 			} finally {
 				isRefreshing = false;

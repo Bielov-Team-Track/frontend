@@ -1,4 +1,4 @@
-import TeamDetailClient from "./TeamDetailClient";
+import { redirect } from "next/navigation";
 
 interface Props {
 	params: Promise<{ id: string }>;
@@ -6,5 +6,5 @@ interface Props {
 
 export default async function TeamDetailPage({ params }: Props) {
 	const { id } = await params;
-	return <TeamDetailClient teamId={id} />;
+	redirect(`/dashboard/teams/${id}/events`);
 }

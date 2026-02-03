@@ -1,16 +1,58 @@
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+	enabled: process.env.ANALYZE === "true",
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	output: "standalone",
 	images: {
-		domains: [
-			"volleyer.s3.eu-west-2.amazonaws.com",
-			"lh3.googleusercontent.com",
-			"www.gravatar.com",
-			"api.dicebear.com",
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "volleyer.s3.eu-west-2.amazonaws.com",
+			},
+			{
+				protocol: "https",
+				hostname: "lh3.googleusercontent.com",
+			},
+			{
+				protocol: "https",
+				hostname: "www.gravatar.com",
+			},
+			{
+				protocol: "https",
+				hostname: "api.dicebear.com",
+			},
 		],
-		unoptimized: process.env.NODE_ENV === "production",
+		// Enable image optimization in production for better LCP
+		unoptimized: false,
 	},
 	serverExternalPackages: ["@microsoft/signalr"],
+
+	// Optimize package imports for better tree-shaking
+	experimental: {
+		optimizePackageImports: [
+			// External packages
+			"lucide-react",
+			"@base-ui-components/react",
+			"framer-motion",
+			"@tanstack/react-query",
+			"@tanstack/react-table",
+			"date-fns",
+			"@tiptap/react",
+			"@tiptap/starter-kit",
+			"@tiptap/core",
+			// Internal barrel exports (if supported)
+			"@/components",
+			"@/components/ui",
+			"@/components/layout",
+			"@/components/features",
+			"@/providers",
+			"@/hooks",
+		],
+	},
 	env: {
 		CUSTOM_KEY: process.env.CUSTOM_KEY,
 	},
@@ -38,4 +80,4 @@ const nextConfig = {
 	},
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

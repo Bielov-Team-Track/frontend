@@ -9,7 +9,7 @@ export function ProgressIndicator() {
 	const activeSteps = getActiveSteps();
 
 	return (
-		<div className="max-w-xl m-auto mb-8">
+		<div className="max-w-xl m-auto mb-8" data-testid="progress-indicator" data-current-step={currentStep}>
 			<Steps steps={activeSteps.map((s) => STEP_CONFIG[s])} currentStep={currentStep}></Steps>
 		</div>
 	);

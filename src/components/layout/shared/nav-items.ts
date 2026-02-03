@@ -1,8 +1,11 @@
 import { Club } from "@/lib/models/Club";
 import {
 	Activity,
+	BookOpen,
 	Calendar,
 	ClipboardList,
+	Dumbbell,
+	FileText,
 	LayoutDashboard,
 	MessageSquare,
 	Search,
@@ -30,6 +33,15 @@ export const getNavigationItems = (
 ): NavigationItem[] => [
 	{ name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
 	{ name: "Events", href: "/dashboard/events", icon: Calendar },
+	{
+		name: "Training",
+		href: "/dashboard/training/drills",
+		icon: Dumbbell,
+		subItems: [
+			{ name: "Drills", href: "/dashboard/training/drills", icon: BookOpen },
+			{ name: "Plans", href: "/dashboard/training/plans", icon: FileText },
+		],
+	},
 	{
 		name: "Clubs",
 		href: "/dashboard/clubs",

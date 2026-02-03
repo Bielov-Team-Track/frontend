@@ -67,6 +67,16 @@ export interface ClubMember {
 	updatedAt?: Date;
 }
 
+/**
+ * Lightweight membership data for the current user.
+ * Used for permission checks without fetching full member data.
+ */
+export interface MyClubMembership {
+	clubId: string;
+	role: ClubRole;
+	isActive: boolean;
+}
+
 export enum SkillLevel {
 	Beginner = "Beginner",
 	Intermediate = "Intermediate",
@@ -216,6 +226,8 @@ export interface GroupMember {
 	role?: GroupRole;
 	isActive: boolean;
 	clubMember?: ClubMember;
+	userProfile?: UserProfile;
+	userId: string;
 }
 
 export interface CreateGroupRequest {

@@ -20,6 +20,7 @@ import {
 	GroupMember,
 	InvitationPreview,
 	InvitationStatus,
+	MyClubMembership,
 	RegistrationFilterRequest,
 	RegistrationStatus,
 	RegistrationStatusCounts,
@@ -83,6 +84,11 @@ export async function inviteMember(clubId: string, userId: string, role: string)
 	await client.post(CLUBS_API_V1 + endpoint, { userId, role });
 }
 
+export async function inviteMembers(clubId: string, userIds: string[]): Promise<void> {
+	const endpoint = `/clubs/${clubId}/members/batch`;
+	await client.post(CLUBS_API_V1 + endpoint, { userIds });
+}
+
 export async function leaveClub(clubId: string, userId: string): Promise<void> {
 	const endpoint = `/clubs/${clubId}/members/${userId}`;
 	await client.delete(CLUBS_API_V1 + endpoint);
@@ -102,6 +108,26 @@ export async function updateClubMember(clubId: string, memberId: string, data: U
 export async function getClubMembers(clubId: string): Promise<ClubMember[]> {
 	const endpoint = `/clubs/${clubId}/members`;
 	return (await client.get<ClubMember[]>(CLUBS_API_V1 + endpoint)).data;
+}
+
+/**
+ * Get the current user's membership in a club.
+ * Returns null if user is not a member.
+ */
+export async function getMyClubMembership(clubId: string): Promise<MyClubMembership | null> {
+	try {
+		const endpoint = `/clubs/${clubId}/my-membership`;
+		return (await client.get<MyClubMembership>(CLUBS_API_V1 + endpoint)).data;
+	} catch (error: unknown) {
+		// Return null if not a member (404)
+		if (error && typeof error === "object" && "response" in error) {
+			const axiosError = error as { response?: { status?: number } };
+			if (axiosError.response?.status === 404) {
+				return null;
+			}
+		}
+		throw error;
+	}
 }
 
 // Team API functions
@@ -176,6 +202,10 @@ export async function addGroupMember(groupId: string, userId: string, role?: str
 	await client.post(CLUBS_API_V1 + endpoint, { userId, role });
 }
 
+export async function addGroupMembers(groupId: string, userIds: string[]): Promise<void> {
+	const endpoint = `/groups/${groupId}/members/batch`;
+	await client.post(CLUBS_API_V1 + endpoint, { userIds });
+}
 export async function removeGroupMember(groupId: string, userId: string): Promise<void> {
 	const endpoint = `/groups/${groupId}/members/${userId}`;
 	await client.delete(CLUBS_API_V1 + endpoint);

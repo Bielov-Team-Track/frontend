@@ -5,6 +5,7 @@ import { useClub } from "@/providers";
 import { ChevronDown, ChevronRight, Volleyball } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useMemo } from "react";
 import { getNavigationItems, NavigationItem } from "../shared/nav-items";
 import { useNavigation } from "../shared/useNavigation";
 
@@ -205,7 +206,10 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 	const { clubs } = useClub();
 
 	// Data Preparation
-	const navigationItems = getNavigationItems(unreadMessageCount, clubs);
+	const navigationItems = useMemo(
+		() => getNavigationItems(unreadMessageCount, clubs),
+		[unreadMessageCount, clubs]
+	);
 
 	const renderNavItems = () => (
 		<nav className="space-y-1">

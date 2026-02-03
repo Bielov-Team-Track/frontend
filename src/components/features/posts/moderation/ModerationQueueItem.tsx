@@ -4,6 +4,7 @@ import { Avatar, Button } from "@/components/ui";
 import { useDeletePostAsAdmin, useDismissReports, useHidePost, useRestorePost } from "@/hooks/usePosts";
 import { ModerationQueueItem as ModerationQueueItemType, ReportReasonOptions } from "@/lib/models/Moderation";
 import { cn } from "@/lib/utils";
+import { sanitizeHtmlWithSafeLinks } from "@/lib/utils/sanitize";
 import { formatDistanceToNow } from "date-fns";
 import { ChevronDown, ChevronUp, Eye, EyeOff, Flag, RefreshCw, Trash2, X } from "lucide-react";
 import { useState } from "react";
@@ -120,7 +121,7 @@ export default function ModerationQueueItem({ item, onAction }: ModerationQueueI
 			{showContent && (
 				<div className="px-4 pb-4">
 					<div className="p-3 rounded-lg bg-white/5 border border-white/10">
-						<div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
+						<div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithSafeLinks(post.content) }} />
 					</div>
 				</div>
 			)}

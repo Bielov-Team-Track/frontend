@@ -7,12 +7,11 @@ import Link from "next/link";
 
 interface GroupCardProps {
 	group: Group;
-	onManage?: () => void;
 	onEdit?: () => void;
 	onDelete?: () => void;
 }
 
-export default function GroupCard({ group, onManage, onEdit, onDelete }: GroupCardProps) {
+export default function GroupCard({ group, onEdit, onDelete }: GroupCardProps) {
 	const groupColor = group.color || "#6B7280";
 
 	return (
@@ -58,16 +57,6 @@ export default function GroupCard({ group, onManage, onEdit, onDelete }: GroupCa
 					<div className="w-3 h-3 rounded-full" style={{ backgroundColor: groupColor }} />
 					<span className="text-xs text-muted">{group.members?.length || 0} members</span>
 				</div>
-				{onManage && (
-					<button
-						onClick={(e) => {
-							e.preventDefault();
-							onManage();
-						}}
-						className="text-xs text-accent hover:underline">
-						Manage Members
-					</button>
-				)}
 			</div>
 		</Link>
 	);

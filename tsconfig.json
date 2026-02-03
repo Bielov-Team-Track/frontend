@@ -1,11 +1,9 @@
 {
   "compilerOptions": {
-    "downlevelIteration": true,
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext",
-      "es2017.object"
+      "esnext"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -28,7 +26,7 @@
         "./src/*"
       ]
     },
-    "target": "ES2017"
+    "target": "ES2020"
   },
   "include": [
     "next-env.d.ts",

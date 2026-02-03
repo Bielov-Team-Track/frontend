@@ -1,9 +1,9 @@
+import { UserSelectorModal } from "@/components/features/users";
 import { UserProfile } from "@/lib/models/User";
 import { useCallback, useState } from "react";
 import { useEventFormContext } from "../../context/EventFormContext";
 import { CapacityField } from "./CapacityField";
 import { InviteesSummaryCard } from "./InviteesSummaryCard";
-import InviteeSelectorModal from "./InviteeSelectorModal";
 import { RegistrationTimingFields } from "./RegistrationTimingFields";
 import { RegistrationTypeSelector } from "./RegistrationTypeSelector";
 
@@ -26,10 +26,10 @@ export function ListRegistration() {
 			// Update form with just user IDs
 			setValue(
 				"invitees",
-				users.map((u) => u.userId)
+				users.map((u) => u.id),
 			);
 		},
-		[setValue]
+		[setValue],
 	);
 
 	return (
@@ -52,14 +52,11 @@ export function ListRegistration() {
 						? "Add people who can participate in this event."
 						: "Optionally invite specific people (they'll be notified)."}
 				</p>
-				<InviteesSummaryCard
-					selectedUsers={selectedUsersCache}
-					onEdit={() => setIsModalOpen(true)}
-				/>
+				<InviteesSummaryCard selectedUsers={selectedUsersCache} onEdit={() => setIsModalOpen(true)} />
 			</div>
 
 			{/* Invitee Selector Modal */}
-			<InviteeSelectorModal
+			<UserSelectorModal
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
 				selectedUsers={selectedUsersCache}

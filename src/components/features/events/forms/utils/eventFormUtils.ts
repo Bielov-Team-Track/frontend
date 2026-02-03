@@ -1,16 +1,9 @@
-import {
-	CreateEvent,
-	CreateEventSeries,
-	EventFormat,
-	EventType,
-	PlayingSurface,
-	RecurrencePattern,
-	TimeOffsetUnit,
-} from "@/lib/models/Event";
+import { CreateEvent, CreateEventSeries, EventFormat, EventType, PlayingSurface, RecurrencePattern, TimeOffsetUnit } from "@/lib/models/Event";
 import { PricingModel, Unit } from "@/lib/models/EventBudget";
 import { EventFormData } from "../validation/eventValidationSchema";
+import { ContextSelection } from "../components/ContextSelector";
 
-export function transformFormDataToCreateEvent(data: EventFormData): CreateEvent {
+export function transformFormDataToCreateEvent(data: EventFormData, contextSelection?: ContextSelection): CreateEvent {
 	return {
 		startTime: new Date(data.startTime),
 		endTime: new Date(data.endTime),
@@ -23,26 +16,26 @@ export function transformFormDataToCreateEvent(data: EventFormData): CreateEvent
 			latitude: data.location.latitude,
 			longitude: data.location.longitude,
 		},
-		budget: data.useBudget ? {
-			cost: data.budget?.cost ?? 0,
-			payToJoin: data.budget?.payToJoin ?? false,
-			pricingModel: data.budget?.pricingModel ?? PricingModel.Individual,
-			dropoutDeadlineHours: data.budget?.dropoutDeadlineHours,
-			minUnitsForBudget: data.budget?.minUnitsForBudget,
-		} : undefined,
+		paymentsConfig: data.useBudget
+			? {
+					cost: Number(data.budget?.cost) || 0,
+					payToJoin: data.budget?.payToJoin ?? false,
+					pricingModel: data.budget?.pricingModel ?? PricingModel.Individual,
+					dropoutDeadlineHours: data.budget?.dropoutDeadlineHours ? Number(data.budget.dropoutDeadlineHours) : undefined,
+					minUnitsForBudget: data.budget?.minUnitsForBudget ? Number(data.budget.minUnitsForBudget) : undefined,
+				}
+			: undefined,
 		name: data.name,
 		eventFormat: data.eventFormat,
-		registrationUnit: data.registrationUnit,
 		type: data.type,
 		surface: data.surface,
-		isPrivate: !!data.isPrivate,
-		// Legacy fields for backend compatibility
-		approveGuests: data.registrationType === "closed",
-		teamsNumber: 2, // Default value for now
+		isPublic: !!data.isPublic,
+		contextType: contextSelection?.contextType,
+		contextId: contextSelection?.context.id,
 	};
 }
 
-export function transformFormDataToCreateEventSeries(data: EventFormData): CreateEventSeries {
+export function transformFormDataToCreateEventSeries(data: EventFormData, contextSelection?: ContextSelection): CreateEventSeries {
 	return {
 		name: data.name,
 		description: data.description,
@@ -68,26 +61,24 @@ export function transformFormDataToCreateEventSeries(data: EventFormData): Creat
 			: undefined,
 		paymentsConfig: data.useBudget
 			? {
-					cost: data.budget?.cost ?? 0,
+					cost: Number(data.budget?.cost) || 0,
 					payToJoin: data.budget?.payToJoin ?? false,
 					pricingModel: data.budget?.pricingModel ?? PricingModel.Individual,
-					dropoutDeadlineHours: data.budget?.dropoutDeadlineHours,
-					minUnitsForBudget: data.budget?.minUnitsForBudget,
+					dropoutDeadlineHours: data.budget?.dropoutDeadlineHours ? Number(data.budget.dropoutDeadlineHours) : undefined,
+					minUnitsForBudget: data.budget?.minUnitsForBudget ? Number(data.budget.minUnitsForBudget) : undefined,
 				}
 			: undefined,
 		registrationOpenOffset: data.registrationOpenOffset,
 		registrationDeadlineOffset: data.registrationDeadlineOffset,
+		contextType: contextSelection?.contextType,
+		contextId: contextSelection?.context.id,
 	};
 }
 
 /**
  * Calculate the number of occurrences for a recurring event series
  */
-export function calculateSeriesOccurrences(
-	firstOccurrenceDate: Date,
-	seriesEndDate: Date,
-	pattern: RecurrencePattern
-): Date[] {
+export function calculateSeriesOccurrences(firstOccurrenceDate: Date, seriesEndDate: Date, pattern: RecurrencePattern): Date[] {
 	const occurrences: Date[] = [];
 	let current = new Date(firstOccurrenceDate);
 	const end = new Date(seriesEndDate);
@@ -153,7 +144,7 @@ export function getDefaultFormValues() {
 		eventFormat: EventFormat.TeamsWithPositions,
 		registrationUnit: Unit.Individual,
 		surface: PlayingSurface.Indoor,
-		isPrivate: false,
+		isPublic: false,
 		capacity: null,
 		description: "",
 		payToEnter: false,

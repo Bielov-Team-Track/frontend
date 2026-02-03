@@ -65,9 +65,9 @@ export default function CommentsList({ postId, commentCount }: CommentsListProps
 	const handleDelete = useCallback(
 		async (commentId: string) => {
 			if (!confirm("Delete this comment?")) return;
-			await deleteComment.mutateAsync(commentId);
+			await deleteComment.mutateAsync({ commentId, postId });
 		},
-		[deleteComment]
+		[deleteComment, postId]
 	);
 
 	const comments = data?.pages.flatMap((page) => page.items) ?? [];
