@@ -16,7 +16,7 @@ const meta: Meta<typeof AttendanceCell> = {
     tags: ["autodocs"],
     decorators: [
         (Story) => (
-            <div className="p-8 bg-background-light rounded-xl">
+            <div className="p-8 bg-surface-elevated rounded-xl">
                 <Story />
             </div>
         ),

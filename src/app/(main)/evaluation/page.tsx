@@ -138,7 +138,7 @@ export default function EvaluationPage() {
 						: "border-transparent hover:bg-white/5"
 				}
               `}>
-							<div className="w-10 h-10 rounded-full bg-background-light overflow-hidden flex items-center justify-center shrink-0">
+							<div className="w-10 h-10 rounded-full bg-surface-elevated overflow-hidden flex items-center justify-center shrink-0">
 								{/* eslint-disable-next-line @next/next/no-img-element */}
 								<img
 									src={player.avatar}

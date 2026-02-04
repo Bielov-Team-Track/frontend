@@ -116,12 +116,12 @@ export default function PlayerPage() {
 			{/* --- HERO SECTION --- */}
 			<div className="relative mb-6">
 				{/* Banner & Gradient */}
-				<div className="h-48 md:h-80 w-full relative overflow-hidden bg-background-light">
+				<div className="h-48 md:h-80 w-full relative overflow-hidden bg-surface">
 					{!bannerError ? (
 						/* eslint-disable-next-line @next/next/no-img-element */
 						<img src={PLAYER.banner} alt="Banner" className="w-full h-full object-cover opacity-60" onError={() => setBannerError(true)} />
 					) : (
-						<div className="w-full h-full flex items-center justify-center bg-background-light text-muted/30">
+						<div className="w-full h-full flex items-center justify-center bg-surface text-muted/30">
 							<ImageOff size={48} />
 						</div>
 					)}
@@ -132,7 +132,7 @@ export default function PlayerPage() {
 				<div className="max-w-desktop mx-auto px-4 sm:px-6 relative -mt-20 md:-mt-32 flex flex-col md:flex-row items-end gap-6">
 					{/* Avatar */}
 					<div className="relative">
-						<div className="w-28 h-28 md:w-48 md:h-48 rounded-full border-4 border-background-dark bg-background-light overflow-hidden shadow-2xl shadow-black/50 flex items-center justify-center">
+						<div className="w-28 h-28 md:w-48 md:h-48 rounded-full border-4 border-background bg-surface-elevated overflow-hidden shadow-2xl shadow-black/50 flex items-center justify-center">
 							{!avatarError ? (
 								/* eslint-disable-next-line @next/next/no-img-element */
 								<img src={PLAYER.avatar} alt={PLAYER.name} className="w-full h-full object-cover" onError={() => setAvatarError(true)} />
@@ -142,7 +142,7 @@ export default function PlayerPage() {
 						</div>
 						{PLAYER.isVerified && (
 							<div
-								className="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full border-4 border-background-dark"
+								className="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full border-4 border-background"
 								title="Verified Player">
 								<Check size={18} strokeWidth={3} />
 							</div>

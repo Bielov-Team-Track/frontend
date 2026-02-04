@@ -44,7 +44,7 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 			{/* --- HERO SECTION --- */}
 			<div className="relative w-full">
 				{/* Banner & Gradient */}
-				<div className="h-56 md:h-80 w-full relative overflow-hidden bg-background-light">
+				<div className="h-56 md:h-80 w-full relative overflow-hidden bg-surface">
 					{/* Placeholder Gradient if no image (Event model doesn't seem to have bannerUrl yet) */}
 					<div className="absolute inset-0 bg-linear-to-br from-primary/20 via-background-dark to-accent/10" />
 					<div className="absolute inset-0 bg-linear-to-t from-background-dark via-background-dark/60 to-transparent" />
@@ -53,7 +53,7 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 				{/* Event Header Content */}
 				<div className="max-w-desktop mx-auto px-4 sm:px-6 relative -mt-20 md:-mt-32 flex flex-col md:flex-row items-end gap-6">
 					{/* Date Badge */}
-					<div className="relative hidden md:flex flex-col items-center justify-center w-32 h-32 rounded-2xl bg-background-light border-4 border-background-dark shadow-2xl">
+					<div className="relative hidden md:flex flex-col items-center justify-center w-32 h-32 rounded-2xl bg-surface-elevated border-4 border-background shadow-2xl">
 						<span className="text-4xl font-black text-accent">{day}</span>
 						<span className="text-lg font-bold text-muted uppercase tracking-wider">{month}</span>
 					</div>
@@ -110,7 +110,7 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 				<div className="lg:col-span-4 space-y-6 order-2 lg:order-1">
 					{/* Status Card (Mobile Date) */}
 					<div className="md:hidden p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center gap-4">
-						<div className="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-background-light border border-white/10">
+						<div className="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-surface-elevated border border-white/10">
 							<span className="text-xl font-bold text-accent">{day}</span>
 							<span className="text-[10px] font-bold text-muted uppercase">{month}</span>
 						</div>

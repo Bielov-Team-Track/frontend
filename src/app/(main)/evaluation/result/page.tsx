@@ -120,7 +120,7 @@ export default function PlayerReportCard() {
 										<span className="text-muted capitalize font-medium">{key}</span>
 										<span className="text-white font-bold">{value}/10</span>
 									</div>
-									<div className="h-2 bg-background-light rounded-full overflow-hidden">
+									<div className="h-2 bg-track rounded-full overflow-hidden">
 										<div
 											className="h-full bg-linear-to-r from-accent/80 to-accent transition-all duration-1000 ease-out"
 											style={{
@@ -134,7 +134,7 @@ export default function PlayerReportCard() {
 						{/* Coach Feedback Box */}
 						<div className="bg-white/5 rounded-xl p-5 border border-white/5">
 							<div className="flex items-center gap-3 mb-3">
-								<div className="w-8 h-8 rounded-full bg-background-light border border-white/10"></div>
+								<div className="w-8 h-8 rounded-full bg-surface-elevated border border-white/10"></div>
 								<div>
 									<div className="text-sm font-bold text-white">{REPORT.coachName}</div>
 									<div className="text-xs text-muted">Head Coach</div>

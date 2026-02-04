@@ -36,7 +36,7 @@ const EventCard = memo(function EventCard({ event, variant = "horizontal" }: Eve
 			<div
 				className={clsx(
 					variantClasses[variant],
-					"rounded-lg relative bg-background-light shadow-md shadow-black/50 overflow-hidden cursor-pointer",
+					"rounded-lg relative bg-surface shadow-md shadow-black/50 overflow-hidden cursor-pointer",
 					"transition-all duration-200 ease-in-out transform-gpu",
 					"hover:shadow-lg hover:shadow-black/50 hover:scale-[1.01]",
 					"active:scale-100",

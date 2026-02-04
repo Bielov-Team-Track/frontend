@@ -17,7 +17,7 @@ const meta: Meta<typeof AttendanceTable> = {
     tags: ["autodocs"],
     decorators: [
         (Story) => (
-            <div className="bg-background-light rounded-xl p-4 max-w-6xl">
+            <div className="bg-surface-elevated rounded-xl p-4 max-w-6xl">
                 <Story />
             </div>
         ),

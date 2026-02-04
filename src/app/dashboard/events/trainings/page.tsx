@@ -150,7 +150,7 @@ export default function TrainingSessionPage() {
 										{EVENT_DETAILS.participants.map((p) => (
 											<div
 												key={p.id}
-												className="w-6 h-6 rounded-full border border-background bg-background-light overflow-hidden flex items-center justify-center">
+												className="w-6 h-6 rounded-full border border-background bg-surface-elevated overflow-hidden flex items-center justify-center">
 												{/* eslint-disable-next-line @next/next/no-img-element */}
 												<img
 													src={p.img}
@@ -231,7 +231,7 @@ export default function TrainingSessionPage() {
 								recommendedDrills.map((drill) => (
 									<div
 										key={drill.id}
-										className="group flex items-center justify-between p-3 rounded-xl bg-background-light border border-white/5 hover:border-white/20 transition-all">
+										className="group flex items-center justify-between p-3 rounded-xl bg-surface border border-white/5 hover:border-white/20 transition-all">
 										<div>
 											<div className="font-bold text-white text-sm">{drill.name}</div>
 											<div className="flex items-center gap-2 text-[10px] text-muted mt-1">

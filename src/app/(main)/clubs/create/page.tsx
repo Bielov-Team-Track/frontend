@@ -453,7 +453,7 @@ export default function CreateClubPage() {
 					placeholder="contact@club.com"
 					error={errors.contact_email?.message}
 					optional
-					className="bg-background-light"
+					className="bg-surface-elevated"
 					{...register("contact_email")}
 				/>
 				<Input
@@ -462,7 +462,7 @@ export default function CreateClubPage() {
 					placeholder="+1 (555) 000-0000"
 					error={errors.contact_phone?.message}
 					optional
-					className="bg-background-light"
+					className="bg-surface-elevated"
 					{...register("contact_phone")}
 				/>
 			</div>
@@ -519,7 +519,7 @@ export default function CreateClubPage() {
 			</div>
 
 			{/* Preview Card */}
-			<div className="relative w-full rounded-2xl overflow-hidden bg-background-light border border-border shadow-xl">
+			<div className="relative w-full rounded-2xl overflow-hidden bg-surface-elevated border border-border shadow-xl">
 				{/* Banner Preview */}
 				<div className="h-32 w-full bg-overlay-light relative">
 					{bannerPreview ? (
@@ -530,13 +530,13 @@ export default function CreateClubPage() {
 							<ImageIcon className="text-white/10" size={48} />
 						</div>
 					)}
-					<div className="absolute inset-0 bg-linear-to-t from-background-light via-transparent to-transparent" />
+					<div className="absolute inset-0 bg-linear-to-t from-surface-elevated via-transparent to-transparent" />
 				</div>
 
 				<div className="px-6 pb-6 relative">
 					<div className="flex justify-between items-end -mt-10 mb-4">
 						{/* Logo Preview */}
-						<div className="w-20 h-20 rounded-2xl border-4 border-background-light bg-background overflow-hidden shadow-lg flex items-center justify-center">
+						<div className="w-20 h-20 rounded-2xl border-4 border-surface-elevated bg-background overflow-hidden shadow-lg flex items-center justify-center">
 							{logoPreview ? (
 								/* eslint-disable-next-line @next/next/no-img-element */
 								<img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />

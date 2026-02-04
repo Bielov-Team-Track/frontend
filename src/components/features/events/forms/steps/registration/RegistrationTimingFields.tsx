@@ -110,7 +110,7 @@ function RelativeRegistrationTiming() {
 								type="number"
 								min={0}
 								placeholder="7"
-								className="w-24 bg-background-light"
+								className="w-24 bg-surface-elevated"
 								onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
 							/>
 						)}
@@ -120,7 +120,7 @@ function RelativeRegistrationTiming() {
 						control={control}
 						render={({ field }) => (
 							<Select value={field.value} onValueChange={field.onChange}>
-								<SelectTrigger className="w-32 bg-background-light">
+								<SelectTrigger className="w-32 bg-surface-elevated">
 									<SelectValue placeholder="days" />
 								</SelectTrigger>
 								<SelectContent>
@@ -160,7 +160,7 @@ function RelativeRegistrationTiming() {
 								type="number"
 								min={0}
 								placeholder="1"
-								className="w-24 bg-background-light"
+								className="w-24 bg-surface-elevated"
 								onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
 							/>
 						)}
@@ -170,7 +170,7 @@ function RelativeRegistrationTiming() {
 						control={control}
 						render={({ field }) => (
 							<Select value={field.value} onValueChange={field.onChange}>
-								<SelectTrigger className="w-32 bg-background-light">
+								<SelectTrigger className="w-32 bg-surface-elevated">
 									<SelectValue placeholder="hours" />
 								</SelectTrigger>
 								<SelectContent>

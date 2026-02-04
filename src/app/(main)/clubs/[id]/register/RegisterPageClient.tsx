@@ -100,7 +100,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 		<div className="min-h-screen bg-background pb-20">
 			{/* --- HERO SECTION --- */}
 			<div className="relative w-full">
-				<div className="h-64 md:h-80 w-full relative overflow-hidden bg-background-light">
+				<div className="h-64 md:h-80 w-full relative overflow-hidden bg-surface">
 					{club.bannerUrl && !bannerError ? (
 						<motion.img
 							initial={{ scale: 1.1, opacity: 0 }}

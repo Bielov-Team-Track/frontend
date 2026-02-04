@@ -38,7 +38,7 @@ export default function PositionAssignmentPopup({
 
 	return (
 		<div
-			className={`absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-background-light border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-96 ${
+			className={`absolute left-1/2 -translate-x-1/2 mt-2 w-72 bg-surface-elevated border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-96 ${
 				className || "top-full"
 			}`}
 			onClick={(e) => e.stopPropagation()}>

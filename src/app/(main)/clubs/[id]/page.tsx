@@ -82,7 +82,7 @@ export default function ClubPage() {
 			{/* --- HERO SECTION --- */}
 			<div className="relative w-full">
 				{/* Banner Image with Gradient Overlay */}
-				<div className="h-56 md:h-80 w-full relative overflow-hidden bg-background-light">
+				<div className="h-56 md:h-80 w-full relative overflow-hidden bg-surface">
 					{club.bannerUrl && !bannerError ? (
 						/* eslint-disable-next-line @next/next/no-img-element */
 						<img src={club.bannerUrl} alt="Club Banner" className="w-full h-full object-cover opacity-80" onError={() => setBannerError(true)} />
@@ -101,7 +101,7 @@ export default function ClubPage() {
 						<div className="relative group self-center md:self-auto">
 							<Avatar src={club.logoUrl} variant="club" size={"2xl"} />
 							{/* Online Status Indicator */}
-							<div className="absolute bottom-2 right-2 md:bottom-4 md:right-4 w-4 h-4 bg-success rounded-full border-2 border-background-dark"></div>
+							<div className="absolute bottom-2 right-2 md:bottom-4 md:right-4 w-4 h-4 bg-success rounded-full border-2 border-background"></div>
 						</div>
 
 						{/* Text Info */}
@@ -170,7 +170,7 @@ export default function ClubPage() {
 										key={team.id}
 										className="flex items-center justify-between group cursor-pointer hover:bg-hover p-2 rounded-lg transition-all">
 										<div className="flex items-center gap-3">
-											<div className="w-10 h-10 rounded-full bg-background-light flex items-center justify-center text-xs font-bold text-muted group-hover:text-white transition-colors">
+											<div className="w-10 h-10 rounded-full bg-surface-elevated flex items-center justify-center text-xs font-bold text-muted group-hover:text-white transition-colors">
 												{team.name.substring(0, 1)}
 											</div>
 											<div>
@@ -199,7 +199,7 @@ export default function ClubPage() {
 							{[1, 2, 3, 4, 5].map((_, i) => (
 								<div
 									key={i}
-									className="aspect-square rounded-lg bg-background-light overflow-hidden relative cursor-pointer hover:opacity-80 transition-opacity">
+									className="aspect-square rounded-lg bg-surface-elevated overflow-hidden relative cursor-pointer hover:opacity-80 transition-opacity">
 									{/* eslint-disable-next-line @next/next/no-img-element */}
 									<img
 										src={`/api/placeholder/100/100?text=${i}`}
@@ -216,7 +216,7 @@ export default function ClubPage() {
 									/>
 								</div>
 							))}
-							<div className="aspect-square rounded-lg bg-background-light border border-border flex items-center justify-center text-xs text-muted cursor-pointer hover:text-white hover:border-white/20 transition-colors">
+							<div className="aspect-square rounded-lg bg-surface-elevated border border-border flex items-center justify-center text-xs text-muted cursor-pointer hover:text-white hover:border-white/20 transition-colors">
 								+24
 							</div>
 						</div>
@@ -269,7 +269,7 @@ export default function ClubPage() {
 												<span>Attendees</span>
 												<span>{event.spots}</span>
 											</div>
-											<div className="h-1.5 w-full bg-background-light rounded-full overflow-hidden">
+											<div className="h-1.5 w-full bg-track rounded-full overflow-hidden">
 												<div className="h-full bg-primary w-[85%] rounded-full"></div>
 											</div>
 										</div>
@@ -335,7 +335,7 @@ export default function ClubPage() {
 
 									{/* Post Image */}
 									{post.image && (
-										<div className="rounded-xl overflow-hidden mb-4 border border-border bg-background-light">
+										<div className="rounded-xl overflow-hidden mb-4 border border-border bg-surface-elevated">
 											{/* eslint-disable-next-line @next/next/no-img-element */}
 											<img src={post.image} alt="Post attachment" className="w-full h-auto object-cover max-h-80" />
 										</div>

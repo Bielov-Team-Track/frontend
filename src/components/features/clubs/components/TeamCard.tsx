@@ -16,7 +16,7 @@ export default function TeamCard({ team, onEdit, onDelete }: TeamCardProps) {
 			href={`/dashboard/teams/${team.id}`}
 			className="rounded-xl bg-white/5 border border-white/10 p-4 hover:border-accent/30 transition-colors group block">
 			<div className="flex items-center gap-3 mb-3">
-				<div className="w-12 h-12 rounded-lg bg-background-light flex items-center justify-center">
+				<div className="w-12 h-12 rounded-lg bg-surface-elevated flex items-center justify-center">
 					{team.logoUrl ? (
 						// eslint-disable-next-line @next/next/no-img-element
 						<img src={team.logoUrl} alt="" className="w-full h-full object-cover rounded-lg" />

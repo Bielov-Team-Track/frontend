@@ -366,7 +366,7 @@ function GroupMemberRow({ member, onEdit, onRemove }: { member: GroupMember; onE
 					{userProfile ? (
 						<Avatar name={displayName} src={userProfile.imageUrl} />
 					) : (
-						<div className="w-10 h-10 rounded-full bg-background-light flex items-center justify-center text-sm font-bold text-muted">?</div>
+						<div className="w-10 h-10 rounded-full bg-surface-elevated flex items-center justify-center text-sm font-bold text-muted">?</div>
 					)}
 					<div>
 						<div className="text-sm font-medium text-white group-hover:text-accent transition-colors">{displayName}</div>

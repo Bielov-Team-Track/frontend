@@ -43,7 +43,7 @@ function PositionWithUser({ position, userId, team, onPositionLeave, open = fals
 
 	if (!collapsable) {
 		return (
-			<div className="p-3 rounded-xl bg-background-light border border-white/5 w-full flex justify-between items-center transition-all hover:bg-white/5">
+			<div className="p-3 rounded-xl bg-surface-elevated border border-white/5 w-full flex justify-between items-center transition-all hover:bg-white/5">
 				<Link href={`/profiles/${userProfile?.id}`} className="flex gap-3 items-center z-50 group">
 					<Avatar profile={userProfile!} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors" />
 					<div className="flex flex-col">
@@ -60,7 +60,7 @@ function PositionWithUser({ position, userId, team, onPositionLeave, open = fals
 	return (
 		<div
 			className={`rounded-xl border transition-all duration-300 overflow-hidden ${
-				isExpanded ? "bg-[#1E1E1E] border-white/10 shadow-lg" : "bg-background-light border-white/5"
+				isExpanded ? "bg-[#1E1E1E] border-white/10 shadow-lg" : "bg-surface-elevated border-white/5"
 			}`}>
 			{/* Header / Trigger */}
 			<div

@@ -70,13 +70,13 @@ export function TimeAndDateStep() {
 	};
 
 	return (
-		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300" data-testid="time-date-step">
-			<div className="border-b-2 pb-4">
-				<h2 className="text-xl font-bold text-white mb-1">Time & Date</h2>
-				<p className="text-muted text-sm">When will your event take place?</p>
+		<div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-right-4 duration-300" data-testid="time-date-step">
+			<div className="border-b-2 pb-3 sm:pb-4">
+				<h2 className="text-lg sm:text-xl font-bold text-white mb-1">Time & Date</h2>
+				<p className="text-muted text-xs sm:text-sm">When will your event take place?</p>
 			</div>
 
-			<div className="space-y-6">
+			<div className="space-y-4 sm:space-y-6">
 				{/* Event Mode Tabs */}
 				<Tabs
 					value={isRecurring ? "recurring" : "single"}
@@ -94,7 +94,7 @@ export function TimeAndDateStep() {
 					</TabsList>
 
 					{/* Single Event Mode */}
-					<TabsContent value="single" className="mt-6">
+					<TabsContent value="single" className="mt-4 sm:mt-6">
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<Controller
 								name="startTime"
@@ -110,7 +110,7 @@ export function TimeAndDateStep() {
 										value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ""}
 										onChange={(e) => field.onChange(new Date(e.target.value))}
 										required
-										className="bg-background-light"
+										className="bg-surface-elevated"
 										data-testid="start-datetime-input"
 									/>
 								)}
@@ -130,7 +130,7 @@ export function TimeAndDateStep() {
 										value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ""}
 										onChange={(e) => field.onChange(new Date(e.target.value))}
 										required
-										className="bg-background-light"
+										className="bg-surface-elevated"
 										data-testid="end-datetime-input"
 									/>
 								)}
@@ -144,7 +144,7 @@ export function TimeAndDateStep() {
 					</TabsContent>
 
 					{/* Recurring Event Mode */}
-					<TabsContent value="recurring" className="mt-6 space-y-6">
+					<TabsContent value="recurring" className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
 						{/* Recurrence Pattern */}
 						<div>
 							<label className="text-sm font-medium text-white mb-2 block">
@@ -158,7 +158,7 @@ export function TimeAndDateStep() {
 										value={field.value ?? ""}
 										onValueChange={field.onChange}
 									>
-										<SelectTrigger className="w-full bg-background-light">
+										<SelectTrigger className="w-full bg-surface-elevated">
 											<SelectValue placeholder="Select frequency" />
 										</SelectTrigger>
 										<SelectContent>
@@ -192,7 +192,7 @@ export function TimeAndDateStep() {
 										value={field.value ? new Date(field.value).toISOString().slice(0, 10) : ""}
 										onChange={(e) => field.onChange(new Date(e.target.value))}
 										required
-										className="bg-background-light"
+										className="bg-surface-elevated"
 									/>
 								)}
 							/>
@@ -211,7 +211,7 @@ export function TimeAndDateStep() {
 										value={field.value ? new Date(field.value).toISOString().slice(0, 10) : ""}
 										onChange={(e) => field.onChange(new Date(e.target.value))}
 										required
-										className="bg-background-light"
+										className="bg-surface-elevated"
 									/>
 								)}
 							/>
@@ -235,7 +235,7 @@ export function TimeAndDateStep() {
 											error={errors.eventStartTime?.message}
 											helperText="When each event starts"
 											required
-											className="bg-background-light"
+											className="bg-surface-elevated"
 										/>
 									)}
 								/>
@@ -252,7 +252,7 @@ export function TimeAndDateStep() {
 											error={errors.eventEndTime?.message}
 											helperText="When each event ends"
 											required
-											className="bg-background-light"
+											className="bg-surface-elevated"
 										/>
 									)}
 								/>
@@ -278,14 +278,15 @@ export function TimeAndDateStep() {
 // Single Event Summary Component
 function SingleEventSummary({ startTime, endTime }: { startTime: Date; endTime: Date }) {
 	return (
-		<div className="p-4 rounded-xl bg-white/5 border border-white/10 mt-4">
-			<div className="flex items-center gap-3 mb-3">
-				<div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
-					<Clock size={16} className="text-accent" />
+		<div className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10 mt-4">
+			<div className="flex items-center gap-2 sm:gap-3 mb-3">
+				<div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+					<Clock size={14} className="text-accent sm:hidden" />
+					<Clock size={16} className="text-accent hidden sm:block" />
 				</div>
-				<span className="text-sm font-semibold text-white">Event Summary</span>
+				<span className="text-xs sm:text-sm font-semibold text-white">Event Summary</span>
 			</div>
-			<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+			<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm">
 				<div>
 					<span className="text-muted text-xs uppercase tracking-wider block mb-1">Start</span>
 					<span className="text-white font-medium">
@@ -358,14 +359,15 @@ function SeriesPreview({
 	const patternLabel = RecurrencePatternOptions.find((o) => o.value === pattern)?.label || pattern;
 
 	return (
-		<div className="p-4 rounded-xl bg-white/5 border border-white/10">
-			<div className="flex items-center gap-3 mb-4">
-				<div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
-					<Repeat size={16} className="text-accent" />
+		<div className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/10">
+			<div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+				<div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+					<Repeat size={14} className="text-accent sm:hidden" />
+					<Repeat size={16} className="text-accent hidden sm:block" />
 				</div>
-				<div>
-					<span className="text-sm font-semibold text-white block">Series Preview</span>
-					<span className="text-xs text-muted">
+				<div className="min-w-0">
+					<span className="text-xs sm:text-sm font-semibold text-white block">Series Preview</span>
+					<span className="text-[10px] sm:text-xs text-muted">
 						{occurrences.length} events · {patternLabel} · {getDurationFromTimes(startTime, endTime)} each
 					</span>
 				</div>
@@ -373,39 +375,38 @@ function SeriesPreview({
 
 			{/* Warning if too many events */}
 			{occurrences.length > 52 && (
-				<div className="mb-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-					<p className="text-sm text-yellow-400">
+				<div className="mb-3 sm:mb-4 p-2 sm:p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+					<p className="text-xs sm:text-sm text-yellow-400">
 						This series will create {occurrences.length} events. Consider a shorter date range.
 					</p>
 				</div>
 			)}
 
 			{/* Occurrence list */}
-			<div className="space-y-2">
+			<div className="space-y-1.5 sm:space-y-2">
 				{displayOccurrences.map((date, index) => (
 					<div
 						key={index}
-						className="flex items-center justify-between text-sm py-2 px-3 rounded-lg bg-white/5"
+						className="flex items-center justify-between text-xs sm:text-sm py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg bg-white/5"
 					>
-						<div className="flex items-center gap-3">
-							<span className="text-muted w-6">#{index + 1}</span>
+						<div className="flex items-center gap-2 sm:gap-3">
+							<span className="text-muted w-5 sm:w-6">#{index + 1}</span>
 							<span className="text-white">
 								{date.toLocaleDateString("en-US", {
 									weekday: "short",
 									month: "short",
 									day: "numeric",
-									year: "numeric",
 								})}
 							</span>
 						</div>
-						<span className="text-muted">
+						<span className="text-muted text-[10px] sm:text-sm">
 							{startTime} - {endTime}
 						</span>
 					</div>
 				))}
 
 				{remainingCount > 0 && (
-					<div className="text-center py-2 text-sm text-muted">
+					<div className="text-center py-2 text-xs sm:text-sm text-muted">
 						...and {remainingCount} more event{remainingCount > 1 ? "s" : ""}
 					</div>
 				)}

@@ -60,7 +60,7 @@ function MultiSelectInputInner<T>(
 	const baseClasses =
 		"input w-full transition-colors duration-200 focus:outline-hidden " +
 		"focus:ring-1 focus:ring-offset-1 focus:ring-muted rounded-md outline-1 " +
-		"bg-background-light text-muted placeholder:text-muted focus:placeholder:text ";
+		"bg-surface-elevated text-muted placeholder:text-muted focus:placeholder:text ";
 
 	const variantClasses = {
 		default: "input-ghost",
