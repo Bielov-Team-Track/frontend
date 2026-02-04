@@ -117,10 +117,10 @@ export default function CommentItem({
 							src={avatarSrc}
 							name={avatarName}
 							size="sm"
-							className="border-2 border-transparent group-hover:border-white/10 transition-colors"
+							className="border-2 border-transparent group-hover:border-border transition-colors"
 						/>
 					) : (
-						<div className="w-9 h-9 rounded-full bg-white/10 border border-white/10" />
+						<div className="w-9 h-9 rounded-full bg-surface border border-border" />
 					)}
 				</div>
 
@@ -144,7 +144,7 @@ export default function CommentItem({
 									if (!open) setShowDeleteConfirm(false);
 								}}
 							>
-								<DropdownMenuTrigger className="p-1 rounded-lg text-muted hover:text-white hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-all">
+								<DropdownMenuTrigger className="p-1 rounded-lg text-muted hover:text-white hover:bg-active opacity-0 group-hover:opacity-100 transition-all">
 									<MoreHorizontal size={14} />
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end" className="w-40">
@@ -182,7 +182,7 @@ export default function CommentItem({
 					</div>
 
 					{/* Comment content */}
-					<div className="text-sm text-gray-200 leading-relaxed bg-white/5 p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl border border-white/5">
+					<div className="text-sm text-muted-foreground leading-relaxed bg-surface p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl border border-border">
 						{comment.content}
 					</div>
 
@@ -202,7 +202,7 @@ export default function CommentItem({
 
 			{/* Nested replies */}
 			{canShowReplies && hasReplies && (
-				<div className="ml-12 mt-4 space-y-4 pl-4 border-l border-white/5">
+				<div className="ml-12 mt-4 space-y-4 pl-4 border-l border-border">
 					{comment.replies!.map((reply) => (
 						<CommentItem
 							key={reply.id}

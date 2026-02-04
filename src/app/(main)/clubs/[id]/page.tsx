@@ -149,7 +149,7 @@ export default function ClubPage() {
 				{/* --- LEFT SIDEBAR (Context) --- */}
 				<div className="lg:col-span-4 space-y-6">
 					{/* About Card */}
-					<div className="p-6 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-xs">
+					<div className="p-6 rounded-2xl bg-surface border border-border backdrop-blur-xs">
 						<h3 className="text-lg font-bold text-white mb-3">About</h3>
 						<p className="text-muted text-sm leading-relaxed mb-4">{club.description || "No description available."}</p>
 						{club.contactEmail && <div className="text-xs text-muted mb-2">Contact: {club.contactEmail}</div>}
@@ -157,7 +157,7 @@ export default function ClubPage() {
 					</div>
 
 					{/* Teams List */}
-					<div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+					<div className="p-6 rounded-2xl bg-surface border border-border">
 						<div className="flex justify-between items-center mb-4">
 							<h3 className="text-lg font-bold text-white">Teams ({teams.length})</h3>
 						</div>
@@ -168,7 +168,7 @@ export default function ClubPage() {
 								{teams.slice(0, 5).map((team) => (
 									<div
 										key={team.id}
-										className="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-all">
+										className="flex items-center justify-between group cursor-pointer hover:bg-hover p-2 rounded-lg transition-all">
 										<div className="flex items-center gap-3">
 											<div className="w-10 h-10 rounded-full bg-background-light flex items-center justify-center text-xs font-bold text-muted group-hover:text-white transition-colors">
 												{team.name.substring(0, 1)}
@@ -190,7 +190,7 @@ export default function ClubPage() {
 					</div>
 
 					{/* Gallery Preview */}
-					<div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+					<div className="p-6 rounded-2xl bg-surface border border-border">
 						<div className="flex justify-between items-center mb-4">
 							<h3 className="text-lg font-bold text-white">Media</h3>
 							<ImageIcon size={16} className="text-muted" />
@@ -216,7 +216,7 @@ export default function ClubPage() {
 									/>
 								</div>
 							))}
-							<div className="aspect-square rounded-lg bg-background-light border border-white/10 flex items-center justify-center text-xs text-muted cursor-pointer hover:text-white hover:border-white/20 transition-colors">
+							<div className="aspect-square rounded-lg bg-background-light border border-border flex items-center justify-center text-xs text-muted cursor-pointer hover:text-white hover:border-white/20 transition-colors">
 								+24
 							</div>
 						</div>
@@ -234,7 +234,7 @@ export default function ClubPage() {
 
 						<div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar snap-x">
 							{MOCK_EVENTS.length === 0 ? (
-								<div className="w-full p-8 text-center text-muted rounded-2xl bg-white/5 border border-white/5">
+								<div className="w-full p-8 text-center text-muted rounded-2xl bg-surface border border-border">
 									<Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
 									<p>No upcoming events</p>
 								</div>
@@ -245,11 +245,11 @@ export default function ClubPage() {
 										className="snap-start min-w-[280px] p-4 rounded-2xl bg-background border border-white/5 hover:border-accent/50 transition-all group cursor-pointer">
 										<div className="flex items-start justify-between mb-3">
 											{/* Date Box */}
-											<div className="flex flex-col items-center justify-center w-12 h-14 rounded-lg bg-white/5 border border-white/10">
+											<div className="flex flex-col items-center justify-center w-12 h-14 rounded-lg bg-surface border border-border">
 												<span className="text-accent font-bold text-lg leading-none">{event.date}</span>
 												<span className="text-[10px] text-muted uppercase font-medium">{event.month}</span>
 											</div>
-											<div className="px-2 py-1 rounded text-[10px] bg-white/5 text-muted border border-white/5">2h Duration</div>
+											<div className="px-2 py-1 rounded text-[10px] bg-surface text-muted border border-border">2h Duration</div>
 										</div>
 
 										<h4 className="font-bold text-white text-lg truncate pr-2 group-hover:text-accent transition-colors">{event.title}</h4>
@@ -282,7 +282,7 @@ export default function ClubPage() {
 					{/* Section: News Feed */}
 					<section>
 						{/* Tabs */}
-						<div className="flex items-center gap-6 border-b border-white/10 mb-6 overflow-x-auto no-scrollbar">
+						<div className="flex items-center gap-6 border-b border-border mb-6 overflow-x-auto no-scrollbar">
 							{["News", "Match Results", "Announcements"].map((tab) => (
 								<button
 									key={tab}
@@ -301,7 +301,7 @@ export default function ClubPage() {
 						{/* Posts List */}
 						<div className="space-y-6">
 							{MOCK_POSTS.map((post) => (
-								<div key={post.id} className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/[0.07] transition-colors">
+								<div key={post.id} className="p-5 rounded-2xl bg-surface border border-border hover:bg-surface/80 transition-colors">
 									{/* Post Header */}
 									<div className="flex items-center justify-between mb-3">
 										<div className="flex items-center gap-3">
@@ -335,14 +335,14 @@ export default function ClubPage() {
 
 									{/* Post Image */}
 									{post.image && (
-										<div className="rounded-xl overflow-hidden mb-4 border border-white/5 bg-background-light">
+										<div className="rounded-xl overflow-hidden mb-4 border border-border bg-background-light">
 											{/* eslint-disable-next-line @next/next/no-img-element */}
 											<img src={post.image} alt="Post attachment" className="w-full h-auto object-cover max-h-80" />
 										</div>
 									)}
 
 									{/* Post Actions */}
-									<div className="flex items-center gap-6 pt-3 border-t border-white/5">
+									<div className="flex items-center gap-6 pt-3 border-t border-border">
 										<button className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors group">
 											<Heart size={18} className="group-hover:fill-accent" />
 											<span>{post.likes}</span>

@@ -63,7 +63,7 @@ const CommentItem = ({ comment, isAuthor = false }: CommentItemProps) => {
 		<div className="flex gap-4 group">
             {/* Avatar Column */}
             <div className="shrink-0">
-			    <Avatar profile={comment.user} className="w-10 h-10 border-2 border-transparent group-hover:border-white/10 transition-colors" />
+			    <Avatar profile={comment.user} className="w-10 h-10 border-2 border-transparent group-hover:border-border transition-colors" />
             </div>
 
             {/* Content Column */}
@@ -88,12 +88,12 @@ const CommentItem = ({ comment, isAuthor = false }: CommentItemProps) => {
                             </label>
                             <ul
                                 tabIndex={0}
-                                className="dropdown-content z-1 menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-48 mt-1"
+                                className="dropdown-content z-1 menu p-2 shadow-lg bg-[#1E1E1E] border border-border rounded-xl w-48 mt-1"
                             >
                                 {!showDeleteConfirm ? (
                                     <>
                                         <li>
-                                            <button onClick={handleEdit} className="text-xs hover:bg-white/5 hover:text-white text-gray-300">
+                                            <button onClick={handleEdit} className="text-xs hover:bg-hover hover:text-white text-muted-foreground">
                                                 <Edit2 size={14} /> Edit
                                             </button>
                                         </li>
@@ -132,7 +132,7 @@ const CommentItem = ({ comment, isAuthor = false }: CommentItemProps) => {
                                             </button>
                                         </li>
                                         <li>
-                                            <button onClick={() => setShowDeleteConfirm(false)} className="text-xs text-gray-400 hover:text-white">
+                                            <button onClick={() => setShowDeleteConfirm(false)} className="text-xs text-muted-foreground hover:text-white">
                                                 Cancel
                                             </button>
                                         </li>
@@ -143,7 +143,7 @@ const CommentItem = ({ comment, isAuthor = false }: CommentItemProps) => {
                     )}
                 </div>
 
-                <div className="text-sm text-gray-200 leading-relaxed wrap-break-word bg-white/5 p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl border border-white/5">
+                <div className="text-sm text-muted-foreground leading-relaxed wrap-break-word bg-surface p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl border border-border">
                     {comment.content}
                 </div>
 

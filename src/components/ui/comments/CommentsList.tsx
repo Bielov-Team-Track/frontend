@@ -41,7 +41,7 @@ export default function CommentsList({
 }: CommentsListProps) {
 	if (!comments || comments.length === 0) {
 		return (
-			<div className={cn("text-center py-10 px-4 rounded-xl border border-white/5 border-dashed bg-white/2", className)}>
+			<div className={cn("text-center py-10 px-4 rounded-xl border border-border border-dashed bg-surface/50", className)}>
 				<MessageCircle size={28} className="mx-auto text-muted/30 mb-3" />
 				<p className="text-muted text-sm font-medium">{emptyMessage}</p>
 				<p className="text-xs text-muted/50 mt-1">{emptyDescription}</p>
@@ -70,8 +70,8 @@ export default function CommentsList({
 						className={cn(
 							"flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors",
 							isLoadingMore
-								? "bg-white/5 text-muted cursor-not-allowed"
-								: "bg-white/5 text-white hover:bg-white/10"
+								? "bg-surface text-muted cursor-not-allowed"
+								: "bg-surface text-white hover:bg-active"
 						)}
 					>
 						{isLoadingMore ? (

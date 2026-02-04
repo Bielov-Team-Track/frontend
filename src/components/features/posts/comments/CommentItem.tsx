@@ -30,7 +30,7 @@ export default function CommentItem({ comment, onReply, onEdit, onDelete, onRetr
 			<div className={`flex gap-3 ${isReply ? "ml-11" : ""} opacity-60`}>
 				<Avatar name={`${comment.author.name} ${comment.author.surname}`} src={comment.author.imageUrl} variant="user" className="w-8 h-8 shrink-0" />
 				<div className="flex-1">
-					<div className="bg-white/5 rounded-xl px-3 py-2">
+					<div className="bg-surface rounded-xl px-3 py-2">
 						<p className="text-sm text-white">{comment.content}</p>
 					</div>
 					<p className="text-xs text-muted-foreground mt-1">Sending...</p>
@@ -69,7 +69,7 @@ export default function CommentItem({ comment, onReply, onEdit, onDelete, onRetr
 		<div className={`flex gap-3 ${isReply ? "ml-11" : ""}`}>
 			<Avatar name={`${comment.author.name} ${comment.author.surname}`} src={comment.author.imageUrl} variant="user" className="w-8 h-8 shrink-0" />
 			<div className="flex-1">
-				<div className="bg-white/5 rounded-xl px-3 py-2 group relative">
+				<div className="bg-surface rounded-xl px-3 py-2 group relative">
 					<div className="flex items-center gap-2 mb-1">
 						<span className="text-sm font-medium text-white">
 							{comment.author.name} {comment.author.surname}
@@ -81,19 +81,19 @@ export default function CommentItem({ comment, onReply, onEdit, onDelete, onRetr
 					{/* Menu */}
 					{isAuthor && (
 						<div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-							<button onClick={() => setShowMenu(!showMenu)} className="p-1 rounded hover:bg-white/10 text-muted-foreground">
+							<button onClick={() => setShowMenu(!showMenu)} className="p-1 rounded hover:bg-active text-muted-foreground">
 								<MoreHorizontal size={14} />
 							</button>
 							{showMenu && (
 								<>
 									<div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-									<div className="absolute right-0 top-full mt-1 z-20 w-32 bg-raised/95 backdrop-blur-lg border border-white/10 rounded-lg shadow-xl py-1">
+									<div className="absolute right-0 top-full mt-1 z-20 w-32 bg-surface-elevated backdrop-blur-lg border border-border rounded-lg shadow-xl py-1">
 										<button
 											onClick={() => {
 												onEdit?.(comment);
 												setShowMenu(false);
 											}}
-											className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-white hover:bg-white/10">
+											className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-white hover:bg-active">
 											<Pencil size={12} />
 											Edit
 										</button>
@@ -102,7 +102,7 @@ export default function CommentItem({ comment, onReply, onEdit, onDelete, onRetr
 												onDelete?.(comment.id);
 												setShowMenu(false);
 											}}
-											className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-destructive hover:bg-white/10">
+											className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-destructive hover:bg-active">
 											<Trash2 size={12} />
 											Delete
 										</button>
