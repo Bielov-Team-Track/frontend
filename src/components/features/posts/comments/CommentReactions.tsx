@@ -46,7 +46,7 @@ export default function CommentReactions({ commentId, reactions, compact = true 
 					onClick={() => handleReactionClick(reaction.emoji, reaction.hasReacted)}
 					className={cn(
 						"text-xs px-1.5 py-0.5 rounded-full transition-all flex items-center gap-1",
-						reaction.hasReacted ? "bg-primary/20 text-primary" : "bg-white/5 text-muted-foreground hover:bg-white/10"
+						reaction.hasReacted ? "bg-primary/20 text-primary" : "bg-surface text-muted-foreground hover:bg-active"
 					)}>
 					<span>{reaction.emoji}</span>
 					<span>{reaction.count}</span>
@@ -56,7 +56,7 @@ export default function CommentReactions({ commentId, reactions, compact = true 
 			<button
 				ref={triggerRef}
 				onClick={() => setShowPicker(!showPicker)}
-				className="p-1 rounded-full text-muted-foreground hover:text-white hover:bg-white/10 transition-colors"
+				className="p-1 rounded-full text-muted-foreground hover:text-white hover:bg-active transition-colors"
 				title="Add reaction">
 				<SmilePlus size={14} />
 			</button>

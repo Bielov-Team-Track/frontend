@@ -51,8 +51,8 @@ export default function ReportModal({ isOpen, onClose, postId, onSuccess }: Repo
 		return (
 			<Modal isOpen={isOpen} onClose={handleClose} title="Report Submitted" size="sm">
 				<div className="text-center py-6">
-					<div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
-						<Check size={32} className="text-green-500" />
+					<div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-4">
+						<Check size={32} className="text-success" />
 					</div>
 					<h3 className="text-lg font-medium text-white mb-2">Thank you for your report</h3>
 					<p className="text-sm text-muted-foreground mb-6">Our moderators will review this post and take appropriate action.</p>
@@ -68,9 +68,9 @@ export default function ReportModal({ isOpen, onClose, postId, onSuccess }: Repo
 		<Modal isOpen={isOpen} onClose={handleClose} title="Report Post" size="md">
 			<div className="space-y-4">
 				{/* Warning */}
-				<div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-					<AlertTriangle size={20} className="text-amber-500 shrink-0 mt-0.5" />
-					<p className="text-sm text-amber-200">
+				<div className="flex items-start gap-3 p-3 rounded-lg bg-warning/10 border border-warning/20">
+					<AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
+					<p className="text-sm text-warning">
 						Please only report content that violates our community guidelines. False reports may result in action against your account.
 					</p>
 				</div>
@@ -85,7 +85,7 @@ export default function ReportModal({ isOpen, onClose, postId, onSuccess }: Repo
 								onClick={() => setSelectedReason(option.value as ReportReason)}
 								className={cn(
 									"w-full text-left p-3 rounded-xl border transition-all",
-									selectedReason === option.value ? "border-primary bg-primary/10" : "border-white/10 bg-white/5 hover:border-white/20"
+									selectedReason === option.value ? "border-primary bg-primary/10" : "border-border bg-surface hover:border-white/20"
 								)}>
 								<div className="flex items-center justify-between">
 									<span className="text-sm font-medium text-white">{option.label}</span>
@@ -106,7 +106,7 @@ export default function ReportModal({ isOpen, onClose, postId, onSuccess }: Repo
 							onChange={(e) => setDescription(e.target.value)}
 							placeholder="Provide any additional context that might help our moderators..."
 							rows={3}
-							className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none"
+							className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none"
 						/>
 					</div>
 				)}

@@ -51,7 +51,7 @@ export default function PollDisplay({ poll, isAuthor = false }: PollDisplayProps
 	const closesIn = poll.closesAt ? formatDistanceToNow(new Date(poll.closesAt), { addSuffix: true }) : null;
 
 	return (
-		<div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-4">
+		<div className="rounded-xl border border-border bg-surface p-4 space-y-4">
 			{/* Header */}
 			<div className="flex items-start justify-between gap-3">
 				<div className="flex items-center gap-2">
@@ -59,7 +59,7 @@ export default function PollDisplay({ poll, isAuthor = false }: PollDisplayProps
 					<h4 className="text-sm font-medium text-white">{poll.question}</h4>
 				</div>
 				{poll.isClosed && (
-					<span className="flex items-center gap-1 text-xs text-muted-foreground bg-white/5 px-2 py-1 rounded">
+					<span className="flex items-center gap-1 text-xs text-muted-foreground bg-surface px-2 py-1 rounded">
 						<Lock size={12} />
 						Closed
 					</span>
@@ -111,7 +111,7 @@ export default function PollDisplay({ poll, isAuthor = false }: PollDisplayProps
 						<button
 							onClick={handleRemoveVote}
 							disabled={removeVoteMutation.isPending}
-							className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-white hover:bg-white/10 transition-colors">
+							className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-white hover:bg-active transition-colors">
 							<X size={14} />
 							Remove vote
 						</button>

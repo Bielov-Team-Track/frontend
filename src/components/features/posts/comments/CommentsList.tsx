@@ -73,10 +73,10 @@ export default function CommentsList({ postId, commentCount }: CommentsListProps
 	const comments = data?.pages.flatMap((page) => page.items) ?? [];
 
 	return (
-		<div className="border-t border-white/5 pt-4 space-y-4">
+		<div className="border-t border-border pt-4 space-y-4">
 			{/* Reply indicator */}
 			{replyingTo && (
-				<div className="flex items-center gap-2 text-xs text-muted-foreground bg-white/5 px-3 py-2 rounded-lg">
+				<div className="flex items-center gap-2 text-xs text-muted-foreground bg-surface px-3 py-2 rounded-lg">
 					<span>Replying to {replyingTo.author.name}</span>
 					<button onClick={() => setReplyingTo(null)} className="text-primary hover:underline">
 						Cancel

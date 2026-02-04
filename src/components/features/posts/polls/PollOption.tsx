@@ -23,7 +23,7 @@ export default function PollOption({ option, isSelected, canVote, canSeeResults,
 			disabled={!canVote}
 			className={cn(
 				"relative w-full text-left rounded-xl border transition-all overflow-hidden",
-				isSelected ? "border-primary bg-primary/10" : "border-white/10 bg-white/5 hover:border-white/20",
+				isSelected ? "border-primary bg-primary/10" : "border-border bg-surface hover:border-white/20",
 				!canVote && "cursor-default"
 			)}>
 			{/* Progress bar background */}

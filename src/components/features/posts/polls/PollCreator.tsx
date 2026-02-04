@@ -67,11 +67,11 @@ export default function PollCreator({ onSave, onCancel }: PollCreatorProps) {
 	const isValid = question.trim() && options.filter((opt) => opt.content.trim()).length >= 2;
 
 	return (
-		<div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-4">
+		<div className="rounded-xl border border-border bg-surface p-4 space-y-4">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<h4 className="text-sm font-medium text-white">Create Poll</h4>
-				<button onClick={onCancel} className="p-1 rounded hover:bg-white/10 text-muted-foreground">
+				<button onClick={onCancel} className="p-1 rounded hover:bg-active text-muted-foreground">
 					<X size={16} />
 				</button>
 			</div>
@@ -82,7 +82,7 @@ export default function PollCreator({ onSave, onCancel }: PollCreatorProps) {
 				value={question}
 				onChange={(e) => setQuestion(e.target.value)}
 				placeholder="Ask a question..."
-				className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+				className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-primary"
 			/>
 
 			{/* Options */}
@@ -95,7 +95,7 @@ export default function PollCreator({ onSave, onCancel }: PollCreatorProps) {
 							value={option.content}
 							onChange={(e) => updateOption(option.id, e.target.value)}
 							placeholder={`Option ${index + 1}`}
-							className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+							className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-primary"
 						/>
 						{options.length > 2 && (
 							<button
@@ -116,7 +116,7 @@ export default function PollCreator({ onSave, onCancel }: PollCreatorProps) {
 			</div>
 
 			{/* Settings */}
-			<div className="space-y-3 pt-2 border-t border-white/10">
+			<div className="space-y-3 pt-2 border-t border-border">
 				<div className="flex gap-4">
 					<Checkbox label="Allow multiple choices" checked={allowMultipleChoices} onChange={(value) => setAllowMultipleChoices(value)} />
 

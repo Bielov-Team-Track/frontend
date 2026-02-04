@@ -119,7 +119,7 @@ export default function PostMediaUploader({ mediaIds, onMediaChange, maxFiles = 
 			{uploads.length > 0 && (
 				<div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
 					{uploads.map((upload) => (
-						<div key={upload.id} className="relative group aspect-square rounded-lg overflow-hidden bg-white/5 border border-white/10">
+						<div key={upload.id} className="relative group aspect-square rounded-lg overflow-hidden bg-surface border border-border">
 							{upload.type === "image" ? (
 								<img src={upload.preview} alt="" className="w-full h-full object-cover" />
 							) : (
@@ -163,7 +163,7 @@ export default function PostMediaUploader({ mediaIds, onMediaChange, maxFiles = 
 					onClick={() => inputRef.current?.click()}
 					className={cn(
 						"border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors",
-						isDragActive ? "border-primary bg-primary/10" : "border-white/10 hover:border-white/20"
+						isDragActive ? "border-primary bg-primary/10" : "border-border hover:border-white/20"
 					)}>
 					<input ref={inputRef} type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onChange={handleInputChange} className="hidden" />
 					<Upload size={24} className="mx-auto text-muted-foreground mb-2" />
