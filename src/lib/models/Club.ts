@@ -43,16 +43,28 @@ export interface Venue {
 
 export enum ClubRole {
 	Member = "Member",
-	Assistant = "Assistant",
-	Coach = "Coach",
+	WelfareOfficer = "WelfareOfficer",
+	Treasurer = "Treasurer",
 	Admin = "Admin",
+	HeadCoach = "HeadCoach",
 	Owner = "Owner",
 }
 
 export enum GroupRole {
 	Member = "Member",
+	Helper = "Helper",
+	Admin = "Admin",
+	AssistantCoach = "AssistantCoach",
+	Coach = "Coach",
+}
+
+export enum TeamRole {
+	Player = "Player",
+	Admin = "Admin",
 	Captain = "Captain",
-	Leader = "Leader",
+	Manager = "Manager",
+	AssistantCoach = "AssistantCoach",
+	Coach = "Coach",
 }
 
 export interface ClubMember {
