@@ -12,27 +12,15 @@ import {
 	getEventMediaUploadUrl,
 	uploadFileToStorage,
 } from "@/lib/api/events";
+import { showErrorToast } from "@/lib/errors/toastErrorHandler";
 import {
 	CreateEventCommentRequest,
 	EventComment,
 	EventCommentsResponse,
 	UpdateEventCommentRequest,
 } from "@/lib/models/EventComment";
-import { AxiosError } from "axios";
-
-// Helper to extract error message from API errors
-function getErrorMessage(error: unknown, fallback: string): string {
-	if (error instanceof AxiosError) {
-		return error.response?.data?.message || fallback;
-	}
-	if (error instanceof Error) {
-		return error.message || fallback;
-	}
-	return fallback;
-}
 import { useAuth } from "@/providers";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 // =============================================================================
 // HELPERS
@@ -147,7 +135,7 @@ export function useCreateEventComment(eventId: string) {
 			if (context?.previousData) {
 				queryClient.setQueryData(eventCommentKeys.list(eventId), context.previousData);
 			}
-			toast.error(getErrorMessage(err, "Failed to post comment"));
+			showErrorToast(err, { fallback: "Failed to post comment" });
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: eventCommentKeys.list(eventId) });
@@ -165,7 +153,7 @@ export function useUpdateEventComment(eventId: string) {
 			queryClient.invalidateQueries({ queryKey: eventCommentKeys.list(eventId) });
 		},
 		onError: (err: Error) => {
-			toast.error(getErrorMessage(err, "Failed to update comment"));
+			showErrorToast(err, { fallback: "Failed to update comment" });
 		},
 	});
 }
@@ -206,7 +194,7 @@ export function useDeleteEventComment(eventId: string) {
 			if (context?.previousData) {
 				queryClient.setQueryData(eventCommentKeys.list(eventId), context.previousData);
 			}
-			toast.error(getErrorMessage(err, "Failed to delete comment"));
+			showErrorToast(err, { fallback: "Failed to delete comment" });
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: eventCommentKeys.list(eventId) });
@@ -296,7 +284,7 @@ export function useAddEventCommentReaction(eventId: string) {
 			if (context?.previousData) {
 				queryClient.setQueryData(eventCommentKeys.list(eventId), context.previousData);
 			}
-			toast.error(getErrorMessage(err, "Failed to add reaction"));
+			showErrorToast(err, { fallback: "Failed to add reaction" });
 		},
 	});
 }
@@ -351,7 +339,7 @@ export function useRemoveEventCommentReaction(eventId: string) {
 			if (context?.previousData) {
 				queryClient.setQueryData(eventCommentKeys.list(eventId), context.previousData);
 			}
-			toast.error(getErrorMessage(err, "Failed to remove reaction"));
+			showErrorToast(err, { fallback: "Failed to remove reaction" });
 		},
 	});
 }

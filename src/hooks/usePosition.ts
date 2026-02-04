@@ -1,31 +1,26 @@
 import { claimPosition, getPosition, releasePosition, takePositionWithUser } from "@/lib/api/positions";
 import { EVENTS_API_URL } from "@/lib/constants";
+import { ApiError, ErrorCodes } from "@/lib/errors";
 import { Position } from "@/lib/models/Position";
 import { UserProfile } from "@/lib/models/User";
 import { usePositionStore } from "@/lib/realtime/positionStore";
 import signalr from "@/lib/realtime/signalrClient";
-import { AxiosError } from "axios";
 import { redirect } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 // Helper to extract error message from API errors
-function getPositionErrorMessage(error: unknown, fallback: string): string {
-	if (error instanceof AxiosError) {
-		if (error.response?.status === 401) {
-			return "You're not authorized for this action";
-		}
-		return error.response?.data?.message || error.message || fallback;
+function getPositionErrorMessage(error: unknown): string {
+	const apiError = ApiError.fromError(error);
+
+	if (apiError.hasCode(ErrorCodes.POSITION_ALREADY_CLAIMED)) {
+		return "This position was just claimed by another player";
 	}
-	if (error instanceof Error) {
-		if (error.message?.includes("Position already taken") || error.message?.includes("already claimed")) {
-			return "Position was just taken by someone else";
-		}
-		if (error.message?.includes("Connection")) {
-			return "Connection lost. Please try again.";
-		}
-		return error.message || fallback;
+
+	if (apiError.hasCode(ErrorCodes.EVENT_FULL)) {
+		return "This event is now full";
 	}
-	return fallback;
+
+	return apiError.getUserMessage();
 }
 
 export function usePosition(defaultPosition: Position, profile: UserProfile | null) {
@@ -83,7 +78,7 @@ export function usePosition(defaultPosition: Position, profile: UserProfile | nu
 			rollback();
 			const errorMessage = connectionStatus !== "connected"
 				? "Connection lost. Please try again."
-				: getPositionErrorMessage(error, "Failed to take position");
+				: getPositionErrorMessage(error);
 			console.error("Take position error:", error);
 			setError(errorMessage);
 		} finally {
@@ -116,7 +111,7 @@ export function usePosition(defaultPosition: Position, profile: UserProfile | nu
 		} catch (error) {
 			const errorMessage = connectionStatus !== "connected"
 				? "Connection lost. Please try again."
-				: getPositionErrorMessage(error, "Failed to release position");
+				: getPositionErrorMessage(error);
 			setError(errorMessage);
 			console.error("Release position error:", error);
 		} finally {
@@ -137,7 +132,7 @@ export function usePosition(defaultPosition: Position, profile: UserProfile | nu
 				const newPosition = await takePositionWithUser(position.id, targetUser.id);
 				setPosition(newPosition);
 			} catch (error) {
-				const errorMessage = getPositionErrorMessage(error, "Failed to assign position");
+				const errorMessage = getPositionErrorMessage(error);
 				setError(errorMessage);
 				console.error("Assign position error:", error);
 			} finally {
