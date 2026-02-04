@@ -9,13 +9,15 @@ interface UseEventWizardProps {
 }
 
 /**
- * Returns the fields to validate for step 2 based on whether it's a recurring event
+ * Returns the fields to validate for step 1 based on whether it's a recurring event
  */
-function getStep2ValidationFields(isRecurring: boolean): string[] {
+function getStep1ValidationFields(isRecurring: boolean): string[] {
+	const baseFields = ["name", "type", "isRecurring"];
+
 	if (isRecurring) {
-		// Recurring event - validate recurring fields only
+		// Recurring event - validate recurring fields
 		return [
-			"isRecurring",
+			...baseFields,
 			"recurrencePattern",
 			"firstOccurrenceDate",
 			"seriesEndDate",
@@ -23,41 +25,32 @@ function getStep2ValidationFields(isRecurring: boolean): string[] {
 			"eventEndTime",
 		];
 	}
-	// Single event - validate single event fields only
-	return ["isRecurring", "startTime", "endTime"];
+	// Single event - validate single event fields
+	return [
+		...baseFields,
+		"eventDate",
+		"eventStartTime",
+		"eventEndTime",
+	];
 }
 
 /**
- * Returns the fields to validate for step 4 based on event type
+ * Returns the fields to validate for step 3 based on event type and payment config
  */
-function getStep4ValidationFields(eventType: EventType): string[] {
-	const baseFields = ["registrationType"];
+function getStep3ValidationFields(eventType: EventType, usePaymentConfig: boolean): string[] {
+	const baseFields = ["eventFormat"];
 
-	switch (eventType) {
-		case EventType.CasualPlay:
-			// CasualPlay requires casualPlayFormat selection
-			return [...baseFields, "casualPlayFormat"];
-		case EventType.Match:
-			// Match events may need team-related validation in the future
-			return baseFields;
-		case EventType.Social:
-		case EventType.TrainingSession:
-		default:
-			// Social and Training use list format, only need registrationType
-			return baseFields;
+	// Add casualPlayFormat if event type is CasualPlay
+	if (eventType === EventType.CasualPlay) {
+		baseFields.push("casualPlayFormat");
 	}
-}
 
-/**
- * Returns the fields to validate for step 5 based on whether budget is enabled
- */
-function getStep5ValidationFields(useBudget: boolean): string[] {
-	if (!useBudget) {
-		// Budget disabled - no validation needed
-		return [];
+	// Add payment config fields if payment is enabled
+	if (usePaymentConfig) {
+		baseFields.push("paymentConfig.pricingModel", "paymentConfig.cost");
 	}
-	// Budget enabled - validate required budget fields
-	return ["budget.pricingModel", "budget.cost"];
+
+	return baseFields;
 }
 
 export function useEventWizard({ trigger, watch }: UseEventWizardProps) {
@@ -83,20 +76,16 @@ export function useEventWizard({ trigger, watch }: UseEventWizardProps) {
 		let fieldsToValidate: string[];
 
 		switch (currentStep) {
-			case 2:
-				// Time & Date - conditional based on isRecurring
-				fieldsToValidate = getStep2ValidationFields(values.isRecurring);
+			case 1:
+				// Basics - conditional based on isRecurring
+				fieldsToValidate = getStep1ValidationFields(values.isRecurring);
 				break;
-			case 4:
-				// Registration - conditional based on event type
-				fieldsToValidate = getStep4ValidationFields(values.type as EventType);
-				break;
-			case 5:
-				// Budget - conditional based on useBudget
-				fieldsToValidate = getStep5ValidationFields(values.useBudget);
+			case 3:
+				// Participants & Payment - conditional based on event type and payment config
+				fieldsToValidate = getStep3ValidationFields(values.type as EventType, values.usePaymentConfig);
 				break;
 			default:
-				// Use default fields for other steps
+				// Use default fields for other steps (Step 2: Location, Step 4: Review)
 				fieldsToValidate = [...STEP_VALIDATION_FIELDS[currentStep as keyof typeof STEP_VALIDATION_FIELDS]];
 		}
 

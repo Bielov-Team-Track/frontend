@@ -1,5 +1,5 @@
 import { EventFormat, EventType, PlayingSurface, RecurrencePattern, TimeOffsetUnit } from "@/lib/models/Event";
-import { PaymentMethod, PricingModel, Unit } from "@/lib/models/EventBudget";
+import { PaymentMethod, PricingModel, Unit } from "@/lib/models/EventPaymentConfig";
 import * as yup from "yup";
 import { CasualPlayFormat, RegistrationType } from "../types/registration";
 
@@ -38,6 +38,13 @@ export const eventValidationSchema = yup.object().shape({
 		otherwise: (schema) => schema.nullable().optional(),
 	}),
 
+	// New separated date/time fields for single events (alternative to startTime/endTime)
+	eventDate: yup.date().when("isRecurring", {
+		is: false,
+		then: (schema) => schema.required("Event date is required").min(new Date(), "Event date must be in the future"),
+		otherwise: (schema) => schema.nullable().optional(),
+	}),
+
 	// Recurring event fields (required when recurring)
 	recurrencePattern: yup
 		.mixed<RecurrencePattern>()
@@ -62,24 +69,19 @@ export const eventValidationSchema = yup.object().shape({
 			}),
 		otherwise: (schema) => schema.nullable().optional(),
 	}),
-	eventStartTime: yup.string().when("isRecurring", {
-		is: true,
-		then: (schema) => schema.required("Event start time is required").matches(/^\d{2}:\d{2}$/, "Invalid time format (HH:mm)"),
-		otherwise: (schema) => schema.optional(),
-	}),
-	eventEndTime: yup.string().when("isRecurring", {
-		is: true,
-		then: (schema) =>
-			schema
-				.required("Event end time is required")
-				.matches(/^\d{2}:\d{2}$/, "Invalid time format (HH:mm)")
-				.test("is-after-start", "End time must be after start time", function (value) {
-					const { eventStartTime } = this.parent as any;
-					if (!eventStartTime || !value) return true;
-					return value > eventStartTime;
-				}),
-		otherwise: (schema) => schema.optional(),
-	}),
+	eventStartTime: yup
+		.string()
+		.required("Start time is required")
+		.matches(/^\d{2}:\d{2}$/, "Invalid time format (HH:mm)"),
+	eventEndTime: yup
+		.string()
+		.required("End time is required")
+		.matches(/^\d{2}:\d{2}$/, "Invalid time format (HH:mm)")
+		.test("is-after-start", "End time must be after start time", function (value) {
+			const { eventStartTime } = this.parent as any;
+			if (!eventStartTime || !value) return true;
+			return value > eventStartTime;
+		}),
 
 	// Registration timing offsets (for recurring events)
 	registrationOpenOffset: timeOffsetSchema.optional().default(undefined),
@@ -94,6 +96,7 @@ export const eventValidationSchema = yup.object().shape({
 			postalCode: yup.string().optional(),
 			latitude: yup.number().optional(),
 			longitude: yup.number().optional(),
+			instructions: yup.string().optional(),
 		})
 		.required("Location is required"),
 	name: yup.string().required("Name is required"),
@@ -160,10 +163,10 @@ export const eventValidationSchema = yup.object().shape({
 			pricingModel: yup
 				.mixed<PricingModel>()
 				.oneOf(Object.values(PricingModel) as PricingModel[])
-				.test("required-when-budget-enabled", "Pricing model is required", function (value) {
+				.test("required-when-payment-config-enabled", "Pricing model is required", function (value) {
 					// Access the root form values via this.from
 					const root = this.from?.[1]?.value;
-					if (root?.useBudget && !value) {
+					if (root?.usePaymentConfig && !value) {
 						return false;
 					}
 					return true;
@@ -171,16 +174,16 @@ export const eventValidationSchema = yup.object().shape({
 			cost: yup
 				.number()
 				.min(0, "Cost cannot be negative")
-				.test("required-when-budget-enabled", "Cost is required", function (value) {
+				.test("required-when-payment-config-enabled", "Cost is required", function (value) {
 					// Access the root form values via this.from
 					const root = this.from?.[1]?.value;
-					if (root?.useBudget && (value === undefined || value === null)) {
+					if (root?.usePaymentConfig && (value === undefined || value === null)) {
 						return false;
 					}
 					return true;
 				}),
 			payToJoin: yup.boolean().optional().default(false),
-			minUnitsForBudget: yup
+			minUnitsForPaymentConfig: yup
 				.number()
 				.min(1, "Must be at least 1")
 				.optional()
@@ -189,6 +192,61 @@ export const eventValidationSchema = yup.object().shape({
 				.number()
 				.min(0, "Cannot be negative")
 				.optional()
+				.transform((v, o) => (o === "" ? null : v)),
+		})
+		.default(undefined),
+	// Payment Config management fields (used by EventPaymentConfigStep)
+	usePaymentConfig: yup.boolean().default(false),
+	paymentConfig: yup
+		.object()
+		.shape({
+			paymentMethods: yup
+				.array()
+				.of(
+					yup
+						.mixed<PaymentMethod>()
+						.oneOf(Object.values(PaymentMethod) as PaymentMethod[])
+						.required(),
+				)
+				.optional(),
+			pricingModel: yup
+				.mixed<PricingModel>()
+				.oneOf(Object.values(PricingModel) as PricingModel[])
+				.test("required-when-payment-config-enabled", "Pricing model is required", function (value) {
+					const root = this.from?.[1]?.value;
+					if (root?.usePaymentConfig && !value) {
+						return false;
+					}
+					return true;
+				}),
+			cost: yup
+				.number()
+				.transform((v, o) => (o === "" ? 0 : v))
+				.test("required-when-payment-config-enabled", "Cost is required", function (value) {
+					const root = this.from?.[1]?.value;
+					if (root?.usePaymentConfig && (!value || value < 1)) {
+						return this.createError({ message: "Cost must be at least 1" });
+					}
+					return true;
+				}),
+			payToJoin: yup.boolean().optional().default(false),
+			minUnitsForPaymentConfig: yup
+				.number()
+				.min(1, "Must be at least 1")
+				.optional()
+				.nullable()
+				.transform((v, o) => (o === "" ? null : v)),
+			dropoutDeadlineHours: yup
+				.number()
+				.min(0, "Cannot be negative")
+				.optional()
+				.nullable()
+				.transform((v, o) => (o === "" ? null : v)),
+			paymentReminderDaysBefore: yup
+				.number()
+				.min(0, "Cannot be negative")
+				.optional()
+				.nullable()
 				.transform((v, o) => (o === "" ? null : v)),
 		})
 		.default(undefined),

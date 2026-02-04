@@ -1,59 +1,48 @@
-import EventBudgetStep from "../steps/EventBudgetStep";
-import { EventDetailsStep } from "../steps/EventDetailsStep";
-import { LocationStep } from "../steps/LocationStep";
-import { RegistrationStep } from "../steps/RegistrationStep";
-import { ReviewStep } from "../steps/ReviewStep";
-import { TimeAndDateStep } from "../steps/TimeAndDateStep";
+import { lazy } from "react";
+
+const BasicsStep = lazy(() => import("../steps/BasicsStep"));
+const LocationStep = lazy(() => import("../steps/LocationStep"));
+const ParticipantsPaymentStep = lazy(() => import("../steps/ParticipantsPaymentStep"));
+const ReviewStep = lazy(() => import("../steps/ReviewStep"));
 
 export interface StepConfig {
-	id: string | number;
-	label: string;
-	key: string;
-	component: React.ComponentType;
+  id: number;
+  label: string;
+  key: string;
+  component: React.LazyExoticComponent<React.ComponentType>;
 }
 
 export const STEP_CONFIG: Record<number, StepConfig> = {
-	1: {
-		id: 1,
-		label: "Event Details",
-		key: "details",
-		component: EventDetailsStep,
-	},
-	2: {
-		id: 2,
-		label: "Time & Date",
-		key: "datetime",
-		component: TimeAndDateStep,
-	},
-	3: {
-		id: 3,
-		label: "Location",
-		key: "location",
-		component: LocationStep,
-	},
-	4: {
-		id: 4,
-		label: "Registration",
-		key: "registration",
-		component: RegistrationStep,
-	},
-	5: {
-		id: 5,
-		label: "Budget",
-		key: "budget",
-		component: EventBudgetStep,
-	},
-	6: {
-		id: 6,
-		label: "Review",
-		key: "review",
-		component: ReviewStep,
-	},
-} as const;
+  1: {
+    id: 1,
+    label: "Basics",
+    key: "basics",
+    component: BasicsStep,
+  },
+  2: {
+    id: 2,
+    label: "Location",
+    key: "location",
+    component: LocationStep,
+  },
+  3: {
+    id: 3,
+    label: "Participants & Payment",
+    key: "participants-payment",
+    component: ParticipantsPaymentStep,
+  },
+  4: {
+    id: 4,
+    label: "Review",
+    key: "review",
+    component: ReviewStep,
+  },
+};
 
-export const TOTAL_STEPS = Object.keys(STEP_CONFIG).length;
+export const TOTAL_STEPS = 4;
 
-// Helper to get active steps (useful if you want to conditionally include steps)
-export function getActiveSteps(): number[] {
-	return Object.keys(STEP_CONFIG).map(Number).sort();
-}
+export const getActiveSteps = (): number[] => {
+  return Object.keys(STEP_CONFIG)
+    .map(Number)
+    .sort((a, b) => a - b);
+};

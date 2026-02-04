@@ -22,22 +22,9 @@ export const surfaceOptions = [
 	{ value: PlayingSurface.Beach, label: "Beach" },
 ];
 
-export const STEP_VALIDATION_FIELDS = {
-	1: ["name", "type", "surface", "isPrivate"],
-	2: [
-		// Single event fields
-		"startTime",
-		"endTime",
-		// Recurring event fields (conditional validation in schema)
-		"isRecurring",
-		"recurrencePattern",
-		"firstOccurrenceDate",
-		"seriesEndDate",
-		"eventStartTime",
-		"eventEndTime",
-	],
-	3: ["location.name"],
-	4: ["registrationType"],
-	5: [], // Budget step - validation handled dynamically based on useBudget
-	6: [], // Review step - no validation needed
-} as const;
+export const STEP_VALIDATION_FIELDS: Record<number, string[]> = {
+	1: ["name", "type"], // Basics - conditional validation for recurring/non-recurring handled in hook
+	2: ["location.name"], // Location
+	3: ["eventFormat"], // Participants & Payment - conditional validation handled in hook
+	4: [], // Review step - no validation
+};

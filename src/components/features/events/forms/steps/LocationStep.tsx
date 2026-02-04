@@ -1,4 +1,4 @@
-import { Map } from "@/components";
+import { Map, TextArea } from "@/components";
 import AddressAutocomplete, { ParsedAddress } from "@/components/ui/address-autocomplete";
 import { Venue } from "@/lib/models/Club";
 import { cn } from "@/lib/utils";
@@ -78,16 +78,16 @@ export function LocationStep() {
 	);
 
 	return (
-		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300" data-testid="location-step">
-			<div className="border-b-2 pb-4">
-				<h2 className="text-xl font-bold text-white mb-1">Location</h2>
-				<p className="text-muted text-sm">Where will your event take place?</p>
+		<div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-right-4 duration-300" data-testid="location-step">
+			<div className="border-b-2 pb-3 sm:pb-4">
+				<h2 className="text-lg sm:text-xl font-bold text-white mb-1">Location</h2>
+				<p className="text-muted text-xs sm:text-sm">Where will your event take place?</p>
 			</div>
 
-			<div className="space-y-4">
+			<div className="space-y-3 sm:space-y-4">
 				{venues.length > 0 && (
 					<div className="space-y-2">
-						<label className="text-sm font-medium text-white">Club Venues</label>
+						<label className="text-xs sm:text-sm font-medium text-white">Club Venues</label>
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
 							{venues.map((venue) => (
 								<button
@@ -95,18 +95,18 @@ export function LocationStep() {
 									type="button"
 									onClick={() => handleVenueSelect(venue)}
 									className={cn(
-										"flex items-start gap-3 p-3 rounded-lg border text-left transition-all",
+										"flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg border text-left transition-all",
 										selectedVenueId === venue.id ? "border-accent bg-accent/10" : "border-white/10 bg-white/5 hover:border-white/20"
 									)}>
-									<Building2 className="w-4 h-4 mt-0.5 text-muted shrink-0" />
+									<Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mt-0.5 text-muted shrink-0" />
 									<div className="min-w-0">
-										<p className="text-sm font-medium text-white truncate">{venue.name}</p>
-										<p className="text-xs text-muted truncate">{[venue.addressLine1, venue.city].filter(Boolean).join(", ")}</p>
+										<p className="text-xs sm:text-sm font-medium text-white truncate">{venue.name}</p>
+										<p className="text-[10px] sm:text-xs text-muted truncate">{[venue.addressLine1, venue.city].filter(Boolean).join(", ")}</p>
 									</div>
 								</button>
 							))}
 						</div>
-						<p className="text-xs text-muted">Or enter a custom address below</p>
+						<p className="text-[10px] sm:text-xs text-muted">Or enter a custom address below</p>
 					</div>
 				)}
 
@@ -147,11 +147,12 @@ export function LocationStep() {
 				/>
 
 				<div className="space-y-2">
-					<div className="flex items-center gap-2 text-sm text-muted">
-						<MapPin size={14} />
+					<div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted">
+						<MapPin size={12} className="sm:hidden" />
+						<MapPin size={14} className="hidden sm:block" />
 						<span>Click on the map to fine-tune the exact location</span>
 					</div>
-					<div className="rounded-xl overflow-hidden border border-white/10">
+					<div className="rounded-lg sm:rounded-xl overflow-hidden border border-white/10">
 						<Map
 							readonly={false}
 							defaultAddress={locationAddress}
@@ -160,6 +161,23 @@ export function LocationStep() {
 						/>
 					</div>
 				</div>
+
+				<Controller
+					name="location.instructions"
+					control={control}
+					render={({ field }) => (
+						<TextArea
+							{...field}
+							label="Instructions"
+							placeholder="Parking information, entrance location, etc."
+							maxLength={300}
+							helperText="Help participants find the venue"
+							minRows={3}
+							optional
+							data-testid="location-instructions-input"
+						/>
+					)}
+				/>
 			</div>
 		</div>
 	);

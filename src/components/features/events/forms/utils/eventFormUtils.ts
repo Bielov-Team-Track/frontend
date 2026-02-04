@@ -1,12 +1,23 @@
 import { CreateEvent, CreateEventSeries, EventFormat, EventType, PlayingSurface, RecurrencePattern, TimeOffsetUnit } from "@/lib/models/Event";
-import { PricingModel, Unit } from "@/lib/models/EventBudget";
+import { PricingModel, Unit } from "@/lib/models/EventPaymentConfig";
 import { EventFormData } from "../validation/eventValidationSchema";
 import { ContextSelection } from "../components/ContextSelector";
 
 export function transformFormDataToCreateEvent(data: EventFormData, contextSelection?: ContextSelection): CreateEvent {
+	// Combine eventDate + eventStartTime into startTime
+	const eventDate = new Date(data.eventDate);
+	const [startHours, startMinutes] = data.eventStartTime.split(":").map(Number);
+	const startTime = new Date(eventDate);
+	startTime.setHours(startHours, startMinutes, 0, 0);
+
+	// Combine eventDate + eventEndTime into endTime
+	const [endHours, endMinutes] = data.eventEndTime.split(":").map(Number);
+	const endTime = new Date(eventDate);
+	endTime.setHours(endHours, endMinutes, 0, 0);
+
 	return {
-		startTime: new Date(data.startTime),
-		endTime: new Date(data.endTime),
+		startTime,
+		endTime,
 		location: {
 			name: data.location.name,
 			address: data.location.address,
@@ -16,13 +27,15 @@ export function transformFormDataToCreateEvent(data: EventFormData, contextSelec
 			latitude: data.location.latitude,
 			longitude: data.location.longitude,
 		},
-		paymentsConfig: data.useBudget
+		paymentsConfig: data.usePaymentConfig
 			? {
-					cost: Number(data.budget?.cost) || 0,
-					payToJoin: data.budget?.payToJoin ?? false,
-					pricingModel: data.budget?.pricingModel ?? PricingModel.Individual,
-					dropoutDeadlineHours: data.budget?.dropoutDeadlineHours ? Number(data.budget.dropoutDeadlineHours) : undefined,
-					minUnitsForBudget: data.budget?.minUnitsForBudget ? Number(data.budget.minUnitsForBudget) : undefined,
+					paymentMethods: data.paymentConfig?.paymentMethods,
+					cost: Number(data.paymentConfig?.cost) || 0,
+					payToJoin: data.paymentConfig?.payToJoin ?? false,
+					pricingModel: data.paymentConfig?.pricingModel ?? PricingModel.Individual,
+					dropoutDeadlineHours: data.paymentConfig?.dropoutDeadlineHours ? Number(data.paymentConfig.dropoutDeadlineHours) : undefined,
+					minUnitsForPaymentConfig: data.paymentConfig?.minUnitsForPaymentConfig ? Number(data.paymentConfig.minUnitsForPaymentConfig) : undefined,
+					paymentReminderDaysBefore: data.paymentConfig?.paymentReminderDaysBefore ? Number(data.paymentConfig.paymentReminderDaysBefore) : undefined,
 				}
 			: undefined,
 		name: data.name,
@@ -59,13 +72,15 @@ export function transformFormDataToCreateEventSeries(data: EventFormData, contex
 					longitude: data.location.longitude,
 				}
 			: undefined,
-		paymentsConfig: data.useBudget
+		paymentsConfig: data.usePaymentConfig
 			? {
-					cost: Number(data.budget?.cost) || 0,
-					payToJoin: data.budget?.payToJoin ?? false,
-					pricingModel: data.budget?.pricingModel ?? PricingModel.Individual,
-					dropoutDeadlineHours: data.budget?.dropoutDeadlineHours ? Number(data.budget.dropoutDeadlineHours) : undefined,
-					minUnitsForBudget: data.budget?.minUnitsForBudget ? Number(data.budget.minUnitsForBudget) : undefined,
+					paymentMethods: data.paymentConfig?.paymentMethods,
+					cost: Number(data.paymentConfig?.cost) || 0,
+					payToJoin: data.paymentConfig?.payToJoin ?? false,
+					pricingModel: data.paymentConfig?.pricingModel ?? PricingModel.Individual,
+					dropoutDeadlineHours: data.paymentConfig?.dropoutDeadlineHours ? Number(data.paymentConfig.dropoutDeadlineHours) : undefined,
+					minUnitsForPaymentConfig: data.paymentConfig?.minUnitsForPaymentConfig ? Number(data.paymentConfig.minUnitsForPaymentConfig) : undefined,
+					paymentReminderDaysBefore: data.paymentConfig?.paymentReminderDaysBefore ? Number(data.paymentConfig.paymentReminderDaysBefore) : undefined,
 				}
 			: undefined,
 		registrationOpenOffset: data.registrationOpenOffset,
@@ -117,13 +132,16 @@ export function getDefaultFormValues() {
 		startTime: tomorrow,
 		endTime: tomorrowPlus2Hours,
 
+		// Single event date/time (separated)
+		eventDate: tomorrow,
+		eventStartTime: "18:00",
+		eventEndTime: "20:00",
+
 		// Recurring event fields
 		isRecurring: false,
 		recurrencePattern: undefined as RecurrencePattern | undefined,
 		firstOccurrenceDate: undefined as Date | undefined,
 		seriesEndDate: undefined as Date | undefined,
-		eventStartTime: "18:00",
-		eventEndTime: "20:00",
 
 		// Registration timing offsets (for recurring events)
 		registrationOpenOffset: { value: 7, unit: TimeOffsetUnit.Days },
@@ -137,6 +155,7 @@ export function getDefaultFormValues() {
 			postalCode: "",
 			latitude: undefined,
 			longitude: undefined,
+			instructions: "",
 		},
 		name: "",
 		courtsNumber: 1,
@@ -150,11 +169,13 @@ export function getDefaultFormValues() {
 		payToEnter: false,
 		useBudget: false,
 		budget: {
+			paymentMethods: [],
 			pricingModel: PricingModel.Individual,
 			cost: 0,
 			payToJoin: false,
 			minUnitsForBudget: undefined,
 			dropoutDeadlineHours: undefined,
+			paymentReminderDaysBefore: undefined,
 		},
 		registrationType: "open" as const,
 		registrationOpenTime: null,

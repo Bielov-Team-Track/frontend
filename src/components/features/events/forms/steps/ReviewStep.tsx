@@ -92,11 +92,11 @@ export function ReviewStep() {
 					{/* Details Grid */}
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
 						{/* Date & Time */}
-						<ReviewSection title="Date" icon={Calendar} onEdit={() => goToStep(2)}>
+						<ReviewSection title="Date" icon={Calendar} onEdit={() => goToStep(1)}>
 							<p className="text-xs sm:text-sm text-white font-medium">{getDateDisplay()}</p>
 						</ReviewSection>
 
-						<ReviewSection title="Time" icon={Clock} onEdit={() => goToStep(2)}>
+						<ReviewSection title="Time" icon={Clock} onEdit={() => goToStep(1)}>
 							<p className="text-xs sm:text-sm text-white font-medium">
 								{values.isRecurring
 									? `${values.eventStartTime} - ${values.eventEndTime}`
@@ -114,7 +114,7 @@ export function ReviewStep() {
 
 						{/* Location */}
 						{values.location?.address && (
-							<ReviewSection title="Location" icon={MapPin} onEdit={() => goToStep(3)}>
+							<ReviewSection title="Location" icon={MapPin} onEdit={() => goToStep(2)}>
 								<p className="text-xs sm:text-sm text-white font-medium truncate">{values.location.name || values.location.address}</p>
 							</ReviewSection>
 						)}
@@ -123,7 +123,7 @@ export function ReviewStep() {
 					{/* Settings Summary */}
 					<div className="pt-3 sm:pt-4 border-t border-white/5 relative group">
 						<div className="absolute right-0 top-3 sm:top-4 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-							<button onClick={() => goToStep(4)} className="text-muted hover:text-white p-1 sm:p-1.5" title="Edit Settings">
+							<button onClick={() => goToStep(3)} className="text-muted hover:text-white p-1 sm:p-1.5" title="Edit Settings">
 								<Pencil size={12} />
 							</button>
 						</div>

@@ -9,6 +9,7 @@ export { default as BlockOverlay } from "./block-overlay";
 export { default as Button } from "./button/index";
 export { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
 export { default as Checkbox } from "./checkbox/index";
+export { CollapsibleSection } from "./collapsible-section";
 export { default as ColorPicker, DEFAULT_PRESET_COLORS } from "./color-picker/index";
 export { CommentItem, CommentsList } from "./comments";
 export { default as ConfirmationModal } from "./confirmation-modal";
