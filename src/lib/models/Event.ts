@@ -1,4 +1,4 @@
-import { EventBudget as EventPaymentsConfig, Unit } from "./EventBudget";
+import { EventPaymentConfig as EventPaymentsConfig, Unit } from "./EventPaymentConfig";
 import { ContextType } from "./shared/models";
 import { Team } from "./Team";
 
@@ -114,6 +114,7 @@ export interface Location {
 	postalCode?: string;
 	latitude?: number;
 	longitude?: number;
+	instructions?: string;
 }
 
 export interface RegistrationConfig {
