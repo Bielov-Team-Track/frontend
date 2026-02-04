@@ -4,16 +4,24 @@ import { EventFormData } from "../validation/eventValidationSchema";
 import { ContextSelection } from "../components/ContextSelector";
 
 export function transformFormDataToCreateEvent(data: EventFormData, contextSelection?: ContextSelection): CreateEvent {
-	// Combine eventDate + eventStartTime into startTime
-	const eventDate = new Date(data.eventDate);
-	const [startHours, startMinutes] = data.eventStartTime.split(":").map(Number);
-	const startTime = new Date(eventDate);
-	startTime.setHours(startHours, startMinutes, 0, 0);
+	let startTime: Date;
+	let endTime: Date;
 
-	// Combine eventDate + eventEndTime into endTime
-	const [endHours, endMinutes] = data.eventEndTime.split(":").map(Number);
-	const endTime = new Date(eventDate);
-	endTime.setHours(endHours, endMinutes, 0, 0);
+	if (data.eventDate && data.eventStartTime && data.eventEndTime) {
+		// New format: separate date and time fields
+		const eventDate = new Date(data.eventDate);
+		const [startHours, startMinutes] = data.eventStartTime.split(":").map(Number);
+		startTime = new Date(eventDate);
+		startTime.setHours(startHours, startMinutes, 0, 0);
+
+		const [endHours, endMinutes] = data.eventEndTime.split(":").map(Number);
+		endTime = new Date(eventDate);
+		endTime.setHours(endHours, endMinutes, 0, 0);
+	} else {
+		// Fallback: use existing startTime/endTime if available
+		startTime = data.startTime ? new Date(data.startTime) : new Date();
+		endTime = data.endTime ? new Date(data.endTime) : new Date();
+	}
 
 	return {
 		startTime,
@@ -60,7 +68,7 @@ export function transformFormDataToCreateEventSeries(data: EventFormData, contex
 		type: data.type,
 		surface: data.surface,
 		eventFormat: data.eventFormat,
-		isPublic: !data.isPrivate,
+		isPublic: !!data.isPublic,
 		location: data.location
 			? {
 					name: data.location.name,

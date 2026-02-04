@@ -96,7 +96,7 @@ export default function BasicsStep() {
 					name="name"
 					control={control}
 					render={({ field }) => (
-						<Input {...field} label="Event Name" placeholder="e.g., Sunday Beach Volleyball Tournament" error={errors.name?.message} required data-testid="event-name-input" />
+						<Input {...field} label="Event Name" placeholder="e.g., Sunday Beach Volleyball Tournament" error={errors.name?.message as string | undefined} required data-testid="event-name-input" />
 					)}
 				/>
 
@@ -110,7 +110,7 @@ export default function BasicsStep() {
 							options={eventTypeCards}
 							value={field.value}
 							onChange={field.onChange}
-							error={errors.type?.message}
+							error={errors.type?.message as string | undefined}
 							columns={2}
 							data-testid="event-type-selector"
 						/>
@@ -128,7 +128,7 @@ export default function BasicsStep() {
 								type="date"
 								label="Event Date"
 								leftIcon={<Calendar size={16} />}
-								error={errors.eventDate?.message}
+								error={errors.eventDate?.message as string | undefined}
 								helperText="When will this event take place?"
 								value={field.value ? new Date(field.value).toISOString().slice(0, 10) : ""}
 								onChange={(e) => field.onChange(new Date(e.target.value))}
@@ -156,7 +156,7 @@ export default function BasicsStep() {
 									type={isRecurring ? "time" : "datetime-local"}
 									label="Start Time"
 									leftIcon={<Clock size={16} />}
-									error={isRecurring ? errors.eventStartTime?.message : errors.startTime?.message}
+									error={(isRecurring ? errors.eventStartTime?.message : errors.startTime?.message) as string | undefined}
 									helperText={isRecurring ? "When each event starts" : "When the event starts"}
 									value={
 										field.value
@@ -184,7 +184,7 @@ export default function BasicsStep() {
 									type={isRecurring ? "time" : "datetime-local"}
 									label="End Time"
 									leftIcon={<Clock size={16} />}
-									error={isRecurring ? errors.eventEndTime?.message : errors.endTime?.message}
+									error={(isRecurring ? errors.eventEndTime?.message : errors.endTime?.message) as string | undefined}
 									helperText={isRecurring ? "When each event ends" : "When the event ends"}
 									value={
 										field.value
@@ -272,7 +272,7 @@ export default function BasicsStep() {
 								)}
 							/>
 							{errors.recurrencePattern?.message && (
-								<p className="text-destructive text-xs mt-1">{errors.recurrencePattern.message}</p>
+								<p className="text-destructive text-xs mt-1">{errors.recurrencePattern.message as string}</p>
 							)}
 						</div>
 
@@ -287,7 +287,7 @@ export default function BasicsStep() {
 										type="date"
 										label="First Occurrence"
 										leftIcon={<Calendar size={16} />}
-										error={errors.firstOccurrenceDate?.message}
+										error={errors.firstOccurrenceDate?.message as string | undefined}
 										helperText="When the first event occurs"
 										value={field.value ? new Date(field.value).toISOString().slice(0, 10) : ""}
 										onChange={(e) => field.onChange(new Date(e.target.value))}
@@ -307,7 +307,7 @@ export default function BasicsStep() {
 										type="date"
 										label="Series End Date"
 										leftIcon={<Calendar size={16} />}
-										error={errors.seriesEndDate?.message}
+										error={errors.seriesEndDate?.message as string | undefined}
 										helperText="When to stop creating events"
 										value={field.value ? new Date(field.value).toISOString().slice(0, 10) : ""}
 										onChange={(e) => field.onChange(new Date(e.target.value))}
@@ -365,7 +365,7 @@ export default function BasicsStep() {
 									options={surfaceCards}
 									value={field.value}
 									onChange={field.onChange}
-									error={errors.surface?.message}
+									error={errors.surface?.message as string | undefined}
 									columns={3}
 									data-testid="event-surface-selector"
 								/>

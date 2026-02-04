@@ -9,7 +9,7 @@ import { Controller } from "react-hook-form";
 import { useEventFormContext } from "../context/EventFormContext";
 import { parseAddressComponents } from "../utils/addressUtils";
 
-export function LocationStep() {
+export default function LocationStep() {
 	const { form, context } = useEventFormContext();
 	const {
 		control,

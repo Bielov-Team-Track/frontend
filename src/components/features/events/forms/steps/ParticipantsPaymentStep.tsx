@@ -107,7 +107,7 @@ export default function ParticipantsPaymentStep() {
 						options={eventFormatCards}
 						value={field.value}
 						onChange={field.onChange}
-						error={errors.eventFormat?.message}
+						error={errors.eventFormat?.message as string | undefined}
 						columns={3}
 					/>
 				)}
@@ -124,29 +124,8 @@ export default function ParticipantsPaymentStep() {
 							options={registrationUnitCards}
 							value={field.value}
 							onChange={field.onChange}
-							error={errors.registrationUnit?.message}
+							error={errors.registrationUnit?.message as string | undefined}
 							columns={2}
-						/>
-					)}
-				/>
-			)}
-
-			{/* Number of Teams - Only show when format is NOT Open */}
-			{eventFormat !== EventFormat.Open && (
-				<Controller
-					name="teamsNumber"
-					control={control}
-					render={({ field: { value, ...field } }) => (
-						<Input
-							{...field}
-							value={value ?? ""}
-							type="number"
-							label="Number of Teams"
-							leftIcon={<Users size={16} />}
-							error={errors.teamsNumber?.message}
-							min="2"
-							helperText="How many teams will participate in this event"
-							data-testid="teams-number-input"
 						/>
 					)}
 				/>
@@ -164,7 +143,7 @@ export default function ParticipantsPaymentStep() {
 							type="number"
 							label="Maximum Participants"
 							leftIcon={<Users size={16} />}
-							error={errors.capacity?.message}
+							error={errors.capacity?.message as string | undefined}
 							min="1"
 							helperText="Leave empty for unlimited participants"
 							optional
@@ -207,7 +186,7 @@ export default function ParticipantsPaymentStep() {
 						accountStatus={status}
 						canAcceptPayments={canAcceptPayments}
 						disabled={false}
-						error={errors.paymentConfig?.paymentMethods?.message}
+						error={errors.paymentConfig?.paymentMethods?.message as string | undefined}
 					/>
 
 					{/* Pricing Model */}
@@ -220,7 +199,7 @@ export default function ParticipantsPaymentStep() {
 								options={pricingModelCards}
 								value={field.value}
 								onChange={field.onChange}
-								error={errors.paymentConfig?.pricingModel?.message}
+								error={errors.paymentConfig?.pricingModel?.message as string | undefined}
 								columns={3}
 							/>
 						)}
@@ -245,7 +224,7 @@ export default function ParticipantsPaymentStep() {
 										? "Fixed price each team will pay"
 										: "Fixed price each person will pay"
 								}
-								error={errors.paymentConfig?.cost?.message}
+								error={errors.paymentConfig?.cost?.message as string | undefined}
 							/>
 						)}
 					/>
@@ -317,7 +296,6 @@ export default function ParticipantsPaymentStep() {
 						control={control}
 						render={({ field }) => (
 							<Select
-								{...field}
 								value={field.value || ""}
 								onChange={field.onChange}
 								options={[
@@ -327,7 +305,6 @@ export default function ParticipantsPaymentStep() {
 								]}
 								label="Casual Play Format"
 								helperText="Select the format for casual play events"
-								optional
 							/>
 						)}
 					/>
@@ -341,12 +318,12 @@ export default function ParticipantsPaymentStep() {
 						render={({ field }) => (
 							<Input
 								{...field}
+								value={field.value ?? ""}
 								type="number"
-								optional
 								label="Dropout Deadline (hours)"
 								leftIcon={<Clock size={16} />}
 								helperText="Hours before event start when participants can no longer drop out"
-								error={errors.paymentConfig?.dropoutDeadlineHours?.message}
+								error={errors.paymentConfig?.dropoutDeadlineHours?.message as string | undefined}
 							/>
 						)}
 					/>
