@@ -29,7 +29,7 @@ const stepCircleVariants = cva("flex items-center justify-center rounded-full tr
 		state: {
 			completed: "bg-primary text-primary-foreground",
 			current: "bg-primary text-primary-foreground",
-			future: "bg-neutral-800 text-muted-foreground",
+			future: "bg-surface-elevated text-muted-foreground",
 		},
 	},
 	defaultVariants: {
@@ -170,7 +170,7 @@ const Steps: React.FC<StepsProps> = ({ steps, currentStep, className, orientatio
 
 								{/* Connector */}
 								{!isLast && (
-									<div className={cn("flex-1 mx-2 relative bg-neutral-800", connectorHeightMap[sizeKey])}>
+									<div className={cn("flex-1 mx-2 relative bg-surface-elevated", connectorHeightMap[sizeKey])}>
 										<div
 											className={cn("absolute inset-0 bg-primary transition-transform duration-300 ease-out origin-left")}
 											style={{
@@ -239,7 +239,7 @@ const Steps: React.FC<StepsProps> = ({ steps, currentStep, className, orientatio
 								style={{
 									width: sizeKey === "sm" ? "24px" : sizeKey === "lg" ? "40px" : "32px",
 								}}>
-								<div className={cn("my-2 relative bg-neutral-800 min-h-6", connectorWidthMap[sizeKey])}>
+								<div className={cn("my-2 relative bg-surface-elevated min-h-6", connectorWidthMap[sizeKey])}>
 									<div
 										className={cn("absolute inset-0 bg-primary transition-transform duration-300 ease-out origin-top")}
 										style={{

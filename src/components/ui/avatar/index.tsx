@@ -96,7 +96,7 @@ const Avatar = ({ src, alt, name, icon, variant, size = "md", color, className }
 			{src && <AvatarImage src={src} alt={alt ?? name ?? "Avatar"} className={"bg-black"} />}
 			<AvatarFallback
 				style={backgroundColor ? { backgroundColor } : undefined}
-				className={cn("bg-neutral-800", backgroundColor ? "text-white" : undefined)}>
+				className={cn("bg-surface-elevated", backgroundColor ? "text-white" : undefined)}>
 				{renderFallback()}
 			</AvatarFallback>
 		</AvatarRoot>

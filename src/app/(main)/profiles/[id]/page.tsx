@@ -20,7 +20,7 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 	const fullName = [profile.name, profile.surname].filter(Boolean).join(" ") || "Unknown User";
 
 	return (
-		<div className="bg-base-200 rounded-2xl overflow-hidden">
+		<div className="bg-background rounded-2xl overflow-hidden">
 			{/* Header */}
 			<div className="bg-linear-to-r from-accent/20 to-purple-500/20 p-6 md:p-8">
 				<div className="flex flex-col md:flex-row items-center gap-6">
@@ -31,10 +31,10 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 								alt={fullName}
 								width={120}
 								height={120}
-								className="rounded-full border-4 border-base-100 object-cover"
+								className="rounded-full border-4 border-card object-cover"
 							/>
 						) : (
-							<div className="w-[120px] h-[120px] rounded-full border-4 border-base-100 bg-base-300 flex items-center justify-center text-4xl font-bold text-white/50">
+							<div className="w-[120px] h-[120px] rounded-full border-4 border-card bg-surface flex items-center justify-center text-4xl font-bold text-white/50">
 								{(profile.name?.[0] || "?").toUpperCase()}
 							</div>
 						)}
@@ -50,14 +50,14 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 
 			{/* Player Profile Stats */}
 			{profile.playerProfile && (
-				<div className="p-6 md:p-8 border-t border-white/5">
+				<div className="p-6 md:p-8 border-t border-border">
 					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 						<TrendingUp className="text-accent" size={20} />
 						Player Stats
 					</h2>
 					<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 						{profile.playerProfile.heightCm && (
-							<div className="bg-base-300 rounded-xl p-4 flex items-center gap-3">
+							<div className="bg-surface rounded-xl p-4 flex items-center gap-3">
 								<Ruler className="text-blue-500" size={20} />
 								<div>
 									<div className="text-xs text-muted">Height</div>
@@ -66,15 +66,15 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 							</div>
 						)}
 						{profile.playerProfile.verticalJumpCm && (
-							<div className="bg-base-300 rounded-xl p-4 flex items-center gap-3">
-								<ArrowUp className="text-green-500" size={20} />
+							<div className="bg-surface rounded-xl p-4 flex items-center gap-3">
+								<ArrowUp className="text-success" size={20} />
 								<div>
 									<div className="text-xs text-muted">Vertical Jump</div>
 									<div className="font-semibold text-white">{profile.playerProfile.verticalJumpCm} cm</div>
 								</div>
 							</div>
 						)}
-						<div className="bg-base-300 rounded-xl p-4 flex items-center gap-3">
+						<div className="bg-surface rounded-xl p-4 flex items-center gap-3">
 							<Zap className="text-purple-500" size={20} />
 							<div>
 								<div className="text-xs text-muted">Dominant Hand</div>
@@ -82,7 +82,7 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 							</div>
 						</div>
 						{profile.playerProfile.highestLevelPlayed !== undefined && (
-							<div className="bg-base-300 rounded-xl p-4 flex items-center gap-3">
+							<div className="bg-surface rounded-xl p-4 flex items-center gap-3">
 								<TrendingUp className="text-orange-500" size={20} />
 								<div>
 									<div className="text-xs text-muted">Highest Level</div>
@@ -103,7 +103,7 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 									</span>
 								)}
 								{profile.playerProfile.secondaryPositions?.map((pos, idx) => (
-									<span key={idx} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/80 text-sm">
+									<span key={idx} className="px-3 py-1 bg-hover border border-border rounded-full text-white/80 text-sm">
 										{getVolleyballPositionLabel(pos)}
 									</span>
 								))}
@@ -115,20 +115,20 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 
 			{/* Coach Profile Stats */}
 			{profile.coachProfile && (
-				<div className="p-6 md:p-8 border-t border-white/5">
+				<div className="p-6 md:p-8 border-t border-border">
 					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 						<Award className="text-accent" size={20} />
 						Coach Profile
 					</h2>
 					<div className="grid grid-cols-2 gap-4 mb-4">
 						{profile.coachProfile.yearsOfExperience && (
-							<div className="bg-base-300 rounded-xl p-4">
+							<div className="bg-surface rounded-xl p-4">
 								<div className="text-xs text-muted">Experience</div>
 								<div className="font-semibold text-white">{profile.coachProfile.yearsOfExperience} Years</div>
 							</div>
 						)}
 						{profile.coachProfile.highestLevelCoached !== undefined && (
-							<div className="bg-base-300 rounded-xl p-4">
+							<div className="bg-surface rounded-xl p-4">
 								<div className="text-xs text-muted">Highest Level Coached</div>
 								<div className="font-semibold text-white">{getSkillLevelLabel(profile.coachProfile.highestLevelCoached)}</div>
 							</div>
@@ -151,7 +151,7 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 
 			{/* History */}
 			{profile.historyEntries && profile.historyEntries.length > 0 && (
-				<div className="p-6 md:p-8 border-t border-white/5">
+				<div className="p-6 md:p-8 border-t border-border">
 					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 						<History className="text-accent" size={20} />
 						Career History
@@ -161,11 +161,11 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 							.sort((a, b) => b.year - a.year)
 							.slice(0, 5)
 							.map((entry) => (
-								<div key={entry.id} className="bg-base-300 rounded-xl p-4 flex items-center gap-4">
+								<div key={entry.id} className="bg-surface rounded-xl p-4 flex items-center gap-4">
 									{entry.clubLogoUrl ? (
 										<Image src={entry.clubLogoUrl} alt={entry.clubName} width={40} height={40} className="rounded-lg" />
 									) : (
-										<div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+										<div className="w-10 h-10 rounded-lg bg-active flex items-center justify-center">
 											<Shield size={20} className="text-muted" />
 										</div>
 									)}
@@ -203,7 +203,7 @@ const ProfilePage = async ({ params }: { params: Promise<{ id: string }> }) => {
 
 			{/* Events Section */}
 			{events && events.length > 0 && (
-				<div className="mt-8 bg-base-200 rounded-2xl p-6 md:p-8">
+				<div className="mt-8 bg-background rounded-2xl p-6 md:p-8">
 					<h2 className="text-lg font-semibold text-white mb-4">
 						Organized Events
 					</h2>

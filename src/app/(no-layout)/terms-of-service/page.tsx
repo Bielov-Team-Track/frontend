@@ -7,9 +7,9 @@ export const metadata: Metadata = {
 
 export default function TermsOfServicePage() {
 	return (
-		<div className="min-h-screen bg-base-200">
+		<div className="min-h-screen bg-background">
 			<div className="container mx-auto sm:px-4 sm:py-8">
-				<div className="max-w-4xl mx-auto bg-base-100 rounded-lg shadow-xl sm:p-8 p-4">
+				<div className="max-w-4xl mx-auto bg-card rounded-lg shadow-xl sm:p-8 p-4">
 					{/* Header */}
 					<div className="text-center mb-8">
 						<h1 className="text-4xl font-bold  mb-2">Terms of Service</h1>
@@ -19,7 +19,7 @@ export default function TermsOfServicePage() {
 					{/* Content */}
 					<div className="prose prose-lg max-w-none space-y-6">
 						{/* Introduction */}
-						<div className="bg-base-200 sm:p-6 p-4 rounded-lg">
+						<div className="bg-background sm:p-6 p-4 rounded-lg">
 							<h2 className="text-2xl font-semibold  mb-4">Agreement to Our Legal Terms</h2>
 							<p className="text-lg mb-4">
 								We are <strong>Spike</strong> (&quot;Company,&quot; &quot;we,&quot; &quot;us,&quot; &quot;our&quot;). We operate the Spike
@@ -125,7 +125,7 @@ export default function TermsOfServicePage() {
 						{/* Section 1 */}
 						<section id="section1" className="scroll-mt-8">
 							<h2 className="text-2xl font-semibold  mb-4">1. Our Services</h2>
-							<div className="card bg-base-200 p-4">
+							<div className="card bg-background p-4">
 								<p className="mb-4">
 									The Spike platform provides volleyball community services including event creation, player matching, team management, and
 									tournament organization. The information provided when using the Services is not intended for distribution to or use by any
@@ -285,7 +285,7 @@ export default function TermsOfServicePage() {
 						{/* Section 6 */}
 						<section id="section6" className="scroll-mt-8">
 							<h2 className="text-2xl font-semibold  mb-4">6. Contribution License</h2>
-							<div className="bg-base-200 p-4 rounded-lg">
+							<div className="bg-background p-4 rounded-lg">
 								<p className="mb-4">
 									You and Services agree that we may access, store, process, and use any information and personal data that you provide and
 									your choices (including settings).
@@ -377,7 +377,7 @@ export default function TermsOfServicePage() {
 						{/* Section 16 */}
 						<section id="section16" className="scroll-mt-8">
 							<h2 className="text-2xl font-semibold  mb-4">16. User Data</h2>
-							<div className="bg-base-200 p-4 rounded-lg">
+							<div className="bg-background p-4 rounded-lg">
 								<p className="mb-4">
 									We will maintain certain data that you transmit to the Services for the purpose of managing the performance of the Services,
 									as well as data relating to your use of the Services. Although we perform regular routine backups of data, you are solely

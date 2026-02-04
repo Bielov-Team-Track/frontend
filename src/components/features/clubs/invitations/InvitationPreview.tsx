@@ -17,9 +17,9 @@ const InvitationPreview = ({ invitation }: InvitationPreviewProps) => {
 					<img src={club.bannerUrl} alt={`${club.name} banner`} className="w-full h-full object-cover" />
 				</div>
 			)}
-			<div className={`bg-base-200 p-6 ${club.bannerUrl ? "rounded-b-2xl" : "rounded-2xl"}`}>
+			<div className={`bg-background p-6 ${club.bannerUrl ? "rounded-b-2xl" : "rounded-2xl"}`}>
 				<div className="flex items-start gap-4">
-					<div className="w-16 h-16 rounded-xl bg-base-300 flex items-center justify-center overflow-hidden">
+					<div className="w-16 h-16 rounded-xl bg-surface flex items-center justify-center overflow-hidden">
 						{club.logoUrl ? (
 							<img src={club.logoUrl} alt={`${club.name} logo`} className="w-full h-full object-cover" />
 						) : (

@@ -177,14 +177,14 @@ function ColorPicker({
 					left: position.left,
 					opacity: isVisible ? 1 : 0,
 				}}
-				className={cn("fixed z-50 rounded-xl overflow-hidden", "bg-neutral-900 border border-white/10 shadow-2xl", "transition-opacity duration-150")}>
+				className={cn("fixed z-50 rounded-xl overflow-hidden", "bg-surface border border-border shadow-2xl", "transition-opacity duration-150")}>
 				{/* Header */}
-				<div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+				<div className="flex items-center justify-between px-4 py-3 border-b border-border">
 					<span className="text-sm font-medium text-white">Custom Color</span>
 					<button
 						type="button"
 						onClick={() => setIsPopoverOpen(false)}
-						className="p-1 -mr-1 rounded-md hover:bg-white/10 text-muted-foreground hover:text-white transition-colors"
+						className="p-1 -mr-1 rounded-md hover:bg-active text-muted-foreground hover:text-white transition-colors"
 						aria-label="Close">
 						<X size={16} />
 					</button>
@@ -203,7 +203,7 @@ function ColorPicker({
 							prefixed={false}
 							className={cn(
 								"flex-1 px-3 py-2 rounded-lg text-sm font-mono uppercase",
-								"bg-white/5 border border-white/10 text-white",
+								"bg-hover border border-border text-white",
 								"focus:outline-none focus:border-primary"
 							)}
 						/>
@@ -295,7 +295,7 @@ function ColorPicker({
 						onClick={() => setIsPopoverOpen(!isPopoverOpen)}
 						className={cn(
 							"w-8 h-8 rounded-lg transition-all flex items-center justify-center",
-							"bg-white/10 border-2 border-dashed border-white/30 hover:border-white/50",
+							"bg-active border-2 border-dashed border-white/30 hover:border-white/50",
 							"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
 							"hover:scale-105",
 							disabled && "opacity-50 cursor-not-allowed"

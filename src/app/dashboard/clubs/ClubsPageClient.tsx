@@ -25,7 +25,7 @@ export default function ClubsPageClient() {
 	return (
 		<Tabs className="h-full flex flex-col space-y-6">
 			{/* Toolbar */}
-			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-neutral-900 backdrop-blur-md p-4 rounded-2xl border border-white/5">
+			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface backdrop-blur-md p-4 rounded-2xl border border-border">
 				{/* Search & Filter */}
 				<div className="flex gap-4">
 					<Input placeholder="Find clubs..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} leftIcon={<Search />} />
@@ -83,7 +83,7 @@ export default function ClubsPageClient() {
 function ClubGridCard({ club }: { club: Club }) {
 	return (
 		<Link href={`/dashboard/clubs/${club.id}`} className="group block h-full">
-			<div className="flex flex-col h-full rounded-2xl bg-white/5 border border-white/5 hover:border-accent/40 hover:bg-white/[0.07] hover:-translate-y-1 transition-all duration-300 shadow-xs hover:shadow-xl">
+			<div className="flex flex-col h-full rounded-2xl bg-hover border border-border hover:border-accent/40 hover:bg-white/[0.07] hover:-translate-y-1 transition-all duration-300 shadow-xs hover:shadow-xl">
 				{/* Banner */}
 				<div className="h-24 bg-linear-to-br from-accent/20 via-primary/10 to-transparent relative overflow-hidden rounded-t-2xl">
 					<div className="absolute inset-0 bg-linear-to-t from-background-dark/80 to-transparent" />
@@ -98,7 +98,7 @@ function ClubGridCard({ club }: { club: Club }) {
 
 					{club.description && <p className="text-xs text-muted line-clamp-2 mb-3">{club.description}</p>}
 
-					<div className="mt-auto pt-3 border-t border-white/5 flex items-center gap-3 text-xs text-muted">
+					<div className="mt-auto pt-3 border-t border-border flex items-center gap-3 text-xs text-muted">
 						<span className="flex items-center gap-1">
 							<Users size={12} />
 							{club.memberCount || 0} members
@@ -127,7 +127,7 @@ function ClubListView({ clubs }: { clubs: Club[] }) {
 				<Link
 					key={club.id}
 					href={`/dashboard/clubs/${club.id}`}
-					className="group flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-accent/30 hover:bg-white/[0.07] transition-all">
+					className="group flex items-center gap-4 p-4 rounded-xl bg-hover border border-border hover:border-accent/30 hover:bg-white/[0.07] transition-all">
 					{/* Logo */}
 					<Avatar src={club.logoUrl || undefined} name={club.name} size="md" />
 
@@ -155,8 +155,8 @@ function ClubListView({ clubs }: { clubs: Club[] }) {
 
 function EmptyState() {
 	return (
-		<div className="col-span-full flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/2">
-			<div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 text-muted">
+		<div className="col-span-full flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-border rounded-2xl bg-white/2">
+			<div className="w-16 h-16 rounded-full bg-hover flex items-center justify-center mb-4 text-muted">
 				<Shield size={32} />
 			</div>
 			<h3 className="text-xl font-bold text-white mb-2">No clubs found</h3>

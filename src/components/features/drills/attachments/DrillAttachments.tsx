@@ -154,7 +154,7 @@ export default function DrillAttachments({ attachments, animation, className }: 
 											className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
 										/>
 									) : (
-										<div className="w-full h-full bg-neutral-800 flex items-center justify-center">
+										<div className="w-full h-full bg-skeleton flex items-center justify-center">
 											<Film size={32} className="text-muted" />
 										</div>
 									)}

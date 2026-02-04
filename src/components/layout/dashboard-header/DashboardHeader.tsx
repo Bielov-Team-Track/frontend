@@ -15,7 +15,7 @@ function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 	const { userProfile, isLoading } = useAuth();
 
 	return (
-		<header className="sticky top-0 z-40 bg-neutral-900 border-b border-white/5">
+		<header className="sticky top-0 z-40 bg-surface border-b border-border">
 			<div className="flex items-center justify-between max-w-7xl h-16 px-4 md:px-6  m-auto">
 				{/* Left: Logo & Mobile Menu */}
 				<div className="flex items-center gap-3">
@@ -23,7 +23,7 @@ function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 					{onMenuClick && (
 						<button
 							onClick={onMenuClick}
-							className="md:hidden p-2 -ml-2 text-muted hover:text-white transition-colors rounded-lg hover:bg-white/5"
+							className="md:hidden p-2 -ml-2 text-muted hover:text-white transition-colors rounded-lg hover:bg-hover"
 							aria-label="Open menu">
 							<Menu size={24} />
 						</button>
@@ -48,7 +48,7 @@ function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 					<ThemeSwitcher />
 
 					{userProfile && <NotificationBell />}
-					<div className="hidden md:block h-6 w-px bg-white/10 mx-1"></div>
+					<div className="hidden md:block h-6 w-px bg-border mx-1"></div>
 
 					<UserMenu user={userProfile!} isLoading={isLoading} />
 				</div>

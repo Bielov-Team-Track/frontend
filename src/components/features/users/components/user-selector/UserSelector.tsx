@@ -49,11 +49,11 @@ export interface UserSelectorProps {
 
 function MemberSkeleton() {
 	return (
-		<div className="flex items-center gap-3 p-3 rounded-lg bg-white/5">
-			<SkeletonAvatar className="bg-neutral-800" size="sm" />
+		<div className="flex items-center gap-3 p-3 rounded-lg bg-hover">
+			<SkeletonAvatar className="bg-skeleton" size="sm" />
 			<div className="flex-1 space-y-1.5">
-				<Skeleton className="bg-neutral-800" height="0.875rem" width="60%" rounded="md" />
-				<Skeleton className="bg-neutral-800" height="0.75rem" width="40%" rounded="md" />
+				<Skeleton className="bg-skeleton" height="0.875rem" width="60%" rounded="md" />
+				<Skeleton className="bg-skeleton" height="0.75rem" width="40%" rounded="md" />
 			</div>
 		</div>
 	);
@@ -553,7 +553,7 @@ export default function UserSelector({
 	);
 
 	return (
-		<div className="border border-white/10 rounded-xl overflow-hidden bg-neutral-950 relative h-[520px] flex flex-col">
+		<div className="border border-border rounded-xl overflow-hidden bg-background relative h-[520px] flex flex-col">
 			{/* Desktop Layout */}
 			<div className="flex flex-1 min-h-0 h-full">
 				{/* Main content */}
@@ -642,7 +642,7 @@ export default function UserSelector({
 
 					{/* Select All Bar */}
 					{!isLoading && displayUsers.length > 0 && (
-						<div className="mt-4 shrink-0 flex items-center justify-between py-2 px-3 bg-white/5 rounded-lg border border-white/5">
+						<div className="mt-4 shrink-0 flex items-center justify-between py-2 px-3 bg-hover rounded-lg border border-border">
 							<div className="flex items-center gap-3">
 								<Checkbox
 									checked={allVisibleSelected}
@@ -775,7 +775,7 @@ export default function UserSelector({
 				</div>
 
 				{/* Desktop Sidebar - Always visible */}
-				<div className="hidden lg:flex w-75 bg-linear-to-l from-white/5 to-transparent border-l border-white/10 overflow-hidden">
+				<div className="hidden lg:flex w-75 bg-linear-to-l from-hover to-transparent border-l border-border overflow-hidden">
 					<div className="p-4 flex-1 flex flex-col min-h-0 overflow-hidden">
 						<SelectedPanelContent />
 					</div>
@@ -783,7 +783,7 @@ export default function UserSelector({
 			</div>
 
 			{/* Mobile Bottom Bar - Stays within modal */}
-			<div className="lg:hidden absolute bottom-0 left-0 right-0 border-t border-white/10 bg-neutral-950">
+			<div className="lg:hidden absolute bottom-0 left-0 right-0 border-t border-border bg-background">
 				<button
 					type="button"
 					onClick={() => setMobileSheetOpen(true)}
@@ -796,7 +796,7 @@ export default function UserSelector({
 								return <Avatar key={user.id} name={displayName} src={user.imageUrl} variant="user" size="xs" />;
 							})}
 							{selectedUsers.length === 0 && (
-								<div className="w-8 h-8 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center">
+								<div className="w-8 h-8 rounded-full bg-active border-2 border-border flex items-center justify-center">
 									<UserPlus size={16} className="text-muted" />
 								</div>
 							)}
@@ -832,7 +832,7 @@ export default function UserSelector({
 						{/* Backdrop */}
 						<div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileSheetOpen(false)} />
 						{/* Sheet */}
-						<div className="absolute bottom-0 left-0 right-0 bg-neutral-900 rounded-t-2xl border-t border-white/10 max-h-[85vh] flex flex-col animate-in slide-in-from-bottom duration-300">
+						<div className="absolute bottom-0 left-0 right-0 bg-surface rounded-t-2xl border-t border-border max-h-[85vh] flex flex-col animate-in slide-in-from-bottom duration-300">
 							{/* Handle */}
 							<div className="flex justify-center py-3">
 								<div className="w-10 h-1 rounded-full bg-white/20" />

@@ -69,7 +69,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
 						onClick={onClose}
 						className={cn(
 							"flex w-full items-center justify-center gap-1 rounded-md px-3 py-2 text-sm font-medium",
-							"text-muted-foreground transition-colors hover:bg-neutral-800 hover:text-foreground"
+							"text-muted-foreground transition-colors hover:bg-surface-elevated hover:text-foreground"
 						)}>
 						View all notifications
 						<ChevronRight className="size-4" />

@@ -151,7 +151,7 @@ export default function TournamentPage() {
 	const [isAdmin, setIsAdmin] = useState(TOURNAMENT.adminMode);
 
 	return (
-		<div className="min-h-screen bg-base-100 text-gray-100 font-sans pb-20">
+		<div className="min-h-screen bg-base-100 text-foreground font-sans pb-20">
 			{/* --- ADMIN TOOLBAR (Visible only to organizers) --- */}
 			{isAdmin && (
 				<div className="bg-accent/10 border-b border-accent/20 px-4 py-2 flex items-center justify-between">
@@ -181,14 +181,14 @@ export default function TournamentPage() {
 								<span className="px-2 py-0.5 rounded bg-red-500/20 text-red-500 border border-red-500/20 text-xs font-bold uppercase animate-pulse">
 									{TOURNAMENT.status}
 								</span>
-								<span className="text-gray-500 text-sm font-medium">
+								<span className="text-muted-foreground text-sm font-medium">
 									{TOURNAMENT.format}
 								</span>
 							</div>
 							<h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
 								{TOURNAMENT.title}
 							</h1>
-							<div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+							<div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
 								<span className="flex items-center gap-1">
 									<Calendar size={14} /> {TOURNAMENT.date}
 								</span>
@@ -233,7 +233,7 @@ export default function TournamentPage() {
                   ${
 						activeTab === tab
 							? "text-accent"
-							: "text-gray-500 hover:text-white"
+							: "text-muted-foreground hover:text-white"
 					}
                 `}>
 									{tab}
@@ -261,7 +261,7 @@ export default function TournamentPage() {
 									<h3 className="font-bold text-white">
 										{group.name}
 									</h3>
-									<button className="text-xs text-gray-500 hover:text-white flex items-center gap-1">
+									<button className="text-xs text-muted-foreground hover:text-white flex items-center gap-1">
 										Full Schedule <ChevronRight size={12} />
 									</button>
 								</div>
@@ -270,7 +270,7 @@ export default function TournamentPage() {
 								<div className="p-2">
 									<table className="w-full text-sm">
 										<thead>
-											<tr className="text-gray-500 border-b border-white/5">
+											<tr className="text-muted-foreground border-b border-white/5">
 												<th className="font-medium text-left py-2 pl-2">
 													Team
 												</th>
@@ -308,29 +308,29 @@ export default function TournamentPage() {
 															className={`text-xs w-4 ${
 																index < 2
 																	? "text-success font-bold"
-																	: "text-gray-600"
+																	: "text-muted-foreground"
 															}`}>
 															{index + 1}
 														</span>
 														<img
 															src={row.logo}
-															className="w-6 h-6 rounded bg-gray-700"
+															className="w-6 h-6 rounded bg-placeholder"
 															alt=""
 														/>
 														<span className="text-white font-medium">
 															{row.team}
 														</span>
 													</td>
-													<td className="text-center text-gray-400">
+													<td className="text-center text-muted-foreground">
 														{row.p}
 													</td>
-													<td className="text-center text-gray-400">
+													<td className="text-center text-muted-foreground">
 														{row.w}
 													</td>
-													<td className="text-center text-gray-400">
+													<td className="text-center text-muted-foreground">
 														{row.l}
 													</td>
-													<td className="text-center text-gray-500 text-xs">
+													<td className="text-center text-muted-foreground text-xs">
 														{row.sets}
 													</td>
 													<td className="text-center font-bold text-white">
@@ -342,13 +342,13 @@ export default function TournamentPage() {
 									</table>
 
 									{/* Legend */}
-									<div className="px-4 py-3 text-[10px] text-gray-500 flex gap-4">
+									<div className="px-4 py-3 text-[10px] text-muted-foreground flex gap-4">
 										<span className="flex items-center gap-1">
 											<div className="w-2 h-2 rounded-full bg-success/20 border border-success"></div>{" "}
 											Promotion
 										</span>
 										<span className="flex items-center gap-1">
-											<div className="w-2 h-2 rounded-full bg-gray-700 border border-gray-600"></div>{" "}
+											<div className="w-2 h-2 rounded-full bg-placeholder border border-gray-600"></div>{" "}
 											Eliminated
 										</span>
 									</div>
@@ -364,7 +364,7 @@ export default function TournamentPage() {
 						<div className="min-w-[800px] flex justify-around relative">
 							{/* STAGE: SEMI-FINALS */}
 							<div className="flex flex-col justify-around w-1/3 gap-12">
-								<div className="text-center text-gray-500 text-xs font-bold uppercase tracking-widest mb-4">
+								<div className="text-center text-muted-foreground text-xs font-bold uppercase tracking-widest mb-4">
 									Semi-Finals
 								</div>
 								{BRACKET.semis.map((match) => (
@@ -430,7 +430,7 @@ function BracketMatch({ match, isAdmin, isFinal }: any) {
     `}>
 			{/* Edit Button (Admin Only) */}
 			{isAdmin && (
-				<button className="absolute -top-2 -right-2 bg-gray-700 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
+				<button className="absolute -top-2 -right-2 bg-placeholder text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
 					<Edit3 size={12} />
 				</button>
 			)}
@@ -455,14 +455,14 @@ function BracketMatch({ match, isAdmin, isFinal }: any) {
 			}
         `}>
 					<div className="flex items-center gap-3">
-						<div className="w-6 h-6 rounded bg-gray-700 text-[10px] flex items-center justify-center text-gray-400">
+						<div className="w-6 h-6 rounded bg-placeholder text-[10px] flex items-center justify-center text-muted-foreground">
 							img
 						</div>
 						<span
 							className={`font-bold text-sm ${
 								match.t1.score > match.t2.score
 									? "text-white"
-									: "text-gray-400"
+									: "text-muted-foreground"
 							}`}>
 							{match.t1.name}
 						</span>
@@ -471,7 +471,7 @@ function BracketMatch({ match, isAdmin, isFinal }: any) {
 						className={`font-mono font-bold ${
 							match.t1.score > match.t2.score
 								? "text-accent"
-								: "text-gray-500"
+								: "text-muted-foreground"
 						}`}>
 						{match.t1.score ?? "-"}
 					</span>
@@ -488,14 +488,14 @@ function BracketMatch({ match, isAdmin, isFinal }: any) {
 			}
         `}>
 					<div className="flex items-center gap-3">
-						<div className="w-6 h-6 rounded bg-gray-700 text-[10px] flex items-center justify-center text-gray-400">
+						<div className="w-6 h-6 rounded bg-placeholder text-[10px] flex items-center justify-center text-muted-foreground">
 							img
 						</div>
 						<span
 							className={`font-bold text-sm ${
 								match.t2.score > match.t1.score
 									? "text-white"
-									: "text-gray-400"
+									: "text-muted-foreground"
 							}`}>
 							{match.t2.name}
 						</span>
@@ -504,7 +504,7 @@ function BracketMatch({ match, isAdmin, isFinal }: any) {
 						className={`font-mono font-bold ${
 							match.t2.score > match.t1.score
 								? "text-accent"
-								: "text-gray-500"
+								: "text-muted-foreground"
 						}`}>
 						{match.t2.score ?? "-"}
 					</span>
@@ -513,7 +513,7 @@ function BracketMatch({ match, isAdmin, isFinal }: any) {
 
 			{/* Date/Status Footer */}
 			{!match.isLive && (
-				<div className="px-3 py-1 bg-black/20 text-center text-[10px] text-gray-500 font-medium uppercase rounded-b-xl">
+				<div className="px-3 py-1 bg-black/20 text-center text-[10px] text-muted-foreground font-medium uppercase rounded-b-xl">
 					{match.status}
 				</div>
 			)}

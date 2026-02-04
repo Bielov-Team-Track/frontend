@@ -119,12 +119,12 @@ const FIXTURES = [
 
 export default function TeamPage() {
 	return (
-		<div className="min-h-screen bg-base-100 text-gray-100 font-sans pb-20">
+		<div className="min-h-screen bg-base-100 text-foreground font-sans pb-20">
 			{/* --- HEADER SECTION --- */}
 			<div className="bg-[#1A1A1A] border-b border-white/5 pt-8 pb-6 px-4 md:px-8">
 				<div className="max-w-desktop mx-auto">
 					{/* Breadcrumb */}
-					<div className="flex items-center gap-2 text-xs text-gray-500 mb-4 uppercase tracking-wider font-bold">
+					<div className="flex items-center gap-2 text-xs text-muted-foreground mb-4 uppercase tracking-wider font-bold">
 						<span className="hover:text-white cursor-pointer">
 							{TEAM.clubName}
 						</span>
@@ -136,7 +136,7 @@ export default function TeamPage() {
 						<div className="flex items-center gap-5">
 							{/* Team Identity */}
 							<div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-linear-to-br from-gray-800 to-black border border-white/10 p-2 flex items-center justify-center shadow-2xl">
-								<span className="text-3xl font-bold text-gray-600">
+								<span className="text-3xl font-bold text-muted-foreground">
 									FA
 								</span>
 								{/* Use <img> here in real app */}
@@ -150,7 +150,7 @@ export default function TeamPage() {
 									<span className="px-2 py-0.5 rounded bg-primary/20 text-primary border border-primary/20 font-bold">
 										{TEAM.division}
 									</span>
-									<span className="text-gray-400 border-l border-white/10 pl-3">
+									<span className="text-muted-foreground border-l border-white/10 pl-3">
 										{TEAM.season} Season
 									</span>
 								</div>
@@ -163,7 +163,7 @@ export default function TeamPage() {
 								<div className="text-2xl font-bold text-white">
 									{TEAM.record}
 								</div>
-								<div className="text-[10px] text-gray-400 uppercase">
+								<div className="text-[10px] text-muted-foreground uppercase">
 									Record
 								</div>
 							</div>
@@ -185,7 +185,7 @@ export default function TeamPage() {
 							<Users className="text-accent" size={20} /> The
 							Squad
 						</h2>
-						<span className="text-xs text-gray-500">
+						<span className="text-xs text-muted-foreground">
 							{ROSTER.length} Players Registered
 						</span>
 					</div>
@@ -198,7 +198,7 @@ export default function TeamPage() {
 								className="group flex items-center gap-4 p-3 rounded-xl bg-[#1E1E1E] border border-white/5 hover:border-accent/30 hover:bg-white/[0.07] transition-all cursor-pointer">
 								{/* Jersey Number */}
 								<div className="w-10 h-12 flex items-center justify-center bg-white/5 rounded-lg border border-white/5 group-hover:bg-accent group-hover:text-white transition-colors">
-									<span className="font-mono text-xl font-bold text-gray-400 group-hover:text-white">
+									<span className="font-mono text-xl font-bold text-muted-foreground group-hover:text-white">
 										{player.number}
 									</span>
 								</div>
@@ -208,7 +208,7 @@ export default function TeamPage() {
 									<img
 										src={player.avatar}
 										alt=""
-										className="w-12 h-12 rounded-full object-cover bg-gray-700"
+										className="w-12 h-12 rounded-full object-cover bg-placeholder"
 									/>
 									{player.isCaptain && (
 										<div
@@ -222,7 +222,7 @@ export default function TeamPage() {
 								{/* Info */}
 								<div className="flex-1">
 									<div className="flex items-center gap-2">
-										<h3 className="font-bold text-gray-200 group-hover:text-white">
+										<h3 className="font-bold text-foreground group-hover:text-white">
 											{player.name}
 										</h3>
 										{player.position === "Libero" && (
@@ -231,13 +231,13 @@ export default function TeamPage() {
 											</span>
 										)}
 									</div>
-									<p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+									<p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
 										{player.position}
 									</p>
 								</div>
 
 								<ChevronRight
-									className="text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity"
+									className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
 									size={18}
 								/>
 							</div>
@@ -245,7 +245,7 @@ export default function TeamPage() {
 					</div>
 
 					{/* Recruit Card */}
-					<div className="border border-dashed border-white/10 rounded-xl p-4 flex items-center justify-center gap-3 text-gray-500 hover:text-white hover:border-white/20 hover:bg-white/5 cursor-pointer transition-all">
+					<div className="border border-dashed border-white/10 rounded-xl p-4 flex items-center justify-center gap-3 text-muted-foreground hover:text-white hover:border-white/20 hover:bg-white/5 cursor-pointer transition-all">
 						<ArrowUpRight size={18} />
 						<span className="text-sm font-medium">
 							Manage Roster / Invite Players
@@ -267,9 +267,9 @@ export default function TeamPage() {
 							<div className="flex justify-between items-center mb-6">
 								{/* Home */}
 								<div className="flex flex-col items-center gap-2 w-1/3">
-									<div className="w-16 h-16 rounded-full bg-gray-800 border-2 border-white/10 p-2">
+									<div className="w-16 h-16 rounded-full bg-surface-elevated border-2 border-white/10 p-2">
 										{/* Img */}
-										<div className="w-full h-full rounded-full bg-gray-600/50"></div>
+										<div className="w-full h-full rounded-full bg-muted/50"></div>
 									</div>
 									<span className="text-sm font-bold truncate w-full">
 										{TEAM.name}
@@ -277,15 +277,15 @@ export default function TeamPage() {
 								</div>
 
 								{/* VS */}
-								<div className="text-2xl font-black text-gray-600 italic">
+								<div className="text-2xl font-black text-muted-foreground italic">
 									VS
 								</div>
 
 								{/* Away */}
 								<div className="flex flex-col items-center gap-2 w-1/3">
-									<div className="w-16 h-16 rounded-full bg-gray-800 border-2 border-white/10 p-2">
+									<div className="w-16 h-16 rounded-full bg-surface-elevated border-2 border-white/10 p-2">
 										{/* Img */}
-										<div className="w-full h-full rounded-full bg-gray-600/50"></div>
+										<div className="w-full h-full rounded-full bg-muted/50"></div>
 									</div>
 									<span className="text-sm font-bold truncate w-full">
 										{TEAM.nextMatch.opponent}
@@ -293,15 +293,15 @@ export default function TeamPage() {
 								</div>
 							</div>
 
-							<div className="bg-black/30 rounded-xl p-3 inline-flex flex-col gap-1 w-full">
+							<div className="bg-overlay-light rounded-xl p-3 inline-flex flex-col gap-1 w-full">
 								<div className="flex items-center justify-center gap-2 text-white font-medium">
 									<Calendar
 										size={14}
-										className="text-gray-400"
+										className="text-muted-foreground"
 									/>{" "}
 									{TEAM.nextMatch.date}
 								</div>
-								<div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+								<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
 									<MapPin size={14} /> {TEAM.nextMatch.venue}
 								</div>
 							</div>
@@ -316,7 +316,7 @@ export default function TeamPage() {
 					<div className="bg-[#1E1E1E] border border-white/5 rounded-2xl p-5">
 						<div className="flex justify-between items-center mb-4">
 							<h3 className="font-bold text-white flex items-center gap-2">
-								<Shield size={16} className="text-gray-400" />{" "}
+								<Shield size={16} className="text-muted-foreground" />{" "}
 								Standings
 							</h3>
 							<span className="text-xs text-accent cursor-pointer hover:underline">
@@ -325,7 +325,7 @@ export default function TeamPage() {
 						</div>
 
 						<div className="space-y-1">
-							<div className="grid grid-cols-12 text-[10px] text-gray-500 uppercase font-bold px-2 mb-2">
+							<div className="grid grid-cols-12 text-[10px] text-muted-foreground uppercase font-bold px-2 mb-2">
 								<div className="col-span-1">#</div>
 								<div className="col-span-8">Team</div>
 								<div className="col-span-3 text-right">Pts</div>
@@ -336,7 +336,7 @@ export default function TeamPage() {
 									className={`grid grid-cols-12 text-sm px-2 py-2 rounded-lg ${
 										row.isCurrent
 											? "bg-white/10 font-bold text-white border border-white/5"
-											: "text-gray-400"
+											: "text-muted-foreground"
 									}`}>
 									<div className="col-span-1">{row.rank}</div>
 									<div className="col-span-8 truncate">
@@ -353,7 +353,7 @@ export default function TeamPage() {
 					{/* RECENT FORM */}
 					<div className="bg-[#1E1E1E] border border-white/5 rounded-2xl p-5">
 						<h3 className="font-bold text-white mb-4 flex items-center gap-2">
-							<Trophy size={16} className="text-gray-400" />{" "}
+							<Trophy size={16} className="text-muted-foreground" />{" "}
 							Recent Form
 						</h3>
 						<div className="space-y-3">
@@ -361,10 +361,10 @@ export default function TeamPage() {
 								<div
 									key={match.id}
 									className="flex items-center justify-between text-sm">
-									<div className="text-gray-400">
+									<div className="text-muted-foreground">
 										{match.date}
 									</div>
-									<div className="text-gray-200 flex-1 px-4 truncate">
+									<div className="text-foreground flex-1 px-4 truncate">
 										vs {match.opponent}
 									</div>
 									<div

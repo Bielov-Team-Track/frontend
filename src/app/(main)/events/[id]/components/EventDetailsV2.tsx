@@ -5,7 +5,7 @@ import { EventPaymentCard } from "@/components/features/events";
 import { Map } from "@/components/features/locations";
 import { TeamsList } from "@/components/features/teams";
 import { Event } from "@/lib/models/Event";
-import { Unit } from "@/lib/models/EventBudget";
+import { Unit } from "@/lib/models/EventPaymentConfig";
 import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { Team } from "@/lib/models/Team";
 import { UserProfile } from "@/lib/models/User";
@@ -135,7 +135,7 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 								</Link>
 							)}
 						</div>
-						<div className="h-48 w-full bg-gray-800 relative">
+						<div className="h-48 w-full bg-surface-elevated relative">
 							{event.location?.address ? (
 								<div className="h-full w-full [&_.leaflet-container]:z-0">
 									<Map defaultAddress={event.location.address} readonly={true} />
@@ -182,7 +182,7 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 
 								<div className="p-6 rounded-2xl bg-white/5 border border-white/5">
 									<h3 className="text-lg font-bold text-white mb-3">About Event</h3>
-									<div className="prose prose-invert max-w-none text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
+									<div className="prose prose-invert max-w-none text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
 										{event.description || "No description provided."}
 									</div>
 								</div>

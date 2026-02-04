@@ -56,13 +56,13 @@ const ProfileRequirementsSection = ({
 	return (
 		<div className="flex flex-col gap-4">
 			{requirePlayerProfile && (
-				<div className={`p-4 rounded-xl border ${playerComplete ? "bg-green-500/10 border-green-500/30" : "bg-amber-500/10 border-amber-500/30"}`}>
+				<div className={`p-4 rounded-xl border ${playerComplete ? "bg-success/10 border-success/30" : "bg-warning/10 border-warning/30"}`}>
 					<div className="flex items-start justify-between gap-4">
 						<div className="flex items-start gap-3">
 							{playerComplete ? (
-								<CheckCircle className="w-5 h-5 text-green-400 mt-0.5" />
+								<CheckCircle className="w-5 h-5 text-success mt-0.5" />
 							) : (
-								<AlertCircle className="w-5 h-5 text-amber-400 mt-0.5" />
+								<AlertCircle className="w-5 h-5 text-warning mt-0.5" />
 							)}
 							<div>
 								<h4 className="font-medium text-white">{playerComplete ? "Player profile complete" : "Player profile required"}</h4>
@@ -81,13 +81,13 @@ const ProfileRequirementsSection = ({
 			)}
 
 			{requireCoachProfile && (
-				<div className={`p-4 rounded-xl border ${coachComplete ? "bg-green-500/10 border-green-500/30" : "bg-amber-500/10 border-amber-500/30"}`}>
+				<div className={`p-4 rounded-xl border ${coachComplete ? "bg-success/10 border-success/30" : "bg-warning/10 border-warning/30"}`}>
 					<div className="flex items-start justify-between gap-4">
 						<div className="flex items-start gap-3">
 							{coachComplete ? (
-								<CheckCircle className="w-5 h-5 text-green-400 mt-0.5" />
+								<CheckCircle className="w-5 h-5 text-success mt-0.5" />
 							) : (
-								<AlertCircle className="w-5 h-5 text-amber-400 mt-0.5" />
+								<AlertCircle className="w-5 h-5 text-warning mt-0.5" />
 							)}
 							<div>
 								<h4 className="font-medium text-white">{coachComplete ? "Coach profile complete" : "Coach profile required"}</h4>

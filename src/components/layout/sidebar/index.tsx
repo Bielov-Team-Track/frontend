@@ -83,7 +83,7 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 		? "group relative flex items-center justify-center xl:justify-start px-3 py-3 rounded-xl transition-all duration-200"
 		: "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors";
 
-	const activeStyles = isActive ? (isRoot ? "bg-neutral-900 text-white" : "bg-white/5 text-white") : "text-muted hover:bg-white/5 hover:text-white";
+	const activeStyles = isActive ? (isRoot ? "bg-surface text-white" : "bg-hover text-white") : "text-muted hover:bg-hover hover:text-white";
 
 	const iconSize = isRoot ? 20 : 16;
 	const indentSize = isRoot ? "ml-5 pl-3" : "ml-4 pl-3";
@@ -136,7 +136,7 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 
 			{/* Recursive Sub-items */}
 			{hasSubItems && isExpanded && (
-				<div className={`${isRoot ? "hidden xl:block" : ""} mt-1 space-y-1 border-l border-white/10 ${indentSize}`}>
+				<div className={`${isRoot ? "hidden xl:block" : ""} mt-1 space-y-1 border-l border-border ${indentSize}`}>
 					{item.subItems!.map((subItem) => (
 						<SidebarItem
 							key={subItem.name}
@@ -160,23 +160,23 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 const MobileDrawer = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => (
 	<>
 		{/* Backdrop */}
-		{isOpen && <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={onClose} aria-hidden="true" />}
+		{isOpen && <div className="fixed inset-0 z-40 bg-overlay backdrop-blur-sm md:hidden" onClick={onClose} aria-hidden="true" />}
 
 		{/* Drawer */}
 		<aside
 			className={`
-				fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-neutral-900 border-r border-white/5
+				fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-surface border-r border-border
 				transition-transform duration-300 ease-in-out md:hidden
 				${isOpen ? "translate-x-0" : "-translate-x-full"}
 			`}>
-			<div className="flex h-16 items-center justify-between border-b border-white/5 px-4">
+			<div className="flex h-16 items-center justify-between border-b border-border px-4">
 				<div className="flex items-center gap-3">
 					<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-tr from-accent to-primary text-white shadow-lg shadow-orange-500/20">
 						<Volleyball size={18} />
 					</div>
 					<span className="text-xl font-bold tracking-tight text-white">Volleyer</span>
 				</div>
-				<button onClick={onClose} className="rounded-lg p-2 text-muted transition-colors hover:bg-white/5 hover:text-white" aria-label="Close menu">
+				<button onClick={onClose} className="rounded-lg p-2 text-muted transition-colors hover:bg-hover hover:text-white" aria-label="Close menu">
 					<ChevronDown size={20} className="-rotate-90" />
 				</button>
 			</div>

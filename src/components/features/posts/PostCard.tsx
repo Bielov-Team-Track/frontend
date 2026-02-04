@@ -60,7 +60,7 @@ const PostCard = memo(function PostCard({ post, onEdit, onDelete, showUnpin, isA
 	}
 
 	return (
-		<article className="bg-neutral-900 backdrop-blur-sm shadow-sm rounded-2xl border border-white/5">
+		<article className="bg-surface backdrop-blur-sm shadow-sm rounded-2xl border border-border">
 			{/* Header */}
 			<div className="flex items-start justify-between p-4">
 				<div className="flex items-center gap-3">
@@ -106,7 +106,7 @@ const PostCard = memo(function PostCard({ post, onEdit, onDelete, showUnpin, isA
 			)}
 
 			{/* Footer - reactions & comments */}
-			<div className="px-4 py-3 border-t border-white/5">
+			<div className="px-4 py-3 border-t border-border">
 				<div className="flex items-center justify-between">
 					<PostReactions postId={post.id} reactions={post.reactions} />
 					<button

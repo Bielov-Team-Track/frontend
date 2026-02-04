@@ -36,10 +36,10 @@ export function SettingsSidebar({ items, activeSection }: SettingsSidebarProps) 
 									isActive
 										? item.danger
 											? "bg-red-500/20 text-red-400"
-											: "bg-neutral-700 text-white"
+											: "bg-track text-white"
 										: item.danger
 											? "text-red-400/70 hover:bg-red-500/10 hover:text-red-400"
-											: "text-muted hover:bg-white/5 hover:text-white"
+											: "text-muted hover:bg-hover hover:text-white"
 								)}>
 								<Icon size={18} />
 								{item.label}
@@ -65,10 +65,10 @@ export function SettingsSidebar({ items, activeSection }: SettingsSidebarProps) 
 									isActive
 										? item.danger
 											? "bg-red-500/20 text-red-400"
-											: "bg-neutral-700 text-white"
+											: "bg-track text-white"
 										: item.danger
 											? "text-red-400/70 hover:bg-red-500/10"
-											: "text-muted hover:bg-white/5"
+											: "text-muted hover:bg-hover"
 								)}>
 								<Icon size={16} />
 								{item.label}

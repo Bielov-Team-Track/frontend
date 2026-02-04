@@ -63,7 +63,7 @@ function TeamEdit({
 	};
 
 	return (
-		<div className="w-full flex flex-col gap-4 bg-gray-900 p-4 rounded-lg relative">
+		<div className="w-full flex flex-col gap-4 bg-surface p-4 rounded-lg relative">
 			<div className="flex w-full justify-between">
 				<span className="text-muted-100 font-bold text-lg">{team.name}</span>
 				<div className="flex gap-4">
@@ -81,7 +81,7 @@ function TeamEdit({
 					return (
 						<div
 							key={p.id}
-							className="p-4 h-14 rounded-md bg-neutral-200 w-full flex justify-between"
+							className="p-4 h-14 rounded-md bg-muted w-full flex justify-between"
 						>
 							<span className="text-black self-center font-bold">{p.name}</span>
 							<div className="flex gap-4">
@@ -114,7 +114,7 @@ function TeamEdit({
 				</div>
 				<ul
 					tabIndex={0}
-					className="dropdown-content z-1 menu p-2 shadow-sm bg-base-100 rounded-box w-52"
+					className="dropdown-content z-1 menu p-2 shadow-sm bg-card rounded-box w-52"
 				>
 					{positionTypes?.map((p) => (
 						<li key={p.id}>

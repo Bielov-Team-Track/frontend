@@ -180,13 +180,13 @@ const MessagesPage = () => {
 	}
 
 	return (
-		<div className="relative h-full w-full rounded-2xl overflow-hidden shadow-md bg-neutral-900">
+		<div className="relative h-full w-full rounded-2xl overflow-hidden shadow-md bg-surface">
 			<ChatsRealtimeClient />
 			<ResizableContainer
 				leftPanel={
 					<div className="rounded-2xl h-full min-h-0">
 						{isNewChatModalOpen ? (
-							<div className="flex flex-col gap-4 h-full min-h-0 bg-background/50 backdrop-blur-xl border border-white/5 p-6 rounded-r-0 rounded-2xl overflow-hidden">
+							<div className="flex flex-col gap-4 h-full min-h-0 bg-background/50 backdrop-blur-xl border border-border p-6 rounded-r-0 rounded-2xl overflow-hidden">
 								<div className="flex items-center gap-2 mb-4">
 									<Button
 										leftIcon={<ChevronLeft />}
@@ -194,7 +194,7 @@ const MessagesPage = () => {
 										color="neutral"
 										variant="ghost"
 										onClick={() => setIsNewChatModalOpen(false)}
-										className="h-8 w-8 p-0 rounded-full bg-white/5 hover:bg-white/10"
+										className="h-8 w-8 p-0 rounded-full bg-hover hover:bg-active"
 									/>
 									<span className="font-bold text-2xl text-white tracking-tight">New chat</span>
 								</div>
@@ -214,11 +214,11 @@ const MessagesPage = () => {
 					<div className="h-full min-h-0 flex flex-col rounded-l-0">
 						{selectedChat ? (
 							messagesLoading ? (
-								<div className="flex-1 flex items-center justify-center bg-background/50 backdrop-blur-xl border border-white/5">
+								<div className="flex-1 flex items-center justify-center bg-background/50 backdrop-blur-xl border border-border">
 									<Loader />
 								</div>
 							) : messagesError ? (
-								<div className="flex-1 flex flex-col items-center justify-center gap-4 bg-background/50 backdrop-blur-xl border border-white/5">
+								<div className="flex-1 flex flex-col items-center justify-center gap-4 bg-background/50 backdrop-blur-xl border border-border">
 									<div className="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center">
 										<AlertCircle size={24} className="text-error" />
 									</div>
@@ -228,7 +228,7 @@ const MessagesPage = () => {
 									</Button>
 								</div>
 							) : (
-								<div className="flex flex-col flex-1 min-h-0 h-[calc(100vh-4rem)] bg-background/50 backdrop-blur-xl border border-white/5 overflow-hidden">
+								<div className="flex flex-col flex-1 min-h-0 h-[calc(100vh-4rem)] bg-background/50 backdrop-blur-xl border border-border overflow-hidden">
 									{sendError && (
 										<div className="shrink-0 bg-error text-white p-2 text-center text-sm z-10">
 											{sendError}
@@ -241,9 +241,9 @@ const MessagesPage = () => {
 								</div>
 							)
 						) : (
-							<div className="grid flex-1 min-h-0 place-items-center bg-background/30 backdrop-blur-xl border border-white/5">
+							<div className="grid flex-1 min-h-0 place-items-center bg-background/30 backdrop-blur-xl border border-border">
 								<div className="flex flex-col items-center p-8 text-center">
-									<div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6 text-muted">
+									<div className="w-20 h-20 rounded-full bg-hover flex items-center justify-center mb-6 text-muted">
 										<MessageSquare size={40} className="opacity-50" />
 									</div>
 									<h3 className="text-xl font-bold text-white mb-2">Your Messages</h3>

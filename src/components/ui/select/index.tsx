@@ -83,7 +83,7 @@ function Select<T = any>({
 					aria-describedby={error ? `${id}-error` : helperText ? `${id}-helper` : undefined}>
 					{leftIcon && !inlineLabel && <span className="text-muted-foreground mr-1">{leftIcon}</span>}
 					{inlineLabel && (
-						<div className="text-muted-foreground bg-neutral-800 -ml-2.5 -my-2 px-2.5 py-2 mr-2 rounded-l-lg text-xs flex gap-1">
+						<div className="text-muted-foreground bg-surface-elevated -ml-2.5 -my-2 px-2.5 py-2 mr-2 rounded-l-lg text-xs flex gap-1">
 							{leftIcon && <span className="text-muted-foreground mr-1">{leftIcon}</span>} {inlineLabel}
 						</div>
 					)}

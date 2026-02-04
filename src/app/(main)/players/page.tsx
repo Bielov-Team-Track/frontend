@@ -223,7 +223,7 @@ export default function PlayerPage() {
 									<div className="flex items-center gap-3">
 										<div
 											className={`w-10 h-10 rounded-xl p-0.5 flex items-center justify-center overflow-hidden ${
-												club.current ? "bg-linear-to-br from-accent to-primary" : "bg-gray-700"
+												club.current ? "bg-linear-to-br from-accent to-primary" : "bg-placeholder"
 											}`}>
 											<div className="w-full h-full bg-background rounded-lg flex items-center justify-center">
 												{/* eslint-disable-next-line @next/next/no-img-element */}
@@ -243,7 +243,7 @@ export default function PlayerPage() {
 											</div>
 										</div>
 										<div>
-											<div className={`text-sm font-bold ${club.current ? "text-white" : "text-gray-300"}`}>{club.name}</div>
+											<div className={`text-sm font-bold ${club.current ? "text-white" : "text-muted-foreground"}`}>{club.name}</div>
 											<div className="text-xs text-muted">{club.period}</div>
 										</div>
 									</div>
@@ -303,7 +303,7 @@ export default function PlayerPage() {
 									<div key={tour.id} className="flex group">
 										{/* Date Column */}
 										<div className="w-24 pt-4 text-right pr-4 flex flex-col items-end relative">
-											<span className="text-sm font-bold text-gray-300">{tour.date.split(" ")[0]}</span>
+											<span className="text-sm font-bold text-muted-foreground">{tour.date.split(" ")[0]}</span>
 											<span className="text-xs text-muted">{tour.date.split(" ")[1]}</span>
 											{/* Timeline Connector */}
 											<div className="absolute right-[-5px] top-[22px] w-2.5 h-2.5 rounded-full bg-background border-2 border-white/20 group-hover:border-accent z-10"></div>
@@ -353,7 +353,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 function ResultBadge({ type, children }: { type: string; children: React.ReactNode }) {
 	const colors = {
 		gold: "bg-yellow-500/20 text-yellow-500 border-yellow-500/30",
-		silver: "bg-gray-300/20 text-gray-300 border-gray-300/30",
+		silver: "bg-muted/20 text-muted-foreground border-border",
 		bronze: "bg-orange-700/20 text-orange-700 border-orange-700/30",
 		neutral: "bg-white/10 text-muted border-white/10",
 	};

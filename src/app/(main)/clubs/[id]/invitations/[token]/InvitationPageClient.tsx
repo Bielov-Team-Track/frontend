@@ -79,7 +79,7 @@ const InvitationPageClient = ({ clubSlug, token }: InvitationPageClientProps) =>
 		return (
 			<div className="min-h-screen flex items-center justify-center">
 				<div className="text-center">
-					<AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+					<AlertCircle className="w-12 h-12 text-error mx-auto mb-4" />
 					<h1 className="text-xl font-bold text-white mb-2">Invitation Not Found</h1>
 					<p className="text-muted mb-4">This invitation may have expired or been revoked.</p>
 					<Button variant="outline" onClick={() => router.push("/clubs")}>
@@ -93,7 +93,7 @@ const InvitationPageClient = ({ clubSlug, token }: InvitationPageClientProps) =>
 		return (
 			<div className="min-h-screen flex items-center justify-center">
 				<div className="text-center">
-					<AlertCircle className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+					<AlertCircle className="w-12 h-12 text-warning mx-auto mb-4" />
 					<h1 className="text-xl font-bold text-white mb-2">Invitation {invitation.status}</h1>
 					<p className="text-muted mb-4">This invitation has already been {invitation.status.toLowerCase()}.</p>
 					<Button variant="outline" onClick={() => router.push("/clubs")}>
@@ -109,7 +109,7 @@ const InvitationPageClient = ({ clubSlug, token }: InvitationPageClientProps) =>
 				<InvitationPreview invitation={invitation} />
 				<div className="mt-6">
 					{!user ? (
-						<div className="p-6 bg-base-200 rounded-xl">
+						<div className="p-6 bg-background rounded-xl">
 							<p className="text-muted text-center mb-4">Sign in to accept this invitation</p>
 							<Button
 								variant="solid"
@@ -121,7 +121,7 @@ const InvitationPageClient = ({ clubSlug, token }: InvitationPageClientProps) =>
 							</Button>
 						</div>
 					) : (
-						<div className="p-6 bg-base-200 rounded-xl">
+						<div className="p-6 bg-background rounded-xl">
 							<InvitationAcceptForm
 								invitation={invitation}
 								hasPlayerProfile={!!playerProfile}

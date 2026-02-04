@@ -157,7 +157,7 @@ export default function Dropdown<T = any>({
                     </div>
                 </summary>
 
-                <ul className="dropdown-content menu bg-base-200 rounded-box z-50 w-full p-2 shadow-lg max-h-60 overflow-y-auto">
+                <ul className="dropdown-content menu bg-background rounded-box z-50 w-full p-2 shadow-lg max-h-60 overflow-y-auto">
                     {options.length > 0 ? (
                         options.map((option) => (
                             <li key={option.value}>

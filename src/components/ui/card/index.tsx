@@ -26,7 +26,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 			<div
 				ref={ref}
 				className={cn(
-					"card bg-base-100",
+					"card bg-card",
 					variantClass,
 					sizeClass,
 					imageFull && "image-full",

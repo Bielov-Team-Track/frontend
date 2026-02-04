@@ -83,17 +83,17 @@ const sizeStyles: Record<SliderSize, { track: string; thumb: string }> = {
 // Variant styles - controls overall appearance
 const variantStyles: Record<SliderVariant, { track: string; indicator: string; thumb: string }> = {
 	default: {
-		track: "bg-neutral-700",
+		track: "bg-track",
 		indicator: "", // Color applied separately
 		thumb: "bg-background border-2",
 	},
 	muted: {
-		track: "bg-neutral-700",
+		track: "bg-track",
 		indicator: "bg-foreground/30",
 		thumb: "bg-foreground/80 border-0 hover:bg-foreground focus-visible:bg-foreground",
 	},
 	outline: {
-		track: "bg-neutral-700",
+		track: "bg-track",
 		indicator: "", // Color applied separately
 		thumb: "bg-background border-2 shadow-md",
 	},

@@ -146,11 +146,11 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 						<h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3 tracking-tight">{club.name}</h1>
 						<div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-muted-foreground">
 							{club.location && (
-								<span className="flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full border border-white/5 text-sm">
+								<span className="flex items-center gap-1.5 bg-hover px-3 py-1 rounded-full border border-border text-sm">
 									<MapPin size={14} /> {club.location}
 								</span>
 							)}
-							<span className="flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full border border-white/5 text-sm">
+							<span className="flex items-center gap-1.5 bg-hover px-3 py-1 rounded-full border border-border text-sm">
 								<Users size={14} /> {club.memberCount || 0} Members
 							</span>
 						</div>
@@ -166,7 +166,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 				{/* Registration Content */}
 				<motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="w-full">
 					{!userProfile ? (
-						<div className="max-w-md mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center backdrop-blur-xs">
+						<div className="max-w-md mx-auto p-10 rounded-3xl bg-hover border border-border text-center backdrop-blur-xs">
 							<h2 className="text-2xl font-bold text-white mb-3">Join {club.name}</h2>
 							<p className="text-muted mb-8">Sign in or create an account to start your registration.</p>
 							<Button
@@ -181,7 +181,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 					) : existingRegistration ? (
 						<RegistrationStatusView registration={existingRegistration} clubName={club.name} clubId={clubId} settings={settings} />
 					) : settings && !settings.allowPublicRegistration ? (
-						<div className="max-w-lg mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center">
+						<div className="max-w-lg mx-auto p-10 rounded-3xl bg-hover border border-border text-center">
 							<Shield size={64} className="mx-auto mb-6 text-muted/50" />
 							<h2 className="text-2xl font-bold text-white mb-3">Registration Closed</h2>
 							<p className="text-muted mb-8">
@@ -194,8 +194,8 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 							</Link>
 						</div>
 					) : (
-						<div className="p-6 md:p-10 rounded-3xl bg-white/5 border border-white/10 shadow-xl backdrop-blur-xs">
-							<div className="mb-8 text-center border-b border-white/10 pb-8">
+						<div className="p-6 md:p-10 rounded-3xl bg-hover border border-border shadow-xl backdrop-blur-xs">
+							<div className="mb-8 text-center border-b border-border pb-8">
 								<h2 className="text-2xl font-bold text-white mb-2">Registration Form</h2>
 								<p className="text-muted">Please provide the required details to join the team.</p>
 							</div>
@@ -245,17 +245,17 @@ function RegistrationStatusView({ registration, clubName, clubId, settings }: Re
 		const message = settings?.welcomeMessage || defaultMessage;
 
 		return (
-			<div className="max-w-2xl mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center relative overflow-hidden">
+			<div className="max-w-2xl mx-auto p-10 rounded-3xl bg-hover border border-border text-center relative overflow-hidden">
 				<div className="absolute top-0 left-0 w-full h-full bg-grid-white/[0.02] -z-10" />
-				<div className="inline-flex items-center justify-center p-5 bg-green-500/10 rounded-full mb-6 relative">
-					<PartyPopper size={48} className="text-green-400" />
+				<div className="inline-flex items-center justify-center p-5 bg-success/10 rounded-full mb-6 relative">
+					<PartyPopper size={48} className="text-success" />
 				</div>
 				<h2 className="text-3xl font-bold text-white mb-4">Welcome to {clubName}!</h2>
 				<p className="text-lg text-muted mb-8 max-w-lg mx-auto leading-relaxed">{message}</p>
 
 				{registration.publicNote && (
-					<div className="bg-white/5 border-l-4 border-l-green-500 border-white/10 rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
-						<h4 className="text-xs font-bold text-green-400 uppercase tracking-wider mb-2">Message from Club</h4>
+					<div className="bg-hover border-l-4 border-l-success border-border rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
+						<h4 className="text-xs font-bold text-success uppercase tracking-wider mb-2">Message from Club</h4>
 						<p className="text-white italic font-light">&quot;{registration.publicNote}&quot;</p>
 					</div>
 				)}
@@ -282,9 +282,9 @@ function RegistrationStatusView({ registration, clubName, clubId, settings }: Re
 		const message = settings?.pendingMessage || defaultMessage;
 
 		return (
-			<div className="max-w-xl mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center backdrop-blur-xs">
-				<div className="inline-flex items-center justify-center p-5 bg-yellow-500/10 rounded-full mb-6">
-					<Clock size={48} className="text-yellow-400" />
+			<div className="max-w-xl mx-auto p-10 rounded-3xl bg-hover border border-border text-center backdrop-blur-xs">
+				<div className="inline-flex items-center justify-center p-5 bg-warning/10 rounded-full mb-6">
+					<Clock size={48} className="text-warning" />
 				</div>
 				<h2 className="text-2xl font-bold text-white mb-3">Request Submitted</h2>
 				<p className="text-muted mb-8 text-lg">{message}</p>
@@ -306,16 +306,16 @@ function RegistrationStatusView({ registration, clubName, clubId, settings }: Re
 		const message = settings?.waitlistMessage || defaultMessage;
 
 		return (
-			<div className="max-w-xl mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center backdrop-blur-xs">
-				<div className="inline-flex items-center justify-center p-5 bg-blue-500/10 rounded-full mb-6">
-					<Users size={48} className="text-blue-400" />
+			<div className="max-w-xl mx-auto p-10 rounded-3xl bg-hover border border-border text-center backdrop-blur-xs">
+				<div className="inline-flex items-center justify-center p-5 bg-info/10 rounded-full mb-6">
+					<Users size={48} className="text-info" />
 				</div>
 				<h2 className="text-2xl font-bold text-white mb-3">Added to Waitlist</h2>
 				<p className="text-muted mb-8 text-lg">{message}</p>
 
 				{registration.publicNote && (
-					<div className="bg-white/5 border-l-4 border-l-blue-500 border-white/10 rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
-						<h4 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2">Note from Club</h4>
+					<div className="bg-hover border-l-4 border-l-info border-border rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
+						<h4 className="text-xs font-bold text-info uppercase tracking-wider mb-2">Note from Club</h4>
 						<p className="text-white italic font-light">&quot;{registration.publicNote}&quot;</p>
 					</div>
 				)}
@@ -336,16 +336,16 @@ function RegistrationStatusView({ registration, clubName, clubId, settings }: Re
 		const message = settings?.declinedMessage || defaultMessage;
 
 		return (
-			<div className="max-w-xl mx-auto p-10 rounded-3xl bg-white/5 border border-white/10 text-center backdrop-blur-xs">
-				<div className="inline-flex items-center justify-center p-5 bg-red-500/10 rounded-full mb-6">
-					<XCircle size={48} className="text-red-400" />
+			<div className="max-w-xl mx-auto p-10 rounded-3xl bg-hover border border-border text-center backdrop-blur-xs">
+				<div className="inline-flex items-center justify-center p-5 bg-error/10 rounded-full mb-6">
+					<XCircle size={48} className="text-error" />
 				</div>
 				<h2 className="text-2xl font-bold text-white mb-3">Registration Declined</h2>
 				<p className="text-muted mb-8 text-lg">{message}</p>
 
 				{registration.publicNote && (
-					<div className="bg-white/5 border-l-4 border-l-red-500 border-white/10 rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
-						<h4 className="text-xs font-bold text-red-400 uppercase tracking-wider mb-2">Reason / Note</h4>
+					<div className="bg-hover border-l-4 border-l-error border-border rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
+						<h4 className="text-xs font-bold text-error uppercase tracking-wider mb-2">Reason / Note</h4>
 						<p className="text-white italic font-light">&quot;{registration.publicNote}&quot;</p>
 					</div>
 				)}

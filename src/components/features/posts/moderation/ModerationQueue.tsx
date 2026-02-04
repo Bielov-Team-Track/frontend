@@ -35,10 +35,10 @@ export default function ModerationQueue({ contextType, contextId }: ModerationQu
 			{/* Summary cards */}
 			{summary && (
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-					<div className="bg-neutral-900 rounded-xl border border-white/5 p-4">
+					<div className="bg-surface rounded-xl border border-border p-4">
 						<div className="flex items-center gap-3">
-							<div className="p-2 rounded-lg bg-amber-500/20">
-								<Flag size={20} className="text-amber-500" />
+							<div className="p-2 rounded-lg bg-warning/20">
+								<Flag size={20} className="text-warning" />
 							</div>
 							<div>
 								<p className="text-2xl font-bold text-white">{summary.pendingReview}</p>
@@ -47,7 +47,7 @@ export default function ModerationQueue({ contextType, contextId }: ModerationQu
 						</div>
 					</div>
 
-					<div className="bg-neutral-900 rounded-xl border border-white/5 p-4">
+					<div className="bg-surface rounded-xl border border-border p-4">
 						<div className="flex items-center gap-3">
 							<div className="p-2 rounded-lg bg-destructive/20">
 								<AlertTriangle size={20} className="text-destructive" />
@@ -59,9 +59,9 @@ export default function ModerationQueue({ contextType, contextId }: ModerationQu
 						</div>
 					</div>
 
-					<div className="bg-neutral-900 rounded-xl border border-white/5 p-4">
+					<div className="bg-surface rounded-xl border border-border p-4">
 						<div className="flex items-center gap-3">
-							<div className="p-2 rounded-lg bg-white/10">
+							<div className="p-2 rounded-lg bg-active">
 								<EyeOff size={20} className="text-muted-foreground" />
 							</div>
 							<div>
@@ -83,7 +83,7 @@ export default function ModerationQueue({ contextType, contextId }: ModerationQu
 				</div>
 
 				{queue?.items.length === 0 ? (
-					<div className="text-center py-12 rounded-2xl border border-dashed border-white/10 bg-white/5">
+					<div className="text-center py-12 rounded-2xl border border-dashed border-border bg-hover">
 						<Flag size={32} className="mx-auto text-muted-foreground mb-3" />
 						<p className="text-muted-foreground">No reported posts to review</p>
 					</div>

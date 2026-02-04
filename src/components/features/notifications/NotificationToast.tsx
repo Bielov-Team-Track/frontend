@@ -52,7 +52,7 @@ export function NotificationToastContent({ notification, toastId }: Notification
 				<button
 					type="button"
 					onClick={handleDismissClick}
-					className={cn("shrink-0 rounded-md p-1 text-muted-foreground transition-colors", "hover:bg-neutral-800 hover:text-foreground")}>
+					className={cn("shrink-0 rounded-md p-1 text-muted-foreground transition-colors", "hover:bg-surface-elevated hover:text-foreground")}>
 					<X className="size-4" />
 					<span className="sr-only">Dismiss</span>
 				</button>

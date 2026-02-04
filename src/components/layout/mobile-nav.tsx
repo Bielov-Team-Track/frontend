@@ -32,7 +32,7 @@ const MobileNav = () => {
 	});
 
 	return (
-		<nav className="fixed bottom-0 left-0 right-0 z-50 bg-base-100 border-t border-base-200 sm:hidden">
+		<nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border sm:hidden">
 			<div className={`grid grid-cols-${flattenedItems.length} h-16`}>
 				{flattenedItems.map((item) => {
 					const Icon = item.icon;

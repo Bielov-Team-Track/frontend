@@ -37,6 +37,9 @@ export default function UserSelectorModal({
 	// Local state for editing - only commit on confirm
 	const [localSelected, setLocalSelected] = useState<UserProfile[]>(selectedUsers);
 
+	// Extract base label (remove any existing count)
+	const baseConfirmLabel = confirmLabel.includes("(") ? confirmLabel.split("(")[0].trim() : confirmLabel;
+
 	// Reset local state when modal opens
 	useEffect(() => {
 		if (isOpen) {
@@ -75,7 +78,7 @@ export default function UserSelectorModal({
 				</div>
 
 				{/* Footer - always visible at bottom */}
-				<div className="flex justify-between items-center px-6 py-4 border-t border-white/10 bg-neutral-900 shrink-0">
+				<div className="flex justify-between items-center px-6 py-4 border-t border-border bg-surface shrink-0">
 					<span className="text-sm text-muted">
 						{localSelected.length} {localSelected.length === 1 ? "person" : "people"} selected
 					</span>
@@ -83,7 +86,9 @@ export default function UserSelectorModal({
 						<Button variant="ghost" onClick={handleCancel}>
 							Cancel
 						</Button>
-						<Button onClick={handleConfirm}>{confirmLabel}</Button>
+						<Button onClick={handleConfirm}>
+							{baseConfirmLabel} ({localSelected.length} selected)
+						</Button>
 					</div>
 				</div>
 			</DialogContent>

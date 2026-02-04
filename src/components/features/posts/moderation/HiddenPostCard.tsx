@@ -29,7 +29,7 @@ export default function HiddenPostCard({ post, reportCount, isAdmin = false, onV
 	const reasonText = post.hiddenReason === "auto_reported" ? "Hidden due to multiple reports" : "Hidden by a moderator";
 
 	return (
-		<article className="bg-neutral-900/50 backdrop-blur-sm rounded-2xl border border-white/5 overflow-hidden">
+		<article className="bg-surface/50 backdrop-blur-sm rounded-2xl border border-border overflow-hidden">
 			{/* Header */}
 			<div className="flex items-start justify-between p-4">
 				<div className="flex items-center gap-3">
@@ -44,13 +44,13 @@ export default function HiddenPostCard({ post, reportCount, isAdmin = false, onV
 			</div>
 
 			{/* Hidden notice */}
-			<div className="mx-4 mb-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+			<div className="mx-4 mb-4 p-4 rounded-xl bg-warning/10 border border-warning/20">
 				<div className="flex items-start gap-3">
-					<AlertTriangle size={20} className="text-amber-500 shrink-0 mt-0.5" />
+					<AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
 					<div className="flex-1">
-						<p className="text-sm font-medium text-amber-200">{reasonText}</p>
+						<p className="text-sm font-medium text-warning">{reasonText}</p>
 						{reportCount && reportCount > 0 && (
-							<p className="text-xs text-amber-200/70 mt-1">
+							<p className="text-xs text-warning/70 mt-1">
 								<Flag size={12} className="inline mr-1" />
 								{reportCount} report{reportCount !== 1 ? "s" : ""}
 							</p>
@@ -80,7 +80,7 @@ export default function HiddenPostCard({ post, reportCount, isAdmin = false, onV
 			{/* Hidden content (admin only) */}
 			{showContent && isAdmin && (
 				<div className="px-4 pb-4">
-					<div className="p-3 rounded-lg bg-white/5 border border-white/10">
+					<div className="p-3 rounded-lg bg-hover border border-border">
 						<p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Hidden Content Preview</p>
 						<div className="prose prose-invert prose-sm max-w-none opacity-70" dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithSafeLinks(post.content) }} />
 					</div>

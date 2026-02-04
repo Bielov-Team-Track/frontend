@@ -23,10 +23,10 @@ export default async function RootLayout({
 				<ThemeScript />
 			</head>
 			<body
-				className={`${inter.className} min-h-screen-safe flex flex-col text-mobile-base sm:text-tablet-base lg:text-desktop-base antialiased bg-base-200 text-base-content`}>
+				className={`${inter.className} min-h-screen-safe flex flex-col text-mobile-base sm:text-tablet-base lg:text-desktop-base antialiased bg-background text-foreground`}>
 				<ThemeProvider>
 					<QueryProvider>
-						<div className="min-h-screen-safe grid bg-base-200">
+						<div className="min-h-screen-safe grid bg-background">
 							<main className="relative w-full">{children}</main>
 						</div>
 					</QueryProvider>

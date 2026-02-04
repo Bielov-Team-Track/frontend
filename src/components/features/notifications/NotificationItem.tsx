@@ -63,7 +63,7 @@ export function NotificationItem({ notification, variant = "compact", onRead, on
 			onClick={handleClick}
 			className={cn(
 				"relative flex w-full gap-3 rounded-lg p-3 text-left transition-colors",
-				"hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+				"hover:bg-surface-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
 				!notification.isRead && "bg-surface/50",
 				variant === "full" && "p-4"
 			)}>
@@ -71,7 +71,7 @@ export function NotificationItem({ notification, variant = "compact", onRead, on
 			<div
 				className={cn(
 					"absolute left-0 top-2 bottom-2 w-0.5 rounded-full",
-					highPriority ? "bg-primary" : !notification.isRead ? "bg-white/10" : "bg-transparent"
+					highPriority ? "bg-primary" : !notification.isRead ? "bg-active" : "bg-transparent"
 				)}
 			/>
 

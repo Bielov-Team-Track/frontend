@@ -32,9 +32,9 @@ const getSkillLevelBadge = (skillLevel?: string) => {
 	if (!skillLevel) return null;
 
 	const colors: Record<string, string> = {
-		Beginner: "bg-green-500/20 text-green-400 border-green-500/30",
+		Beginner: "bg-success/20 text-success border-success/30",
 		Intermediate: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-		Advanced: "bg-orange-500/20 text-orange-400 border-orange-500/30",
+		Advanced: "bg-primary/20 text-primary border-primary/30",
 		Expert: "bg-red-500/20 text-red-400 border-red-500/30",
 	};
 
@@ -82,8 +82,8 @@ export default function MemberRow({ member, clubId, currentUserRole, onEdit, onR
 			<td className="px-4 py-3">
 				<Link href={memberUrl}>
 					{member.isActive ? (
-						<span className="inline-flex items-center gap-1.5 text-xs text-green-400">
-							<span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+						<span className="inline-flex items-center gap-1.5 text-xs text-success">
+							<span className="w-1.5 h-1.5 rounded-full bg-success" />
 							Active
 						</span>
 					) : (

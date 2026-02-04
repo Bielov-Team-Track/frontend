@@ -296,7 +296,7 @@ export default function CreateClubPage() {
 					placeholder="e.g. Spikers United"
 					error={errors.name?.message}
 					required
-					className="bg-black/20"
+					className="bg-overlay-light"
 					{...register("name")}
 				/>
 				<TextArea
@@ -304,10 +304,10 @@ export default function CreateClubPage() {
 					placeholder="Describe your club's mission, skill levels, etc..."
 					error={errors.description?.message}
 					rows={4}
-					className="bg-black/20"
+					className="bg-overlay-light"
 					{...register("description")}
 				/>
-				<div className="p-4 rounded-2xl bg-black/10 border border-white/5">
+				<div className="p-4 rounded-2xl bg-overlay-light border border-border">
 					<Controller
 						name="is_public"
 						control={control}
@@ -337,7 +337,7 @@ export default function CreateClubPage() {
 				<label className="block font-medium text-white text-sm">Club Banner</label>
 				<div
 					className={`relative w-full h-40 md:h-48 rounded-xl border-2 border-dashed transition-colors overflow-hidden group 
-            ${isDraggingBanner ? "border-primary bg-primary/10" : "border-white/10 bg-black/20 hover:border-primary/50"}`}
+            ${isDraggingBanner ? "border-primary bg-primary/10" : "border-border bg-overlay-light hover:border-primary/50"}`}
 					onDragOver={(e) => onDragOver(e, "banner")}
 					onDragLeave={(e) => onDragLeave(e, "banner")}
 					onDrop={(e) => onDrop(e, "banner")}>
@@ -345,9 +345,9 @@ export default function CreateClubPage() {
 						<>
 							{/* eslint-disable-next-line @next/next/no-img-element */}
 							<img src={bannerPreview} alt="Banner Preview" className="w-full h-full object-cover" />
-							<div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+							<div className="absolute inset-0 bg-overlay flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
 								<div className="flex gap-2">
-									<label className="cursor-pointer btn btn-sm btn-ghost text-white border border-white/20 hover:bg-white/10">
+									<label className="cursor-pointer btn btn-sm btn-ghost text-white border border-white/20 hover:bg-active">
 										Change
 										<input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileSelect(e, "banner")} />
 									</label>
@@ -357,14 +357,14 @@ export default function CreateClubPage() {
 											setValue("banner", null);
 											setBannerPreview(null);
 										}}
-										className="btn btn-sm btn-ghost text-red-400 border border-white/20 hover:bg-red-500/10">
+										className="btn btn-sm btn-ghost text-error border border-white/20 hover:bg-red-500/10">
 										<Trash size={14} />
 									</button>
 								</div>
 							</div>
 						</>
 					) : (
-						<label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors">
+						<label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-hover transition-colors">
 							<ImageIcon
 								size={32}
 								className={`mb-2 transition-colors ${isDraggingBanner ? "text-primary" : "text-muted group-hover:text-white"}`}
@@ -385,7 +385,7 @@ export default function CreateClubPage() {
 				<div className="flex items-center gap-6">
 					<div
 						className={`relative w-32 h-32 rounded-full border-2 border-dashed transition-colors overflow-hidden group shrink-0
-                ${isDraggingLogo ? "border-primary bg-primary/10" : "border-white/10 bg-black/20 hover:border-primary/50"}`}
+                ${isDraggingLogo ? "border-primary bg-primary/10" : "border-border bg-overlay-light hover:border-primary/50"}`}
 						onDragOver={(e) => onDragOver(e, "logo")}
 						onDragLeave={(e) => onDragLeave(e, "logo")}
 						onDrop={(e) => onDrop(e, "logo")}>
@@ -393,7 +393,7 @@ export default function CreateClubPage() {
 							<>
 								{/* eslint-disable-next-line @next/next/no-img-element */}
 								<img src={logoPreview} alt="Logo Preview" className="w-full h-full object-cover" />
-								<div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+								<div className="absolute inset-0 bg-overlay flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
 									<div className="flex flex-col gap-2">
 										<label className="cursor-pointer text-xs font-medium text-white hover:underline">
 											Change
@@ -405,14 +405,14 @@ export default function CreateClubPage() {
 												setValue("logo", null);
 												setLogoPreview(null);
 											}}
-											className="text-xs font-medium text-red-400 hover:underline">
+											className="text-xs font-medium text-error hover:underline">
 											Remove
 										</button>
 									</div>
 								</div>
 							</>
 						) : (
-							<label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors">
+							<label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-hover transition-colors">
 								<Shield
 									size={24}
 									className={`mb-1 transition-colors ${isDraggingLogo ? "text-primary" : "text-muted group-hover:text-white"}`}
@@ -468,7 +468,7 @@ export default function CreateClubPage() {
 			</div>
 
 			{/* Venues Section */}
-			<div className="pt-6 border-t border-white/10">
+			<div className="pt-6 border-t border-border">
 				<div className="mb-4">
 					<h2 className="text-xl font-bold text-white mb-1">Club Venues</h2>
 					<p className="text-muted text-sm">Add locations where your club hosts activities (optional)</p>
@@ -478,7 +478,7 @@ export default function CreateClubPage() {
 				{venues.length > 0 && (
 					<div className="space-y-2 mb-6">
 						{venues.map((venue) => (
-							<div key={venue.tempId} className="flex items-start justify-between p-4 rounded-lg border border-white/10 bg-white/5">
+							<div key={venue.tempId} className="flex items-start justify-between p-4 rounded-lg border border-border bg-hover">
 								<div className="flex items-start gap-3">
 									<MapPin size={18} className="text-muted mt-0.5 shrink-0" />
 									<div>
@@ -504,7 +504,7 @@ export default function CreateClubPage() {
 				)}
 
 				{/* Venue Form */}
-				<div className="p-4 rounded-lg border border-dashed border-white/10 bg-white/5">
+				<div className="p-4 rounded-lg border border-dashed border-border bg-hover">
 					<VenueForm onAddVenue={handleAddVenue} />
 				</div>
 			</div>
@@ -519,14 +519,14 @@ export default function CreateClubPage() {
 			</div>
 
 			{/* Preview Card */}
-			<div className="relative w-full rounded-2xl overflow-hidden bg-background-light border border-white/10 shadow-xl">
+			<div className="relative w-full rounded-2xl overflow-hidden bg-background-light border border-border shadow-xl">
 				{/* Banner Preview */}
-				<div className="h-32 w-full bg-black/40 relative">
+				<div className="h-32 w-full bg-overlay-light relative">
 					{bannerPreview ? (
 						/* eslint-disable-next-line @next/next/no-img-element */
 						<img src={bannerPreview} alt="Banner" className="w-full h-full object-cover opacity-80" />
 					) : (
-						<div className="w-full h-full flex items-center justify-center bg-white/5">
+						<div className="w-full h-full flex items-center justify-center bg-hover">
 							<ImageIcon className="text-white/10" size={48} />
 						</div>
 					)}
@@ -554,7 +554,7 @@ export default function CreateClubPage() {
 
 						<p className="text-sm text-gray-300">{formData.description || "No description provided."}</p>
 
-						<div className="pt-4 border-t border-white/5 grid grid-cols-2 gap-4">
+						<div className="pt-4 border-t border-border grid grid-cols-2 gap-4">
 							<div>
 								<span className="text-xs text-muted block uppercase tracking-wider">Contact Email</span>
 								<span className="text-sm text-white">{formData.contact_email || "N/A"}</span>
@@ -567,7 +567,7 @@ export default function CreateClubPage() {
 
 						{/* Venues Summary */}
 						{venues.length > 0 && (
-							<div className="pt-4 border-t border-white/5">
+							<div className="pt-4 border-t border-border">
 								<span className="text-xs text-muted block uppercase tracking-wider mb-2">Venues ({venues.length})</span>
 								<div className="space-y-2">
 									{venues.map((venue) => (
@@ -607,7 +607,7 @@ export default function CreateClubPage() {
 			</div>
 
 			{/* Form Content */}
-			<div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xs flex flex-col justify-between relative overflow-hidden">
+			<div className="bg-hover border border-border rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xs flex flex-col justify-between relative overflow-hidden">
 				{/* Decorative Gradient Blob */}
 				<div className="absolute -top-20 -right-20 w-60 h-60 bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
 
@@ -619,7 +619,7 @@ export default function CreateClubPage() {
 				</div>
 
 				{/* Footer Navigation */}
-				<div className="relative z-10 mt-10 flex items-center justify-between pt-6 border-t border-white/10">
+				<div className="relative z-10 mt-10 flex items-center justify-between pt-6 border-t border-border">
 					<Button
 						variant="ghost"
 						onClick={handleBack}
@@ -638,7 +638,7 @@ export default function CreateClubPage() {
 							color="primary"
 							onClick={handleSubmit(onSubmit)}
 							loading={isSubmitting}
-							className="px-8 bg-green-600 hover:bg-green-700 text-white border-none shadow-lg shadow-green-600/20"
+							className="px-8 bg-success hover:bg-success text-white border-none shadow-lg shadow-green-600/20"
 							rightIcon={!isSubmitting && <Check size={16} />}>
 							Create Club
 						</Button>

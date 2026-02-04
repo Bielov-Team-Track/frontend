@@ -15,17 +15,17 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning className={`${inter.variable} min-h-screen relative bg-base-300`}>
+		<html lang="en" suppressHydrationWarning className={`${inter.variable} min-h-screen relative bg-surface`}>
 			<head>
 				<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 				<ThemeScript />
 			</head>
-			<body className="font-sans min-h-screen-safe flex flex-col text-mobile-base sm:text-tablet-base lg:text-desktop-base antialiased bg-base-200 text-base-content">
+			<body className="font-sans min-h-screen-safe flex flex-col text-mobile-base sm:text-tablet-base lg:text-desktop-base antialiased bg-background text-foreground">
 				<ThemeProvider>
 					<AuthProvider>
 						<QueryProvider>
 							<div className="min-h-screen flex items-center justify-center p-4">
-								<div className="w-fit max-w-2xl relative bg-neutral-900 p-6 sm:p-8 rounded-lg shadow-lg flex flex-col gap-6">{children}</div>
+								<div className="w-fit max-w-2xl relative bg-surface p-6 sm:p-8 rounded-lg shadow-lg flex flex-col gap-6">{children}</div>
 							</div>
 						</QueryProvider>
 					</AuthProvider>

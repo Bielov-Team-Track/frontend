@@ -19,12 +19,12 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning className="min-h-screen relative font-sans bg-base-300">
+		<html lang="en" suppressHydrationWarning className="min-h-screen relative font-sans bg-surface">
 			<head>
 				<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 				<ThemeScript />
 			</head>
-			<body className={`${inter.className} min-h-screen flex flex-col antialiased selection:bg-accent/30 selection:text-white text-base-content`}>
+			<body className={`${inter.className} min-h-screen flex flex-col antialiased selection:bg-accent/30 selection:text-white text-foreground`}>
 				<ThemeProvider>
 					<AuthProvider>
 						<ClubProvider>

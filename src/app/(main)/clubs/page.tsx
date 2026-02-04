@@ -207,8 +207,8 @@ function ClubCard({ club }: { club: ClubData }) {
 		<Link href={`/clubs/${club.id}`}>
 			<Card>
 				{/* Banner */}
-				<figure className="h-28 relative bg-base-200">
-					<div className="absolute inset-0 bg-linear-to-t from-base-100 via-transparent to-transparent z-10" />
+				<figure className="h-28 relative bg-background">
+					<div className="absolute inset-0 bg-linear-to-t from-card via-transparent to-transparent z-10" />
 					{club.banner && !bannerError ? (
 						<Image
 							src={club.banner}
@@ -239,7 +239,7 @@ function ClubCard({ club }: { club: ClubData }) {
 						<div className="relative">
 							<Avatar size="lg" variant="club" src={club.logo || undefined} name={club.name} />
 							{club.isVerified && (
-								<div className="absolute -bottom-1 -right-1 bg-primary text-primary-content p-0.5 rounded-full border-2 border-base-100">
+								<div className="absolute -bottom-1 -right-1 bg-primary text-primary-content p-0.5 rounded-full border-2 border-card">
 									<Trophy size={10} />
 								</div>
 							)}

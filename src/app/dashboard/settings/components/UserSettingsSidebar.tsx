@@ -62,7 +62,7 @@ export default function UserSettingsSidebar() {
 
 	return (
 		<nav className="overflow-x-auto no-scrollbar">
-			<div className="inline-flex items-center gap-1 p-1 rounded-xl bg-neutral-800 min-w-max">
+			<div className="inline-flex items-center gap-1 p-1 rounded-xl bg-surface-elevated min-w-max">
 				{navItems.map((item) => {
 					const active = activeSection === item.id;
 					return (

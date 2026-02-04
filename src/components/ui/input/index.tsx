@@ -136,7 +136,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 					{inlineLabel && (
 						<div
 							ref={inlineLabelRef}
-							className="text-muted-foreground bg-neutral-800 absolute top-1/2 -translate-y-1/2 left-0 flex items-center pointer-events-none px-2.5 py-2 rounded-l-lg text-xs gap-1">
+							className="text-muted-foreground bg-surface-elevated absolute top-1/2 -translate-y-1/2 left-0 flex items-center pointer-events-none px-2.5 py-2 rounded-l-lg text-xs gap-1">
 							{leftIcon && <span className="text-muted-foreground mr-1 [&>svg]:size-4">{leftIcon}</span>}
 							<span className="whitespace-nowrap">{inlineLabel}</span>
 						</div>

@@ -54,7 +54,7 @@ export default function ModerationQueueItem({ item, onAction }: ModerationQueueI
 	};
 
 	return (
-		<div className="bg-neutral-900 rounded-2xl border border-white/5 overflow-hidden">
+		<div className="bg-surface rounded-2xl border border-border overflow-hidden">
 			{/* Header */}
 			<div className="flex items-start justify-between p-4">
 				<div className="flex items-center gap-3">
@@ -75,14 +75,14 @@ export default function ModerationQueueItem({ item, onAction }: ModerationQueueI
 							reportCount >= 5
 								? "bg-destructive/20 text-destructive"
 								: reportCount >= 3
-								? "bg-amber-500/20 text-amber-500"
-								: "bg-white/10 text-white"
+								? "bg-warning/20 text-warning"
+								: "bg-active text-white"
 						)}>
 						<Flag size={12} />
 						{reportCount} report{reportCount !== 1 ? "s" : ""}
 					</div>
 					{post.isHidden && (
-						<span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 text-xs text-muted-foreground">
+						<span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-active text-xs text-muted-foreground">
 							<EyeOff size={12} />
 							Hidden
 						</span>
@@ -94,7 +94,7 @@ export default function ModerationQueueItem({ item, onAction }: ModerationQueueI
 			<div className="px-4 pb-3">
 				<div className="flex flex-wrap gap-2">
 					{reportSummary.map((summary) => (
-						<span key={summary.reason} className="px-2 py-1 rounded bg-white/5 text-xs text-muted-foreground">
+						<span key={summary.reason} className="px-2 py-1 rounded bg-hover text-xs text-muted-foreground">
 							{getReasonLabel(summary.reason)} ({summary.count})
 						</span>
 					))}
@@ -120,14 +120,14 @@ export default function ModerationQueueItem({ item, onAction }: ModerationQueueI
 			{/* Post content */}
 			{showContent && (
 				<div className="px-4 pb-4">
-					<div className="p-3 rounded-lg bg-white/5 border border-white/10">
+					<div className="p-3 rounded-lg bg-hover border border-border">
 						<div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithSafeLinks(post.content) }} />
 					</div>
 				</div>
 			)}
 
 			{/* Actions */}
-			<div className="flex items-center justify-between px-4 py-3 bg-white/5 border-t border-white/5">
+			<div className="flex items-center justify-between px-4 py-3 bg-hover border-t border-border">
 				<Button size="sm" variant="ghost" onClick={handleDismiss} disabled={isLoading} leftIcon={<X size={14} />}>
 					Dismiss Reports
 				</Button>

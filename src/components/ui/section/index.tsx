@@ -41,7 +41,7 @@ const Section: React.FC<SectionProps> = ({
 			case "success":
 				return "border-success";
 			default:
-				return "bg-base-200 border border-base-300";
+				return "bg-background border border-surface";
 		}
 	};
 

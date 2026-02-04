@@ -55,8 +55,8 @@ const MultiSelectPills = ({ label, helperText, options, selectedItems, onSelecte
 							className={cn(
 								"px-2 py-1 rounded-full border transition-colors duration-200 text-sm font-medium",
 								isSelected
-									? "bg-neutral-600 text-white/90"
-									: "bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20",
+									? "bg-active text-white/90"
+									: "bg-hover border-border text-white/70 hover:bg-active hover:border-white/20",
 								disabled && "opacity-50 cursor-not-allowed"
 							)}>
 							{option.label}

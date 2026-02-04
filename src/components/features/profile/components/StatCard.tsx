@@ -25,18 +25,18 @@ const StatCard = ({
 	return (
 		<div
 			className={cn(
-				"bg-base-300 rounded-lg p-4 flex flex-col gap-2",
-				"hover:bg-base-300/80 transition-colors",
+				"bg-surface rounded-lg p-4 flex flex-col gap-2",
+				"hover:bg-surface/80 transition-colors",
 				className
 			)}>
 			<div className="flex items-center gap-2">
 				{icon && <span className="text-primary text-lg">{icon}</span>}
-				<span className="text-sm text-gray-400">{label}</span>
+				<span className="text-sm text-muted-foreground">{label}</span>
 			</div>
 			<div className="flex items-end gap-2">
 				<span className="text-2xl font-bold text-white">{value}</span>
 				{subValue && (
-					<span className="text-sm text-gray-400 mb-0.5">{subValue}</span>
+					<span className="text-sm text-muted-foreground mb-0.5">{subValue}</span>
 				)}
 			</div>
 			{trend && trendValue && (
@@ -45,7 +45,7 @@ const StatCard = ({
 						"text-xs flex items-center gap-1",
 						trend === "up" && "text-success",
 						trend === "down" && "text-error",
-						trend === "neutral" && "text-gray-400"
+						trend === "neutral" && "text-muted-foreground"
 					)}>
 					{trend === "up" && "↑"}
 					{trend === "down" && "↓"}

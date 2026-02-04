@@ -36,10 +36,10 @@ const positionLabels: Record<VolleyballPosition, string> = {
 };
 
 const experienceLevelColors = {
-	beginner: "bg-green-500/20 text-green-400 border-green-500/30",
+	beginner: "bg-success/20 text-success border-success/30",
 	intermediate: "bg-blue-500/20 text-blue-400 border-blue-500/30",
 	advanced: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-	professional: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+	professional: "bg-warning/20 text-warning border-warning/30",
 };
 
 const PlayerProfileCard = ({
@@ -57,7 +57,7 @@ const PlayerProfileCard = ({
 	return (
 		<div className="w-full">
 			{/* Header Section */}
-			<div className="bg-linear-to-br from-primary/20 via-base-200 to-base-200 rounded-t-2xl p-6 md:p-8">
+			<div className="bg-linear-to-br from-primary/20 via-background to-background rounded-t-2xl p-6 md:p-8">
 				<div className="flex flex-col md:flex-row gap-6 items-start">
 					{/* Avatar */}
 					<div className="relative">
@@ -80,11 +80,11 @@ const PlayerProfileCard = ({
 						</h1>
 
 						{player.bio && (
-							<p className="text-gray-300 mb-4 max-w-xl">{player.bio}</p>
+							<p className="text-muted-foreground mb-4 max-w-xl">{player.bio}</p>
 						)}
 
 						{/* Meta info */}
-						<div className="flex flex-wrap gap-4 text-sm text-gray-400">
+						<div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
 							{player.location && (
 								<div className="flex items-center gap-1.5">
 									<MapPin size={14} className="text-primary" />
@@ -117,13 +117,13 @@ const PlayerProfileCard = ({
 								<span className="text-xl font-bold text-white">
 									{player.followersCount}
 								</span>
-								<span className="text-sm text-gray-400 ml-1">Followers</span>
+								<span className="text-sm text-muted-foreground ml-1">Followers</span>
 							</div>
 							<div className="text-center">
 								<span className="text-xl font-bold text-white">
 									{player.followingCount}
 								</span>
-								<span className="text-sm text-gray-400 ml-1">Following</span>
+								<span className="text-sm text-muted-foreground ml-1">Following</span>
 							</div>
 						</div>
 					</div>
@@ -162,7 +162,7 @@ const PlayerProfileCard = ({
 
 			{/* Physical Attributes */}
 			{(player.height || player.verticalJump || player.reach) && (
-				<div className="bg-base-200 px-6 md:px-8 py-6 border-t border-base-300">
+				<div className="bg-background px-6 md:px-8 py-6 border-t border-border">
 					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 						<Ruler size={18} className="text-primary" />
 						Physical Attributes
@@ -204,7 +204,7 @@ const PlayerProfileCard = ({
 
 			{/* Preferred Positions */}
 			{player.preferredPositions && player.preferredPositions.length > 0 && (
-				<div className="bg-base-200 px-6 md:px-8 py-6 border-t border-base-300">
+				<div className="bg-background px-6 md:px-8 py-6 border-t border-border">
 					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 						<Circle size={18} className="text-primary" />
 						Preferred Positions
@@ -217,7 +217,7 @@ const PlayerProfileCard = ({
 									"px-4 py-2 rounded-full text-sm font-medium",
 									index === 0
 										? "bg-primary text-white"
-										: "bg-base-300 text-gray-300"
+										: "bg-surface text-muted-foreground"
 								)}>
 								{positionLabels[position]}
 							</span>
@@ -228,7 +228,7 @@ const PlayerProfileCard = ({
 
 			{/* Skill Ratings */}
 			{player.skillRatings && (
-				<div className="bg-base-200 px-6 md:px-8 py-6 border-t border-base-300">
+				<div className="bg-background px-6 md:px-8 py-6 border-t border-border">
 					<h2 className="text-lg font-semibold text-white mb-4">
 						Skill Ratings
 					</h2>
@@ -269,7 +269,7 @@ const PlayerProfileCard = ({
 
 			{/* Statistics */}
 			{player.stats && (
-				<div className="bg-base-200 px-6 md:px-8 py-6 border-t border-base-300">
+				<div className="bg-background px-6 md:px-8 py-6 border-t border-border">
 					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 						<Trophy size={18} className="text-primary" />
 						Statistics
@@ -302,7 +302,7 @@ const PlayerProfileCard = ({
 
 			{/* Badges */}
 			{player.badges && player.badges.length > 0 && (
-				<div className="bg-base-200 px-6 md:px-8 py-6 border-t border-base-300 rounded-b-2xl">
+				<div className="bg-background px-6 md:px-8 py-6 border-t border-border rounded-b-2xl">
 					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
 						<span className="text-primary">🏅</span>
 						Achievements

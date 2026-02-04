@@ -16,7 +16,7 @@ function Drawer({ children }: PropsWithChildren) {
 					aria-label="close sidebar"
 					className="drawer-overlay"
 				></label>
-				<ul className="menu p-4 w-80 min-h-full bg-base-200 flex flex-col gap-2">
+				<ul className="menu p-4 w-80 min-h-full bg-background flex flex-col gap-2">
 					<Link href={"/events"}>Events</Link>
 					<Link href={"/my-payments"}>My payments</Link>
 					<Link href={"/events-payments"}>My events payments</Link>

@@ -53,19 +53,19 @@ const BadgeDisplay = ({
 				<div
 					className={cn(
 						"absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2",
-						"bg-base-100 rounded-lg shadow-xl border border-base-300",
+						"bg-card rounded-lg shadow-xl border border-border",
 						"opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none",
 						"whitespace-nowrap z-10 min-w-max"
 					)}>
 					<div className="text-sm font-semibold text-white">{badge.name}</div>
-					<div className="text-xs text-gray-400">{badge.description}</div>
+					<div className="text-xs text-muted-foreground">{badge.description}</div>
 					<div
 						className={cn(
 							"text-xs mt-1 capitalize",
 							badge.rarity === "common" && "text-gray-500",
 							badge.rarity === "rare" && "text-blue-400",
 							badge.rarity === "epic" && "text-purple-400",
-							badge.rarity === "legendary" && "text-amber-400"
+							badge.rarity === "legendary" && "text-warning"
 						)}>
 						{badge.rarity}
 					</div>
@@ -97,7 +97,7 @@ export const BadgeGrid = ({
 			{remainingCount > 0 && (
 				<div
 					className={cn(
-						"rounded-full bg-base-300 flex items-center justify-center text-gray-400 text-sm font-medium",
+						"rounded-full bg-surface flex items-center justify-center text-muted-foreground text-sm font-medium",
 						sizeClasses[size]
 					)}>
 					+{remainingCount}

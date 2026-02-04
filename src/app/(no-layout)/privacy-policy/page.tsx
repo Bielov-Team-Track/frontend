@@ -7,9 +7,9 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
 	return (
-		<div className="min-h-screen bg-base-200">
+		<div className="min-h-screen bg-background">
 			<div className="container mx-auto sm:px-4 sm:py-8">
-				<div className="max-w-4xl mx-auto bg-base-100 rounded-lg shadow-xl sm:p-8 p-4">
+				<div className="max-w-4xl mx-auto bg-card rounded-lg shadow-xl sm:p-8 p-4">
 					{/* Header */}
 					<div className="text-center mb-8">
 						<h1 className="text-4xl font-bold mb-2">Privacy Policy</h1>
@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
 					{/* Content */}
 					<div className="prose prose-lg max-w-none space-y-6">
 						{/* Introduction */}
-						<div className="bg-base-200 sm:p-6 rounded-lg">
+						<div className="bg-background sm:p-6 rounded-lg">
 							<p className="text-lg">
 								This Privacy Notice for <strong>Spike</strong> (&lsquo;we&rsquo;, &lsquo;us&rsquo;, or &lsquo;our&rsquo;), describes how and why
 								we might access, collect, store, use, and/or share (&lsquo;process&rsquo;) your personal information when you use our services
@@ -58,22 +58,22 @@ export default function PrivacyPolicyPage() {
 							</p>
 
 							<div className="grid gap-4 md:grid-cols-2">
-								<div className="card bg-base-200 p-4">
+								<div className="card bg-background p-4">
 									<h3 className="font-semibold mb-2">What personal information do we process?</h3>
 									<p className="text-sm">
 										When you visit, use, or navigate our Services, we may process personal information depending on how you interact with us
 										and the Services, the choices you make, and the products and features you use.
 									</p>
 								</div>
-								<div className="card bg-base-200 p-4">
+								<div className="card bg-background p-4">
 									<h3 className="font-semibold mb-2">Do we process any sensitive personal information?</h3>
 									<p className="text-sm">We do not process sensitive personal information.</p>
 								</div>
-								<div className="card bg-base-200 p-4">
+								<div className="card bg-background p-4">
 									<h3 className="font-semibold mb-2">Do we collect any information from third parties?</h3>
 									<p className="text-sm">We do not collect any information from third parties.</p>
 								</div>
-								<div className="card bg-base-200 p-4">
+								<div className="card bg-background p-4">
 									<h3 className="font-semibold mb-2">How do we keep your information safe?</h3>
 									<p className="text-sm">
 										We have adequate organisational and technical processes and procedures in place to protect your personal information.
@@ -145,7 +145,7 @@ export default function PrivacyPolicyPage() {
 								when you contact us.
 							</p>
 
-							<div className="bg-base-200 p-4 rounded-lg mb-4">
+							<div className="bg-background p-4 rounded-lg mb-4">
 								<h4 className="font-semibold mb-2">Personal Information Provided by You:</h4>
 								<div className="grid gap-2 md:grid-cols-2">
 									<span className="badge badge-outline">Names</span>
@@ -220,7 +220,7 @@ export default function PrivacyPolicyPage() {
 								for security and fraud prevention, and to comply with law.
 							</p>
 
-							<div className="card bg-base-200 p-4">
+							<div className="card bg-background p-4">
 								<h4 className="font-semibold mb-2">We process your personal information for a variety of reasons, including:</h4>
 								<ul className="list-disc pl-6 space-y-2">
 									<li>To facilitate account creation and authentication and otherwise manage user accounts</li>
@@ -246,21 +246,21 @@ export default function PrivacyPolicyPage() {
 							</p>
 
 							<div className="space-y-4">
-								<div className="card bg-base-200 p-4">
+								<div className="card bg-background p-4">
 									<h4 className="font-semibold mb-2">🔒 Consent</h4>
 									<p className="text-sm">
 										We may process your information if you have given us permission to use your personal information for a specific purpose.
 										You can withdraw your consent at any time.
 									</p>
 								</div>
-								<div className="card bg-base-200 p-4">
+								<div className="card bg-background p-4">
 									<h4 className="font-semibold mb-2">⚖️ Legal Obligations</h4>
 									<p className="text-sm">
 										We may process your information where we believe it is necessary for compliance with our legal obligations, such as to
 										cooperate with law enforcement or regulatory agencies.
 									</p>
 								</div>
-								<div className="card bg-base-200 p-4">
+								<div className="card bg-background p-4">
 									<h4 className="font-semibold mb-2">🛡️ Vital Interests</h4>
 									<p className="text-sm">
 										We may process your information where we believe it is necessary to protect your vital interests or the vital interests
@@ -407,7 +407,7 @@ export default function PrivacyPolicyPage() {
 								information.
 							</p>
 
-							<div className="bg-base-200 p-6 rounded-lg">
+							<div className="bg-background p-6 rounded-lg">
 								<h4 className="font-semibold mb-3">Your Rights Include:</h4>
 								<div className="grid gap-3 md:grid-cols-2">
 									<div className="flex items-center space-x-2">
@@ -494,7 +494,7 @@ export default function PrivacyPolicyPage() {
 						{/* Section 14 */}
 						<section id="section14" className="scroll-mt-8">
 							<h2 className="text-2xl font-semibold  mb-4">14. How Can You Review, Update, or Delete Data?</h2>
-							<div className="card bg-base-200 p-4">
+							<div className="card bg-background p-4">
 								<p className="mb-4">
 									Based on the applicable laws of your country, you may have the right to request access to the personal information we
 									collect from you, details about how we have processed it, correct inaccuracies, or delete your personal information.

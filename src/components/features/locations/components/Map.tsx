@@ -85,8 +85,8 @@ function MapComponent({ defaultAddress, onAddressSelected, onLocationCalculated,
 	};
 
 	return (
-		<div className="w-full h-56 resize-y overflow-hidden border border-base-300 rounded-lg min-h-32 max-h-96 relative">
-			{isLoading && <Loader className="bg-black/25 absolute inset-0 rounded-md" />}
+		<div className="w-full h-56 resize-y overflow-hidden border border-border rounded-lg min-h-32 max-h-96 relative">
+			{isLoading && <Loader className="bg-overlay-light absolute inset-0 rounded-md" />}
 			<GoogleMap
 				mapId={"31199ddcdd9ac2de"}
 				defaultZoom={12}
@@ -102,7 +102,7 @@ function MapComponent({ defaultAddress, onAddressSelected, onLocationCalculated,
 			{readonly && position && (
 				<button
 					onClick={handleCenterOnMarker}
-					className="absolute top-2 right-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 shadow-xs transition-colors duration-200 flex items-center gap-1.5 z-10"
+					className="absolute top-2 right-2 bg-white hover:bg-gray-50 border border-border rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground shadow-xs transition-colors duration-200 flex items-center gap-1.5 z-10"
 					type="button">
 					<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path

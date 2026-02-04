@@ -14,11 +14,11 @@ interface InvitationsListProps {
 }
 
 const statusColors: Record<InvitationStatus, string> = {
-	[InvitationStatus.Pending]: "bg-amber-500/20 text-amber-400",
-	[InvitationStatus.Accepted]: "bg-green-500/20 text-green-400",
+	[InvitationStatus.Pending]: "bg-warning/20 text-warning",
+	[InvitationStatus.Accepted]: "bg-success/20 text-success",
 	[InvitationStatus.Declined]: "bg-red-500/20 text-red-400",
-	[InvitationStatus.Expired]: "bg-gray-500/20 text-gray-400",
-	[InvitationStatus.Revoked]: "bg-gray-500/20 text-gray-400",
+	[InvitationStatus.Expired]: "bg-muted/20 text-muted-foreground",
+	[InvitationStatus.Revoked]: "bg-muted/20 text-muted-foreground",
 };
 
 const InvitationsList = ({ clubId }: InvitationsListProps) => {
@@ -75,7 +75,7 @@ const InvitationsList = ({ clubId }: InvitationsListProps) => {
 					{invitations.map((invitation) => (
 						<div key={invitation.id} className="p-4 bg-white/5 rounded-xl border border-white/10 flex items-center justify-between gap-4">
 							<div className="flex items-center gap-3">
-								<div className="w-10 h-10 rounded-full bg-base-300 flex items-center justify-center">
+								<div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center">
 									{invitation.targetEmail ? (
 										<Mail size={18} className="text-muted" />
 									) : invitation.targetUserId ? (

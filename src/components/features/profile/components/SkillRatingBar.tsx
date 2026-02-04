@@ -38,14 +38,14 @@ const SkillRatingBar = ({
 	return (
 		<div className="flex flex-col gap-1">
 			<div className="flex justify-between items-center">
-				<span className="text-sm text-gray-300 capitalize">{label}</span>
+				<span className="text-sm text-muted-foreground capitalize">{label}</span>
 				{showValue && (
 					<span className="text-sm font-semibold text-white">{value}</span>
 				)}
 			</div>
 			<div
 				className={cn(
-					"w-full bg-base-300 rounded-full overflow-hidden",
+					"w-full bg-surface rounded-full overflow-hidden",
 					sizeClasses[size]
 				)}>
 				<div

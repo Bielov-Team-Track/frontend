@@ -229,7 +229,7 @@ export default function EvaluationPage() {
 									step="0.5"
 									value={drillScores[drill.id] || 0}
 									onChange={(e) => handleScore(drill.id, parseFloat(e.target.value))}
-									className="w-full h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-accent hover:accent-orange-400"
+									className="w-full h-3 bg-placeholder rounded-lg appearance-none cursor-pointer accent-accent hover:accent-orange-400"
 								/>
 								<div className="flex justify-between text-xs text-muted mt-2 font-medium px-1">
 									<span>0 (Poor)</span>
@@ -300,11 +300,11 @@ function StatCard({ label, score, icon: Icon, color, bg, desc }: any) {
 			<div className="flex items-center gap-2 mb-2">
 				<Icon size={18} className={color} />
 				<span className="font-bold text-white text-lg">{label}</span>
-				<span className={`ml-auto font-mono font-bold text-xl ${isRated ? "text-white" : "text-gray-600"}`}>{score}</span>
+				<span className={`ml-auto font-mono font-bold text-xl ${isRated ? "text-white" : "text-muted-foreground"}`}>{score}</span>
 			</div>
 
 			{/* Progress Bar */}
-			<div className="h-2.5 w-full bg-gray-800 rounded-full overflow-hidden mb-2">
+			<div className="h-2.5 w-full bg-surface-elevated rounded-full overflow-hidden mb-2">
 				<div className={`h-full ${bg} transition-all duration-500 ease-out`} style={{ width }} />
 			</div>
 			<p className="text-xs text-muted">{desc}</p>
