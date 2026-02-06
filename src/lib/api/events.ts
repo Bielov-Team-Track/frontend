@@ -92,6 +92,16 @@ export async function removeParticipant(eventId: string, userId: string) {
 	await client.delete(PREFIX + endpoint);
 }
 
+export async function updateParticipantStatus(
+	eventId: string,
+	userId: string,
+	status: string,
+	declineNote?: string,
+): Promise<EventParticipant> {
+	const endpoint = `/v1/events/${eventId}/participants/${userId}`;
+	return (await client.patch<EventParticipant>(PREFIX + endpoint, { status, declineNote })).data;
+}
+
 export async function updateParticipantPaymentStatus(
 	participantId: string,
 	status: "pending" | "completed",

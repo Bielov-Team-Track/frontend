@@ -1,12 +1,17 @@
 "use client";
 
-import { Avatar, Button, DropdownMenu, EmptyState, Input } from "@/components";
+import { Avatar, Button, DropdownMenu, EmptyState, Modal, TextArea } from "@/components";
+import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
+import { ListToolbar } from "@/components/ui/list-toolbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserSelectorModal } from "@/components/features/users";
-import { inviteUsers } from "@/lib/api/events";
+import { inviteUsers, removeParticipant, updateParticipantStatus } from "@/lib/api/events";
+import { InvitedVia } from "@/lib/models/EventParticipant";
 import { UserProfile } from "@/lib/models/User";
+import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Filter, Search, UserMinus, UserPlus, Users } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { ArrowDownAZ, Clock, CreditCard, Search, UserMinus, UserPlus, Users, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useEventContext } from "../layout";
 
@@ -14,8 +19,7 @@ import { useEventContext } from "../layout";
 type ParticipantStatus = "Invited" | "Waitlisted" | "Accepted" | "Declined" | "Attended" | "NoShow";
 type StatusFilter = "all" | ParticipantStatus;
 
-const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
-	{ value: "all", label: "All Statuses" },
+const ALL_STATUSES: { value: ParticipantStatus; label: string }[] = [
 	{ value: "Accepted", label: "Accepted" },
 	{ value: "Invited", label: "Invited" },
 	{ value: "Waitlisted", label: "Waitlisted" },
@@ -24,23 +28,21 @@ const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
 	{ value: "NoShow", label: "No Show" },
 ];
 
+const STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
+	{ value: "all", label: "All Statuses" },
+	...ALL_STATUSES,
+];
+
+const MEMBER_SORT_OPTIONS = [
+	{ value: "joined-desc", label: "Newest First", icon: <Clock size={14} /> },
+	{ value: "joined-asc", label: "Oldest First", icon: <Clock size={14} /> },
+	{ value: "name-asc", label: "Name (A-Z)", icon: <ArrowDownAZ size={14} /> },
+	{ value: "name-desc", label: "Name (Z-A)", icon: <ArrowDownAZ size={14} /> },
+	{ value: "status", label: "Status", icon: <Clock size={14} /> },
+];
+
 const getStatusLabel = (status: string): string => {
-	switch (status) {
-		case "Invited":
-			return "Invited";
-		case "Waitlisted":
-			return "Waitlisted";
-		case "Accepted":
-			return "Accepted";
-		case "Declined":
-			return "Declined";
-		case "Attended":
-			return "Attended";
-		case "NoShow":
-			return "No Show";
-		default:
-			return status || "Unknown";
-	}
+	return ALL_STATUSES.find((s) => s.value === status)?.label || status || "Unknown";
 };
 
 const getStatusColor = (status: string): string => {
@@ -50,15 +52,43 @@ const getStatusColor = (status: string): string => {
 		case "Waitlisted":
 			return "bg-warning/20 text-warning border-warning/30";
 		case "Accepted":
-			return "bg-success/20 text-success border-success/30";
-		case "Declined":
-			return "bg-error/20 text-error border-error/30";
 		case "Attended":
 			return "bg-success/20 text-success border-success/30";
+		case "Declined":
 		case "NoShow":
 			return "bg-error/20 text-error border-error/30";
 		default:
 			return "bg-hover text-muted border-border";
+	}
+};
+
+const getInvitedViaLabel = (invitedVia: InvitedVia | string): string => {
+	switch (invitedVia) {
+		case InvitedVia.Direct:
+		case "Direct":
+			return "Direct Invite";
+		case InvitedVia.ClubMembership:
+		case "ClubMembership":
+			return "Club Member";
+		case InvitedVia.SeriesParticipation:
+		case "SeriesParticipation":
+			return "Series";
+		case InvitedVia.PublicJoin:
+		case "PublicJoin":
+			return "Public Join";
+		default:
+			return "—";
+	}
+};
+
+const getPaymentLabel = (paymentStatus?: string | null): { label: string; color: string } => {
+	switch (paymentStatus) {
+		case "completed":
+			return { label: "Paid", color: "text-success" };
+		case "pending":
+			return { label: "Pending", color: "text-warning" };
+		default:
+			return { label: "Unpaid", color: "text-muted" };
 	}
 };
 
@@ -68,7 +98,11 @@ export default function EventMembersPage() {
 
 	const [searchQuery, setSearchQuery] = useState("");
 	const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+	const [sortBy, setSortBy] = useState("joined-desc");
 	const [showInviteModal, setShowInviteModal] = useState(false);
+	const [removingParticipant, setRemovingParticipant] = useState<{ id: string; userId: string; name: string } | null>(null);
+	const [decliningParticipant, setDecliningParticipant] = useState<{ userId: string; name: string } | null>(null);
+	const [declineNote, setDeclineNote] = useState("");
 
 	const inviteMutation = useMutation({
 		mutationFn: (userIds: string[]) => inviteUsers(eventId, userIds),
@@ -78,36 +112,87 @@ export default function EventMembersPage() {
 		},
 	});
 
+	const removeMutation = useMutation({
+		mutationFn: (userId: string) => removeParticipant(eventId, userId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
+			setRemovingParticipant(null);
+		},
+	});
+
+	const statusMutation = useMutation({
+		mutationFn: ({ userId, status, declineNote }: { userId: string; status: string; declineNote?: string }) =>
+			updateParticipantStatus(eventId, userId, status, declineNote),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
+			setDecliningParticipant(null);
+			setDeclineNote("");
+		},
+	});
+
 	if (!event) return null;
+
+	const hasBudget = !!(event.budget || event.costToEnter);
 
 	// Get existing participant user IDs to exclude from invite modal
 	const existingUserIds = participants.map((p) => p.userId);
 
-	// Filter participants based on search and status
-	const filteredParticipants = participants.filter((p) => {
-		const profile = p.userProfile;
-		const participantStatus = p.status as unknown as string;
+	// Filter and sort participants
+	const filteredParticipants = participants
+		.filter((p) => {
+			const profile = p.userProfile;
+			const participantStatus = p.status as unknown as string;
 
-		// Status filter
-		if (statusFilter !== "all" && participantStatus !== statusFilter) {
-			return false;
-		}
+			if (statusFilter !== "all" && participantStatus !== statusFilter) return false;
 
-		// Search filter
-		if (searchQuery) {
-			const fullName = `${profile.name} ${profile.surname}`.toLowerCase();
-			if (!fullName.includes(searchQuery.toLowerCase())) {
-				return false;
+			if (searchQuery) {
+				const fullName = `${profile.name} ${profile.surname}`.toLowerCase();
+				if (!fullName.includes(searchQuery.toLowerCase())) return false;
 			}
-		}
 
-		return true;
-	});
+			return true;
+		})
+		.sort((a, b) => {
+			switch (sortBy) {
+				case "name-asc":
+					return `${a.userProfile.name} ${a.userProfile.surname}`.localeCompare(`${b.userProfile.name} ${b.userProfile.surname}`);
+				case "name-desc":
+					return `${b.userProfile.name} ${b.userProfile.surname}`.localeCompare(`${a.userProfile.name} ${a.userProfile.surname}`);
+				case "joined-desc":
+					return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+				case "joined-asc":
+					return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+				case "status":
+					return (a.status as unknown as string).localeCompare(b.status as unknown as string);
+				default:
+					return 0;
+			}
+		});
 
-	const handleRemoveParticipant = (participantId: string) => {
-		// TODO: Implement remove participant API call
-		void participantId; // Placeholder until API is implemented
-	};
+	const activeFilterCount = statusFilter !== "all" ? 1 : 0;
+	const clearFilters = () => setStatusFilter("all");
+
+	const filterContent = (
+		<div className="space-y-2">
+			<p className="text-xs font-medium text-muted-foreground">Status</p>
+			<div className="flex flex-wrap gap-2">
+				{STATUS_FILTER_OPTIONS.map((option) => (
+					<button
+						key={option.value}
+						type="button"
+						onClick={() => setStatusFilter(option.value)}
+						className={cn(
+							"px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
+							statusFilter === option.value
+								? "bg-foreground/10 text-foreground border-foreground/30"
+								: "bg-card/50 text-muted-foreground border-border hover:bg-card hover:text-foreground hover:border-foreground/20"
+						)}>
+						{option.label}
+					</button>
+				))}
+			</div>
+		</div>
+	);
 
 	const handleInviteUsers = (users: UserProfile[]) => {
 		const userIds = users.map((u) => u.id).filter((id): id is string => id !== undefined);
@@ -116,84 +201,160 @@ export default function EventMembersPage() {
 		}
 	};
 
+	const handleStatusChange = (userId: string, name: string, newStatus: string) => {
+		if (newStatus === "Declined") {
+			setDecliningParticipant({ userId, name });
+		} else {
+			statusMutation.mutate({ userId, status: newStatus });
+		}
+	};
+
+	const getParticipantName = (profile: { name?: string; surname?: string }) =>
+		`${profile.name || ""} ${profile.surname || ""}`.trim() || "Unknown";
+
 	return (
 		<div className="space-y-6">
 			{/* Header */}
 			<div className="flex items-center justify-between">
-				<h2 className="text-xl font-bold text-white">Members</h2>
+				<h2 className="text-lg font-semibold text-foreground">Members</h2>
 				{isAdmin && (
-					<Button color="primary" leftIcon={<UserPlus size={16} />} onClick={() => setShowInviteModal(true)}>
+					<Button variant="outline" leftIcon={<UserPlus size={16} />} onClick={() => setShowInviteModal(true)}>
 						Invite
 					</Button>
 				)}
 			</div>
 
-			{/* Search and Filters */}
-			<div className="flex flex-col sm:flex-row gap-3">
-				{/* Search */}
-				<div className="flex-1">
-					<Input
-						placeholder="Search members..."
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-						leftIcon={<Search size={18} />}
-					/>
-				</div>
+			{/* Toolbar */}
+			<ListToolbar
+				search={searchQuery}
+				onSearchChange={setSearchQuery}
+				searchPlaceholder="Search members..."
+				sortOptions={MEMBER_SORT_OPTIONS}
+				sortBy={sortBy}
+				onSortChange={setSortBy}
+				filterContent={filterContent}
+				activeFilterCount={activeFilterCount}
+				onClearFilters={clearFilters}
+				count={filteredParticipants.length}
+				itemLabel="member"
+				showViewToggle={false}
+			/>
 
-				{/* Status Filter */}
-				<Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
-					<SelectTrigger className="w-[180px]">
-						<Filter size={16} className="mr-2 text-muted-foreground" />
-						<SelectValue placeholder="Filter by status" />
-					</SelectTrigger>
-					<SelectContent>
-						{STATUS_OPTIONS.map((option) => (
-							<SelectItem key={option.value} value={option.value}>
-								{option.label}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
-			</div>
-
-			{/* Participants List */}
+			{/* Participants Table */}
 			{filteredParticipants.length > 0 ? (
-				<div className="rounded-2xl bg-surface border border-border divide-y divide-border">
-					{filteredParticipants.map((participant) => {
-						const { userProfile } = participant;
-						const statusStr = participant.status as unknown as string;
-
-						return (
-							<div key={participant.id} className="flex items-center justify-between p-4 hover:bg-hover transition-colors">
-								<div className="flex items-center gap-3">
-									<Avatar name={`${userProfile.name} ${userProfile.surname}`} src={userProfile.imageUrl} />
-									<div>
-										<div className="font-medium text-white">
-											{userProfile.name} {userProfile.surname}
-										</div>
-										<div className="flex items-center gap-2 mt-0.5">
-											<span className={`px-2 py-0.5 rounded-md text-xs font-medium border ${getStatusColor(statusStr)}`}>
-												{getStatusLabel(statusStr)}
-											</span>
-										</div>
-									</div>
-								</div>
-
-								{isAdmin && (
-									<DropdownMenu
-										items={[
-											{
-												label: "Remove",
-												icon: <UserMinus size={16} />,
-												variant: "destructive",
-												onClick: () => handleRemoveParticipant(participant.id),
-											},
-										]}
-									/>
+				<div className="rounded-xl bg-surface border border-border overflow-hidden">
+					<table className="w-full">
+						<thead>
+							<tr className="border-b border-border">
+								<th className="text-left text-xs font-medium text-muted px-4 py-3">Member</th>
+								<th className="text-left text-xs font-medium text-muted px-4 py-3">Status</th>
+								<th className="text-left text-xs font-medium text-muted px-4 py-3 hidden md:table-cell">Joined</th>
+								{hasBudget && (
+									<th className="text-left text-xs font-medium text-muted px-4 py-3 hidden lg:table-cell">Payment</th>
 								)}
-							</div>
-						);
-					})}
+								<th className="text-left text-xs font-medium text-muted px-4 py-3 hidden lg:table-cell">Source</th>
+								{isAdmin && (
+									<th className="text-right text-xs font-medium text-muted px-4 py-3">Actions</th>
+								)}
+							</tr>
+						</thead>
+						<tbody>
+							{filteredParticipants.map((participant) => {
+								const { userProfile } = participant;
+								const statusStr = participant.status as unknown as string;
+								const name = getParticipantName(userProfile);
+								const payment = getPaymentLabel(participant.payment?.status);
+
+								return (
+									<tr key={participant.id} className="border-b border-border last:border-b-0 hover:bg-hover transition-colors">
+										{/* Member */}
+										<td className="px-4 py-3">
+											<div className="flex items-center gap-3">
+												<Avatar name={name} src={userProfile.imageUrl} />
+												<div className="min-w-0">
+													<div className="font-medium text-white truncate">{name}</div>
+													{userProfile.email && (
+														<div className="text-xs text-muted truncate hidden sm:block">{userProfile.email}</div>
+													)}
+												</div>
+											</div>
+										</td>
+
+										{/* Status */}
+										<td className="px-4 py-3">
+											{isAdmin ? (
+												<Select
+													value={statusStr}
+													onValueChange={(value) => value && handleStatusChange(participant.userId, name, value)}
+												>
+													<SelectTrigger className="w-[130px] h-7 text-xs" size="sm">
+														<span className={`inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded text-xs font-medium ${getStatusColor(statusStr)}`}>
+															{getStatusLabel(statusStr)}
+														</span>
+													</SelectTrigger>
+													<SelectContent align="start">
+														{ALL_STATUSES.map((s) => (
+															<SelectItem key={s.value} value={s.value} disabled={s.value === statusStr}>
+																<span className={`inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded text-xs font-medium ${getStatusColor(s.value)}`}>
+																	{s.label}
+																</span>
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+											) : (
+												<span className={`px-2 py-0.5 rounded-md text-xs font-medium border ${getStatusColor(statusStr)}`}>
+													{getStatusLabel(statusStr)}
+												</span>
+											)}
+										</td>
+
+										{/* Joined */}
+										<td className="px-4 py-3 hidden md:table-cell">
+											<span className="text-sm text-muted">
+												{participant.createdAt
+													? formatDistanceToNow(new Date(participant.createdAt), { addSuffix: true })
+													: "—"}
+											</span>
+										</td>
+
+										{/* Payment */}
+										{hasBudget && (
+											<td className="px-4 py-3 hidden lg:table-cell">
+												<div className="flex items-center gap-1.5">
+													<CreditCard size={14} className={payment.color} />
+													<span className={`text-sm font-medium ${payment.color}`}>{payment.label}</span>
+												</div>
+											</td>
+										)}
+
+										{/* Source */}
+										<td className="px-4 py-3 hidden lg:table-cell">
+											<span className="text-sm text-muted">
+												{getInvitedViaLabel(participant.invitedVia)}
+											</span>
+										</td>
+
+										{/* Actions */}
+										{isAdmin && (
+											<td className="px-4 py-3 text-right">
+												<DropdownMenu
+													items={[
+														{
+															label: "Remove",
+															icon: <UserMinus size={16} />,
+															variant: "destructive" as const,
+															onClick: () => setRemovingParticipant({ id: participant.id, userId: participant.userId, name }),
+														},
+													]}
+												/>
+											</td>
+										)}
+									</tr>
+								);
+							})}
+						</tbody>
+					</table>
 				</div>
 			) : (
 				<EmptyState
@@ -225,6 +386,66 @@ export default function EventMembersPage() {
 				title="Invite to Event"
 				confirmLabel="Send Invitations"
 				excludeUserIds={existingUserIds}
+			/>
+
+			{/* Decline Modal */}
+			<Modal
+				isOpen={!!decliningParticipant}
+				onClose={() => { setDecliningParticipant(null); setDeclineNote(""); }}
+				size="sm"
+				showCloseButton={false}
+			>
+				<div>
+					<div className="w-12 h-12 rounded-full bg-warning/20 flex items-center justify-center mx-auto mb-4">
+						<XCircle className="text-warning" size={24} />
+					</div>
+					<h3 className="text-lg font-bold text-white mb-2 text-center">Decline Participant</h3>
+					<p className="text-sm text-muted mb-4 text-center">
+						Decline <span className="font-medium text-white">{decliningParticipant?.name}</span> from this event?
+					</p>
+					<TextArea
+						placeholder="Reason for declining (optional)"
+						value={declineNote}
+						onChange={(e) => setDeclineNote(e.target.value)}
+						rows={3}
+					/>
+					<div className="flex gap-12 justify-center mt-6">
+						<Button
+							variant="destructive"
+							loading={statusMutation.isPending}
+							onClick={() => decliningParticipant && statusMutation.mutate({
+								userId: decliningParticipant.userId,
+								status: "Declined",
+								declineNote: declineNote || undefined,
+							})}
+						>
+							Decline
+						</Button>
+						<Button
+							variant="secondary"
+							disabled={statusMutation.isPending}
+							onClick={() => { setDecliningParticipant(null); setDeclineNote(""); }}
+						>
+							Cancel
+						</Button>
+					</div>
+				</div>
+			</Modal>
+
+			{/* Remove Confirmation Modal */}
+			<DeleteConfirmModal
+				isOpen={!!removingParticipant}
+				title="Remove Participant"
+				itemName={removingParticipant?.name || ""}
+				description={
+					removingParticipant
+						? `Are you sure you want to remove ${removingParticipant.name} from this event?`
+						: undefined
+				}
+				onClose={() => setRemovingParticipant(null)}
+				onConfirm={() => removingParticipant && removeMutation.mutate(removingParticipant.userId)}
+				isLoading={removeMutation.isPending}
+				confirmText="Remove"
 			/>
 		</div>
 	);

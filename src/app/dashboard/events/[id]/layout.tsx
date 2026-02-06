@@ -4,6 +4,7 @@ import { Button } from "@/components";
 import { getMyParticipation, loadEvent, loadParticipants } from "@/lib/api/events";
 import { loadTeams } from "@/lib/api/teams";
 import { Event, EventType } from "@/lib/models/Event";
+import { Unit } from "@/lib/models/EventPaymentConfig";
 import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { Team } from "@/lib/models/Team";
 import { useQuery } from "@tanstack/react-query";
@@ -49,11 +50,12 @@ interface TabConfig {
 	icon: typeof Calendar;
 	href: string;
 	trainingOnly?: boolean;
+	teamsOnly?: boolean;
 }
 
 const TABS: TabConfig[] = [
 	{ id: "overview", label: "Overview", icon: Calendar, href: "" },
-	{ id: "teams", label: "Teams", icon: Users, href: "/teams" },
+	{ id: "teams", label: "Teams", icon: Users, href: "/teams", teamsOnly: true },
 	{ id: "members", label: "Members", icon: Users, href: "/members" },
 	{ id: "training", label: "Training Plan", icon: ClipboardList, href: "/training", trainingOnly: true },
 	{ id: "payments", label: "Payments", icon: CreditCard, href: "/payments" },
@@ -327,7 +329,11 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 					{/* Tabs */}
 					<div className="border-t border-border overflow-x-auto">
 						<div className="flex gap-1 px-6">
-							{TABS.filter((tab) => !tab.trainingOnly || event.type === EventType.TrainingSession).map((tab) => {
+							{TABS.filter((tab) => {
+								if (tab.trainingOnly && event.type !== EventType.TrainingSession) return false;
+								if (tab.teamsOnly && event.registrationUnit === Unit.Individual) return false;
+								return true;
+							}).map((tab) => {
 								const count = getTabCount(tab.id);
 								const isActive = activeTab === tab.id;
 								return (
