@@ -44,14 +44,14 @@ export default function EventPaymentCard({ event, userParticipant, isInvited = f
 	const cost = event.budget.cost;
 
 	return (
-		<div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+		<div className="p-6 rounded-2xl bg-surface border border-border">
 			<div className="flex flex-col gap-4">
 				<div className="flex items-center justify-between">
 					<div>
-						<h3 className="text-lg font-bold text-white">
+						<h3 className="text-lg font-bold text-foreground">
 							{isInvited ? "You're Invited!" : "Join This Event"}
 						</h3>
-						<p className="text-sm text-muted mt-1">
+						<p className="text-sm text-muted-foreground mt-1">
 							{isInvited
 								? "Accept your invitation by completing the payment"
 								: "Payment is required to join this event"}
@@ -62,7 +62,7 @@ export default function EventPaymentCard({ event, userParticipant, isInvited = f
 							{currency}
 							{cost}
 						</div>
-						<div className="text-xs text-muted">per person</div>
+						<div className="text-xs text-muted-foreground">per person</div>
 					</div>
 				</div>
 
@@ -81,7 +81,7 @@ export default function EventPaymentCard({ event, userParticipant, isInvited = f
 					{cost}
 				</Button>
 
-				<p className="text-xs text-muted text-center">
+				<p className="text-xs text-muted-foreground text-center">
 					Secure payment powered by Stripe. You'll receive a confirmation email after payment.
 				</p>
 			</div>

@@ -66,7 +66,7 @@ export default function EventDangerSettingsPage() {
 						</p>
 					</div>
 					<Button
-						variant="solid"
+						variant="destructive"
 						color="error"
 						leftIcon={<Trash2 size={16} />}
 						onClick={() => setShowDeleteModal(true)}>
@@ -78,9 +78,9 @@ export default function EventDangerSettingsPage() {
 			{/* Cancel Modal */}
 			{showCancelModal && (
 				<>
-					<div className="fixed inset-0 bg-black/60 z-50" onClick={() => setShowCancelModal(false)} />
+					<div className="fixed inset-0 bg-overlay z-50" onClick={() => setShowCancelModal(false)} />
 					<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-						<div className="bg-raised border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+						<div className="bg-raised border border-border rounded-2xl w-full max-w-md p-6 shadow-2xl">
 							<div className="flex items-center gap-3 mb-4">
 								<div className="w-10 h-10 rounded-full bg-warning/20 flex items-center justify-center">
 									<XCircle className="text-warning" size={20} />
@@ -95,7 +95,7 @@ export default function EventDangerSettingsPage() {
 								<Button variant="ghost" color="neutral" onClick={() => setShowCancelModal(false)}>
 									Keep Event
 								</Button>
-								<Button variant="solid" color="error" onClick={handleCancelEvent}>
+								<Button variant="destructive" color="error" onClick={handleCancelEvent}>
 									Cancel Event
 								</Button>
 							</div>
@@ -107,9 +107,9 @@ export default function EventDangerSettingsPage() {
 			{/* Delete Modal */}
 			{showDeleteModal && (
 				<>
-					<div className="fixed inset-0 bg-black/60 z-50" onClick={() => setShowDeleteModal(false)} />
+					<div className="fixed inset-0 bg-overlay z-50" onClick={() => setShowDeleteModal(false)} />
 					<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-						<div className="bg-raised border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+						<div className="bg-raised border border-border rounded-2xl w-full max-w-md p-6 shadow-2xl">
 							<div className="flex items-center gap-3 mb-4">
 								<div className="w-10 h-10 rounded-full bg-error/20 flex items-center justify-center">
 									<Trash2 className="text-error" size={20} />
@@ -128,7 +128,7 @@ export default function EventDangerSettingsPage() {
 									value={confirmText}
 									onChange={(e) => setConfirmText(e.target.value)}
 									placeholder="Enter event name..."
-									className="w-full px-4 py-3 rounded-xl bg-background border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-error/50"
+									className="w-full px-4 py-3 rounded-xl bg-background border border-border text-white placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-error/50"
 								/>
 							</div>
 							<div className="flex justify-end gap-3">
@@ -136,7 +136,7 @@ export default function EventDangerSettingsPage() {
 									Cancel
 								</Button>
 								<Button
-									variant="solid"
+									variant="destructive"
 									color="error"
 									onClick={handleDeleteEvent}
 									disabled={confirmText !== event.name}>

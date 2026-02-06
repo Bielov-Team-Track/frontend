@@ -357,7 +357,7 @@ export default function EditDrillModal({ drill, isOpen, onClose, onSuccess }: Ed
 				</div>
 
 				{/* Navigation */}
-				<div className="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
+				<div className="pt-6 mt-6 border-t border-border flex items-center justify-between">
 					{!isFirstStep ? (
 						<Button
 							type="button"
@@ -435,7 +435,7 @@ function StepBasics({
 }: StepBasicsProps) {
 	return (
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-			<div className="border-b border-white/10 pb-4">
+			<div className="border-b border-border pb-4">
 				<h3 className="text-lg font-semibold text-white mb-1">Basic Information</h3>
 				<p className="text-sm text-muted">Update the essentials about your drill.</p>
 			</div>
@@ -524,7 +524,7 @@ function StepDetails({
 }: StepDetailsProps) {
 	return (
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-			<div className="border-b border-white/10 pb-4">
+			<div className="border-b border-border pb-4">
 				<h3 className="text-lg font-semibold text-white mb-1">Drill Details</h3>
 				<p className="text-sm text-muted">Configure timing, players, and skills.</p>
 			</div>
@@ -551,7 +551,6 @@ function StepDetails({
 						...clubs.map((club) => ({ value: club.id, label: club.name })),
 					]}
 					leftIcon={<Building2 size={16} />}
-					optional
 					helperText="Link this drill to one of your clubs"
 				/>
 			)}
@@ -622,7 +621,7 @@ function StepContent({
 }: StepContentProps) {
 	return (
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-			<div className="border-b border-white/10 pb-4">
+			<div className="border-b border-border pb-4">
 				<h3 className="text-lg font-semibold text-white mb-1">Instructions & Tips</h3>
 				<p className="text-sm text-muted">Add step-by-step instructions and coaching notes.</p>
 			</div>
@@ -669,7 +668,7 @@ function StepMedia({
 }: StepMediaProps) {
 	return (
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-			<div className="border-b border-white/10 pb-4">
+			<div className="border-b border-border pb-4">
 				<h3 className="text-lg font-semibold text-white mb-1">Media & Variations</h3>
 				<p className="text-sm text-muted">Add videos, images, and link related drills.</p>
 			</div>
@@ -754,7 +753,7 @@ function DynamicList({ label, icon, items, onChange, placeholder, ordered, helpe
 					{items.map((item, index) => (
 						<div
 							key={index}
-							className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 group"
+							className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-border group"
 						>
 							{ordered && (
 								<span className="w-6 h-6 rounded-full bg-accent/20 text-accent text-xs font-bold flex items-center justify-center shrink-0">
@@ -768,7 +767,7 @@ function DynamicList({ label, icon, items, onChange, placeholder, ordered, helpe
 							<button
 								type="button"
 								onClick={() => removeItem(index)}
-								className="p-1.5 rounded-lg hover:bg-white/10 text-muted hover:text-error transition-colors opacity-0 group-hover:opacity-100"
+								className="p-1.5 rounded-lg hover:bg-hover text-muted hover:text-error transition-colors opacity-0 group-hover:opacity-100"
 							>
 								<X size={14} />
 							</button>
@@ -784,7 +783,7 @@ function DynamicList({ label, icon, items, onChange, placeholder, ordered, helpe
 					onChange={(e) => setNewItem(e.target.value)}
 					onKeyDown={handleKeyDown}
 					placeholder={placeholder}
-					className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+					className="flex-1 px-4 py-2.5 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
 				/>
 				<Button
 					type="button"
@@ -853,7 +852,7 @@ function EquipmentList({ items, onChange }: EquipmentListProps) {
 					{items.map((item, index) => (
 						<div
 							key={index}
-							className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 group"
+							className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-border group"
 						>
 							<Dumbbell size={14} className={item.isOptional ? "text-muted/50" : "text-accent"} />
 							<span className={`flex-1 text-sm ${item.isOptional ? "text-muted" : "text-white"}`}>
@@ -865,7 +864,7 @@ function EquipmentList({ items, onChange }: EquipmentListProps) {
 								className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
 									item.isOptional
 										? "bg-accent/20 text-accent"
-										: "bg-white/5 text-muted hover:bg-white/10"
+										: "bg-surface text-muted hover:bg-hover"
 								}`}
 							>
 								{item.isOptional ? "Optional" : "Required"}
@@ -873,7 +872,7 @@ function EquipmentList({ items, onChange }: EquipmentListProps) {
 							<button
 								type="button"
 								onClick={() => removeItem(index)}
-								className="p-1.5 rounded-lg hover:bg-white/10 text-muted hover:text-error transition-colors opacity-0 group-hover:opacity-100"
+								className="p-1.5 rounded-lg hover:bg-hover text-muted hover:text-error transition-colors opacity-0 group-hover:opacity-100"
 							>
 								<X size={14} />
 							</button>
@@ -889,14 +888,14 @@ function EquipmentList({ items, onChange }: EquipmentListProps) {
 					onChange={(e) => setNewItem(e.target.value)}
 					onKeyDown={handleKeyDown}
 					placeholder="Add equipment item..."
-					className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+					className="flex-1 px-4 py-2.5 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
 				/>
 				<label className="flex items-center gap-1.5 text-xs text-muted cursor-pointer whitespace-nowrap px-2">
 					<input
 						type="checkbox"
 						checked={newItemOptional}
 						onChange={(e) => setNewItemOptional(e.target.checked)}
-						className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-accent focus:ring-accent/50"
+						className="w-3.5 h-3.5 rounded border-border bg-surface text-accent focus:ring-accent/50"
 					/>
 					Optional
 				</label>

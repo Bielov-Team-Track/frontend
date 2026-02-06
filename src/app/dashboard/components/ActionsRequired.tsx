@@ -27,7 +27,7 @@ export function ActionsRequired({ unpaidEvents, pendingInvitations, eventsNeedin
 
 	// Add unpaid events
 	if (unpaidEvents.length > 0) {
-		const totalAmount = unpaidEvents.reduce((sum, e) => sum + (e.amountDue || e.budget?.amount || 0), 0);
+		const totalAmount = unpaidEvents.reduce((sum, e) => sum + (e.amountDue || e.budget?.cost || 0), 0);
 		actions.push({
 			id: "unpaid-events",
 			type: "payment",
@@ -99,7 +99,7 @@ export function ActionsRequired({ unpaidEvents, pendingInvitations, eventsNeedin
 	};
 
 	return (
-		<div className="relative rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
+		<div className="relative rounded-2xl bg-surface border border-border overflow-hidden">
 			{/* Subtle warning accent - left border glow */}
 			<div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-500/60 via-orange-500/40 to-orange-500/20" />
 			<div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-orange-500/5 to-transparent" />
@@ -126,7 +126,7 @@ export function ActionsRequired({ unpaidEvents, pendingInvitations, eventsNeedin
 					{displayActions.map((action) => (
 						<div
 							key={action.id}
-							className="group relative rounded-xl bg-white/[0.02] border border-white/5 p-4 hover:bg-white/[0.04] hover:border-white/10 transition-all duration-200"
+							className="group relative rounded-xl bg-surface border border-border p-4 hover:bg-hover hover:border-border transition-all duration-200"
 						>
 							<div className="flex items-center gap-3">
 								{/* Icon */}
@@ -142,7 +142,8 @@ export function ActionsRequired({ unpaidEvents, pendingInvitations, eventsNeedin
 										</span>
 										{action.amount && action.amount > 0 && (
 											<Badge
-												variant="destructive"
+												variant="solid"
+												color="error"
 												className="text-[10px] h-5 font-semibold flex-shrink-0"
 											>
 												${action.amount}

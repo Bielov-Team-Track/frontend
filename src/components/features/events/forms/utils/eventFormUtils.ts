@@ -173,6 +173,7 @@ export function getDefaultFormValues() {
 		surface: PlayingSurface.Indoor,
 		isPublic: false,
 		capacity: null,
+		teamsNumber: null,
 		description: "",
 		payToEnter: false,
 		useBudget: false,

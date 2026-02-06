@@ -57,16 +57,16 @@ const CommentsSection = ({ eventId }: CommentsSectionProps) => {
 		return (
 			<div className="flex flex-col items-center justify-center h-40 space-y-3">
 				<div className="w-8 h-8 border-4 border-accent/30 border-t-accent rounded-full animate-spin"></div>
-				<p className="text-sm text-muted">Loading discussion...</p>
+				<p className="text-sm text-muted-foreground">Loading discussion...</p>
 			</div>
 		);
 	}
 
 	return (
-		<div className="bg-[#1A1A1A] border border-white/5 rounded-2xl overflow-hidden">
+		<div className="bg-surface border border-border rounded-2xl overflow-hidden">
 			{/* Header */}
-			<div className="p-4 border-b border-white/5 bg-white/2 flex items-center justify-between">
-				<h3 className="text-sm font-bold text-white flex items-center gap-2">
+			<div className="p-4 border-b border-border bg-surface flex items-center justify-between">
+				<h3 className="text-sm font-bold text-foreground flex items-center gap-2">
 					<MessageCircle size={16} className="text-accent" />
 					Discussion ({comments.length})
 				</h3>
@@ -78,9 +78,9 @@ const CommentsSection = ({ eventId }: CommentsSectionProps) => {
 				<div className="flex gap-4 mb-8">
 					<div className="shrink-0 hidden sm:block">
 						{isAuthenticated && userProfile ? (
-							<Avatar profile={userProfile} className="w-10 h-10" />
+							<Avatar src={userProfile.imageUrl} name={`${userProfile.name} ${userProfile.surname}`} className="w-10 h-10" />
 						) : (
-							<div className="w-10 h-10 rounded-full bg-white/5 border border-white/10" />
+							<div className="w-10 h-10 rounded-full bg-surface border border-border" />
 						)}
 					</div>
 
@@ -94,7 +94,7 @@ const CommentsSection = ({ eventId }: CommentsSectionProps) => {
 										placeholder="Add to the discussion..."
 										rows={3}
 										maxLength={2000}
-										className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white placeholder:text-muted focus:outline-hidden focus:border-accent/50 focus:bg-white/10 transition-all resize-none pr-12"
+										className="w-full bg-surface border border-border rounded-xl p-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:border-accent/50 focus:bg-hover transition-all resize-none pr-12"
 										required
 									/>
 									<button
@@ -103,18 +103,18 @@ const CommentsSection = ({ eventId }: CommentsSectionProps) => {
 										className={`absolute bottom-3 right-3 p-2 rounded-lg transition-all ${
 											commentText.trim() && !submitting
 												? "bg-accent text-white hover:bg-accent/90"
-												: "bg-white/10 text-muted cursor-not-allowed"
+												: "bg-foreground/10 text-muted-foreground cursor-not-allowed"
 										}`}>
 										<Send size={16} className={submitting ? "animate-pulse" : ""} />
 									</button>
 								</div>
-								<div className="text-[10px] text-muted text-right mt-1 opacity-0 group-focus-within:opacity-100 transition-opacity">
+								<div className="text-[10px] text-muted-foreground text-right mt-1 opacity-0 group-focus-within:opacity-100 transition-opacity">
 									{commentText.length}/2000
 								</div>
 							</form>
 						) : (
-							<div className="bg-white/5 border border-white/5 border-dashed rounded-xl p-4 text-center">
-								<p className="text-sm text-muted mb-2">Join the conversation</p>
+							<div className="bg-surface border border-border border-dashed rounded-xl p-4 text-center">
+								<p className="text-sm text-muted-foreground mb-2">Join the conversation</p>
 								<button className="btn btn-sm bg-primary text-white border-none hover:bg-primary/90">Log in to Comment</button>
 							</div>
 						)}
@@ -129,10 +129,10 @@ const CommentsSection = ({ eventId }: CommentsSectionProps) => {
 						))}
 					</div>
 				) : (
-					<div className="text-center py-12 px-4 rounded-xl border border-white/5 border-dashed bg-white/2">
-						<MessageCircle size={32} className="mx-auto text-muted/30 mb-3" />
-						<p className="text-muted text-sm font-medium">No comments yet.</p>
-						<p className="text-xs text-muted/50 mt-1">Be the first to share your thoughts!</p>
+					<div className="text-center py-12 px-4 rounded-xl border border-border border-dashed bg-surface">
+						<MessageCircle size={32} className="mx-auto text-muted-foreground/30 mb-3" />
+						<p className="text-muted-foreground text-sm font-medium">No comments yet.</p>
+						<p className="text-xs text-muted-foreground/50 mt-1">Be the first to share your thoughts!</p>
 					</div>
 				)}
 			</div>

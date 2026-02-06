@@ -66,7 +66,7 @@ const PostCard = memo(function PostCard({ post, onEdit, onDelete, showUnpin, isA
 				<div className="flex items-center gap-3">
 					<Avatar name={post.author.name + " " + post.author.surname} src={post.author.imageUrl} variant="user" />
 					<div>
-						<p className="text-sm font-medium text-white">{post.author.name + " " + post.author.surname}</p>
+						<p className="text-sm font-medium text-foreground">{post.author.name + " " + post.author.surname}</p>
 						<div className="flex items-center gap-2 text-xs text-muted-foreground">
 							<span>{timeAgo}</span>
 							{post.isPinned && (
@@ -111,7 +111,7 @@ const PostCard = memo(function PostCard({ post, onEdit, onDelete, showUnpin, isA
 					<PostReactions postId={post.id} reactions={post.reactions} />
 					<button
 						onClick={() => setShowComments(!showComments)}
-						className="flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors">
+						className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
 						<MessageCircle size={16} />
 						{post.commentCount} comments
 					</button>

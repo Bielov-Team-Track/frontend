@@ -85,10 +85,15 @@ export default function EmojiPicker({
 			}
 		};
 
-		document.addEventListener("mousedown", handleClickOutside);
+		// Delay attaching listener by one frame to prevent the opening
+		// tap/click from immediately closing the picker on mobile
+		const rafId = requestAnimationFrame(() => {
+			document.addEventListener("mousedown", handleClickOutside);
+		});
 		window.addEventListener("resize", onClose);
 
 		return () => {
+			cancelAnimationFrame(rafId);
 			document.removeEventListener("mousedown", handleClickOutside);
 			window.removeEventListener("resize", onClose);
 		};
@@ -104,8 +109,8 @@ export default function EmojiPicker({
 				left: position.left,
 				opacity: isVisible ? 1 : 0,
 			}}
-			className={`fixed z-9999 bg-background/80 backdrop-blur-md border border-white/10 shadow-2xl transition-opacity duration-200 ${
-				showFullPicker ? "rounded-2xl p-0 overflow-hidden" : "rounded-full p-1.5 flex gap-1"
+			className={`fixed z-9999 bg-background/80 backdrop-blur-md border border-border shadow-2xl transition-opacity duration-200 ${
+				showFullPicker ? "rounded-2xl p-0 overflow-hidden" : "rounded-2xl p-1.5 flex gap-1 overflow-x-auto max-w-[calc(100vw-20px)] no-scrollbar"
 			}`}
 		>
 			{showFullPicker ? (
@@ -130,19 +135,19 @@ export default function EmojiPicker({
 								onSelect(emoji);
 								onClose();
 							}}
-							className="hover:bg-white/10 p-2 rounded-full text-xl transition-colors w-10 h-10 flex items-center justify-center leading-none select-none"
+							className="hover:bg-foreground/10 p-2 rounded-full text-xl transition-colors w-10 h-10 flex items-center justify-center leading-none select-none"
 						>
 							{emoji}
 						</button>
 					))}
-					<div className="w-px h-6 bg-white/10 my-auto mx-1" />
+					<div className="w-px h-6 bg-foreground/10 my-auto mx-1" />
 					<button
 						onClick={(e) => {
 							e.stopPropagation();
 							setIsVisible(false);
 							setShowFullPicker(true);
 						}}
-						className="hover:bg-white/10 p-2 rounded-full text-muted-foreground hover:text-white transition-colors w-10 h-10 flex items-center justify-center leading-none"
+						className="hover:bg-foreground/10 p-2 rounded-full text-muted-foreground hover:text-foreground transition-colors w-10 h-10 flex items-center justify-center leading-none"
 						title="More emojis"
 					>
 						<Plus size={20} />

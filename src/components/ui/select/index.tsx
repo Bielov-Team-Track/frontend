@@ -101,7 +101,7 @@ function Select<T = any>({
 						}
 					</SelectValue>
 				</SelectTrigger>
-				<SelectContent className={"shadow-md shadow-black"}>
+				<SelectContent className={"shadow-md"}>
 					{clearable && (
 						<SelectItem value={undefined}>
 							<span className="text-muted-foreground">Clear selection</span>

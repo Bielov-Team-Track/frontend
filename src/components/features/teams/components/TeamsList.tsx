@@ -1,6 +1,6 @@
 "use client";
 
-import { Unit } from "@/lib/models/EventBudget";
+import { Unit } from "@/lib/models/EventPaymentConfig";
 import { Team } from "@/lib/models/Team";
 import { default as TeamComponent } from "./Team";
 

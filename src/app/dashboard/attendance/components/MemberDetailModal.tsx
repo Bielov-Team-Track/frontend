@@ -14,7 +14,7 @@ interface MemberDetailModalProps {
 
 const STATUS_CONFIG: Record<AttendanceStatus, { bg: string; textColor: string; icon: React.ReactNode; label: string }> = {
 	[AttendanceStatus.Invited]: {
-		bg: "bg-white/10",
+		bg: "bg-hover",
 		textColor: "text-muted",
 		icon: <HelpCircle size={14} />,
 		label: "Invited",
@@ -85,21 +85,21 @@ export default function MemberDetailModal({ member, events, records, onClose }: 
 			const event = events.find((e) => e.id === record.eventId);
 			return event ? { record, event } : null;
 		})
-		.filter(Boolean)
-		.sort((a, b) => new Date(b!.event.date).getTime() - new Date(a!.event.date).getTime());
+		.filter((item): item is { record: AttendanceRecord; event: AttendanceEvent } => item !== null)
+		.sort((a, b) => new Date(b.event.date).getTime() - new Date(a.event.date).getTime());
 
 	return (
 		<>
 			{/* Backdrop */}
-			<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+			<div className="fixed inset-0 z-50 bg-overlay backdrop-blur-sm" onClick={onClose} />
 
 			{/* Modal */}
 			<div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
 				<div
-					className="bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden pointer-events-auto animate-in fade-in-0 zoom-in-95 duration-200"
+					className="bg-surface border border-border rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden pointer-events-auto animate-in fade-in-0 zoom-in-95 duration-200"
 					onClick={(e) => e.stopPropagation()}>
 					{/* Header */}
-					<div className="flex items-center gap-4 p-4 border-b border-white/10">
+					<div className="flex items-center gap-4 p-4 border-b border-border">
 						{/* Avatar */}
 						<div
 							className="w-14 h-14 rounded-lg flex items-center justify-center text-lg font-bold text-background-dark shrink-0"
@@ -119,7 +119,7 @@ export default function MemberDetailModal({ member, events, records, onClose }: 
 						{/* Name and warning */}
 						<div className="flex-1 min-w-0">
 							<div className="flex items-center gap-2">
-								<h2 className="text-lg font-semibold text-white truncate">{member.name}</h2>
+								<h2 className="text-lg font-semibold text-foreground truncate">{member.name}</h2>
 								{member.highlightWarning && (
 									<span className="flex items-center gap-1 text-xs font-semibold text-warning bg-warning/10 px-2 py-0.5 rounded">
 										<AlertTriangle size={12} />
@@ -138,13 +138,13 @@ export default function MemberDetailModal({ member, events, records, onClose }: 
 						</div>
 
 						{/* Close button */}
-						<button onClick={onClose} className="p-2 rounded-lg hover:bg-white/10 text-muted hover:text-white transition-colors">
+						<button onClick={onClose} className="p-2 rounded-lg hover:bg-hover text-muted hover:text-foreground transition-colors">
 							<X size={20} />
 						</button>
 					</div>
 
 					{/* Stats */}
-					<div className="grid grid-cols-4 gap-2 p-4 border-b border-white/10">
+					<div className="grid grid-cols-4 gap-2 p-4 border-b border-border">
 						<div className="text-center p-2 rounded-lg bg-success/10">
 							<div className="text-xl font-bold text-success">{stats.attended}</div>
 							<div className="text-xs text-muted">Attended</div>
@@ -165,7 +165,7 @@ export default function MemberDetailModal({ member, events, records, onClose }: 
 
 					{/* Payment summary (if applicable) */}
 					{paidEvents.length > 0 && (
-						<div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/2">
+						<div className="flex items-center justify-between px-4 py-3 border-b border-border bg-surface">
 							<div className="flex items-center gap-2 text-sm">
 								<DollarSign size={16} className="text-muted" />
 								<span className="text-muted">Payment Status</span>
@@ -175,7 +175,7 @@ export default function MemberDetailModal({ member, events, records, onClose }: 
 									<span className="text-success font-medium">{paidCount}</span>
 									<span className="text-muted"> paid</span>
 								</span>
-								<span className="text-white/20">|</span>
+								<span className="text-foreground/20">|</span>
 								<span className="text-sm">
 									<span className="text-error font-medium">{unpaidCount}</span>
 									<span className="text-muted"> unpaid</span>
@@ -204,10 +204,10 @@ export default function MemberDetailModal({ member, events, records, onClose }: 
 												onClose();
 												router.push(`/dashboard/events/${event.id}`);
 											}}
-											className="w-full text-left flex flex-col gap-2 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group">
+											className="w-full text-left flex flex-col gap-2 p-3 rounded-lg bg-surface hover:bg-hover transition-colors group">
 											<div className="flex items-center gap-3">
 												{/* Date */}
-												<div className="flex flex-col items-center justify-center w-10 h-10 rounded bg-white/5 shrink-0">
+												<div className="flex flex-col items-center justify-center w-10 h-10 rounded bg-surface shrink-0">
 													<span className="text-xs font-bold text-white leading-none">{eventDate.getDate()}</span>
 													<span className="text-[10px] text-muted uppercase">
 														{eventDate.toLocaleString("default", { month: "short" })}
@@ -216,7 +216,7 @@ export default function MemberDetailModal({ member, events, records, onClose }: 
 
 												{/* Event info */}
 												<div className="flex-1 min-w-0">
-													<div className="text-sm font-medium text-white truncate group-hover:text-primary transition-colors">
+													<div className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
 														{event.name}
 													</div>
 												</div>
@@ -241,12 +241,12 @@ export default function MemberDetailModal({ member, events, records, onClose }: 
 												)}
 
 												{/* Chevron indicator */}
-												<ChevronRight size={16} className="text-muted group-hover:text-white transition-colors shrink-0" />
+												<ChevronRight size={16} className="text-muted group-hover:text-foreground transition-colors shrink-0" />
 											</div>
 
 											{/* Decline/No-show reason */}
 											{hasReason && (
-												<div className="flex items-start gap-2 ml-[52px] pl-3 border-l-2 border-white/10">
+												<div className="flex items-start gap-2 ml-[52px] pl-3 border-l-2 border-border">
 													<MessageSquare size={12} className="text-muted shrink-0 mt-0.5" />
 													<span className="text-xs text-muted italic">{record.declineNote}</span>
 												</div>

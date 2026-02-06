@@ -35,9 +35,9 @@ function getStep1ValidationFields(isRecurring: boolean): string[] {
 }
 
 /**
- * Returns the fields to validate for step 3 based on event type and payment config
+ * Returns the fields to validate for step 3 (Participants) based on event type
  */
-function getStep3ValidationFields(eventType: EventType, usePaymentConfig: boolean): string[] {
+function getParticipantsValidationFields(eventType: EventType): string[] {
 	const baseFields = ["eventFormat"];
 
 	// Add casualPlayFormat if event type is CasualPlay
@@ -45,16 +45,24 @@ function getStep3ValidationFields(eventType: EventType, usePaymentConfig: boolea
 		baseFields.push("casualPlayFormat");
 	}
 
+	return baseFields;
+}
+
+/**
+ * Returns the fields to validate for step 4 (Payment) based on payment config
+ */
+function getPaymentValidationFields(usePaymentConfig: boolean): string[] {
 	// Add payment config fields if payment is enabled
 	if (usePaymentConfig) {
-		baseFields.push("paymentConfig.pricingModel", "paymentConfig.cost");
+		return ["paymentConfig.pricingModel", "paymentConfig.cost"];
 	}
 
-	return baseFields;
+	return [];
 }
 
 export function useEventWizard({ trigger, watch }: UseEventWizardProps) {
 	const [currentStep, setCurrentStep] = useState(1);
+	const [highestVisitedStep, setHighestVisitedStep] = useState(1);
 	const values = watch();
 
 	useEffect(() => {
@@ -81,11 +89,15 @@ export function useEventWizard({ trigger, watch }: UseEventWizardProps) {
 				fieldsToValidate = getStep1ValidationFields(values.isRecurring);
 				break;
 			case 3:
-				// Participants & Payment - conditional based on event type and payment config
-				fieldsToValidate = getStep3ValidationFields(values.type as EventType, values.usePaymentConfig);
+				// Participants - conditional based on event type
+				fieldsToValidate = getParticipantsValidationFields(values.type as EventType);
+				break;
+			case 4:
+				// Payment - conditional based on payment config
+				fieldsToValidate = getPaymentValidationFields(values.usePaymentConfig);
 				break;
 			default:
-				// Use default fields for other steps (Step 2: Location, Step 4: Review)
+				// Use default fields for other steps (Step 2: Location, Step 5: Review)
 				fieldsToValidate = [...STEP_VALIDATION_FIELDS[currentStep as keyof typeof STEP_VALIDATION_FIELDS]];
 		}
 
@@ -94,6 +106,7 @@ export function useEventWizard({ trigger, watch }: UseEventWizardProps) {
 		if (isValid && currentStep < TOTAL_STEPS) {
 			const newStep = currentStep + 1;
 			setCurrentStep(newStep);
+			setHighestVisitedStep((prev) => Math.max(prev, newStep));
 		}
 	};
 
@@ -105,7 +118,7 @@ export function useEventWizard({ trigger, watch }: UseEventWizardProps) {
 	};
 
 	const goToStep = (step: number) => {
-		if (step >= 1 && step <= TOTAL_STEPS) {
+		if (step >= 1 && step <= highestVisitedStep) {
 			setCurrentStep(step);
 		}
 	};
@@ -118,5 +131,6 @@ export function useEventWizard({ trigger, watch }: UseEventWizardProps) {
 		isFirstStep: currentStep === 1,
 		isLastStep: currentStep === TOTAL_STEPS,
 		totalSteps: TOTAL_STEPS,
+		highestVisitedStep,
 	};
 }

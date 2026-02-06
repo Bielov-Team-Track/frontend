@@ -50,7 +50,7 @@ export default function TemplateBookmarkButton({ templateId, isBookmarked: initi
 			<button
 				onClick={handleToggleBookmark}
 				disabled={!isAuthenticated}
-				className="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-white transition-colors disabled:opacity-50"
+				className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
 			>
 				<Bookmark size={14} className={isBookmarked ? "fill-accent text-accent" : ""} />
 				<span className="hidden sm:inline">Bookmark</span>

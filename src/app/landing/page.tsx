@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useAuth } from "@/providers";
 import {
 	Users,
 	Calendar,
@@ -78,15 +80,17 @@ function HeroSection() {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.5, delay: 0.3 }}
 						className="flex flex-col sm:flex-row gap-4 justify-center">
-						<Button asChild size="lg" className="text-base px-8 py-6">
-							<Link href="/sign-up">
-								Start Free Trial
-								<ChevronRight className="w-5 h-5 ml-1" />
-							</Link>
-						</Button>
-						<Button asChild variant="outline" size="lg" className="text-base px-8 py-6">
-							<Link href="/clubs">Explore Clubs</Link>
-						</Button>
+						<Link
+							href="/sign-up"
+							className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-base px-8 py-3 font-medium">
+							Start Free Trial
+							<ChevronRight className="w-5 h-5" />
+						</Link>
+						<Link
+							href="/clubs"
+							className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-background hover:bg-muted text-foreground transition-colors text-base px-8 py-3 font-medium">
+							Explore Clubs
+						</Link>
 					</motion.div>
 
 					{/* Stats */}
@@ -515,19 +519,17 @@ function CTASection() {
 							Join volleyball clubs already using Spike to train smarter, compete better, and build winning programs.
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center">
-							<Button asChild size="lg" variant="secondary" className="text-base px-8 py-6 bg-white text-primary hover:bg-white/90">
-								<Link href="/sign-up">
-									Start Free Trial
-									<ChevronRight className="w-5 h-5 ml-1" />
-								</Link>
-							</Button>
-							<Button
-								asChild
-								size="lg"
-								variant="outline"
-								className="text-base px-8 py-6 border-white/30 text-primary-foreground hover:bg-white/10">
-								<Link href="/clubs">Explore Clubs</Link>
-							</Button>
+							<Link
+								href="/sign-up"
+								className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-primary hover:bg-white/90 transition-colors text-base px-8 py-3 font-medium">
+								Start Free Trial
+								<ChevronRight className="w-5 h-5" />
+							</Link>
+							<Link
+								href="/clubs"
+								className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 text-primary-foreground hover:bg-white/10 transition-colors text-base px-8 py-3 font-medium">
+								Explore Clubs
+							</Link>
 						</div>
 					</div>
 				</motion.div>
@@ -586,12 +588,16 @@ function Navbar() {
 
 						{/* Desktop CTA */}
 						<div className="hidden md:flex items-center gap-3">
-							<Button asChild variant="ghost">
-								<Link href="/login">Log In</Link>
-							</Button>
-							<Button asChild>
-								<Link href="/sign-up">Get Started</Link>
-							</Button>
+							<Link
+								href="/login"
+								className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted transition-colors">
+								Log In
+							</Link>
+							<Link
+								href="/sign-up"
+								className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-2 text-sm font-medium transition-colors">
+								Get Started
+							</Link>
 						</div>
 
 						{/* Mobile Menu Button */}
@@ -624,12 +630,16 @@ function Navbar() {
 							</Link>
 						))}
 						<div className="flex flex-col gap-3 pt-4">
-							<Button asChild variant="outline" size="lg">
-								<Link href="/login">Log In</Link>
-							</Button>
-							<Button asChild size="lg">
-								<Link href="/sign-up">Get Started</Link>
-							</Button>
+							<Link
+								href="/login"
+								className="inline-flex items-center justify-center rounded-lg border border-border bg-background hover:bg-muted px-4 py-3 text-sm font-medium transition-colors">
+								Log In
+							</Link>
+							<Link
+								href="/sign-up"
+								className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-3 text-sm font-medium transition-colors">
+								Get Started
+							</Link>
 						</div>
 					</div>
 				</motion.div>
@@ -703,6 +713,20 @@ function Footer() {
 
 // Main Landing Page
 export default function LandingPage() {
+	const { isAuthenticated, isLoading } = useAuth();
+	const router = useRouter();
+
+	useEffect(() => {
+		if (!isLoading && isAuthenticated) {
+			router.replace("/dashboard/events");
+		}
+	}, [isAuthenticated, isLoading, router]);
+
+	// Show nothing while checking auth to prevent flash of landing content
+	if (isLoading || isAuthenticated) {
+		return null;
+	}
+
 	return (
 		<div className="min-h-screen bg-background">
 			<Navbar />

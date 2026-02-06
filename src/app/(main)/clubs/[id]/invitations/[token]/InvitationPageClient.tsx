@@ -7,7 +7,7 @@ import { useAuth } from "@/providers";
 import { FormFieldAnswerDto, InvitationStatus } from "@/lib/models/Club";
 import { CreateOrUpdateCoachProfileDto, CreateOrUpdatePlayerProfileDto } from "@/lib/models/Profile";
 import { acceptInvitation, declineInvitation, getInvitationByToken } from "@/lib/api/clubs";
-import { getCoachProfile, getPlayerProfile, updateCoachProfile, updatePlayerProfile } from "@/lib/api/user";
+import { getCoachProfile, getPlayerProfile, createOrUpdateCoachProfile, createOrUpdatePlayerProfile } from "@/lib/api/user";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AlertCircle, LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -20,18 +20,18 @@ interface InvitationPageClientProps {
 
 const InvitationPageClient = ({ clubSlug, token }: InvitationPageClientProps) => {
 	const router = useRouter();
-	const { user, isLoading: authLoading } = useAuth();
+	const { userProfile, isLoading: authLoading } = useAuth();
 
 	const { data: invitation, isLoading, error } = useQuery({ queryKey: ["invitation", token], queryFn: () => getInvitationByToken(token) });
 	const { data: playerProfile } = useQuery({
-		queryKey: ["player-profile", user?.id],
-		queryFn: () => getPlayerProfile(),
-		enabled: !!user && !!invitation?.requirePlayerProfile,
+		queryKey: ["player-profile", userProfile?.id],
+		queryFn: () => getPlayerProfile(userProfile!.id),
+		enabled: !!userProfile && !!invitation?.requirePlayerProfile,
 	});
 	const { data: coachProfile } = useQuery({
-		queryKey: ["coach-profile", user?.id],
-		queryFn: () => getCoachProfile(),
-		enabled: !!user && !!invitation?.requireCoachProfile,
+		queryKey: ["coach-profile", userProfile?.id],
+		queryFn: () => getCoachProfile(userProfile!.id),
+		enabled: !!userProfile && !!invitation?.requireCoachProfile,
 	});
 
 	const acceptMutation = useMutation({
@@ -44,8 +44,8 @@ const InvitationPageClient = ({ clubSlug, token }: InvitationPageClientProps) =>
 			playerData?: CreateOrUpdatePlayerProfileDto;
 			coachData?: CreateOrUpdateCoachProfileDto;
 		}) => {
-			if (playerData) await updatePlayerProfile(playerData);
-			if (coachData) await updateCoachProfile(coachData);
+			if (playerData) await createOrUpdatePlayerProfile(playerData);
+			if (coachData) await createOrUpdateCoachProfile(coachData);
 			return acceptInvitation(token, formAnswers);
 		},
 		onSuccess: () => {
@@ -80,7 +80,7 @@ const InvitationPageClient = ({ clubSlug, token }: InvitationPageClientProps) =>
 			<div className="min-h-screen flex items-center justify-center">
 				<div className="text-center">
 					<AlertCircle className="w-12 h-12 text-error mx-auto mb-4" />
-					<h1 className="text-xl font-bold text-white mb-2">Invitation Not Found</h1>
+					<h1 className="text-xl font-bold text-foreground mb-2">Invitation Not Found</h1>
 					<p className="text-muted mb-4">This invitation may have expired or been revoked.</p>
 					<Button variant="outline" onClick={() => router.push("/clubs")}>
 						Browse Clubs
@@ -94,7 +94,7 @@ const InvitationPageClient = ({ clubSlug, token }: InvitationPageClientProps) =>
 			<div className="min-h-screen flex items-center justify-center">
 				<div className="text-center">
 					<AlertCircle className="w-12 h-12 text-warning mx-auto mb-4" />
-					<h1 className="text-xl font-bold text-white mb-2">Invitation {invitation.status}</h1>
+					<h1 className="text-xl font-bold text-foreground mb-2">Invitation {invitation.status}</h1>
 					<p className="text-muted mb-4">This invitation has already been {invitation.status.toLowerCase()}.</p>
 					<Button variant="outline" onClick={() => router.push("/clubs")}>
 						Browse Clubs
@@ -108,15 +108,14 @@ const InvitationPageClient = ({ clubSlug, token }: InvitationPageClientProps) =>
 			<div className="max-w-lg mx-auto">
 				<InvitationPreview invitation={invitation} />
 				<div className="mt-6">
-					{!user ? (
+					{!userProfile ? (
 						<div className="p-6 bg-background rounded-xl">
 							<p className="text-muted text-center mb-4">Sign in to accept this invitation</p>
 							<Button
-								variant="solid"
-								color="primary"
+								variant="default"
 								className="w-full"
-								leftIcon={<LogIn size={16} />}
 								onClick={() => router.push(`/login?redirect=/clubs/${clubSlug}/invitations/${token}`)}>
+								<LogIn size={16} />
 								Sign In
 							</Button>
 						</div>

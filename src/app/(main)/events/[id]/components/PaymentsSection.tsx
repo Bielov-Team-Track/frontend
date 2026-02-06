@@ -1,7 +1,7 @@
 import { Avatar, Button } from "@/components";
 import { loadTeamPayments, loadUserPaymentForEvent } from "@/lib/api/payments";
 import { Event } from "@/lib/models/Event";
-import { PaymentMethod, PricingModel } from "@/lib/models/EventBudget";
+import { PaymentMethod, PricingModel } from "@/lib/models/EventPaymentConfig";
 import { Payment } from "@/lib/models/Payment";
 import { Team } from "@/lib/models/Team";
 import { UserProfile } from "@/lib/models/User";
@@ -120,7 +120,7 @@ const PaymentsSection = async ({ event, teams, userProfile }: PaymentsSectionPro
 											return (
 												<div key={p.id} className="flex items-center justify-between rounded-md bg-background p-2 pr-4">
 													<div className="flex items-center gap-2">
-														<Avatar profile={profile} />
+														<Avatar src={profile.imageUrl} alt={`${profile.name} ${profile.surname}`} name={`${profile.name} ${profile.surname}`} />
 														<span>
 															{profile.name} {profile.surname}
 														</span>

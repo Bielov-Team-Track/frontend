@@ -67,7 +67,7 @@ export function SeriesEditModal({
 					options={scopeOptions}
 					value={selectedScope}
 					onChange={setSelectedScope}
-					columns={1}
+					columns={3}
 					size="md"
 				/>
 

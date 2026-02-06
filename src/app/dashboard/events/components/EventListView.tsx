@@ -189,12 +189,12 @@ export function EventListView({ events }: EventListViewProps) {
 											className="mb-6">
 											{/* Week Header */}
 											<div className="flex items-center gap-4 mb-3">
-												<div className="flex-1 h-px bg-white/10" />
+												<div className="flex-1 h-px bg-hover" />
 												<span className={`text-xs ${isCurrentWeek ? "text-accent font-medium" : "text-muted"}`}>
 													Week {weekGroup.weekNumber} · {format(weekGroup.weekStart, "MMM d")} - {format(weekGroup.weekEnd, "MMM d")}
 													{isCurrentWeek && " · Now"}
 												</span>
-												<div className="flex-1 h-px bg-white/10" />
+												<div className="flex-1 h-px bg-hover" />
 											</div>
 
 											{/* Events */}
@@ -221,7 +221,7 @@ export function EventListView({ events }: EventListViewProps) {
 							<button
 								onClick={() => toggleYear(yearGroup.year)}
 								className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
-									expandedYears.has(yearGroup.year) ? "text-white bg-white/5" : "text-muted hover:text-white hover:bg-white/5"
+									expandedYears.has(yearGroup.year) ? "text-white bg-surface" : "text-muted hover:text-white hover:bg-surface"
 								}`}>
 								<span>{yearGroup.year}</span>
 								{expandedYears.has(yearGroup.year) ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -229,7 +229,7 @@ export function EventListView({ events }: EventListViewProps) {
 
 							{/* Months & Weeks */}
 							{expandedYears.has(yearGroup.year) && (
-								<div className="ml-2 border-l border-white/10 pl-2 mt-1 space-y-1">
+								<div className="ml-2 border-l border-border pl-2 mt-1 space-y-1">
 									{yearGroup.months.map((monthGroup) => (
 										<div key={monthGroup.month}>
 											{/* Month */}
@@ -259,7 +259,7 @@ export function EventListView({ events }: EventListViewProps) {
 																activeSection === sectionId
 																	? "text-accent bg-accent/10"
 																	: isCurrentWeek
-																	? "text-white bg-white/5"
+																	? "text-white bg-surface"
 																	: "text-muted/70 hover:text-white"
 															}`}>
 															{isCurrentWeek && <span className="w-1.5 h-1.5 rounded-full bg-accent" />}
@@ -291,15 +291,15 @@ function EventListItem({ event }: { event: Event }) {
 			<div
 				className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${
 					isPastEvent
-						? "bg-white/2 border-white/5 opacity-60 hover:opacity-100"
+						? "bg-surface border-border opacity-60 hover:opacity-100"
 						: isTodayEvent
 						? "bg-accent/5 border-accent/20 hover:border-accent/40"
-						: "bg-white/5 border-white/5 hover:border-accent/30 hover:bg-white/[0.07]"
+						: "bg-surface border-border hover:border-accent/30 hover:bg-hover"
 				}`}>
 				{/* Date Badge */}
 				<div
 					className={`flex flex-col items-center justify-center w-14 h-14 rounded-xl border shrink-0 transition-colors ${
-						isTodayEvent ? "bg-accent/20 border-accent/30" : "bg-background border-white/10 group-hover:border-white/20"
+						isTodayEvent ? "bg-accent/20 border-accent/30" : "bg-background border-border group-hover:border-border"
 					}`}>
 					<span className={`text-lg font-bold leading-none ${isTodayEvent ? "text-accent" : "text-white"}`}>{date.getDate()}</span>
 					<span className="text-[10px] font-bold text-muted uppercase mt-0.5">{date.toLocaleString("default", { month: "short" })}</span>
@@ -325,7 +325,7 @@ function EventListItem({ event }: { event: Event }) {
 								{event.location.name}
 							</span>
 						)}
-						<span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10">{event.type}</span>
+						<span className="px-2 py-0.5 rounded-full bg-surface border border-border">{event.type}</span>
 					</div>
 				</div>
 

@@ -89,7 +89,7 @@ export default function ModerationQueue({ contextType, contextId }: ModerationQu
 					</div>
 				) : (
 					<div className="space-y-4">
-						{queue?.items.map((item: ModerationQueueItem) => (
+						{queue?.items.map((item) => (
 							<ModerationQueueItem key={item.post.id} item={item} onAction={() => refetch()} />
 						))}
 					</div>

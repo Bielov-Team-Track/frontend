@@ -39,7 +39,7 @@ export function NotificationToastContent({ notification, toastId }: Notification
 			className={cn(
 				"pointer-events-auto w-80 cursor-pointer overflow-hidden rounded-lg",
 				"bg-popover text-popover-foreground ring-1 ring-foreground/10",
-				"shadow-xl shadow-black/30"
+				"shadow-xl"
 			)}>
 			<div className="flex items-center gap-3 p-3">
 				<NotificationIcon notification={notification} />

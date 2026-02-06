@@ -150,9 +150,8 @@ export default function ClubRegistrationSettingsPage() {
 						<Controller
 							name="allowPublicRegistration"
 							control={control}
-							render={({ field: { value, onChange, ref } }) => (
+							render={({ field: { value, onChange } }) => (
 								<Checkbox
-									ref={ref}
 									checked={value}
 									onChange={onChange}
 									label="Allow people to register with the club"
@@ -163,9 +162,8 @@ export default function ClubRegistrationSettingsPage() {
 						<Controller
 							name="requirePlayerProfile"
 							control={control}
-							render={({ field: { value, onChange, ref } }) => (
+							render={({ field: { value, onChange } }) => (
 								<Checkbox
-									ref={ref}
 									checked={value}
 									onChange={onChange}
 									label="Require player profile information"
@@ -176,9 +174,8 @@ export default function ClubRegistrationSettingsPage() {
 						<Controller
 							name="requireCoachProfile"
 							control={control}
-							render={({ field: { value, onChange, ref } }) => (
+							render={({ field: { value, onChange } }) => (
 								<Checkbox
-									ref={ref}
 									checked={value}
 									onChange={onChange}
 									label="Require coach profile information"

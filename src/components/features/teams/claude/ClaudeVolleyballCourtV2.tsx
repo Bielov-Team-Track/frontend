@@ -101,13 +101,13 @@ export default function ClaudeVolleyballCourtV2({
 				}} />
 
 				{/* Court border glow */}
-				<div className="absolute inset-0 rounded-2xl ring-2 ring-white/20 ring-inset" />
+				<div className="absolute inset-0 rounded-2xl ring-2 ring-border ring-inset" />
 
 				{/* Court outer boundary */}
-				<div className="absolute inset-4 border-2 border-white/40 rounded-xl" />
+				<div className="absolute inset-4 border-2 border-border rounded-xl" />
 
 				{/* Attack line */}
-				<div className="absolute top-[35%] left-4 right-4 h-0.5 bg-white/50" />
+				<div className="absolute top-[35%] left-4 right-4 h-0.5 bg-surface0" />
 				<div className="absolute top-[35%] left-4 transform -translate-y-1/2">
 					<span className="font-condensed text-[10px] text-white/40 uppercase tracking-wider">Attack Line</span>
 				</div>
@@ -242,7 +242,7 @@ function ClaudeDroppableCourtPosition({
 								? `ring-4 ring-accent ${styles.glow} shadow-lg`
 								: isSelecting
 								? `ring-2 ${styles.border} ${styles.glow} shadow-lg`
-								: "ring-2 ring-white/20"
+								: "ring-2 ring-border"
 						}`}>
 							{starter.userProfile?.imageUrl ? (
 								<Image
@@ -278,7 +278,7 @@ function ClaudeDroppableCourtPosition({
 								{assignedMembers.slice(1, 4).map((member, idx) => (
 									<div
 										key={member.id}
-										className="w-5 h-5 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-[8px] font-display text-white"
+										className="w-5 h-5 rounded-full bg-hover border border-border flex items-center justify-center text-[8px] font-display text-white"
 										style={{ zIndex: 10 - idx }}
 									>
 										{member.userProfile?.name?.[0]}
@@ -307,7 +307,7 @@ function ClaudeDroppableCourtPosition({
 								? `bg-accent/30 border-accent ${styles.glow} shadow-lg scale-105`
 								: isSelecting
 								? `bg-linear-to-br ${styles.gradient} ${styles.border} border-solid`
-								: "bg-white/5 border-white/30 hover:bg-white/10 hover:border-white/50"
+								: "bg-surface border-border hover:bg-hover hover:border-border"
 						}`}>
 							<Plus size={20} className={isOver || isSelecting ? "text-white" : "text-white/50"} />
 							<span className={`font-display text-xs font-bold mt-0.5 ${
@@ -384,7 +384,7 @@ function ClaudeDroppableRolePosition({
 						? "bg-accent/20 border-accent ring-2 ring-accent/30 shadow-lg shadow-accent/20"
 						: isSelecting
 						? `bg-linear-to-r ${styles.gradient}/20 ${styles.border} ring-1 ring-current`
-						: "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"
+						: "bg-surface border-border hover:bg-hover hover:border-border"
 				}`}
 			>
 				{/* Role icon/label */}
@@ -393,7 +393,7 @@ function ClaudeDroppableRolePosition({
 						? "bg-accent"
 						: assignedMembers.length > 0
 						? `bg-linear-to-br ${styles.gradient}`
-						: "bg-white/10"
+						: "bg-hover"
 				}`}>
 					{assignedMembers.length > 0 ? (
 						starter.userProfile?.imageUrl ? (
@@ -437,7 +437,7 @@ function ClaudeDroppableRolePosition({
 				<div className={`px-2 py-1 rounded-lg font-condensed text-xs uppercase tracking-wider ${
 					assignedMembers.length > 0
 						? `bg-linear-to-r ${styles.gradient} text-white`
-						: "bg-white/5 text-muted"
+						: "bg-surface text-muted"
 				}`}>
 					{styles.label}
 				</div>

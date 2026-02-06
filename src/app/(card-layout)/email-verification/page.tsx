@@ -39,7 +39,7 @@ function EmailVerificationContent() {
 					We sent a verification email to your email address. Please check your
 					inbox and click the verification link.
 				</p>
-				<Link href="/login" className="btn btn-link">
+				<Link href="/login" className="text-accent hover:underline font-medium">
 					Go back to login
 				</Link>
 			</div>

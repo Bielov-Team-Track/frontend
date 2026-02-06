@@ -1,8 +1,8 @@
 "use client";
 
-import { Avatar } from "@/components";
-import { getClub, getGroup } from "@/lib/api/clubs";
-import { Club, Group } from "@/lib/models/Club";
+import { Avatar, ScrollableTabBar } from "@/components";
+import { getClub, getClubMembers, getGroup } from "@/lib/api/clubs";
+import { Club, ClubMember, Group } from "@/lib/models/Club";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, Layers, MessageSquare, Settings, Users } from "lucide-react";
 import Link from "next/link";
@@ -14,6 +14,7 @@ interface GroupContextValue {
 	groupId: string;
 	group: Group | undefined;
 	club: Club | undefined;
+	clubMembers: ClubMember[];
 	isLoading: boolean;
 }
 
@@ -63,6 +64,12 @@ export default function GroupLayout({ children }: { children: React.ReactNode })
 		enabled: !!group?.clubId,
 	});
 
+	const { data: clubMembers = [] } = useQuery({
+		queryKey: ["club-members", group?.clubId],
+		queryFn: () => getClubMembers(group!.clubId),
+		enabled: !!group?.clubId,
+	});
+
 	// Get tab href
 	const getTabHref = (tabId: TabType): string => {
 		const base = `/dashboard/groups/${groupId}`;
@@ -97,18 +104,19 @@ export default function GroupLayout({ children }: { children: React.ReactNode })
 				groupId,
 				group,
 				club,
+				clubMembers,
 				isLoading: groupLoading,
 			}}>
 			<div className="space-y-6">
 				{/* Header */}
 				<div className="flex items-center gap-4">
-					<Link href={`/dashboard/clubs/${group.clubId}`} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+					<Link href={`/dashboard/clubs/${group.clubId}`} className="p-2 rounded-lg bg-surface hover:bg-hover transition-colors">
 						<ArrowLeft size={20} />
 					</Link>
 					<div className="flex-1">
 						<div className="flex items-center gap-3">
 							<h1 className="text-2xl font-bold text-white">{group.name}</h1>
-							{group.skillLevel && <span className="px-2 py-0.5 rounded text-xs font-medium bg-white/10 text-muted">{group.skillLevel}</span>}
+							{group.skillLevel && <span className="px-2 py-0.5 rounded text-xs font-medium bg-hover text-muted">{group.skillLevel}</span>}
 						</div>
 						<div className="flex items-center gap-2 text-sm text-muted">
 							<span>Group</span>
@@ -121,7 +129,7 @@ export default function GroupLayout({ children }: { children: React.ReactNode })
 				</div>
 
 				{/* Group Banner/Info */}
-				<div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+				<div className="rounded-2xl overflow-hidden border border-border bg-surface">
 					{/* Banner Area (using color) */}
 					<div
 						className="h-32 relative"
@@ -153,28 +161,26 @@ export default function GroupLayout({ children }: { children: React.ReactNode })
 					</div>
 
 					{/* Tabs */}
-					<div className="border-t border-white/10 px-6">
-						<div className="flex gap-1 overflow-x-auto no-scrollbar">
-							{TABS.map((tab) => {
-								const count = tab.showCount ? group.members?.length || 0 : undefined;
-								const isActive = activeTab === tab.id;
-								return (
-									<Link
-										key={tab.id}
-										href={getTabHref(tab.id)}
-										prefetch={true}
-										className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap shrink-0 ${
-											isActive ? "text-accent" : "text-muted hover:text-white"
-										}`}>
-										<tab.icon size={16} />
-										{tab.label}
-										{count !== undefined && <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-xs">{count}</span>}
-										{isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
-									</Link>
-								);
-							})}
-						</div>
-					</div>
+					<ScrollableTabBar>
+						{TABS.map((tab) => {
+							const count = tab.showCount ? group.members?.length || 0 : undefined;
+							const isActive = activeTab === tab.id;
+							return (
+								<Link
+									key={tab.id}
+									href={getTabHref(tab.id)}
+									prefetch={true}
+									className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap shrink-0 ${
+										isActive ? "text-accent" : "text-muted hover:text-white"
+									}`}>
+									<tab.icon size={16} />
+									{tab.label}
+									{count !== undefined && <span className="px-1.5 py-0.5 rounded-full bg-hover text-xs">{count}</span>}
+									{isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
+								</Link>
+							);
+						})}
+					</ScrollableTabBar>
 				</div>
 
 				{/* Tab Content */}

@@ -17,6 +17,8 @@ export interface StepsProps extends VariantProps<typeof stepCircleVariants> {
 	className?: string;
 	orientation?: "horizontal" | "vertical";
 	onStepClick?: (stepIndex: number) => void;
+	/** Step numbers (1-indexed) that have validation errors */
+	errorSteps?: number[];
 }
 
 const stepCircleVariants = cva("flex items-center justify-center rounded-full transition-all duration-300 shrink-0", {
@@ -80,7 +82,8 @@ const iconSizeMap = {
 	lg: "size-5",
 } as const;
 
-const Steps: React.FC<StepsProps> = ({ steps, currentStep, className, orientation = "horizontal", size = "md", onStepClick }) => {
+const Steps: React.FC<StepsProps> = ({ steps, currentStep, className, orientation = "horizontal", size = "md", onStepClick, errorSteps = [] }) => {
+	const errorStepSet = new Set(errorSteps);
 	const [previousStep, setPreviousStep] = useState(currentStep);
 	const [isAnimating, setIsAnimating] = useState(false);
 	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -159,13 +162,24 @@ const Steps: React.FC<StepsProps> = ({ steps, currentStep, className, orientatio
 						const state = getStepState(stepNumber);
 						const isLast = index === steps.length - 1;
 
+						const hasError = errorStepSet.has(stepNumber);
+
 						return (
 							<React.Fragment key={step.id}>
 								{/* Circle */}
-								<div
-									className={cn(stepCircleVariants({ size, state }), onStepClick && "cursor-pointer")}
-									onClick={() => onStepClick?.(stepNumber)}>
-									{renderStepContent(step, stepNumber, state)}
+								<div className="relative">
+									<div
+										className={cn(
+											stepCircleVariants({ size, state }),
+											onStepClick && "cursor-pointer",
+											hasError && "ring-2 ring-error ring-offset-1 ring-offset-surface",
+										)}
+										onClick={() => onStepClick?.(stepNumber)}>
+										{renderStepContent(step, stepNumber, state)}
+									</div>
+									{hasError && (
+										<span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-error border border-surface" />
+									)}
 								</div>
 
 								{/* Connector */}
@@ -190,6 +204,7 @@ const Steps: React.FC<StepsProps> = ({ steps, currentStep, className, orientatio
 						const stepNumber = index + 1;
 						const state = getStepState(stepNumber);
 						const isLast = index === steps.length - 1;
+						const hasError = errorStepSet.has(stepNumber);
 
 						return (
 							<React.Fragment key={`label-${step.id}`}>
@@ -200,7 +215,7 @@ const Steps: React.FC<StepsProps> = ({ steps, currentStep, className, orientatio
 										width: sizeKey === "sm" ? "24px" : sizeKey === "lg" ? "40px" : "32px",
 									}}
 									onClick={() => onStepClick?.(stepNumber)}>
-									<span className={cn(stepLabelVariants({ size, state }), "text-center whitespace-nowrap")}>{step.label}</span>
+									<span className={cn(stepLabelVariants({ size, state }), "text-center whitespace-nowrap", hasError && "text-error")}>{step.label}</span>
 								</div>
 
 								{/* Spacer matching connector */}
@@ -220,16 +235,28 @@ const Steps: React.FC<StepsProps> = ({ steps, currentStep, className, orientatio
 				const stepNumber = index + 1;
 				const state = getStepState(stepNumber);
 				const isLast = index === steps.length - 1;
+				const hasError = errorStepSet.has(stepNumber);
 
 				return (
 					<React.Fragment key={step.id}>
 						{/* Step row */}
 						<div className={cn("flex items-center gap-3", onStepClick && "cursor-pointer")} onClick={() => onStepClick?.(stepNumber)}>
 							{/* Circle */}
-							<div className={cn(stepCircleVariants({ size, state }))}>{renderStepContent(step, stepNumber, state)}</div>
+							<div className="relative">
+								<div
+									className={cn(
+										stepCircleVariants({ size, state }),
+										hasError && "ring-2 ring-error ring-offset-1 ring-offset-surface",
+									)}>
+									{renderStepContent(step, stepNumber, state)}
+								</div>
+								{hasError && (
+									<span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-error border border-surface" />
+								)}
+							</div>
 
 							{/* Label */}
-							<span className={cn(stepLabelVariants({ size, state }))}>{step.label}</span>
+							<span className={cn(stepLabelVariants({ size, state }), hasError && "text-error")}>{step.label}</span>
 						</div>
 
 						{/* Connector */}

@@ -21,10 +21,6 @@ const meta: Meta<typeof Dropdown> = {
             control: "select",
             options: ["sm", "md", "lg"],
         },
-        status: {
-            control: "select",
-            options: ["default", "error"],
-        },
     },
     decorators: [
         (Story) => (
@@ -81,18 +77,24 @@ export const CustomRendering: Story = {
         label: "Custom Rendering",
         options: richOptions,
         onChange: () => {},
-        renderOption: (option) => (
-            <div className="flex items-center gap-2">
-                <option.data.icon size={16} className={option.data.color} />
-                <span>{option.label}</span>
-            </div>
-        ),
-        renderValue: (option) => (
-            <div className="flex items-center gap-2">
-                <option.data.icon size={16} className={option.data.color} />
-                <span className="font-semibold">{option.label}</span>
-            </div>
-        ),
+        renderOption: (option) => {
+            const data = option.data as { icon: typeof Building2; color: string };
+            return (
+                <div className="flex items-center gap-2">
+                    <data.icon size={16} className={data.color} />
+                    <span>{option.label}</span>
+                </div>
+            );
+        },
+        renderValue: (option) => {
+            const data = option.data as { icon: typeof Building2; color: string };
+            return (
+                <div className="flex items-center gap-2">
+                    <data.icon size={16} className={data.color} />
+                    <span className="font-semibold">{option.label}</span>
+                </div>
+            );
+        },
     },
 };
 

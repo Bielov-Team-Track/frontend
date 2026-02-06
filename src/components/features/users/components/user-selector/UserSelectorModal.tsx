@@ -20,6 +20,8 @@ export interface UserSelectorModalProps {
 	excludeUserIds?: string[];
 	/** Restrict selection to members of a specific club (locks club filter) */
 	restrictToClub?: Club;
+	/** Pre-fetched users to display (if provided, disables internal fetching) */
+	users?: UserProfile[];
 }
 
 export default function UserSelectorModal({
@@ -33,6 +35,7 @@ export default function UserSelectorModal({
 	defaultContext,
 	excludeUserIds,
 	restrictToClub,
+	users,
 }: UserSelectorModalProps) {
 	// Local state for editing - only commit on confirm
 	const [localSelected, setLocalSelected] = useState<UserProfile[]>(selectedUsers);
@@ -60,16 +63,17 @@ export default function UserSelectorModal({
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && handleCancel()}>
 			<DialogContent className="sm:max-w-4xl p-0 gap-0 flex flex-col max-h-[85vh]">
-				<DialogHeader className="px-6 py-4 border-b border-white/10 shrink-0">
+				<DialogHeader className="px-6 py-4 border-b border-border shrink-0">
 					<DialogTitle>{title}</DialogTitle>
 				</DialogHeader>
 
 				{/* Selector container - takes available space */}
 				<div className="flex-1 min-h-0 overflow-hidden">
 					<UserSelector
+						users={users}
 						selectedUsers={localSelected}
 						onChange={setLocalSelected}
-						showFilters={showFilters}
+						showFilters={showFilters && !users}
 						showButton={false}
 						defaultContext={defaultContext}
 						excludeUserIds={excludeUserIds}

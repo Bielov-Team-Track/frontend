@@ -241,7 +241,7 @@ export default function FormBuilderInline({ clubId, formId, forms, onBack, onFor
 				{/* Header */}
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-4">
-						<button onClick={handleBack} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+						<button onClick={handleBack} className="p-2 rounded-lg bg-surface hover:bg-hover transition-colors">
 							<ArrowLeft size={20} />
 						</button>
 						<div>
@@ -254,7 +254,7 @@ export default function FormBuilderInline({ clubId, formId, forms, onBack, onFor
 							Preview
 						</Button>
 						<Button
-							variant="solid"
+							variant="default"
 							color="accent"
 							onClick={handleSave}
 							loading={isSaving}
@@ -290,6 +290,12 @@ export default function FormBuilderInline({ clubId, formId, forms, onBack, onFor
 							setHasUnsavedChanges(true);
 						}}
 						onSelectField={setSelectedFieldIndex}
+						onUpdateField={(index, updates) => {
+							const newFields = [...fields];
+							newFields[index] = { ...newFields[index], ...updates };
+							setFields(newFields);
+							setHasUnsavedChanges(true);
+						}}
 						onDeleteField={handleDeleteField}
 					/>
 

@@ -22,19 +22,20 @@ function CreateEventFormContent({ onClearContext, onChageContext }: CreateEventF
 
 	return (
 		<>
-			{isPending && <Loader className="absolute inset-0 bg-black/60 rounded-3xl z-50" />}
-
-			{isError && (
-				<div className="bg-error/10 border border-error/20 text-error p-4 rounded-lg mb-6">
-					<p className="font-medium">Something went wrong</p>
-					<p className="text-sm opacity-80">We&apos;re working on it. Please try again.</p>
-				</div>
-			)}
+			{isPending && <Loader className="absolute inset-0 bg-overlay rounded-3xl z-50" />}
 
 			<div className="relative z-10 flex-1">
 				<StepRenderer />
 			</div>
 			<ContextIndicator context={context} onChange={onChageContext} onClear={onClearContext} />
+
+			{isError && (
+				<div className="bg-error/10 border border-error/20 text-error p-4 rounded-lg mt-4">
+					<p className="font-medium">Something went wrong</p>
+					<p className="text-sm opacity-80">We&apos;re working on it. Please try again.</p>
+				</div>
+			)}
+
 			<NavigationButtons />
 		</>
 	);
@@ -47,7 +48,7 @@ function CreateEventForm({ event, variant, contextSelection, onSuccess }: Create
 	const showContextSelector = selection === undefined && clubs && clubs.length > 0;
 
 	const variants = {
-		default: "relative bg-card/50 border border-white/10 rounded-3xl p-8 shadow-lg",
+		default: "relative bg-card/50 border border-border rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-lg",
 		embedded: "bg-transparent border-0 p-0 shadow-none",
 	};
 
@@ -55,12 +56,12 @@ function CreateEventForm({ event, variant, contextSelection, onSuccess }: Create
 
 	return (
 		<EventFormProvider event={event} contextSelection={selection} onSuccess={onSuccess}>
-			<div className="w-full max-w-3xl mx-auto py-8 px-4 text-white" data-testid="create-event-form">
+			<div className="w-full max-w-3xl mx-auto py-4 sm:py-8 px-2 sm:px-4 text-foreground" data-testid="create-event-form">
 				{/* Header */}
 				{variant !== "embedded" && (
-					<div className="mb-10 text-center">
-						<h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">{event ? "Edit Event" : "Create a New Event"}</h1>
-						<p className="text-muted text-lg">Set up your volleyball game, practice, or tournament.</p>
+					<div className="mb-6 sm:mb-10 text-center">
+						<h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 tracking-tight">{event ? "Edit Event" : "Create a New Event"}</h1>
+						<p className="text-muted text-sm sm:text-lg">Set up your volleyball game, practice, or tournament.</p>
 					</div>
 				)}
 

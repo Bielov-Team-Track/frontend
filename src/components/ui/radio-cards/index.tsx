@@ -36,30 +36,30 @@ function RadioCards<T extends string = string>({
 	const gridCols = {
 		2: "grid-cols-1 sm:grid-cols-2",
 		3: "grid-cols-1 sm:grid-cols-3",
-		4: "grid-cols-2 sm:grid-cols-4",
+		4: "grid-cols-1 min-[480px]:grid-cols-2 sm:grid-cols-4",
 	};
 
 	const sizeStyles = {
 		sm: {
-			card: "p-3",
-			iconContainer: "w-8 h-8 mb-2",
-			iconSize: 16,
+			card: "p-2.5 sm:p-3",
+			iconContainer: "w-7 h-7 sm:w-8 sm:h-8 mb-2",
+			iconSize: 14,
 			label: "text-xs",
 			description: "text-[10px]",
 		},
 		md: {
-			card: "p-4",
-			iconContainer: "w-10 h-10 mb-3",
-			iconSize: 20,
-			label: "text-sm",
-			description: "text-xs",
+			card: "p-3 sm:p-4",
+			iconContainer: "w-8 h-8 sm:w-10 sm:h-10 mb-2 sm:mb-3",
+			iconSize: 18,
+			label: "text-xs sm:text-sm",
+			description: "text-[10px] sm:text-xs",
 		},
 		lg: {
-			card: "p-5",
-			iconContainer: "w-12 h-12 mb-3",
-			iconSize: 24,
-			label: "text-base",
-			description: "text-sm",
+			card: "p-4 sm:p-5",
+			iconContainer: "w-10 h-10 sm:w-12 sm:h-12 mb-2 sm:mb-3",
+			iconSize: 22,
+			label: "text-sm sm:text-base",
+			description: "text-xs sm:text-sm",
 		},
 	};
 
@@ -68,7 +68,7 @@ function RadioCards<T extends string = string>({
 	return (
 		<div className={`space-y-3 ${className}`}>
 			{label && (
-				<label className="text-sm font-medium text-white">{label}</label>
+				<label className="text-sm font-medium text-foreground">{label}</label>
 			)}
 
 			<div className={`grid ${gridCols[columns]} gap-3`}>
@@ -84,31 +84,31 @@ function RadioCards<T extends string = string>({
 							onClick={() => onChange?.(option.value)}
 							className={`relative ${styles.card} rounded-xl border text-left transition-all duration-200 ${
 								disabled
-									? "opacity-50 cursor-not-allowed bg-white/5 border-white/5"
+									? "opacity-50 cursor-not-allowed bg-surface border-border"
 									: isSelected
 										? "bg-accent/10 border-accent shadow-[0_0_15px_rgba(249,115,22,0.15)]"
-										: "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+										: "bg-surface border-border hover:bg-hover hover:border-border/80"
 							}`}
 						>
 							{Icon && (
 								<div
 									className={`${styles.iconContainer} rounded-lg flex items-center justify-center ${
-										isSelected ? "bg-accent/20" : "bg-white/10"
+										isSelected ? "bg-accent/20" : "bg-surface"
 									}`}
 								>
 									<Icon
 										size={styles.iconSize}
-										className={isSelected ? "text-accent" : "text-muted"}
+										className={isSelected ? "text-accent" : "text-muted-foreground"}
 									/>
 								</div>
 							)}
 
-							<div className={`font-medium text-white ${styles.label} ${!option.description && !Icon ? "" : "mb-1"}`}>
+							<div className={`font-medium text-foreground ${styles.label} ${!option.description && !Icon ? "" : "mb-1"}`}>
 								{option.label}
 							</div>
 
 							{option.description && (
-								<div className={`text-muted leading-relaxed ${styles.description}`}>
+								<div className={`text-muted-foreground leading-relaxed ${styles.description}`}>
 									{option.description}
 								</div>
 							)}

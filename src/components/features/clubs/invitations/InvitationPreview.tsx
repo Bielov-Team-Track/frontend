@@ -23,18 +23,18 @@ const InvitationPreview = ({ invitation }: InvitationPreviewProps) => {
 						{club.logoUrl ? (
 							<img src={club.logoUrl} alt={`${club.name} logo`} className="w-full h-full object-cover" />
 						) : (
-							<Users className="w-8 h-8 text-muted" />
+							<Users className="w-8 h-8 text-muted-foreground" />
 						)}
 					</div>
 					<div className="flex-1">
-						<h2 className="text-xl font-bold text-white">{club.name}</h2>
-						{club.description && <p className="text-sm text-muted mt-1 line-clamp-2">{club.description}</p>}
+						<h2 className="text-xl font-bold text-foreground">{club.name}</h2>
+						{club.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{club.description}</p>}
 					</div>
 				</div>
-				<div className="mt-4 pt-4 border-t border-white/10">
-					<p className="text-sm text-muted">You've been invited to join this club</p>
+				<div className="mt-4 pt-4 border-t border-border">
+					<p className="text-sm text-muted-foreground">You've been invited to join this club</p>
 					{invitation.expiresAt && (
-						<p className="text-xs text-muted mt-1 flex items-center gap-1">
+						<p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
 							<Calendar size={12} />
 							Expires {new Date(invitation.expiresAt).toLocaleDateString()}
 						</p>

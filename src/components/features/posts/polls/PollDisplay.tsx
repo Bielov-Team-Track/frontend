@@ -56,7 +56,7 @@ export default function PollDisplay({ poll, isAuthor = false }: PollDisplayProps
 			<div className="flex items-start justify-between gap-3">
 				<div className="flex items-center gap-2">
 					<BarChart3 size={18} className="text-primary shrink-0" />
-					<h4 className="text-sm font-medium text-white">{poll.question}</h4>
+					<h4 className="text-sm font-medium text-foreground">{poll.question}</h4>
 				</div>
 				{poll.isClosed && (
 					<span className="flex items-center gap-1 text-xs text-muted-foreground bg-surface px-2 py-1 rounded">
@@ -111,7 +111,7 @@ export default function PollDisplay({ poll, isAuthor = false }: PollDisplayProps
 						<button
 							onClick={handleRemoveVote}
 							disabled={removeVoteMutation.isPending}
-							className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-white hover:bg-active transition-colors">
+							className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-active transition-colors">
 							<X size={14} />
 							Remove vote
 						</button>

@@ -8,5 +8,5 @@ interface EventsTabProps {
 }
 
 export default function EventsTab({ club }: EventsTabProps) {
-	return <EventsDisplay contextType="club" contextId={club.id} contextName={club.name} />;
+	return <EventsDisplay contextType="club" contextId={club.id} contextName={club.name} context={club} />;
 }

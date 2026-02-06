@@ -40,7 +40,7 @@ const SkillRatingBar = ({
 			<div className="flex justify-between items-center">
 				<span className="text-sm text-muted-foreground capitalize">{label}</span>
 				{showValue && (
-					<span className="text-sm font-semibold text-white">{value}</span>
+					<span className="text-sm font-semibold text-foreground">{value}</span>
 				)}
 			</div>
 			<div

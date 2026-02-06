@@ -7,6 +7,12 @@ import { Plus, Search } from "lucide-react";
 import { useState } from "react";
 import { VOLLEYBALL_POSITIONS_OPTIONS } from "../constants";
 
+// Helper to extract role strings from role objects or strings
+function extractRoleStrings(roles: any[] | undefined): string[] {
+	if (!roles) return [];
+	return roles.map((r) => (typeof r === "string" ? r : r?.role)).filter(Boolean);
+}
+
 interface AddTeamMemberModalProps {
 	isOpen: boolean;
 	clubMembers: ClubMember[];
@@ -59,7 +65,7 @@ export default function AddTeamMemberModal({ isOpen, clubMembers, currentMemberI
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
 							placeholder="Search club members..."
-							className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
+							className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 
@@ -75,7 +81,7 @@ export default function AddTeamMemberModal({ isOpen, clubMembers, currentMemberI
 									key={member.id}
 									type="button"
 									onClick={() => setSelectedUserId(member.userId)}
-									className="w-full flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:border-accent hover:bg-accent/10 transition-colors">
+									className="w-full flex items-center justify-between p-3 rounded-xl bg-surface border border-border hover:border-accent hover:bg-accent/10 transition-colors">
 									<div className="flex items-center gap-3">
 										<div className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-sm font-bold text-muted">
 											{member.userProfile?.name?.[0] || "?"}
@@ -84,7 +90,7 @@ export default function AddTeamMemberModal({ isOpen, clubMembers, currentMemberI
 											<div className="text-sm font-medium text-white">
 												{member.userProfile?.name} {member.userProfile?.surname}
 											</div>
-											<div className="text-xs text-muted">{member.role}</div>
+											<div className="text-xs text-muted">{extractRoleStrings(member.roles).join(", ") || "Member"}</div>
 										</div>
 									</div>
 									<Plus size={18} className="text-muted" />
@@ -110,7 +116,7 @@ export default function AddTeamMemberModal({ isOpen, clubMembers, currentMemberI
 							value={jerseyNumber}
 							onChange={(e) => setJerseyNumber(e.target.value)}
 							placeholder="e.g. 10"
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-white focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 

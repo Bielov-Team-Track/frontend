@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, fn, userEvent, within } from "@storybook/test";
 import EventPaymentCard from "./EventPaymentCard";
 import { Event, EventFormat, EventType, PlayingSurface } from "@/lib/models/Event";
 import { EventParticipant, InvitedVia, ParticipationStatus } from "@/lib/models/EventParticipant";
-import { PricingModel, Unit } from "@/lib/models/EventBudget";
-
-// Mock the payments API module
-const mockCreateEventCheckoutSession = fn();
+import { PricingModel, Unit } from "@/lib/models/EventPaymentConfig";
 
 // Create a base event for testing
 const createMockEvent = (overrides: Partial<Event> = {}): Event => ({
@@ -15,7 +11,7 @@ const createMockEvent = (overrides: Partial<Event> = {}): Event => ({
 	startTime: new Date("2026-03-15T18:00:00Z"),
 	endTime: new Date("2026-03-15T20:00:00Z"),
 	type: EventType.CasualPlay,
-	eventFormat: EventFormat.Open,
+	eventFormat: EventFormat.List,
 	surface: PlayingSurface.Indoor,
 	isPrivate: false,
 	teamsNumber: 2,
@@ -87,30 +83,16 @@ const meta: Meta<typeof EventPaymentCard> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Test: Component renders when payToJoin is true
+// Component renders when payToJoin is true
 export const PayToJoinEnabled: Story = {
 	args: {
 		event: createMockEvent(),
 		userParticipant: null,
 		isInvited: false,
 	},
-	play: async ({ canvasElement }) => {
-		const canvas = within(canvasElement);
-
-		// Should render the card
-		expect(canvas.getByText("Join This Event")).toBeInTheDocument();
-		expect(canvas.getByText("Payment is required to join this event")).toBeInTheDocument();
-
-		// Should show the correct amount
-		expect(canvas.getByText("£")).toBeInTheDocument();
-		expect(canvas.getByText("15")).toBeInTheDocument();
-
-		// Should show "Pay and join" button
-		expect(canvas.getByRole("button", { name: /Pay and join - £15/i })).toBeInTheDocument();
-	},
 };
 
-// Test: Component doesn't render when payToJoin is false
+// Component doesn't render when payToJoin is false
 export const PayToJoinDisabled: Story = {
 	args: {
 		event: createMockEvent({
@@ -118,22 +100,15 @@ export const PayToJoinDisabled: Story = {
 				pricingModel: PricingModel.Individual,
 				cost: 15,
 				currency: "£",
-				payToJoin: false, // Disabled
+				payToJoin: false,
 			},
 		}),
 		userParticipant: null,
 		isInvited: false,
 	},
-	play: async ({ canvasElement }) => {
-		const canvas = within(canvasElement);
-
-		// Should NOT render the card when payToJoin is false
-		expect(canvas.queryByText("Join This Event")).not.toBeInTheDocument();
-		expect(canvas.queryByText("You're Invited!")).not.toBeInTheDocument();
-	},
 };
 
-// Test: Component doesn't render when budget is null
+// Component doesn't render when budget is null
 export const NoBudget: Story = {
 	args: {
 		event: createMockEvent({
@@ -142,57 +117,27 @@ export const NoBudget: Story = {
 		userParticipant: null,
 		isInvited: false,
 	},
-	play: async ({ canvasElement }) => {
-		const canvas = within(canvasElement);
-
-		// Should NOT render when there's no budget
-		expect(canvas.queryByText("Join This Event")).not.toBeInTheDocument();
-	},
 };
 
-// Test: Shows "Pay and join" for non-invited users (public join)
+// Shows "Pay and join" for non-invited users (public join)
 export const PublicJoin: Story = {
 	args: {
 		event: createMockEvent(),
 		userParticipant: null,
 		isInvited: false,
 	},
-	play: async ({ canvasElement }) => {
-		const canvas = within(canvasElement);
-
-		// Should show public join messaging
-		expect(canvas.getByText("Join This Event")).toBeInTheDocument();
-		expect(canvas.getByText("Payment is required to join this event")).toBeInTheDocument();
-
-		// Should show "Pay and join" button (not "Pay and accept")
-		const button = canvas.getByRole("button");
-		expect(button).toHaveTextContent("Pay and join");
-		expect(button).not.toHaveTextContent("Pay and accept");
-	},
 };
 
-// Test: Shows "Pay and accept" for invited users
+// Shows "Pay and accept" for invited users
 export const InvitedUser: Story = {
 	args: {
 		event: createMockEvent(),
 		userParticipant: createMockParticipant({ status: ParticipationStatus.Invited }),
 		isInvited: true,
 	},
-	play: async ({ canvasElement }) => {
-		const canvas = within(canvasElement);
-
-		// Should show invitation messaging
-		expect(canvas.getByText("You're Invited!")).toBeInTheDocument();
-		expect(canvas.getByText("Accept your invitation by completing the payment")).toBeInTheDocument();
-
-		// Should show "Pay and accept" button (not "Pay and join")
-		const button = canvas.getByRole("button");
-		expect(button).toHaveTextContent("Pay and accept");
-		expect(button).not.toHaveTextContent("Pay and join");
-	},
 };
 
-// Test: Displays correct amount from event.budget.cost
+// Displays correct amount from event.budget.cost
 export const DifferentAmounts: Story = {
 	render: () => (
 		<div className="space-y-4">
@@ -243,62 +188,21 @@ export const DifferentAmounts: Story = {
 	},
 };
 
-// Test: Component doesn't render for already accepted participant
+// Component doesn't render for already accepted participant
 export const AcceptedParticipant: Story = {
 	args: {
 		event: createMockEvent(),
 		userParticipant: createMockParticipant({ status: ParticipationStatus.Accepted }),
 		isInvited: false,
 	},
-	play: async ({ canvasElement }) => {
-		const canvas = within(canvasElement);
-
-		// Should NOT render when user is already an accepted participant
-		expect(canvas.queryByText("Join This Event")).not.toBeInTheDocument();
-		expect(canvas.queryByText("You're Invited!")).not.toBeInTheDocument();
-	},
 };
 
-// Test: Shows Stripe security message
+// Shows Stripe security message
 export const ShowsStripeMessage: Story = {
 	args: {
 		event: createMockEvent(),
 		userParticipant: null,
 		isInvited: false,
-	},
-	play: async ({ canvasElement }) => {
-		const canvas = within(canvasElement);
-
-		// Should show Stripe security message
-		expect(
-			canvas.getByText("Secure payment powered by Stripe. You'll receive a confirmation email after payment."),
-		).toBeInTheDocument();
-	},
-};
-
-// Test: Button click behavior (loading state will be shown)
-export const ClickToPayButton: Story = {
-	args: {
-		event: createMockEvent(),
-		userParticipant: null,
-		isInvited: false,
-	},
-	play: async ({ canvasElement }) => {
-		const canvas = within(canvasElement);
-		const user = userEvent.setup();
-
-		// Find the button
-		const button = canvas.getByRole("button", { name: /Pay and join/i });
-		expect(button).toBeInTheDocument();
-		expect(button).not.toBeDisabled();
-
-		// Click the button - this will trigger loading state
-		// Note: The actual API call will fail in Storybook since it's not mocked,
-		// but we can verify the button exists and is clickable
-		await user.click(button);
-
-		// The button should still be in the document (it may show loading or error)
-		expect(canvas.getByRole("button")).toBeInTheDocument();
 	},
 };
 

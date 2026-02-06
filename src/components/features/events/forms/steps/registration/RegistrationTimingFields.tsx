@@ -97,7 +97,7 @@ function RelativeRegistrationTiming() {
 
 			{/* Registration Opens */}
 			<div>
-				<label className="text-sm font-medium text-white mb-2 block">
+				<label className="text-sm font-medium text-foreground mb-2 block">
 					Registration Opens
 				</label>
 				<div className="flex items-center gap-3">
@@ -147,7 +147,7 @@ function RelativeRegistrationTiming() {
 
 			{/* Registration Deadline */}
 			<div>
-				<label className="text-sm font-medium text-white mb-2 block">
+				<label className="text-sm font-medium text-foreground mb-2 block">
 					Registration Deadline
 				</label>
 				<div className="flex items-center gap-3">
@@ -250,12 +250,12 @@ function OffsetPreviewExample() {
 		});
 
 	return (
-		<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+		<div className="p-4 rounded-xl bg-surface border border-border">
 			<p className="text-xs text-muted uppercase tracking-wider mb-3">Example Preview</p>
 			<div className="space-y-2 text-sm">
 				<div className="flex justify-between">
 					<span className="text-muted">Event starts:</span>
-					<span className="text-white">{formatDate(exampleEventDate)}</span>
+					<span className="text-foreground">{formatDate(exampleEventDate)}</span>
 				</div>
 				<div className="flex justify-between">
 					<span className="text-muted">Registration opens:</span>

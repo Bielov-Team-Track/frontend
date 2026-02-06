@@ -4,9 +4,9 @@ import { MembersTab } from "../components/tabs";
 import { useGroupContext } from "../layout";
 
 export default function GroupMembersPage() {
-	const { group, groupId } = useGroupContext();
+	const { group, groupId, club, clubMembers } = useGroupContext();
 
 	if (!group) return null;
 
-	return <MembersTab group={group} groupId={groupId} />;
+	return <MembersTab group={group} groupId={groupId} club={club} clubMembers={clubMembers} />;
 }

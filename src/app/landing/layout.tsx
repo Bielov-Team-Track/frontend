@@ -1,5 +1,6 @@
+import { FeedbackButton } from "@/components/features/feedback";
 import { ThemeScript } from "@/components/ui/theme-script";
-import { ThemeProvider } from "@/providers";
+import { AuthProvider, ThemeProvider } from "@/providers";
 import { inter } from "@/lib/fonts";
 import type { Metadata } from "next";
 import "../globals.css";
@@ -24,7 +25,12 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
 				<ThemeScript />
 			</head>
 			<body className="font-sans min-h-screen antialiased selection:bg-accent/30">
-				<ThemeProvider>{children}</ThemeProvider>
+				<ThemeProvider>
+					<AuthProvider>
+						{children}
+						<FeedbackButton />
+					</AuthProvider>
+				</ThemeProvider>
 			</body>
 		</html>
 	);

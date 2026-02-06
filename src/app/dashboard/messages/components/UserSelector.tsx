@@ -27,9 +27,9 @@ const UserSelector = ({ selectedUsers, onSelectedUsersChange, excludedUserIds = 
 		}
 		setIsLoading(true);
 
-		searchUsersAPI(term)
+		searchUsersAPI({ query: term })
 			.then((data) => {
-				const filteredData = data.filter((u) => !excludedUserIds.includes(u.userId));
+				const filteredData = data.items.filter((u) => !excludedUserIds.includes(u.id!));
 				setUsers(filteredData);
 				setIsLoading(false);
 			})
@@ -86,10 +86,10 @@ const UserSelector = ({ selectedUsers, onSelectedUsersChange, excludedUserIds = 
 	return (
 		<div className="flex flex-col h-full bg-background/50">
 			{/* Search Input */}
-			<div className="p-3 border-b border-white/5 space-y-3">
+			<div className="p-3 border-b border-border space-y-3">
 				{/* Selected Chips */}
 				{selectedUsers.length > 0 && (
-					<div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
+					<div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-foreground/10">
 						{selectedUsers.map((user) => (
 							<div
 								key={user.id}
@@ -97,7 +97,7 @@ const UserSelector = ({ selectedUsers, onSelectedUsersChange, excludedUserIds = 
 								<span>
 									{user.name} {user.surname}
 								</span>
-								<button onClick={(e) => removeSelected(user.id, e)} className="p-0.5 hover:bg-black/20 rounded-full transition-colors">
+								<button onClick={(e) => removeSelected(user.id, e)} className="p-0.5 hover:bg-active rounded-full transition-colors">
 									<X size={12} />
 								</button>
 							</div>
@@ -112,13 +112,13 @@ const UserSelector = ({ selectedUsers, onSelectedUsersChange, excludedUserIds = 
 						value={searchQuery}
 						onChange={(e) => handleSearchChange(e.target.value)}
 						placeholder="Search to add..."
-						className="bg-white/5 border-white/10 focus:border-accent/50"
+						className="bg-surface border-border focus:border-accent/50"
 					/>
 				</div>
 			</div>
 
 			{/* Users List */}
-			<div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-white/10">
+			<div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-foreground/10">
 				{isLoading && (
 					<div className="flex items-center justify-center py-8">
 						<Loader />
@@ -149,12 +149,12 @@ const UserSelector = ({ selectedUsers, onSelectedUsersChange, excludedUserIds = 
 								onClick={() => toggleUser(user)}
 								className={`
 								flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all group
-								${isSelected ? "bg-accent/10 border border-accent/30" : "hover:bg-white/5 border border-transparent"}
+								${isSelected ? "bg-accent/10 border border-accent/30" : "hover:bg-hover border border-transparent"}
 							`}>
 								<div className="flex items-center gap-3">
 									<UserAvatar profile={user} />
 									<div className="flex flex-col">
-										<span className={`text-sm font-medium transition-colors ${isSelected ? "text-white" : "text-gray-200"}`}>
+										<span className={`text-sm font-medium transition-colors ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
 											{user.name} {user.surname}
 										</span>
 										<span className="text-xs text-muted truncate max-w-[180px]">{user.email}</span>
@@ -164,7 +164,7 @@ const UserSelector = ({ selectedUsers, onSelectedUsersChange, excludedUserIds = 
 								<div
 									className={`
 									w-5 h-5 rounded-full border flex items-center justify-center transition-all
-									${isSelected ? "bg-accent border-accent scale-110" : "border-white/20 group-hover:border-white/40"}
+									${isSelected ? "bg-accent border-accent scale-110" : "border-border group-hover:border-border"}
 								`}>
 									{isSelected && <Check size={12} className="text-white" />}
 								</div>

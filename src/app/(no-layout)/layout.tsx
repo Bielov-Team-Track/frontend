@@ -1,3 +1,4 @@
+import { FeedbackButton } from "@/components/features/feedback";
 import { ThemeScript } from "@/components/ui/theme-script";
 import { QueryProvider, ThemeProvider } from "@/providers";
 import type { Metadata } from "next";
@@ -29,6 +30,7 @@ export default async function RootLayout({
 						<div className="min-h-screen-safe grid bg-background">
 							<main className="relative w-full">{children}</main>
 						</div>
+						<FeedbackButton />
 					</QueryProvider>
 				</ThemeProvider>
 			</body>

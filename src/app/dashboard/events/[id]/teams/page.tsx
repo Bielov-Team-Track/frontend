@@ -1,7 +1,7 @@
 "use client";
 
 import { TeamsList } from "@/components/features/teams";
-import { Unit } from "@/lib/models/EventBudget";
+import { Unit } from "@/lib/models/EventPaymentConfig";
 import { Users } from "lucide-react";
 import { useEventContext } from "../layout";
 
@@ -43,7 +43,7 @@ export default function EventTeamsPage() {
 					registrationType={event.registrationUnit || Unit.Individual}
 				/>
 			) : (
-				<div className="rounded-2xl bg-white/5 border border-white/10 p-12 text-center">
+				<div className="rounded-2xl bg-surface border border-border p-12 text-center">
 					<Users className="w-16 h-16 mx-auto mb-4 text-muted/30" />
 					<h3 className="text-lg font-bold text-white mb-2">No Teams Yet</h3>
 					<p className="text-muted text-sm">Teams will appear here once they register for the event.</p>

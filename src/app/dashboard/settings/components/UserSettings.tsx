@@ -7,6 +7,7 @@ import PlayerInfoStep from "@/components/features/profile/forms/steps/PlayerInfo
 import { Button } from "@/components/ui";
 import { createNotificationSubscription } from "@/lib/api/subscriptions";
 import { createOrUpdateCoachProfile, createOrUpdatePlayerProfile, updateCurrentProfile } from "@/lib/api/user";
+import { showSuccessToast } from "@/lib/errors";
 import { CoachProfileDto, CreateOrUpdateCoachProfileDto, CreateOrUpdatePlayerProfileDto, FullProfileDto, PlayerProfileDto } from "@/lib/models/Profile";
 import { Activity, ClipboardList, History, Save, User } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -19,7 +20,6 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 	const router = useRouter();
 	const [activeTab, setActiveTab] = useState("basic");
 	const [isLoading, setIsLoading] = useState(false);
-	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
 	// Initialize state from user prop
@@ -56,7 +56,7 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 						})
 						.then(async function (subscription) {
 							await createNotificationSubscription(user?.userProfile?.id!, subscription);
-							showSuccess("Notifications enabled successfully!");
+							showSuccessToast("Notifications enabled successfully!");
 						});
 				})
 				.catch(function (error) {
@@ -66,15 +66,9 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 		}
 	};
 
-	const showSuccess = (msg: string) => {
-		setSuccessMessage(msg);
-		setTimeout(() => setSuccessMessage(null), 3000);
-	};
-
 	const handleSave = async (section: "basic" | "player" | "coach" | "history", data: any) => {
 		setIsLoading(true);
 		setError(null);
-		setSuccessMessage(null);
 
 		try {
 			if (section === "basic") {
@@ -105,7 +99,7 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 				await createOrUpdateCoachProfile(coachPayload);
 			}
 
-			showSuccess("Profile updated successfully!");
+			showSuccessToast("Profile updated successfully!");
 			router.refresh(); // Refresh server components to reflect changes
 		} catch (err: any) {
 			console.error("Profile update error:", err);
@@ -119,20 +113,20 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 		<div className="flex flex-col gap-6 w-full max-w-4xl mx-auto mt-6">
 			<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 				<div>
-					<h1 className="text-2xl font-bold text-white">Profile Settings</h1>
+					<h1 className="text-2xl font-bold text-foreground">Profile Settings</h1>
 					<p className="text-muted text-sm">Manage your public profile and preferences.</p>
 				</div>
 			</div>
 
 			{/* Tabs */}
-			<div className="flex overflow-x-auto border-b border-white/10 no-scrollbar gap-2">
+			<div className="flex overflow-x-auto border-b border-border no-scrollbar gap-2">
 				{tabs.map((tab) => (
 					<button
 						key={tab.id}
 						onClick={() => setActiveTab(tab.id)}
 						className={`
                             flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all border-b-2 whitespace-nowrap
-                            ${activeTab === tab.id ? "border-accent text-accent" : "border-transparent text-muted hover:text-white hover:border-white/20"}
+                            ${activeTab === tab.id ? "border-accent text-accent" : "border-transparent text-muted hover:text-foreground hover:border-border"}
                         `}>
 						{tab.icon}
 						{tab.label}
@@ -140,12 +134,6 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 				))}
 			</div>
 
-			{/* Messages */}
-			{successMessage && (
-				<div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg text-sm font-medium animate-in fade-in slide-in-from-top-2">
-					{successMessage}
-				</div>
-			)}
 			{error && (
 				<div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm font-medium animate-in fade-in slide-in-from-top-2">
 					{error}
@@ -153,15 +141,15 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 			)}
 
 			{/* Content */}
-			<div className="bg-[#141414] border border-white/5 rounded-2xl p-6 md:p-8">
+			<div className="bg-surface border border-border rounded-2xl p-6 md:p-8">
 				{activeTab === "basic" && (
 					<div className="flex flex-col gap-8">
 						<BasicInfoStep defaultValues={basicInfo} onNext={(data) => handleSave("basic", data)} formId="basic-settings-form" />
-						<div className="flex flex-col gap-4 pt-6 border-t border-white/5">
-							<h3 className="font-semibold text-white">Notifications</h3>
-							<div className="flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/5">
+						<div className="flex flex-col gap-4 pt-6 border-t border-border">
+							<h3 className="font-semibold text-foreground">Notifications</h3>
+							<div className="flex items-center justify-between bg-surface p-4 rounded-xl border border-border">
 								<div className="flex flex-col gap-1">
-									<span className="text-sm font-medium text-white">Push Notifications</span>
+									<span className="text-sm font-medium text-foreground">Push Notifications</span>
 									<span className="text-xs text-muted">Receive updates about upcoming games and events.</span>
 								</div>
 								<Button variant="outline" size="sm" onClick={enableNotifications}>
@@ -169,7 +157,7 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 								</Button>
 							</div>
 						</div>
-						<div className="flex justify-end pt-4 border-t border-white/5">
+						<div className="flex justify-end pt-4 border-t border-border">
 							<Button type="submit" form="basic-settings-form" loading={isLoading} className="gap-2" leftIcon={<Save size={20} />}>
 								Save Changes
 							</Button>
@@ -180,7 +168,7 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 				{activeTab === "player" && (
 					<div className="flex flex-col gap-8">
 						<PlayerInfoStep defaultValues={playerInfo || undefined} onNext={(data) => handleSave("player", data)} formId="player-settings-form" />
-						<div className="flex justify-end pt-4 border-t border-white/5">
+						<div className="flex justify-end pt-4 border-t border-border">
 							<Button type="submit" form="player-settings-form" loading={isLoading} className="gap-2">
 								<Save size={18} />
 								Save Changes
@@ -192,7 +180,7 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 				{activeTab === "coach" && (
 					<div className="flex flex-col gap-8">
 						<CoachInfoStep defaultValues={coachInfo || undefined} onNext={(data) => handleSave("coach", data)} formId="coach-settings-form" />
-						<div className="flex justify-end pt-4 border-t border-white/5">
+						<div className="flex justify-end pt-4 border-t border-border">
 							<Button type="submit" form="coach-settings-form" loading={isLoading} className="gap-2">
 								<Save size={18} />
 								Save Changes
@@ -208,7 +196,7 @@ function UserSettings({ user }: { user: ExtendedUser }) {
 							not be editable here if they were added as plain text previously.
 						</div>
 						<HistoryStep onNext={(data) => handleSave("history", data)} formId="history-settings-form" />
-						<div className="flex justify-end pt-4 border-t border-white/5">
+						<div className="flex justify-end pt-4 border-t border-border">
 							<Button type="submit" form="history-settings-form" loading={isLoading} className="gap-2" leftIcon={<Save size={20} />}>
 								Save Changes
 							</Button>

@@ -49,7 +49,7 @@ const FormFieldEditor = ({ field, index, onChange, onRemove, onMoveUp, onMoveDow
 	};
 
 	return (
-		<div className="p-4 bg-white/5 rounded-xl border border-white/10">
+		<div className="p-4 bg-surface rounded-xl border border-border">
 			<div className="flex items-start gap-3">
 				{/* Drag handle */}
 				<div className="flex flex-col gap-1 pt-2">

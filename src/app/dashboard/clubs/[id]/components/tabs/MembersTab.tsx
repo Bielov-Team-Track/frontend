@@ -16,6 +16,12 @@ import {
 import { ClubMember, ClubRegistration, ClubRole, RegistrationSortBy, RegistrationStatus } from "@/lib/models/Club";
 import { SortDirection } from "@/lib/models/filteringAndPagination";
 import { cn } from "@/lib/utils";
+
+// Helper to extract role strings from role objects or strings
+function extractRoleStrings(roles: any[] | undefined): string[] {
+	if (!roles) return [];
+	return roles.map((r) => (typeof r === "string" ? r : r?.role)).filter(Boolean);
+}
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
@@ -148,7 +154,7 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 	const queryClient = useQueryClient();
 
 	const updateMutation = useMutation({
-		mutationFn: (data: UpdateClubMemberRequest) => updateClubMember(clubId, editingMember!.id, data),
+		mutationFn: (data: UpdateClubMemberRequest) => updateClubMember(clubId, editingMember!.userId, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["club-members", clubId] });
 			setEditingMember(null);
@@ -189,7 +195,7 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 				}
 			}
 			// Role filter
-			if (roleFilter !== "all" && member.role !== roleFilter) {
+			if (roleFilter !== "all" && !extractRoleStrings(member.roles).includes(roleFilter)) {
 				return false;
 			}
 			return true;
@@ -282,10 +288,10 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 					}
 				/>
 			) : (
-				<div className="rounded-xl bg-white/5 border border-white/10 overflow-hidden">
+				<div className="rounded-xl bg-surface border border-border overflow-hidden">
 					<table className="w-full">
 						<thead>
-							<tr className="border-b border-white/10">
+							<tr className="border-b border-border">
 								<th className="text-left text-xs font-medium text-muted px-4 py-3">Member</th>
 								<th className="text-left text-xs font-medium text-muted px-4 py-3">Role</th>
 								<th className="text-left text-xs font-medium text-muted px-4 py-3">Skill Level</th>
@@ -354,7 +360,7 @@ const REGISTRATION_SORT_OPTIONS = [
 // Loading skeleton for registration cards
 function RegistrationCardSkeleton() {
 	return (
-		<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+		<div className="p-4 rounded-xl bg-surface border border-border">
 			<div className="flex items-center gap-4">
 				<SkeletonAvatar size="md" />
 				<div className="flex-1 space-y-2">
@@ -539,7 +545,7 @@ function RegistrationCard({
 
 	return (
 		<div
-			className={`group p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/[0.07] transition-all duration-200 cursor-pointer ${
+			className={`group p-4 rounded-xl bg-surface border border-border hover:border-border hover:bg-hover transition-all duration-200 cursor-pointer ${
 				isThisUpdating ? "opacity-70 pointer-events-none" : ""
 			}`}
 			role="listitem"
@@ -551,7 +557,7 @@ function RegistrationCard({
 					{userProfile ? (
 						<Avatar name={userProfile.name + " " + userProfile.surname} src={userProfile.imageUrl} variant={"user"} />
 					) : (
-						<div className="w-10 h-10 rounded-lg bg-linear-to-br from-accent/30 to-primary/30 flex items-center justify-center text-sm font-bold text-white border border-white/10">
+						<div className="w-10 h-10 rounded-lg bg-linear-to-br from-accent/30 to-primary/30 flex items-center justify-center text-sm font-bold text-white border border-border">
 							{initials}
 						</div>
 					)}

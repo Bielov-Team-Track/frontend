@@ -1,3 +1,4 @@
+import { VenueFormData } from "@/components/features/venues";
 import { UserProfile } from "@/lib/models/User";
 
 export interface ClubFormData {
@@ -19,19 +20,4 @@ export interface ClubFormData {
 
 	// Invite (Step 4)
 	invitees: UserProfile[];
-}
-
-export interface VenueFormData {
-	tempId?: string; // For frontend identification before saved
-	clubId?: string;
-	name: string;
-	addressLine1?: string;
-	addressLine2?: string;
-	city?: string;
-	country?: string;
-	region?: string;
-	postalCode?: string;
-	latitude?: number;
-	longitude?: number;
-	howToGetThereInstructions?: string;
 }

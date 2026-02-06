@@ -20,12 +20,6 @@ function TeamMenu({ team, onCaptainAssigned, onCaptainRemoved }: TeamMenuProps) 
 	const [isLoading, setIsLoading] = useState(false);
 	const { userProfile } = useUser();
 
-	const isAdmin = !!team.event.admins?.find((a) => a.userId == userProfile?.id);
-
-	if (!isAdmin) {
-		return null;
-	}
-
 	if (!team) {
 		return null;
 	}
@@ -58,12 +52,12 @@ function TeamMenu({ team, onCaptainAssigned, onCaptainRemoved }: TeamMenuProps) 
 	return (
 		<>
 			<div className="dropdown dropdown-end">
-				<div tabIndex={0} role="button" className="btn btn-ghost btn-xs btn-circle text-muted hover:text-white">
+				<div tabIndex={0} role="button" className="btn btn-ghost btn-xs btn-circle text-muted hover:text-foreground">
 					<MoreHorizontal size={16} />
 				</div>
-				<ul tabIndex={0} className="dropdown-content z-1 menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-48 mt-1">
+				<ul tabIndex={0} className="dropdown-content z-1 menu p-2 shadow-lg bg-surface-elevated border border-border rounded-xl w-48 mt-1">
 					<li>
-						<button onClick={() => setIsModalOpen(true)} className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2">
+						<button onClick={() => setIsModalOpen(true)} className="text-xs hover:bg-hover hover:text-foreground text-gray-300 gap-2">
 							{team.captain ? <UserPlus size={14} /> : <Crown size={14} />}
 							{team.captain ? "Change Captain" : "Assign Captain"}
 						</button>
@@ -81,7 +75,7 @@ function TeamMenu({ team, onCaptainAssigned, onCaptainRemoved }: TeamMenuProps) 
 			<Modal isLoading={isLoading} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Assign Captain">
 				<div className="p-4">
 					<p className="text-sm text-muted mb-4">
-						Search for a user to make them the captain of <span className="text-white font-bold">{team.name}</span>.
+						Search for a user to make them the captain of <span className="text-foreground font-bold">{team.name}</span>.
 					</p>
 					<UserSearch onUserSelect={assignCaptain} />
 				</div>

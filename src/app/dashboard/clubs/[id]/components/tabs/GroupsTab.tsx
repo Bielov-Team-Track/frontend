@@ -251,7 +251,7 @@ export default function GroupsTab({ groups, clubId, clubMembers }: GroupsTabProp
 // List view item for groups
 function GroupListItem({ group, onEdit, onDelete }: { group: Group; onEdit: () => void; onDelete: () => void }) {
 	return (
-		<div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/[0.07] transition-all group">
+		<div className="flex items-center justify-between p-4 rounded-xl bg-surface border border-border hover:border-border hover:bg-hover transition-all group">
 			<div className="flex items-center gap-3 min-w-0">
 				<div
 					className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"

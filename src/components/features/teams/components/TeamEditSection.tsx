@@ -35,7 +35,7 @@ export default function TeamsEditSection({ event }: { event: Event }) {
 		<div className="flex flex-col justify-center items-center">
 			<div className="w-full flex flex-col gap-4 relative">
 				{isLoading && (
-					<Loader className="absolute inset-0 flex justify-center items-center bg-black/55 rounded-lg z-50" />
+					<Loader className="absolute inset-0 flex justify-center items-center bg-overlay rounded-lg z-50" />
 				)}
 				<button onClick={addTeam} className="btn w-full text-muted-100">
 					<PlusIcon size={18} />

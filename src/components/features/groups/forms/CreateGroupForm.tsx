@@ -59,7 +59,7 @@ function CreateGroupForm() {
 
 	return (
 		<form className="form relative" onSubmit={handleSubmit(saveGroup)}>
-			{isPending && <Loader className="absolute inset-0 bg-black/55" />}
+			{isPending && <Loader className="absolute inset-0 bg-overlay" />}
 			<div className="flex gap-2">
 				<h1 className="text-2xl font-bold">Create Group</h1>
 			</div>

@@ -72,8 +72,8 @@ export default function UserSettingsSidebar() {
 							className={cn(
 								"flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
 								active
-									? "bg-background text-white shadow-sm"
-									: "text-muted-foreground hover:text-white"
+									? "bg-background text-foreground shadow-sm"
+									: "text-muted-foreground hover:text-foreground"
 							)}>
 							<item.icon size={16} />
 							{item.label}

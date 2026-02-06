@@ -13,7 +13,7 @@ export async function getAttendanceMatrix(
     filter: AttendanceFilter
 ): Promise<AttendanceMatrix> {
     const endpoint = "/v1/attendance";
-    const params = getParamsFromObject(filter);
+    const params = getParamsFromObject(filter as unknown as Record<string, unknown>);
     return (
         await client.get<AttendanceMatrix>(PREFIX + endpoint, { params })
     ).data;

@@ -122,7 +122,7 @@ export default function TrainingSessionPage() {
 	return (
 		<div className="min-h-screen bg-background text-white font-sans pb-20">
 			{/* --- SHARED HEADER COMPONENT (The Shell) --- */}
-			<div className="bg-background border-b border-white/5 pt-8 pb-6 px-4 md:px-8">
+			<div className="bg-background border-b border-border pt-8 pb-6 px-4 md:px-8">
 				<div className="max-w-desktop mx-auto">
 					<div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
 						<div>
@@ -145,7 +145,7 @@ export default function TrainingSessionPage() {
 								</span>
 
 								{/* Participants Preview */}
-								<div className="flex items-center gap-2 pl-4 border-l border-white/10">
+								<div className="flex items-center gap-2 pl-4 border-l border-border">
 									<div className="flex -space-x-2">
 										{EVENT_DETAILS.participants.map((p) => (
 											<div
@@ -175,10 +175,10 @@ export default function TrainingSessionPage() {
 
 						{/* Header Actions */}
 						<div className="flex gap-3 w-full md:w-auto mt-4 md:mt-0">
-							<button className="flex-1 md:flex-none btn bg-white/5 hover:bg-white/10 text-white border border-white/10 gap-2 flex items-center justify-center px-4 py-2 rounded-lg transition-colors">
+							<button className="flex-1 md:flex-none btn bg-surface hover:bg-hover text-white border border-border gap-2 flex items-center justify-center px-4 py-2 rounded-lg transition-colors">
 								<Users size={18} /> Invite
 							</button>
-							<button className="flex-1 md:flex-none btn bg-white/5 hover:bg-white/10 text-white border border-white/10 gap-2 flex items-center justify-center px-4 py-2 rounded-lg transition-colors">
+							<button className="flex-1 md:flex-none btn bg-surface hover:bg-hover text-white border border-border gap-2 flex items-center justify-center px-4 py-2 rounded-lg transition-colors">
 								<MoreHorizontal size={18} />
 							</button>
 							<button className="flex-1 md:flex-none btn bg-accent hover:bg-accent/90 text-white border-none shadow-[0_0_15px_rgba(249,115,22,0.3)] gap-2 px-6 flex items-center justify-center py-2 rounded-lg transition-colors font-medium">
@@ -194,7 +194,7 @@ export default function TrainingSessionPage() {
 				{/* LEFT COLUMN: DRILL FINDER (4 Cols) */}
 				<div className="lg:col-span-4 space-y-6">
 					{/* 1. Skill Selector */}
-					<div className="bg-background rounded-2xl border border-white/5 p-5">
+					<div className="bg-background rounded-2xl border border-border p-5">
 						<h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
 							<Filter size={16} className="text-accent" /> Focus Areas
 						</h3>
@@ -208,7 +208,7 @@ export default function TrainingSessionPage() {
                     ${
 						selectedSkills.includes(skill)
 							? "bg-accent text-white border-accent"
-							: "bg-white/5 text-muted border-transparent hover:border-white/20 hover:text-white"
+							: "bg-surface text-muted border-transparent hover:border-border hover:text-white"
 					}
                   `}>
 									{skill}
@@ -218,8 +218,8 @@ export default function TrainingSessionPage() {
 					</div>
 
 					{/* 2. Recommendations List */}
-					<div className="bg-background rounded-2xl border border-white/5 overflow-hidden flex flex-col h-[500px]">
-						<div className="p-4 border-b border-white/5 bg-white/2">
+					<div className="bg-background rounded-2xl border border-border overflow-hidden flex flex-col h-[500px]">
+						<div className="p-4 border-b border-border bg-surface">
 							<h3 className="font-bold text-white">Recommended Drills</h3>
 							<p className="text-xs text-muted">Based on your selection</p>
 						</div>
@@ -231,7 +231,7 @@ export default function TrainingSessionPage() {
 								recommendedDrills.map((drill) => (
 									<div
 										key={drill.id}
-										className="group flex items-center justify-between p-3 rounded-xl bg-surface border border-white/5 hover:border-white/20 transition-all">
+										className="group flex items-center justify-between p-3 rounded-xl bg-surface border border-border hover:border-border transition-all">
 										<div>
 											<div className="font-bold text-white text-sm">{drill.name}</div>
 											<div className="flex items-center gap-2 text-[10px] text-muted mt-1">
@@ -244,7 +244,7 @@ export default function TrainingSessionPage() {
 										</div>
 										<button
 											onClick={() => addToTimeline(drill)}
-											className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-muted hover:bg-accent hover:text-white transition-colors">
+											className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-muted hover:bg-accent hover:text-white transition-colors">
 											<Plus size={16} />
 										</button>
 									</div>
@@ -257,7 +257,7 @@ export default function TrainingSessionPage() {
 				{/* RIGHT COLUMN: SESSION TIMELINE (8 Cols) */}
 				<div className="lg:col-span-8 space-y-6">
 					{/* Time Budget Bar */}
-					<div className="bg-background rounded-2xl border border-white/5 p-6 relative overflow-hidden">
+					<div className="bg-background rounded-2xl border border-border p-6 relative overflow-hidden">
 						{/* Background Progress */}
 						<div
 							className={`absolute bottom-0 left-0 h-1 transition-all duration-500 ${remainingTime < 0 ? "bg-red-500" : "bg-accent"}`}
@@ -282,12 +282,12 @@ export default function TrainingSessionPage() {
 					</div>
 
 					{/* The Timeline */}
-					<div className="relative pl-6 border-l-2 border-white/5 space-y-6 min-h-[400px]">
+					<div className="relative pl-6 border-l-2 border-border space-y-6 min-h-[400px]">
 						{/* Start Node */}
 						<div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-accent border-4 border-background-dark"></div>
 
 						{timeline.length === 0 && (
-							<div className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center flex flex-col items-center justify-center text-muted h-64">
+							<div className="border-2 border-dashed border-border rounded-xl p-8 text-center flex flex-col items-center justify-center text-muted h-64">
 								<Dumbbell size={32} className="mb-2 opacity-50" />
 								<p>Your timeline is empty.</p>
 								<p className="text-sm">Select skills on the left to add drills.</p>
@@ -305,7 +305,7 @@ export default function TrainingSessionPage() {
 								</div>
 
 								{/* Card */}
-								<div className="group bg-background rounded-xl border border-white/5 p-4 flex items-center gap-4 hover:border-accent/50 hover:shadow-lg transition-all cursor-grab active:cursor-grabbing">
+								<div className="group bg-background rounded-xl border border-border p-4 flex items-center gap-4 hover:border-accent/50 hover:shadow-lg transition-all cursor-grab active:cursor-grabbing">
 									<div className="text-muted cursor-grab">
 										<GripVertical size={20} />
 									</div>

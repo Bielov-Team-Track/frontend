@@ -76,7 +76,7 @@ export default function DrillLikeButton({
 					"p-2 rounded-lg transition-all",
 					isLiked
 						? "text-red-500 bg-red-500/10 hover:bg-red-500/20"
-						: "text-muted hover:text-red-500 hover:bg-white/5",
+						: "text-muted hover:text-red-500 hover:bg-hover",
 					(isLoading || isLoadingStatus) && "opacity-50 cursor-not-allowed",
 					className
 				)}
@@ -122,7 +122,7 @@ export default function DrillLikeButton({
 				"flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
 				isLiked
 					? "bg-red-500/10 text-red-500 hover:bg-red-500/20"
-					: "bg-white/5 text-muted hover:text-white hover:bg-white/10",
+					: "bg-surface text-muted hover:text-white hover:bg-hover",
 				(isLoading || isLoadingStatus) && "opacity-50 cursor-not-allowed",
 				className
 			)}

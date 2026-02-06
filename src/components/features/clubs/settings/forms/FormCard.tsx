@@ -20,7 +20,7 @@ export default function FormCard({ form, clubId, onEdit, onDuplicate, onSetDefau
 	const [menuOpen, setMenuOpen] = useState(false);
 
 	return (
-		<div className="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/[0.07] transition-colors">
+		<div className="p-4 rounded-xl bg-surface border border-border hover:bg-hover transition-colors">
 			<div className="flex items-start justify-between gap-4">
 				<div className="flex-1 min-w-0">
 					<div className="flex items-center gap-2 mb-1">
@@ -43,25 +43,25 @@ export default function FormCard({ form, clubId, onEdit, onDuplicate, onSetDefau
 				</div>
 
 				<div className="flex items-center gap-2">
-					<button onClick={onEdit} className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-white transition-colors">
+					<button onClick={onEdit} className="px-3 py-1.5 rounded-lg bg-surface hover:bg-hover text-sm text-white transition-colors">
 						Edit
 					</button>
 					<div className="relative">
 						<button
 							onClick={() => setMenuOpen(!menuOpen)}
-							className="p-2 rounded-lg hover:bg-white/10 text-muted hover:text-white transition-colors">
+							className="p-2 rounded-lg hover:bg-hover text-muted hover:text-white transition-colors">
 							<MoreVertical size={16} />
 						</button>
 						{menuOpen && (
 							<>
 								<div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-								<div className="absolute right-0 top-full mt-1 z-50 w-48 rounded-xl bg-[#1e1e1e] border border-white/10 shadow-xl py-1">
+								<div className="absolute right-0 top-full mt-1 z-50 w-48 rounded-xl bg-surface-elevated border border-border shadow-xl py-1">
 									<button
 										onClick={() => {
 											onDuplicate(form.id);
 											setMenuOpen(false);
 										}}
-										className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/5 flex items-center gap-2">
+										className="w-full px-4 py-2 text-left text-sm text-white hover:bg-hover flex items-center gap-2">
 										<Copy size={14} />
 										Duplicate
 									</button>
@@ -71,7 +71,7 @@ export default function FormCard({ form, clubId, onEdit, onDuplicate, onSetDefau
 												onSetDefault(form.id);
 												setMenuOpen(false);
 											}}
-											className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/5 flex items-center gap-2">
+											className="w-full px-4 py-2 text-left text-sm text-white hover:bg-hover flex items-center gap-2">
 											<Star size={14} />
 											Set as Default
 										</button>
@@ -81,7 +81,7 @@ export default function FormCard({ form, clubId, onEdit, onDuplicate, onSetDefau
 											onToggleActive(form.id, !form.isActive);
 											setMenuOpen(false);
 										}}
-										className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/5 flex items-center gap-2">
+										className="w-full px-4 py-2 text-left text-sm text-white hover:bg-hover flex items-center gap-2">
 										{form.isActive ? (
 											<>
 												<ToggleLeft size={14} />
@@ -94,7 +94,7 @@ export default function FormCard({ form, clubId, onEdit, onDuplicate, onSetDefau
 											</>
 										)}
 									</button>
-									<hr className="my-1 border-white/10" />
+									<hr className="my-1 border-border" />
 									<button
 										onClick={() => {
 											onDelete(form.id);

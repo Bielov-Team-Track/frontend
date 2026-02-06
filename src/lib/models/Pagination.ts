@@ -25,3 +25,15 @@ export enum SortDirection {
 	Ascending = "Ascending",
 	Descending = "Descending",
 }
+
+/**
+ * Generic page-based pagination result.
+ * Used for traditional page/pageSize pagination.
+ */
+export interface PaginatedResponse<T> {
+	items: T[];
+	page: number;
+	pageSize: number;
+	totalCount: number;
+	totalPages: number;
+}

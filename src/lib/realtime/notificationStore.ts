@@ -14,6 +14,7 @@ type NotificationState = {
 	decrementUnread: (by?: number) => void;
 
 	showNotificationToast: (notification: Notification) => void;
+	updateNotificationToast: (notification: Notification) => void;
 	dismissToast: (id: string) => void;
 	clearToasts: () => void;
 
@@ -35,6 +36,16 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 	decrementUnread: (by = 1) => set((s) => ({ unreadCount: Math.max(0, s.unreadCount - by) })),
 
 	showNotificationToast: (notification) => {
+		const { isDropdownOpen } = get();
+		if (isDropdownOpen) return;
+
+		toast.custom((toastId) => createElement(NotificationToastContent, { notification, toastId }), {
+			id: notification.id,
+			duration: TOAST_DURATION,
+		});
+	},
+
+	updateNotificationToast: (notification) => {
 		const { isDropdownOpen } = get();
 		if (isDropdownOpen) return;
 

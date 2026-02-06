@@ -4,7 +4,8 @@ import { getClub, getClubMembers, getTeam } from "@/lib/api/clubs";
 import { ClubMember, Team } from "@/lib/models/Club";
 import { Club } from "@/lib/models/Club";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, MessageSquare, Settings, Users } from "lucide-react";
+import { ScrollableTabBar } from "@/components";
+import { ArrowLeft, Calendar, LayoutGrid, MessageSquare, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { createContext, useContext, useState } from "react";
@@ -28,12 +29,13 @@ export function useTeamContext() {
 	return context;
 }
 
-type TabType = "events" | "posts" | "roster" | "settings";
+type TabType = "events" | "posts" | "members" | "roster" | "settings";
 
 const TABS: { id: TabType; label: string; icon: typeof Calendar; showCount?: boolean }[] = [
 	{ id: "events", label: "Events", icon: Calendar },
 	{ id: "posts", label: "Posts", icon: MessageSquare },
-	{ id: "roster", label: "Roster", icon: Users, showCount: true },
+	{ id: "members", label: "Members", icon: Users, showCount: true },
+	{ id: "roster", label: "Roster", icon: LayoutGrid },
 	{ id: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -48,6 +50,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 	const getActiveTab = (): TabType => {
 		if (pathname.includes("/settings")) return "settings";
 		if (pathname.includes("/posts")) return "posts";
+		if (pathname.includes("/members")) return "members";
 		if (pathname.includes("/roster")) return "roster";
 		return "events";
 	};
@@ -92,7 +95,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 		return (
 			<div className="text-center py-20">
 				<Users className="w-16 h-16 text-muted mx-auto mb-4" />
-				<h2 className="text-xl font-bold text-white mb-2">Team not found</h2>
+				<h2 className="text-xl font-bold text-foreground mb-2">Team not found</h2>
 				<Link href="/dashboard/clubs" className="text-accent hover:underline">
 					Back to clubs
 				</Link>
@@ -112,13 +115,13 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 			<div className="space-y-6">
 				{/* Header */}
 				<div className="flex items-center gap-4">
-					<Link href={`/dashboard/clubs/${team.clubId}`} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+					<Link href={`/dashboard/clubs/${team.clubId}`} className="p-2 rounded-lg bg-surface hover:bg-hover transition-colors">
 						<ArrowLeft size={20} />
 					</Link>
 					<div className="flex-1">
 						<div className="flex items-center gap-3">
-							<h1 className="text-2xl font-bold text-white">{team.name}</h1>
-							{team.skillLevel && <span className="px-2 py-0.5 rounded text-xs font-medium bg-white/10 text-muted">{team.skillLevel}</span>}
+							<h1 className="text-2xl font-bold text-foreground">{team.name}</h1>
+							{team.skillLevel && <span className="px-2 py-0.5 rounded text-xs font-medium bg-hover text-muted">{team.skillLevel}</span>}
 						</div>
 						<div className="flex items-center gap-2 text-sm text-muted">
 							<span>Team</span>
@@ -131,10 +134,10 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 				</div>
 
 				{/* Team Banner/Info */}
-				<div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+				<div className="rounded-2xl overflow-hidden border border-border bg-surface">
 					{/* Banner Area */}
 					<div className="h-32 relative bg-linear-to-r from-blue-900/50 to-indigo-900/50">
-						<div className="absolute inset-0 bg-black/30" />
+						<div className="absolute inset-0 bg-overlay-light" />
 					</div>
 
 					{/* Info Row */}
@@ -151,42 +154,40 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 
 						{/* Details */}
 						<div className="flex-1 min-w-0">
-							<h2 className="text-xl font-bold text-white truncate">{team.name}</h2>
+							<h2 className="text-xl font-bold text-foreground truncate">{team.name}</h2>
 							{team.description && <p className="text-sm text-muted truncate">{team.description}</p>}
 						</div>
 
 						{/* Quick Stats */}
 						<div className="flex gap-6">
 							<div className="text-center">
-								<div className="text-2xl font-bold text-white">{team.members?.length || 0}</div>
+								<div className="text-2xl font-bold text-foreground">{team.members?.length || 0}</div>
 								<div className="text-xs text-muted">Players</div>
 							</div>
 						</div>
 					</div>
 
 					{/* Tabs */}
-					<div className="border-t border-white/10 px-6">
-						<div className="flex gap-1 overflow-x-auto no-scrollbar">
-							{TABS.map((tab) => {
-								const count = tab.showCount ? team.members?.length || 0 : undefined;
-								const isActive = activeTab === tab.id;
-								return (
-									<Link
-										key={tab.id}
-										href={getTabHref(tab.id)}
-										prefetch={true}
-										className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap shrink-0 ${
-											isActive ? "text-accent" : "text-muted hover:text-white"
-										}`}>
-										<tab.icon size={16} />
-										{tab.label}
-										{count !== undefined && <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-xs">{count}</span>}
-										{isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
-									</Link>
-								);
-							})}
-						</div>
-					</div>
+					<ScrollableTabBar>
+						{TABS.map((tab) => {
+							const count = tab.showCount ? team.members?.length || 0 : undefined;
+							const isActive = activeTab === tab.id;
+							return (
+								<Link
+									key={tab.id}
+									href={getTabHref(tab.id)}
+									prefetch={true}
+									className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap shrink-0 ${
+										isActive ? "text-accent" : "text-muted hover:text-foreground"
+									}`}>
+									<tab.icon size={16} />
+									{tab.label}
+									{count !== undefined && <span className="px-1.5 py-0.5 rounded-full bg-hover text-xs">{count}</span>}
+									{isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
+								</Link>
+							);
+						})}
+					</ScrollableTabBar>
 				</div>
 
 				{/* Tab Content */}

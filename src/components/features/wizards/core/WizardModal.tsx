@@ -1,14 +1,14 @@
 "use client";
 
 import Modal from "@/components/ui/modal";
-import { UseFormReturn } from "react-hook-form";
+import { FieldValues, UseFormReturn } from "react-hook-form";
 import { ContextHeaderInfo, WizardConfig, WizardContext, WizardState, WizardStep } from "./types";
 import { WizardContextHeader } from "./WizardContextHeader";
 import { WizardNavigation } from "./WizardNavigation";
 import { WizardStepIndicator } from "./WizardStepIndicator";
 import { WizardSuccessScreen } from "./WizardSuccessScreen";
 
-interface WizardModalProps<TData> {
+interface WizardModalProps<TData extends FieldValues> {
 	isOpen: boolean;
 	onClose: () => void;
 	config: WizardConfig<TData>;
@@ -28,7 +28,7 @@ interface WizardModalProps<TData> {
 	onEditContext?: () => void;
 }
 
-export function WizardModal<TData>({
+export function WizardModal<TData extends FieldValues>({
 	isOpen,
 	onClose,
 	config,

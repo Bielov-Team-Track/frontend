@@ -35,12 +35,12 @@ function EventSettingsFormContent({ event, children }: EventSettingsFormProps) {
 				startTime: formData.startTime.toISOString(),
 				endTime: formData.endTime.toISOString(),
 				location: formData.location,
-				paymentsConfig: formData.useBudget && formData.budget
+				paymentsConfig: formData.usePaymentConfig && formData.paymentConfig
 					? {
-							pricingModel: formData.budget.pricingModel,
-							cost: formData.budget.cost || 0,
-							payToJoin: formData.budget.payToJoin,
-							dropoutDeadlineHours: formData.budget.dropoutDeadlineHours,
+							pricingModel: formData.paymentConfig.pricingModel,
+							cost: formData.paymentConfig.cost || 0,
+							payToJoin: formData.paymentConfig.payToJoin,
+							dropoutDeadlineHours: formData.paymentConfig.dropoutDeadlineHours,
 						}
 					: undefined,
 			};
@@ -75,7 +75,7 @@ function EventSettingsFormContent({ event, children }: EventSettingsFormProps) {
 		if (isSeriesEvent) {
 			setShowSeriesModal(true);
 		} else {
-			saveMutation.mutate();
+			saveMutation.mutate(undefined);
 		}
 	};
 
@@ -95,7 +95,7 @@ function EventSettingsFormContent({ event, children }: EventSettingsFormProps) {
 			{/* Save Button - Fixed at bottom when changes exist */}
 			{hasChanges && (
 				<div className="sticky bottom-0 pt-4 pb-2 bg-gradient-to-t from-background via-background to-transparent">
-					<div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-raised border border-white/10">
+					<div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-raised border border-border">
 						<p className="text-sm text-muted">You have unsaved changes</p>
 						<div className="flex gap-3">
 							<Button

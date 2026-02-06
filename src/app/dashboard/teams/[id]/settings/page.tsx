@@ -1,12 +1,10 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { SettingsTab } from "../components/tabs";
-import { useTeamContext } from "../layout";
+interface Props {
+	params: Promise<{ id: string }>;
+}
 
-export default function TeamSettingsPage() {
-	const { team } = useTeamContext();
-
-	if (!team) return null;
-
-	return <SettingsTab team={team} clubId={team.clubId} />;
+export default async function TeamSettingsPage({ params }: Props) {
+	const { id } = await params;
+	redirect(`/dashboard/teams/${id}/settings/general`);
 }

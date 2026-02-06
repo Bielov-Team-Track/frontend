@@ -60,7 +60,7 @@ export default function ModerationQueueItem({ item, onAction }: ModerationQueueI
 				<div className="flex items-center gap-3">
 					<Avatar name={`${post.author.name} ${post.author.surname}`} src={post.author.imageUrl} variant="user" />
 					<div>
-						<p className="text-sm font-medium text-white">
+						<p className="text-sm font-medium text-foreground">
 							{post.author.name} {post.author.surname}
 						</p>
 						<p className="text-xs text-muted-foreground">Posted {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</p>
@@ -76,7 +76,7 @@ export default function ModerationQueueItem({ item, onAction }: ModerationQueueI
 								? "bg-destructive/20 text-destructive"
 								: reportCount >= 3
 								? "bg-warning/20 text-warning"
-								: "bg-active text-white"
+								: "bg-active text-foreground"
 						)}>
 						<Flag size={12} />
 						{reportCount} report{reportCount !== 1 ? "s" : ""}
@@ -110,7 +110,7 @@ export default function ModerationQueueItem({ item, onAction }: ModerationQueueI
 			<div className="px-4 pb-3">
 				<button
 					onClick={() => setShowContent(!showContent)}
-					className="flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors">
+					className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
 					{showContent ? <EyeOff size={14} /> : <Eye size={14} />}
 					{showContent ? "Hide content" : "View content"}
 					{showContent ? <ChevronUp size={14} /> : <ChevronDown size={14} />}

@@ -36,9 +36,9 @@ const EventCard = memo(function EventCard({ event, variant = "horizontal" }: Eve
 			<div
 				className={clsx(
 					variantClasses[variant],
-					"rounded-lg relative bg-surface shadow-md shadow-black/50 overflow-hidden cursor-pointer",
+					"rounded-lg relative bg-surface shadow-md overflow-hidden cursor-pointer",
 					"transition-all duration-200 ease-in-out transform-gpu",
-					"hover:shadow-lg hover:shadow-black/50 hover:scale-[1.01]",
+					"hover:shadow-lg hover:scale-[1.01]",
 					"active:scale-100",
 				)}
 			>
@@ -76,7 +76,7 @@ const EventCard = memo(function EventCard({ event, variant = "horizontal" }: Eve
 							<span className="text-sm text-error">[canceled]</span>
 						)}
 					</h2>
-					<div className="flex flex-col text-sm gap-1 text-muted">
+					<div className="flex flex-col text-sm gap-1 text-muted-foreground">
 						<div className="flex flex-row items-center gap-2">
 							<div className="w-4 flex justify-center">
 								<MapIcon className="w-4 h-4" />

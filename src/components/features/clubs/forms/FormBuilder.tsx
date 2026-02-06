@@ -102,14 +102,14 @@ const FormBuilder = ({ initialData, onSave, onCancel, isLoading }: FormBuilderPr
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
 			{/* Template Info */}
-			<div className="p-4 bg-white/5 rounded-xl border border-white/10">
-				<h3 className="text-lg font-semibold text-white mb-4">Template Settings</h3>
+			<div className="p-4 bg-surface rounded-xl border border-border">
+				<h3 className="text-lg font-semibold text-foreground mb-4">Template Settings</h3>
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<Input {...register("name")} label="Template Name" placeholder="e.g., Player Registration Form" error={errors.name?.message} required />
 					<div className="flex items-end pb-2">
 						<label className="flex items-center gap-2 cursor-pointer">
 							<input type="checkbox" {...register("isDefault")} className="checkbox checkbox-primary" />
-							<span className="text-sm text-white">Set as default form</span>
+							<span className="text-sm text-foreground">Set as default form</span>
 						</label>
 					</div>
 				</div>
@@ -117,7 +117,7 @@ const FormBuilder = ({ initialData, onSave, onCancel, isLoading }: FormBuilderPr
 
 			{/* Add Field Buttons */}
 			<div className="flex flex-col gap-2">
-				<label className="text-sm font-medium text-white">Add Field</label>
+				<label className="text-sm font-medium text-foreground">Add Field</label>
 				<div className="flex flex-wrap gap-2">
 					{fieldTypeButtons.map(({ type, label, icon: Icon }) => (
 						<Button key={type} type="button" variant="outline" size="sm" onClick={() => addField(type)} leftIcon={<Icon size={14} />}>
@@ -129,9 +129,9 @@ const FormBuilder = ({ initialData, onSave, onCancel, isLoading }: FormBuilderPr
 
 			{/* Fields List */}
 			<div className="flex flex-col gap-3">
-				<label className="text-sm font-medium text-white">Fields ({fields.length})</label>
+				<label className="text-sm font-medium text-foreground">Fields ({fields.length})</label>
 				{fields.length === 0 ? (
-					<div className="p-8 bg-white/5 rounded-xl border border-dashed border-white/20 text-center">
+					<div className="p-8 bg-surface rounded-xl border border-dashed border-border text-center">
 						<p className="text-muted">No fields added yet. Click a button above to add a field.</p>
 					</div>
 				) : (
@@ -158,7 +158,7 @@ const FormBuilder = ({ initialData, onSave, onCancel, isLoading }: FormBuilderPr
 				<Button type="button" variant="ghost" onClick={onCancel}>
 					Cancel
 				</Button>
-				<Button type="submit" variant="solid" color="primary" loading={isLoading}>
+				<Button type="submit" variant="default" color="primary" loading={isLoading}>
 					{initialData ? "Save Changes" : "Create Template"}
 				</Button>
 			</div>

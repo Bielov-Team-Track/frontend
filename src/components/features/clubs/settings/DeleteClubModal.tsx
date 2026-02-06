@@ -52,7 +52,6 @@ export default function DeleteClubModal({ isOpen, clubName, onClose, onConfirm, 
 					value={confirmName}
 					onChange={(e) => setConfirmName(e.target.value)}
 					placeholder={clubName}
-					status="error"
 				/>
 
 				<div className="flex gap-3">

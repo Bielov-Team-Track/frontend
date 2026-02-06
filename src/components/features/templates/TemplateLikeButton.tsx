@@ -62,7 +62,7 @@ export default function TemplateLikeButton({ templateId, initialLikeCount = 0, v
 			<button
 				onClick={handleToggleLike}
 				disabled={!isAuthenticated}
-				className="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-white transition-colors disabled:opacity-50"
+				className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
 			>
 				<Heart size={14} className={isLiked ? "fill-red-500 text-red-500" : ""} />
 				{likeCount > 0 && <span>{likeCount}</span>}

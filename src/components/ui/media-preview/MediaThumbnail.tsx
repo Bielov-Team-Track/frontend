@@ -138,8 +138,8 @@ export default function MediaThumbnail({ item, size = "md", onClick, className }
 			onClick={onClick}
 			className={cn(
 				"relative group rounded-lg overflow-hidden",
-				"border border-white/10 hover:border-white/20",
-				"bg-white/5 hover:bg-white/10",
+				"border border-border hover:border-border/80",
+				"bg-surface hover:bg-hover",
 				"transition-all duration-200",
 				"focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background",
 				sizeStyles[size],

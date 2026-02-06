@@ -5,9 +5,10 @@ import EventCommentsSection from "@/components/features/comments/components/Even
 import { TeamsList } from "@/components/features/teams";
 import { Modal } from "@/components/ui";
 import { respondToInvitation } from "@/lib/api/events";
-import { Unit } from "@/lib/models/EventBudget";
+import { EventType } from "@/lib/models/Event";
+import { Unit } from "@/lib/models/EventPaymentConfig";
 import { useMutation } from "@tanstack/react-query";
-import { MapPin, Users } from "lucide-react";
+import { ClipboardCheck, MapPin, Users } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useState } from "react";
@@ -24,7 +25,7 @@ const Map = dynamic(() => import("@/components/features/locations").then((mod) =
 // MAIN PAGE COMPONENT
 // =============================================================================
 export default function EventOverviewPage() {
-	const { event, teams, hasInvitation, myParticipation, refetchMyParticipation } = useEventContext();
+	const { event, teams, hasInvitation, myParticipation, refetchMyParticipation, isAdmin } = useEventContext();
 	const [showDeclineModal, setShowDeclineModal] = useState(false);
 	const [declineNote, setDeclineNote] = useState("");
 
@@ -68,6 +69,9 @@ export default function EventOverviewPage() {
 
 	if (!event) return null;
 
+	// Check if this is a Trial or Evaluation event
+	const isTrialOrEvaluation = event.type === EventType.Trial || event.type === EventType.Evaluation;
+
 	return (
 		<>
 			{/*
@@ -79,9 +83,44 @@ export default function EventOverviewPage() {
 			<div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 items-start">
 				{/* Main Content */}
 				<div className="order-2 lg:order-1 space-y-6">
+					{/* Evaluation Card - Show for Trial/Evaluation events */}
+					{isTrialOrEvaluation && (
+						<div className="rounded-2xl bg-surface border border-border p-6">
+							<div className="flex items-center gap-3 mb-4">
+								<div className="p-2 rounded-lg bg-accent/10 text-accent">
+									<ClipboardCheck size={20} />
+								</div>
+								<h3 className="text-lg font-bold text-white">Player Evaluations</h3>
+							</div>
+
+							{isAdmin ? (
+								<div className="space-y-3">
+									<p className="text-sm text-muted">
+										As an organizer, you can evaluate players who attended this {event.type?.toLowerCase()} session.
+									</p>
+									<Link href={`/dashboard/coach/evaluate?eventId=${event.id}`}>
+										<Button color="accent" className="w-full sm:w-auto">
+											Evaluate Players
+										</Button>
+									</Link>
+								</div>
+							) : (
+								<div className="space-y-3">
+									<p className="text-sm text-muted">
+										After the {event.type?.toLowerCase()}, coaches will share their evaluation and feedback with you.
+									</p>
+									{/* Mock evaluation status - replace with real data */}
+									<div className="p-3 rounded-lg bg-surface border border-border text-sm text-muted">
+										Evaluation status: <span className="text-white font-medium">Pending</span>
+									</div>
+								</div>
+							)}
+						</div>
+					)}
+
 					{/* About Card */}
 					{event.description && (
-						<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+						<div className="rounded-2xl bg-surface border border-border p-6">
 							<h3 className="text-lg font-bold text-white mb-4">About This Event</h3>
 							<p className="text-muted text-sm leading-relaxed">{event.description}</p>
 
@@ -103,14 +142,14 @@ export default function EventOverviewPage() {
 						<Link
 							href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(event.location.address)}`}
 							target="_blank"
-							className="flex items-center gap-2 p-4 rounded-2xl bg-white/5 border border-white/10 text-sm text-accent hover:underline lg:hidden">
+							className="flex items-center gap-2 p-4 rounded-2xl bg-surface border border-border text-sm text-accent hover:underline lg:hidden">
 							<MapPin size={16} />
 							{event.location.address}
 						</Link>
 					)}
 
 					{/* Teams Preview */}
-					<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+					<div className="rounded-2xl bg-surface border border-border p-6">
 						<div className="flex items-center justify-between mb-4">
 							<h3 className="text-lg font-bold text-white">Teams</h3>
 							<Link href={`/dashboard/events/${event.id}/teams`} className="text-sm text-accent hover:underline">
@@ -129,7 +168,7 @@ export default function EventOverviewPage() {
 					</div>
 
 					{/* Comments Section */}
-					<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+					<div className="rounded-2xl bg-surface border border-border p-6">
 						<EventCommentsSection eventId={event.id!} />
 					</div>
 				</div>
@@ -142,8 +181,8 @@ export default function EventOverviewPage() {
 					)}
 
 					{/* Location Card - hidden on mobile */}
-					<div className="hidden lg:block rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
-						<div className="p-4 border-b border-white/10 flex justify-between items-center">
+					<div className="hidden lg:block rounded-2xl bg-surface border border-border overflow-hidden">
+						<div className="p-4 border-b border-border flex justify-between items-center">
 							<h3 className="text-sm font-bold text-white flex items-center gap-2">
 								<MapPin size={16} className="text-accent" />
 								Location
@@ -184,7 +223,7 @@ export default function EventOverviewPage() {
 					value={declineNote}
 					onChange={(e) => setDeclineNote(e.target.value)}
 					placeholder="Add a note..."
-					className="w-full h-24 px-4 py-3 rounded-xl bg-background border border-white/10 text-white placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
+					className="w-full h-24 px-4 py-3 rounded-xl bg-background border border-border text-white placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
 				/>
 				<div className="flex justify-end gap-3 mt-4">
 					<Button variant="ghost" color="neutral" onClick={handleCloseModal}>

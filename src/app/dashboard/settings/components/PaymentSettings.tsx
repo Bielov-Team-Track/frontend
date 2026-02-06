@@ -66,7 +66,7 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
 			case PaymentAccountStatus.Created:
 				return <span className={`${baseClasses} bg-blue-500/10 text-blue-400 border-blue-500/20`}>Created</span>;
 			case PaymentAccountStatus.None:
-				return <span className={`${baseClasses} bg-white/5 text-muted border-white/10`}>Not Created</span>;
+				return <span className={`${baseClasses} bg-surface text-muted border-border`}>Not Created</span>;
 			default:
 				return null;
 		}
@@ -92,13 +92,13 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
 			)}
 
             {/* Main Content Card */}
-			<div className="bg-[#141414] border border-white/5 rounded-2xl p-6 md:p-8">
+			<div className="bg-surface border border-border rounded-2xl p-6 md:p-8">
                 <div className="flex flex-col gap-8">
                     {/* Status Header */}
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-white/5">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-border">
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center gap-3">
-                                <h2 className="text-xl font-semibold text-white">Stripe Payment Account</h2>
+                                <h2 className="text-xl font-semibold text-foreground">Stripe Payment Account</h2>
                                 {!isLoading && getStatusBadge()}
                             </div>
                             {!isLoading && (
@@ -113,7 +113,7 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
                                 onClick={refetch}
                                 leftIcon={<RefreshCw size={16} />}
                                 loading={isLoading}
-                                className="text-muted hover:text-white"
+                                className="text-muted hover:text-foreground"
                             >
                                 Refresh
                             </Button>
@@ -121,7 +121,7 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
                                 <Button
                                     leftIcon={<ExternalLink size={16} />}
                                     onClick={openDashboard}
-                                    variant="bordered"
+                                    variant="outline"
                                     size="sm"
                                 >
                                     Stripe Dashboard
@@ -141,7 +141,7 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
                                     {/* Status Cards Grid */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         {/* Onboarding Status */}
-                                        <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3">
+                                        <div className="bg-surface border border-border rounded-xl p-4 flex flex-col gap-3">
                                             <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
                                                 <FileText size={20} />
                                             </div>
@@ -162,7 +162,7 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
                                         </div>
 
                                         {/* Payments Status */}
-                                        <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3">
+                                        <div className="bg-surface border border-border rounded-xl p-4 flex flex-col gap-3">
                                             <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400">
                                                 <CreditCard size={20} />
                                             </div>
@@ -183,7 +183,7 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
                                         </div>
 
                                         {/* Payouts Status */}
-                                        <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3">
+                                        <div className="bg-surface border border-border rounded-xl p-4 flex flex-col gap-3">
                                             <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-400">
                                                 <DollarSign size={20} />
                                             </div>
@@ -205,16 +205,16 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
                                     </div>
 
                                     {/* Account Details & Deleted Warning */}
-                                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/5 rounded-xl p-4 border border-white/10">
+                                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-surface rounded-xl p-4 border border-border">
                                          {account.country && (
                                             <div className="flex items-center gap-4 text-sm text-muted">
                                                 <div className="flex items-center gap-2">
                                                     <Globe size={16} />
-                                                    <span>Country: <span className="text-white font-medium">{account.country.toUpperCase()}</span></span>
+                                                    <span>Country: <span className="text-foreground font-medium">{account.country.toUpperCase()}</span></span>
                                                 </div>
-                                                <div className="w-px h-4 bg-white/10"></div>
+                                                <div className="w-px h-4 bg-border"></div>
                                                 <div>
-                                                    <span>Currency: <span className="text-white font-medium">{account.currency?.toUpperCase()}</span></span>
+                                                    <span>Currency: <span className="text-foreground font-medium">{account.currency?.toUpperCase()}</span></span>
                                                 </div>
                                             </div>
                                         )}
@@ -229,7 +229,7 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
                                 </div>
                             ) : (
                                 <div className="text-center py-12 text-muted">
-                                    <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+                                    <div className="w-16 h-16 rounded-full bg-surface flex items-center justify-center mx-auto mb-4">
                                         <CreditCard size={32} className="opacity-50" />
                                     </div>
                                     <p>No payment account linked yet.</p>
@@ -237,7 +237,7 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
                             )}
 
                             {/* Actions Footer */}
-                            <div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
+                            <div className="flex flex-wrap gap-3 pt-4 border-t border-border">
                                 {!account ? (
                                     <Button
                                         leftIcon={<CreditCard size={18} />}
@@ -269,7 +269,7 @@ const PaymentSettings: React.FC<PaymentSettingsProps> = ({ user }) => {
                         <Info size={18} />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <h3 className="font-semibold text-white">How Payment Accounts Work</h3>
+                        <h3 className="font-semibold text-foreground">How Payment Accounts Work</h3>
                         <ul className="space-y-2 text-sm text-muted">
                             <li className="flex items-start gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 mt-1.5 shrink-0"></span>

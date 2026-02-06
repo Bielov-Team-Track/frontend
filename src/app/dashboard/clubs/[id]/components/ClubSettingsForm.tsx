@@ -117,21 +117,21 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
 			{/* Banner Section */}
-			<div className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
+			<div className="rounded-2xl bg-surface border border-border overflow-hidden">
 				<div className="relative h-32 bg-linear-to-r from-accent/20 to-primary/20 group">
 					{bannerPreview ? (
 						// eslint-disable-next-line @next/next/no-img-element
 						<img src={bannerPreview} alt="Club banner" className="w-full h-full object-cover" />
 					) : (
 						<div className="w-full h-full flex items-center justify-center">
-							<ImageIcon className="text-white/20" size={32} />
+							<ImageIcon className="text-muted" size={32} />
 						</div>
 					)}
-					<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+					<div className="absolute inset-0 bg-overlay-light opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 						<button
 							type="button"
 							onClick={() => bannerInputRef.current?.click()}
-							className="btn btn-sm bg-white/20 hover:bg-white/30 text-white border-none gap-2">
+							className="btn btn-sm bg-hover hover:bg-surface text-white border-none gap-2">
 							<Camera size={14} />
 							Change Banner
 						</button>
@@ -150,11 +150,11 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
 								<Shield className="text-muted" size={24} />
 							</div>
 						)}
-						<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+						<div className="absolute inset-0 bg-overlay-light opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 							<button
 								type="button"
 								onClick={() => logoInputRef.current?.click()}
-								className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white">
+								className="p-2 rounded-full bg-hover hover:bg-surface text-white">
 								<Camera size={12} />
 							</button>
 						</div>
@@ -165,7 +165,7 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
 			</div>
 
 			{/* Form Fields */}
-			<div className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-4">
+			<div className="rounded-2xl bg-surface border border-border p-6 space-y-4">
 				<h3 className="text-lg font-bold text-white mb-4">Club Information</h3>
 
 				<div>
@@ -173,7 +173,7 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
 					<input
 						type="text"
 						{...register("name", { required: "Club name is required" })}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
+						className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
 					/>
 					{errors.name && <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>}
 				</div>
@@ -183,7 +183,7 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
 					<textarea
 						{...register("description")}
 						rows={3}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent resize-none"
+						className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent resize-none"
 					/>
 				</div>
 
@@ -193,7 +193,7 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
 						<input
 							type="email"
 							{...register("contactEmail")}
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 					<div>
@@ -201,12 +201,12 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
 						<input
 							type="tel"
 							{...register("contactPhone")}
-							className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
+							className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
 						/>
 					</div>
 				</div>
 
-				<div className="flex items-center gap-3 p-4 rounded-xl bg-white/5">
+				<div className="flex items-center gap-3 p-4 rounded-xl bg-surface">
 					<input type="checkbox" {...register("isPublic")} className="checkbox checkbox-accent" />
 					<div>
 						<p className="text-sm font-medium text-white">Public Club</p>

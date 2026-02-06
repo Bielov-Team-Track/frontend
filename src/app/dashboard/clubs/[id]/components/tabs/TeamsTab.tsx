@@ -250,7 +250,7 @@ export default function TeamsTab({ teams, clubId, clubMembers }: TeamsTabProps) 
 // List view item for teams
 function TeamListItem({ team, onEdit, onDelete }: { team: Team; onEdit: () => void; onDelete: () => void }) {
 	return (
-		<div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/[0.07] transition-all group">
+		<div className="flex items-center justify-between p-4 rounded-xl bg-surface border border-border hover:border-border hover:bg-hover transition-all group">
 			<div className="flex items-center gap-3 min-w-0">
 				<div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center shrink-0">
 					<Users size={18} className="text-accent" />

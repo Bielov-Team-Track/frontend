@@ -110,9 +110,9 @@ const CoachInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 		};
 
 		setQualifications([...qualifications, newQual]);
-		setQualName(undefined);
-		setQualYear(undefined);
-		setAddQualError(undefined);
+		setQualName("");
+		setQualYear("");
+		setAddQualError("");
 	};
 
 	const handleRemoveQualification = (id: string) => {
@@ -183,13 +183,13 @@ const CoachInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 					</label>
 
 					{/* Add New Qualification Form */}
-					<div className="p-4 bg-white/5 rounded-xl border border-white/10 flex flex-col gap-3">
+					<div className="p-4 bg-surface rounded-xl border border-border flex flex-col gap-3">
 						<div className="grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-3">
 							<Input
 								value={qualName}
 								onChange={(e) => {
 									setQualName(e.target.value);
-									if (addQualError) setAddQualError(null);
+									if (addQualError) setAddQualError("");
 								}}
 								placeholder="Qualification Name"
 							/>
@@ -199,7 +199,7 @@ const CoachInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 								value={qualYear}
 								onChange={(val) => {
 									setQualYear(val as string);
-									if (addQualError) setAddQualError(null);
+									if (addQualError) setAddQualError("");
 								}}
 								required
 							/>
@@ -214,7 +214,7 @@ const CoachInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 					{qualifications.length > 0 && (
 						<div className="flex flex-col gap-2 mt-2">
 							{qualifications.map((qual) => (
-								<div key={qual.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+								<div key={qual.id} className="flex items-center justify-between p-3 bg-surface rounded-lg border border-border">
 									<div className="flex items-center gap-3">
 										<div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-accent">
 											<Award size={16} />

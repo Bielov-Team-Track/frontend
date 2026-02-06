@@ -33,21 +33,21 @@ export function ListRegistration() {
 	);
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-4 sm:space-y-6">
 			<RegistrationTypeSelector />
 
-			<div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
+			<div className="p-3 sm:p-4 rounded-xl bg-surface border border-border space-y-3 sm:space-y-4">
 				<CapacityField />
 			</div>
 
-			<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+			<div className="p-3 sm:p-4 rounded-xl bg-surface border border-border">
 				<RegistrationTimingFields />
 			</div>
 
 			{/* Invitee selector - Summary + Edit pattern */}
-			<div className="p-4 rounded-xl bg-white/5 border border-white/10">
-				<h3 className="text-sm font-medium text-white mb-2">Invitees</h3>
-				<p className="text-muted text-sm mb-4">
+			<div className="p-3 sm:p-4 rounded-xl bg-surface border border-border">
+				<h3 className="text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">Invitees</h3>
+				<p className="text-muted text-[10px] sm:text-sm mb-3 sm:mb-4">
 					{registrationType === "closed"
 						? "Add people who can participate in this event."
 						: "Optionally invite specific people (they'll be notified)."}
@@ -62,7 +62,7 @@ export function ListRegistration() {
 				selectedUsers={selectedUsersCache}
 				onConfirm={handleSelectionConfirm}
 				title="Select Invitees"
-				confirmLabel={`Done (${selectedUsersCache.length} selected)`}
+				confirmLabel="Done"
 				showFilters={true}
 				defaultContext={context || undefined}
 			/>

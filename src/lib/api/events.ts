@@ -11,7 +11,7 @@ export async function loadEvents(
 ): Promise<Event[]> {
 	const endpoint = "/v1/events";
 
-	const params = getParamsFromObject(filter);
+	const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
 
 	return (await client.get<Event[]>(PREFIX + endpoint, { params })).data;
 }
@@ -21,7 +21,7 @@ export async function loadEventsByFilter(
 ): Promise<Event[]> {
 	const endpoint = "/v1/events";
 
-	const params = getParamsFromObject(filter);
+	const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
 
 	return (await client.get<Event[]>(PREFIX + endpoint, { params })).data;
 }
@@ -32,10 +32,11 @@ export async function loadEvent(eventId: string): Promise<Event> {
 	return (await client.get<Event>(PREFIX + endpoint)).data;
 }
 
-export async function createEvent(event: CreateEvent) {
+export async function createEvent(event: CreateEvent): Promise<Event> {
 	const endpoint = "/v1/events/";
 
-	await client.post(PREFIX + endpoint, event);
+	const response = await client.post<Event>(PREFIX + endpoint, event);
+	return response.data;
 }
 
 export async function saveEvent(event: Event) {

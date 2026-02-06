@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { CheckCircle, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 import { WizardSuccessConfig } from "./types";
@@ -30,12 +30,10 @@ export function WizardSuccessScreen({ config, createdId, onClose }: WizardSucces
 					Close
 				</Button>
 
-				<Button asChild>
-					<Link href={href}>
-						{config.linkText}
-						<ExternalLink size={16} className="ml-2" />
-					</Link>
-				</Button>
+				<Link href={href} className={buttonVariants({ variant: "default" })}>
+					{config.linkText}
+					<ExternalLink size={16} className="ml-2" />
+				</Link>
 			</div>
 		</div>
 	);

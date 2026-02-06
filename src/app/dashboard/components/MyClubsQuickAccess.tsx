@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Badge } from "@/components";
+import { Avatar, Badge, Button } from "@/components";
 import { Club, ClubRole } from "@/lib/models/Club";
 import { ArrowRight, Plus, Shield } from "lucide-react";
 import Link from "next/link";
@@ -14,13 +14,13 @@ interface MyClubsQuickAccessProps {
 	clubs: ClubWithMeta[];
 }
 
-function getRoleBadgeVariant(role: ClubRole): "default" | "secondary" | "outline" {
+function getRoleBadgeVariant(role: ClubRole): "solid" | "soft" | "outline" {
 	switch (role) {
 		case ClubRole.Owner:
 		case ClubRole.Admin:
-			return "default";
+			return "solid";
 		case ClubRole.Coach:
-			return "secondary";
+			return "soft";
 		default:
 			return "outline";
 	}
@@ -52,7 +52,7 @@ export function MyClubsQuickAccess({ clubs }: MyClubsQuickAccessProps) {
 	const hasMore = clubs.length > 4;
 
 	return (
-		<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+		<div className="rounded-2xl bg-surface border border-border p-6">
 			{/* Header */}
 			<div className="flex items-center justify-between mb-4">
 				<h2 className="text-lg font-semibold text-white">My Clubs</h2>
@@ -72,7 +72,7 @@ export function MyClubsQuickAccess({ clubs }: MyClubsQuickAccessProps) {
 					<Link
 						key={club.id}
 						href={`/dashboard/clubs/${club.id}`}
-						className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] hover:border-accent/30 transition-all group">
+						className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border hover:bg-hover hover:border-accent/30 transition-all group">
 						{/* Avatar with Pending Badge */}
 						<div className="relative flex-shrink-0">
 							<Avatar size="sm" src={club.logoUrl} name={club.name} variant="club" />
@@ -109,8 +109,8 @@ export function MyClubsQuickAccess({ clubs }: MyClubsQuickAccessProps) {
 				{/* Join Club CTA */}
 				<Link
 					href="/clubs"
-					className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-white/10 hover:border-accent/50 hover:bg-accent/5 transition-all group">
-					<div className="size-10 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-accent/10 transition-colors flex-shrink-0">
+					className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-border hover:border-accent/50 hover:bg-accent/5 transition-all group">
+					<div className="size-10 rounded-lg bg-surface flex items-center justify-center group-hover:bg-accent/10 transition-colors flex-shrink-0">
 						<Plus className="size-5 text-muted group-hover:text-accent transition-colors" />
 					</div>
 					<div className="flex-1">
@@ -129,19 +129,16 @@ export function MyClubsQuickAccess({ clubs }: MyClubsQuickAccessProps) {
 
 function EmptyState() {
 	return (
-		<div className="rounded-2xl bg-white/5 border border-dashed border-white/10 p-6">
+		<div className="rounded-2xl bg-surface border border-dashed border-border p-6">
 			<div className="text-center py-6">
-				<div className="size-12 rounded-xl bg-white/5 flex items-center justify-center mx-auto mb-4">
+				<div className="size-12 rounded-xl bg-surface flex items-center justify-center mx-auto mb-4">
 					<Shield className="size-6 text-muted" />
 				</div>
 				<h3 className="font-semibold text-white mb-1">Not a member of any clubs yet</h3>
 				<p className="text-sm text-muted mb-4">Join a club to find games near you</p>
-				<Link
-					href="/clubs"
-					className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent/10 hover:bg-accent/20 text-accent border border-accent/20 hover:border-accent/30 transition-all text-sm font-medium">
-					<Plus className="size-4" />
-					Browse Clubs
-				</Link>
+				<Button variant="outline" asChild leftIcon={<Plus className="size-4" />}>
+					<Link href="/clubs">Browse Clubs</Link>
+				</Button>
 			</div>
 		</div>
 	);

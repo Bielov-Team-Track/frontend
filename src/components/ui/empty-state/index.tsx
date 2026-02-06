@@ -19,10 +19,10 @@ interface EmptyStateProps {
 
 export default function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
 	return (
-		<div className={cn("text-center py-12 rounded-2xl bg-white/5 border border-white/10", className)}>
-			<Icon className="w-12 h-12 text-muted mx-auto mb-4" />
-			<h4 className="text-lg font-bold text-white mb-2">{title}</h4>
-			{description && <p className="text-sm text-muted mb-4">{description}</p>}
+		<div className={cn("text-center py-12 rounded-2xl bg-surface border border-border", className)}>
+			<Icon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+			<h4 className="text-lg font-bold text-foreground mb-2">{title}</h4>
+			{description && <p className="text-sm text-muted-foreground mb-4">{description}</p>}
 			{action && (
 				<Button variant={action.variant || "outline"} onClick={action.onClick}>
 					{action.icon && <action.icon size={16} />}

@@ -79,12 +79,12 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 	};
 
 	return (
-		<Link href={`/dashboard/training/drills/${drill.id}`} className="group block">
-			<div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/[0.07] transition-all">
+		<Link href={`/dashboard/coaching/training/drills/${drill.id}`} className="group block">
+			<div className="flex items-center gap-4 p-4 rounded-xl bg-surface border border-border hover:border-border hover:bg-hover transition-all">
 				{/* Content */}
 				<div className="flex-1 min-w-0">
 					{/* Title */}
-					<h3 className="text-base font-semibold text-white truncate group-hover:text-accent transition-colors">
+					<h3 className="text-base font-semibold text-foreground truncate group-hover:text-accent transition-colors">
 						{drill.name}
 					</h3>
 
@@ -92,7 +92,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 					<div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-1.5 text-xs">
 						{/* Duration */}
 						{drill.duration && (
-							<div className="flex items-center gap-1.5 text-muted">
+							<div className="flex items-center gap-1.5 text-muted-foreground">
 								<Clock size={12} />
 								<span className="tabular-nums">{drill.duration} min</span>
 							</div>
@@ -100,7 +100,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 
 						{/* Players */}
 						{drill.minPlayers && (
-							<div className="flex items-center gap-1.5 text-muted">
+							<div className="flex items-center gap-1.5 text-muted-foreground">
 								<Users size={12} />
 								<span className="tabular-nums">
 									{drill.minPlayers}
@@ -113,7 +113,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 
 						{/* Divider */}
 						{(drill.duration || drill.minPlayers) && (
-							<div className="w-px h-4 bg-white/10" />
+							<div className="w-px h-4 bg-foreground/10" />
 						)}
 
 						{/* Intensity */}
@@ -136,7 +136,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 					{/* Skills */}
 					{drill.skills.length > 0 && (
 						<div className="flex items-center gap-2 mt-2.5">
-							<span className="text-xs text-muted shrink-0">Skills:</span>
+							<span className="text-xs text-muted-foreground shrink-0">Skills:</span>
 							<div className="flex flex-wrap items-center gap-1.5">
 								{drill.skills.map((skill) => {
 									const isHighlighted = highlightedSkills.includes(skill);
@@ -147,7 +147,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 											className={`px-2 py-0.5 rounded-md text-xs font-medium transition-colors ${
 												isHighlighted
 													? "bg-accent/20 text-accent ring-1 ring-accent/50"
-													: "bg-white/5 text-muted hover:bg-white/10 hover:text-white"
+													: "bg-surface text-muted-foreground hover:bg-foreground/10 hover:text-foreground"
 											}`}
 										>
 											{skill}
@@ -165,7 +165,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 							<button
 								onClick={handleLikeClick}
 								className={`flex items-center gap-1 transition-colors ${
-									drill.isLiked ? "text-rose-400" : "text-muted hover:text-rose-400"
+									drill.isLiked ? "text-rose-400" : "text-muted-foreground hover:text-rose-400"
 								}`}
 								title="Like"
 							>
@@ -178,7 +178,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 							<button
 								onClick={handleBookmarkClick}
 								className={`flex items-center gap-1 transition-colors ${
-									drill.isBookmarked ? "text-amber-400" : "text-muted hover:text-amber-400"
+									drill.isBookmarked ? "text-amber-400" : "text-muted-foreground hover:text-amber-400"
 								}`}
 								title="Save"
 							>
@@ -195,7 +195,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 							<Link
 								href={`/dashboard/clubs/${drill.clubId}`}
 								onClick={(e) => e.stopPropagation()}
-								className="flex items-center gap-1.5 text-[11px] text-muted/70 hover:text-white transition-colors group/club">
+								className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors group/club">
 								<span className="truncate max-w-[100px] group-hover/club:underline">{drill.clubName}</span>
 								<Avatar size="sm" className="size-4">
 									{drill.clubLogoUrl ? (
@@ -210,7 +210,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 							<Link
 								href={`/dashboard/profile/${drill.author?.id}`}
 								onClick={(e) => e.stopPropagation()}
-								className="flex items-center gap-1.5 text-[11px] text-muted/70 hover:text-white transition-colors group/author">
+								className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors group/author">
 								<span className="truncate max-w-[100px] group-hover/author:underline">{authorName}</span>
 								<Avatar size="sm" className="size-4">
 									{drill.author?.avatarUrl ? (
@@ -227,7 +227,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 
 				{/* Arrow */}
 				<div className="hidden sm:flex items-center">
-					<ChevronRight size={18} className="text-muted group-hover:text-white transition-colors" />
+					<ChevronRight size={18} className="text-muted-foreground group-hover:text-foreground transition-colors" />
 				</div>
 			</div>
 		</Link>

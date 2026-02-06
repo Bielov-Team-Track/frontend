@@ -59,10 +59,10 @@ export function GeneralSection() {
 
 			{/* Event type is read-only since changing it affects registration structure */}
 			<div>
-				<label className="text-sm font-medium text-white block mb-2">Event Type</label>
-				<div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10">
-					<span className="text-white">{getEventTypeLabel(formData.type)}</span>
-					<p className="text-xs text-muted mt-1">
+				<label className="text-sm font-medium text-foreground block mb-2">Event Type</label>
+				<div className="px-4 py-3 rounded-xl bg-surface border border-border">
+					<span className="text-foreground">{getEventTypeLabel(formData.type)}</span>
+					<p className="text-xs text-muted-foreground mt-1">
 						Event type cannot be changed after creation as it affects the registration structure.
 					</p>
 				</div>
@@ -77,7 +77,7 @@ export function GeneralSection() {
 				size="sm"
 			/>
 
-			<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+			<div className="p-4 rounded-xl bg-surface border border-border">
 				<Checkbox
 					checked={!formData.isPrivate}
 					onChange={(checked) => updateField("isPrivate", !checked)}

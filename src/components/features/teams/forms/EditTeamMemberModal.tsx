@@ -2,27 +2,38 @@
 
 import { Button, MultiSelectPills } from "@/components";
 import Modal from "@/components/ui/modal";
-import { TeamMember, VolleyballPosition } from "@/lib/models/Club";
+import { Label } from "@/components/ui/label";
+import { RoleCheckboxGroup } from "@/components/ui/role-checkbox-group";
+import { TEAM_ROLE_OPTIONS } from "@/lib/constants/roles";
+import { TeamMember, TeamRole, VolleyballPosition } from "@/lib/models/Club";
 import { useEffect, useState } from "react";
 import { VOLLEYBALL_POSITIONS_OPTIONS } from "../constants";
+
+// Helper to extract role strings from role objects or strings
+function extractRoleStrings(roles: any[] | undefined): string[] {
+	if (!roles) return [];
+	return roles.map((r) => (typeof r === "string" ? r : r?.role)).filter(Boolean);
+}
 
 interface EditTeamMemberModalProps {
 	isOpen: boolean;
 	member: TeamMember | null;
 	onClose: () => void;
-	onSave: (data: { memberId: string; positions: VolleyballPosition[]; jerseyNumber?: string }) => void;
+	onSave: (data: { memberId: string; positions: VolleyballPosition[]; jerseyNumber?: string; roles: TeamRole[] }) => void;
 	isLoading?: boolean;
 }
 
 export default function EditTeamMemberModal({ isOpen, member, onClose, onSave, isLoading = false }: EditTeamMemberModalProps) {
 	const [positions, setPositions] = useState<VolleyballPosition[]>([]);
 	const [jerseyNumber, setJerseyNumber] = useState<string>("");
+	const [roles, setRoles] = useState<TeamRole[]>([]);
 
 	// Reset form when member changes
 	useEffect(() => {
 		if (member) {
 			setPositions(member.positions || []);
 			setJerseyNumber(member.jerseyNumber || "");
+			setRoles(extractRoleStrings((member as any).roles) as TeamRole[]);
 		}
 	}, [member]);
 
@@ -32,6 +43,7 @@ export default function EditTeamMemberModal({ isOpen, member, onClose, onSave, i
 				memberId: member.id,
 				positions: positions,
 				jerseyNumber: jerseyNumber.trim() || undefined,
+				roles: roles,
 			});
 		}
 	};
@@ -39,6 +51,7 @@ export default function EditTeamMemberModal({ isOpen, member, onClose, onSave, i
 	const handleClose = () => {
 		setPositions([]);
 		setJerseyNumber("");
+		setRoles([]);
 		onClose();
 	};
 
@@ -50,7 +63,7 @@ export default function EditTeamMemberModal({ isOpen, member, onClose, onSave, i
 		<Modal isOpen={isOpen} onClose={handleClose} title="Edit Player" size="md">
 			<div className="space-y-6">
 				{/* Player Info Header */}
-				<div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
+				<div className="flex items-center gap-4 p-4 rounded-xl bg-surface border border-border">
 					<div className="w-12 h-12 rounded-full bg-background flex items-center justify-center text-lg font-bold text-muted">
 						{member.userProfile?.name?.[0] || "?"}
 					</div>
@@ -77,7 +90,17 @@ export default function EditTeamMemberModal({ isOpen, member, onClose, onSave, i
 						value={jerseyNumber}
 						onChange={(e) => setJerseyNumber(e.target.value)}
 						placeholder="e.g. 10"
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent"
+						className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-white focus:outline-hidden focus:border-accent"
+					/>
+				</div>
+
+				{/* Roles */}
+				<div className="space-y-2">
+					<Label className="text-sm font-medium text-white">Assign Roles (Optional)</Label>
+					<RoleCheckboxGroup
+						availableRoles={TEAM_ROLE_OPTIONS}
+						selectedRoles={roles}
+						onChange={setRoles}
 					/>
 				</div>
 

@@ -100,7 +100,7 @@ function WeekView({ events, date, scrollToNow, onEventClick }: ViewComponentProp
 	};
 
 	return (
-		<div className="w-full h-full flex flex-col border border-white/5 rounded-2xl backdrop-blur-xl overflow-hidden shadow-2xl">
+		<div className="w-full h-full flex flex-col border border-border rounded-2xl backdrop-blur-xl overflow-hidden shadow-2xl">
 			<WeekNavigation
 				start={weekStart}
 				end={weekEnd}
@@ -108,7 +108,7 @@ function WeekView({ events, date, scrollToNow, onEventClick }: ViewComponentProp
 				onNext={handleNextWeek}
 			/>
 
-			<div className="flex-1 flex flex-col overflow-hidden border border-white/5 rounded-xl">
+			<div className="flex-1 flex flex-col overflow-hidden border border-border rounded-xl">
 				<AnimatePresence
 					mode="wait"
 					initial={false}
@@ -183,29 +183,29 @@ function WeekNavigation({
 	onNext: () => void;
 }) {
 	return (
-		<div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/2">
-			<h2 className="text-2xl font-bold text-white tracking-tight">
+		<div className="p-4 flex items-center justify-between border-b border-border bg-surface">
+			<h2 className="text-2xl font-bold text-foreground tracking-tight">
 				{start.getMonth() != end.getMonth()
 					? format(start, "MMMM") + " - " + format(end, "MMMM yyyy")
 					: format(end, "MMMM yyyy")}
 			</h2>
-			<div className="flex items-center bg-black/20 rounded-lg p-1 border border-white/5">
+			<div className="flex items-center bg-hover rounded-lg p-1 border border-border">
 				<Button
 					size="sm"
 					variant="ghost"
 					color="neutral"
 					onClick={onPrev}
-					className="h-8 w-8 p-0 hover:bg-white/10 hover:text-white rounded-md">
+					className="h-8 w-8 p-0 hover:bg-hover hover:text-foreground rounded-md">
 					<ChevronLeft size={16} />
 				</Button>
 
-				<div className="w-px h-4 bg-white/10 mx-1"></div>
+				<div className="w-px h-4 bg-hover mx-1"></div>
 				<Button
 					onClick={onNext}
 					variant="ghost"
 					color="neutral"
 					size="sm"
-					className="h-8 w-8 p-0 hover:bg-white/10 hover:text-white rounded-md">
+					className="h-8 w-8 p-0 hover:bg-hover hover:text-foreground rounded-md">
 					<ChevronRight size={16} />
 				</Button>
 			</div>
@@ -215,7 +215,7 @@ function WeekNavigation({
 
 function DaysHeader({ days }: { days: Date[] }) {
 	return (
-		<div className="flex mb-2 pr-4 border-b border-white/5 pb-2 pt-2 bg-white/5">
+		<div className="flex mb-2 pr-4 border-b border-border pb-2 pt-2 bg-surface">
 			<div className="w-16 shrink-0" />
 			<div className="flex-1 grid grid-cols-7">
 				{days.map((day) => (
@@ -226,7 +226,7 @@ function DaysHeader({ days }: { days: Date[] }) {
 						}`}>
 						<div
 							className={`text-xs font-bold uppercase tracking-wider mb-1 ${
-								isToday(day) ? "text-accent" : "text-muted"
+								isToday(day) ? "text-accent" : "text-muted-foreground"
 							}`}>
 							{format(day, "EEE")}
 						</div>
@@ -289,12 +289,12 @@ function HoursColumn({
 	hourHeight: number;
 }) {
 	return (
-		<div className="w-16 shrink-0 border-r border-white/5 bg-white/2">
+		<div className="w-16 shrink-0 border-r border-border bg-surface">
 			{hours.map((hour) => (
 				<div
 					key={hour}
 					style={{ height: hourHeight }}
-					className="flex items-start justify-end pr-3 text-muted/60 text-[10px] font-medium pt-1">
+					className="flex items-start justify-end pr-3 text-muted-foreground/60 text-[10px] font-medium pt-1">
 					{format(new Date().setHours(hour, 0, 0, 0), "ha")}
 				</div>
 			))}
@@ -350,12 +350,12 @@ function DaysGrid({
 				return (
 					<div
 						key={day.toISOString()}
-						className="flex flex-col relative border-r border-white/5 last:border-r-0">
+						className="flex flex-col relative border-r border-border last:border-r-0">
 						{hours.map((hour) => (
 							<div
 								key={`${day.toISOString()}-${hour}`}
 								style={{ height: hourHeight }}
-								className="border-b border-white/5 hover:bg-white/2 transition-colors cursor-pointer"
+								className="border-b border-border hover:bg-surface transition-colors cursor-pointer"
 							/>
 						))}
 
@@ -430,7 +430,7 @@ function EventBlock({
 				absolute left-0.5 right-0.5 z-20 cursor-pointer
 				overflow-hidden
 				bg-[#2a2a32]
-				border-b border-white/5
+				border-b border-border
 				group
 			">
 			{/* Content container */}

@@ -63,17 +63,17 @@ const CommentItem = ({ comment, isAuthor = false }: CommentItemProps) => {
 		<div className="flex gap-4 group">
             {/* Avatar Column */}
             <div className="shrink-0">
-			    <Avatar profile={comment.user} className="w-10 h-10 border-2 border-transparent group-hover:border-border transition-colors" />
+			    <Avatar src={comment.user.imageUrl} name={`${comment.user.name} ${comment.user.surname}`} className="w-10 h-10 border-2 border-transparent group-hover:border-border transition-colors" />
             </div>
 
             {/* Content Column */}
 			<div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-white hover:text-accent cursor-pointer transition-colors">
+                        <span className="font-bold text-sm text-foreground hover:text-accent cursor-pointer transition-colors">
                             {comment.user.name} {comment.user.surname}
                         </span>
-                        <span className="text-[10px] text-muted flex items-center gap-1">
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                             • {getFormattedDate(comment.createdAt)}
                             {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
                                 <span className="italic">(edited)</span>
@@ -83,17 +83,17 @@ const CommentItem = ({ comment, isAuthor = false }: CommentItemProps) => {
 
                     {isAuthor && (
                         <div className="dropdown dropdown-end">
-                            <label tabIndex={0} className="btn btn-ghost btn-xs btn-circle text-muted hover:text-white">
+                            <label tabIndex={0} className="btn btn-ghost btn-xs btn-circle text-muted-foreground hover:text-foreground">
                                 <MoreHorizontal size={16} />
                             </label>
                             <ul
                                 tabIndex={0}
-                                className="dropdown-content z-1 menu p-2 shadow-lg bg-[#1E1E1E] border border-border rounded-xl w-48 mt-1"
+                                className="dropdown-content z-1 menu p-2 shadow-lg bg-surface-elevated border border-border rounded-xl w-48 mt-1"
                             >
                                 {!showDeleteConfirm ? (
                                     <>
                                         <li>
-                                            <button onClick={handleEdit} className="text-xs hover:bg-hover hover:text-white text-muted-foreground">
+                                            <button onClick={handleEdit} className="text-xs hover:bg-hover hover:text-foreground text-muted-foreground">
                                                 <Edit2 size={14} /> Edit
                                             </button>
                                         </li>
@@ -132,7 +132,7 @@ const CommentItem = ({ comment, isAuthor = false }: CommentItemProps) => {
                                             </button>
                                         </li>
                                         <li>
-                                            <button onClick={() => setShowDeleteConfirm(false)} className="text-xs text-muted-foreground hover:text-white">
+                                            <button onClick={() => setShowDeleteConfirm(false)} className="text-xs text-muted-foreground hover:text-foreground">
                                                 Cancel
                                             </button>
                                         </li>
@@ -150,14 +150,14 @@ const CommentItem = ({ comment, isAuthor = false }: CommentItemProps) => {
                 <div className="flex items-center gap-4 mt-2">
                     <button 
                         onClick={toggleLike}
-                        className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${isLiked ? "text-error" : "text-muted hover:text-error"}`}
+                        className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${isLiked ? "text-error" : "text-muted-foreground hover:text-error"}`}
                     >
                         <Heart size={14} className={isLiked ? "fill-current" : ""} /> 
                         {likesCount > 0 && <span>{likesCount}</span>}
                         <span className="hidden sm:inline">Like</span>
                     </button>
                     
-                    <button className="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-white transition-colors">
+                    <button className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
                         <MessageSquare size={14} /> Reply
                     </button>
                 </div>

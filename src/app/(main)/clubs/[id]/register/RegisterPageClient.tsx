@@ -83,7 +83,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 
 	if (!club) {
 		return (
-			<div className="flex flex-col items-center justify-center min-h-screen bg-background text-white p-4 text-center">
+			<div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 text-center">
 				<Shield className="w-20 h-20 text-muted/50 mb-6" />
 				<h1 className="text-3xl font-bold mb-3">Club Not Found</h1>
 				<p className="text-muted mb-8 max-w-md">The club you&apos;re looking for doesn&apos;t exist or may have been removed.</p>
@@ -113,7 +113,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 						/>
 					) : (
 						<div className="w-full h-full flex items-center justify-center bg-linear-to-r from-accent/10 to-primary/10">
-							<ImageOff size={48} className="text-white/10" />
+							<ImageOff size={48} className="text-muted/30" />
 						</div>
 					)}
 					<div className="absolute inset-0 bg-linear-to-t from-background-dark via-background-dark/40 to-transparent" />
@@ -122,7 +122,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 						<Link href={`/clubs/${clubId}`}>
 							<Button
 								variant="ghost"
-								className="bg-black/20 backdrop-blur-md text-white hover:bg-black/40 border border-white/10"
+								className="bg-overlay-light backdrop-blur-md text-foreground hover:bg-active border border-border"
 								leftIcon={<ArrowLeft size={16} />}>
 								Back to Club
 							</Button>
@@ -143,7 +143,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 					</div>
 
 					<div>
-						<h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3 tracking-tight">{club.name}</h1>
+						<h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-3 tracking-tight">{club.name}</h1>
 						<div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-muted-foreground">
 							{club.location && (
 								<span className="flex items-center gap-1.5 bg-hover px-3 py-1 rounded-full border border-border text-sm">
@@ -167,7 +167,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 				<motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="w-full">
 					{!userProfile ? (
 						<div className="max-w-md mx-auto p-10 rounded-3xl bg-hover border border-border text-center backdrop-blur-xs">
-							<h2 className="text-2xl font-bold text-white mb-3">Join {club.name}</h2>
+							<h2 className="text-2xl font-bold text-foreground mb-3">Join {club.name}</h2>
 							<p className="text-muted mb-8">Sign in or create an account to start your registration.</p>
 							<Button
 								variant="outline"
@@ -183,7 +183,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 					) : settings && !settings.allowPublicRegistration ? (
 						<div className="max-w-lg mx-auto p-10 rounded-3xl bg-hover border border-border text-center">
 							<Shield size={64} className="mx-auto mb-6 text-muted/50" />
-							<h2 className="text-2xl font-bold text-white mb-3">Registration Closed</h2>
+							<h2 className="text-2xl font-bold text-foreground mb-3">Registration Closed</h2>
 							<p className="text-muted mb-8">
 								This club is not accepting new public registrations at the moment. Please contact the club administrator for an invitation.
 							</p>
@@ -196,7 +196,7 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 					) : (
 						<div className="p-6 md:p-10 rounded-3xl bg-hover border border-border shadow-xl backdrop-blur-xs">
 							<div className="mb-8 text-center border-b border-border pb-8">
-								<h2 className="text-2xl font-bold text-white mb-2">Registration Form</h2>
+								<h2 className="text-2xl font-bold text-foreground mb-2">Registration Form</h2>
 								<p className="text-muted">Please provide the required details to join the team.</p>
 							</div>
 
@@ -250,13 +250,13 @@ function RegistrationStatusView({ registration, clubName, clubId, settings }: Re
 				<div className="inline-flex items-center justify-center p-5 bg-success/10 rounded-full mb-6 relative">
 					<PartyPopper size={48} className="text-success" />
 				</div>
-				<h2 className="text-3xl font-bold text-white mb-4">Welcome to {clubName}!</h2>
+				<h2 className="text-3xl font-bold text-foreground mb-4">Welcome to {clubName}!</h2>
 				<p className="text-lg text-muted mb-8 max-w-lg mx-auto leading-relaxed">{message}</p>
 
 				{registration.publicNote && (
 					<div className="bg-hover border-l-4 border-l-success border-border rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
 						<h4 className="text-xs font-bold text-success uppercase tracking-wider mb-2">Message from Club</h4>
-						<p className="text-white italic font-light">&quot;{registration.publicNote}&quot;</p>
+						<p className="text-foreground italic font-light">&quot;{registration.publicNote}&quot;</p>
 					</div>
 				)}
 
@@ -286,7 +286,7 @@ function RegistrationStatusView({ registration, clubName, clubId, settings }: Re
 				<div className="inline-flex items-center justify-center p-5 bg-warning/10 rounded-full mb-6">
 					<Clock size={48} className="text-warning" />
 				</div>
-				<h2 className="text-2xl font-bold text-white mb-3">Request Submitted</h2>
+				<h2 className="text-2xl font-bold text-foreground mb-3">Request Submitted</h2>
 				<p className="text-muted mb-8 text-lg">{message}</p>
 
 				<div className="flex justify-center">
@@ -310,13 +310,13 @@ function RegistrationStatusView({ registration, clubName, clubId, settings }: Re
 				<div className="inline-flex items-center justify-center p-5 bg-info/10 rounded-full mb-6">
 					<Users size={48} className="text-info" />
 				</div>
-				<h2 className="text-2xl font-bold text-white mb-3">Added to Waitlist</h2>
+				<h2 className="text-2xl font-bold text-foreground mb-3">Added to Waitlist</h2>
 				<p className="text-muted mb-8 text-lg">{message}</p>
 
 				{registration.publicNote && (
 					<div className="bg-hover border-l-4 border-l-info border-border rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
 						<h4 className="text-xs font-bold text-info uppercase tracking-wider mb-2">Note from Club</h4>
-						<p className="text-white italic font-light">&quot;{registration.publicNote}&quot;</p>
+						<p className="text-foreground italic font-light">&quot;{registration.publicNote}&quot;</p>
 					</div>
 				)}
 
@@ -340,13 +340,13 @@ function RegistrationStatusView({ registration, clubName, clubId, settings }: Re
 				<div className="inline-flex items-center justify-center p-5 bg-error/10 rounded-full mb-6">
 					<XCircle size={48} className="text-error" />
 				</div>
-				<h2 className="text-2xl font-bold text-white mb-3">Registration Declined</h2>
+				<h2 className="text-2xl font-bold text-foreground mb-3">Registration Declined</h2>
 				<p className="text-muted mb-8 text-lg">{message}</p>
 
 				{registration.publicNote && (
 					<div className="bg-hover border-l-4 border-l-error border-border rounded-r-xl p-6 mb-8 text-left max-w-lg mx-auto">
 						<h4 className="text-xs font-bold text-error uppercase tracking-wider mb-2">Reason / Note</h4>
-						<p className="text-white italic font-light">&quot;{registration.publicNote}&quot;</p>
+						<p className="text-foreground italic font-light">&quot;{registration.publicNote}&quot;</p>
 					</div>
 				)}
 

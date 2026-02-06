@@ -21,12 +21,12 @@ const PositionWaitlist = ({ userId, position, shouldLoad = true }: PositionWaitl
 	const isOccupant = position.eventParticipant?.userProfile?.id === userId;
 
 	return (
-		<div className="bg-white/5 rounded-xl p-3 border border-white/5 mt-2">
+		<div className="bg-surface rounded-xl p-3 border border-border mt-2">
 			<div className="flex items-center justify-between mb-3">
 				<div className="flex items-center gap-2 text-sm font-bold text-white">
 					<Clock size={14} className="text-accent" />
 					<span>Waitlist</span>
-					{waitlist && waitlist.length > 0 && <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-xs text-muted">{waitlist.length}</span>}
+					{waitlist && waitlist.length > 0 && <span className="px-1.5 py-0.5 rounded-full bg-hover text-xs text-muted">{waitlist.length}</span>}
 				</div>
 
 				{!isOccupant && !isOnWaitlist && (
@@ -46,11 +46,11 @@ const PositionWaitlist = ({ userId, position, shouldLoad = true }: PositionWaitl
 						waitlist.map((waitlistEntry, i) => (
 							<div
 								key={`waitlist-${position.id}-${waitlistEntry.userId}`}
-								className="flex w-full items-center justify-between gap-3 p-2 rounded-lg bg-black/20 hover:bg-black/40 transition-colors group">
+								className="flex w-full items-center justify-between gap-3 p-2 rounded-lg bg-hover hover:bg-active transition-colors group">
 								<div className="flex items-center gap-3 min-w-0">
 									<span className="text-xs font-mono text-muted/50 w-4 text-center">{i + 1}</span>
 									<Link href={`/profiles/${waitlistEntry.userId}`} className="flex gap-2 items-center">
-										<Avatar profile={waitlistEntry.user} className="w-6 h-6 border border-white/10" />
+										<Avatar src={waitlistEntry.user.imageUrl} name={`${waitlistEntry.user.name} ${waitlistEntry.user.surname}`} className="w-6 h-6 border border-border" />
 										<span className="text-sm text-gray-300 hover:text-white hover:underline truncate">
 											{waitlistEntry.user.name} {waitlistEntry.user.surname}
 										</span>

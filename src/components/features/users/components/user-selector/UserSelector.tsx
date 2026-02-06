@@ -198,7 +198,7 @@ export default function UserSelector({
 							staleTime: 5000,
 						},
 					]
-				: [],
+				: ([] as any),
 	});
 
 	const isLoadingMembers = membersQueries.some((q) => q.isLoading);
@@ -210,7 +210,7 @@ export default function UserSelector({
 			return { hasMore: false, totalCount: externalUsers.length };
 		}
 		if (selectedClubId) {
-			const firstQuery = membersQueries[0];
+			const firstQuery = membersQueries[0] as any;
 			return {
 				hasMore: firstQuery?.data?.hasMore ?? false,
 				totalCount: firstQuery?.data?.totalCount,
@@ -240,8 +240,8 @@ export default function UserSelector({
 			}
 		} else if (selectedClubId) {
 			const userMap = new Map<string, UserProfile>();
-			membersQueries.forEach((query) => {
-				(query.data?.items || []).forEach((member) => {
+			membersQueries.forEach((query: any) => {
+				(query.data?.items || []).forEach((member: any) => {
 					if (member.userProfile) {
 						userMap.set(member.userProfile.userId, member.userProfile);
 					}
@@ -330,7 +330,7 @@ export default function UserSelector({
 			setIsSelectingAll(true);
 			try {
 				const allUsers: UserProfile[] = [...displayUsers];
-				let cursor = selectedClubId ? membersQueries[0]?.data?.nextCursor : usersResult?.nextCursor;
+				let cursor = selectedClubId ? (membersQueries[0] as any)?.data?.nextCursor : usersResult?.nextCursor;
 
 				// Fetch all remaining pages
 				while (cursor) {
@@ -453,7 +453,7 @@ export default function UserSelector({
 					<div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
 						<UserCheck size={16} className="text-accent" />
 					</div>
-					<span className="text-sm font-semibold text-white">Selected ({selectedUsers.length})</span>
+					<span className="text-sm font-semibold text-foreground">Selected ({selectedUsers.length})</span>
 				</div>
 				<div className="flex items-center gap-2">
 					{selectedUsers.length > 0 && (
@@ -461,7 +461,7 @@ export default function UserSelector({
 							type="button"
 							onClick={handleClearAllSelected}
 							disabled={disabled}
-							className="text-xs text-muted hover:text-red-400 transition-colors disabled:opacity-50">
+							className="text-xs text-muted-foreground hover:text-red-400 transition-colors disabled:opacity-50">
 							Clear
 						</button>
 					)}
@@ -469,7 +469,7 @@ export default function UserSelector({
 						<button
 							type="button"
 							onClick={() => setMobileSheetOpen(false)}
-							className="p-1 ml-2 rounded-md text-muted hover:text-white hover:bg-white/10 transition-colors">
+							className="p-1 ml-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-hover transition-colors">
 							<X size={20} />
 						</button>
 					)}
@@ -491,7 +491,7 @@ export default function UserSelector({
 						<button
 							type="button"
 							onClick={() => setSidebarSearch("")}
-							className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors">
+							className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
 							<X size={12} />
 						</button>
 					)}
@@ -500,7 +500,7 @@ export default function UserSelector({
 
 			{/* Search results info */}
 			{sidebarSearch && filteredSelectedUsers.length !== selectedUsers.length && (
-				<p className="text-xs text-muted mb-2 shrink-0">
+				<p className="text-xs text-muted-foreground mb-2 shrink-0">
 					Showing {filteredSelectedUsers.length} of {selectedUsers.length}
 				</p>
 			)}
@@ -508,28 +508,28 @@ export default function UserSelector({
 			<div className={`flex-1 min-h-0 overflow-y-auto space-y-2 ${isMobile ? "max-h-[40vh]" : ""}`}>
 				{selectedUsers.length === 0 ? (
 					<div className="py-8 text-center">
-						<div className="w-12 h-12 mx-auto mb-3 rounded-full bg-white/5 flex items-center justify-center">
-							<UserPlus size={24} className="text-muted" />
+						<div className="w-12 h-12 mx-auto mb-3 rounded-full bg-surface flex items-center justify-center">
+							<UserPlus size={24} className="text-muted-foreground" />
 						</div>
-						<p className="text-muted text-sm">No one selected yet</p>
-						<p className="text-muted/60 text-xs mt-1">Select people from the list</p>
+						<p className="text-muted-foreground text-sm">No one selected yet</p>
+						<p className="text-muted-foreground/60 text-xs mt-1">Select people from the list</p>
 					</div>
 				) : filteredSelectedUsers.length === 0 && sidebarSearch ? (
-					<div className="py-6 text-center text-muted text-xs">No selected people match "{sidebarSearch}"</div>
+					<div className="py-6 text-center text-muted-foreground text-xs">No selected people match "{sidebarSearch}"</div>
 				) : (
 					filteredSelectedUsers.map((user) => {
 						const displayName = `${user.name || ""} ${user.surname || ""}`.trim() || "Unknown User";
 						return (
-							<div key={user.id} className="flex items-center gap-3 p-2 rounded-lg bg-white/5 group">
+							<div key={user.id} className="flex items-center gap-3 p-2 rounded-lg bg-surface group">
 								<Avatar name={displayName} src={user.imageUrl} variant="user" size="xs" />
 								<div className="flex-1 min-w-0">
-									<p className="text-sm font-medium text-white truncate">{displayName}</p>
+									<p className="text-sm font-medium text-foreground truncate">{displayName}</p>
 								</div>
 								<button
 									type="button"
 									onClick={() => handleRemoveUser(user)}
 									disabled={disabled}
-									className="p-1.5 rounded-md text-muted hover:text-red-400 hover:bg-red-400/10 disabled:opacity-50">
+									className="p-1.5 rounded-md text-muted-foreground hover:text-red-400 hover:bg-red-400/10 disabled:opacity-50">
 									<X size={16} />
 								</button>
 							</div>
@@ -539,7 +539,7 @@ export default function UserSelector({
 			</div>
 
 			{showButton && (
-				<div className="pt-4 border-t border-white/10 mt-4 shrink-0">
+				<div className="pt-4 border-t border-border mt-4 shrink-0">
 					<Button
 						onClick={() => onButtonClick?.(selectedUsers)}
 						disabled={selectedUsers.length === 0 || disabled}
@@ -571,13 +571,13 @@ export default function UserSelector({
 							<button
 								type="button"
 								onClick={() => setSearchQuery("")}
-								className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors">
+								className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
 								<X size={16} />
 							</button>
 						)}
 						{(isSearching || isFetching) && (
 							<div className="absolute right-3 top-1/2 -translate-y-1/2">
-								<Loader2 size={16} className="animate-spin text-muted" />
+								<Loader2 size={16} className="animate-spin text-muted-foreground" />
 							</div>
 						)}
 					</div>
@@ -585,7 +585,7 @@ export default function UserSelector({
 					{/* Filters Row */}
 					{showFilters && (
 						<div className="mt-4 space-y-3 shrink-0">
-							<div className="flex items-center gap-1.5 text-muted">
+							<div className="flex items-center gap-1.5 text-muted-foreground">
 								<Filter size={14} />
 								<span className="text-xs font-medium">Filter by:</span>
 								{hasActiveFilters && (
@@ -595,7 +595,7 @@ export default function UserSelector({
 										onClick={clearAllFilters}
 										leftIcon={<RotateCcw size={14} />}
 										disabled={disabled}
-										className="text-muted hover:text-white ml-auto">
+										className="text-muted-foreground hover:text-foreground ml-auto">
 										Clear all
 									</Button>
 								)}
@@ -650,7 +650,7 @@ export default function UserSelector({
 									onChange={() => (allVisibleSelected ? handleDeselectAllFiltered() : handleSelectAll())}
 									disabled={disabled || isSelectingAll}
 								/>
-								<span className="text-sm text-muted">
+								<span className="text-sm text-muted-foreground">
 									{isSelectingAll ? (
 										<span className="flex items-center gap-2 text-accent">
 											<Loader2 size={14} className="animate-spin" />
@@ -660,16 +660,16 @@ export default function UserSelector({
 										<span className="text-accent">All {displayUsers.length} selected</span>
 									) : someVisibleSelected ? (
 										<>
-											<span className="text-white">{displayUsers.filter((u) => isUserSelected(u.id)).length}</span>
-											<span className="text-muted/60"> of </span>
-											<span className="text-white">{displayUsers.length}</span>
-											<span className="text-muted/60 hidden sm:inline"> selected</span>
+											<span className="text-foreground">{displayUsers.filter((u) => isUserSelected(u.id)).length}</span>
+											<span className="text-muted-foreground/60"> of </span>
+											<span className="text-foreground">{displayUsers.length}</span>
+											<span className="text-muted-foreground/60 hidden sm:inline"> selected</span>
 										</>
 									) : (
 										<span className="hidden sm:inline">
 											{displayUsers.length} {displayUsers.length === 1 ? "person" : "people"} in list
 											{paginationInfo.hasMore && paginationInfo.totalCount && (
-												<span className="text-muted/60"> ({paginationInfo.totalCount} total)</span>
+												<span className="text-muted-foreground/60"> ({paginationInfo.totalCount} total)</span>
 											)}
 										</span>
 									)}
@@ -677,7 +677,7 @@ export default function UserSelector({
 							</div>
 							<div className="flex items-center gap-2">
 								{isSelectingAll ? (
-									<span className="text-xs text-muted">Please wait...</span>
+									<span className="text-xs text-muted-foreground">Please wait...</span>
 								) : (
 									<>
 										{someVisibleSelected && !allVisibleSelected && (
@@ -694,7 +694,7 @@ export default function UserSelector({
 												type="button"
 												onClick={handleDeselectAllFiltered}
 												disabled={disabled || isSelectingAll}
-												className="text-xs text-muted hover:text-red-400 transition-colors disabled:opacity-50">
+												className="text-xs text-muted-foreground hover:text-red-400 transition-colors disabled:opacity-50">
 												Deselect
 											</button>
 										)}
@@ -759,13 +759,13 @@ export default function UserSelector({
 										onClick={() => handleUserToggle(user)}
 										disabled={disabled}
 										className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed ${
-											isSelected ? "bg-accent/10" : "hover:bg-white/5 border-l-2 border-transparent"
+											isSelected ? "bg-accent/10" : "hover:bg-hover border-l-2 border-transparent"
 										}`}>
 										<Checkbox checked={isSelected} onChange={() => {}} tabIndex={-1} disabled={disabled} />
 										<Avatar name={displayName} src={user.imageUrl} variant="user" size="sm" />
 										<div className="flex-1 min-w-0">
-											<p className={`text-sm font-medium truncate ${isSelected ? "text-white" : "text-white/90"}`}>{displayName}</p>
-											{user.email && <p className="text-xs text-muted truncate">{user.email}</p>}
+											<p className={`text-sm font-medium truncate ${isSelected ? "text-foreground" : "text-foreground/90"}`}>{displayName}</p>
+											{user.email && <p className="text-xs text-muted-foreground truncate">{user.email}</p>}
 										</div>
 									</button>
 								);
@@ -787,7 +787,7 @@ export default function UserSelector({
 				<button
 					type="button"
 					onClick={() => setMobileSheetOpen(true)}
-					className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors">
+					className="w-full flex items-center justify-between p-4 hover:bg-hover transition-colors">
 					<div className="flex items-center gap-3">
 						{/* Avatar Stack */}
 						<div className="flex -space-x-2">
@@ -797,27 +797,27 @@ export default function UserSelector({
 							})}
 							{selectedUsers.length === 0 && (
 								<div className="w-8 h-8 rounded-full bg-active border-2 border-border flex items-center justify-center">
-									<UserPlus size={16} className="text-muted" />
+									<UserPlus size={16} className="text-muted-foreground" />
 								</div>
 							)}
 							{selectedUsers.length > 3 && (
-								<div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-xs text-white font-medium border-2 border-neutral-900">
+								<div className="w-8 h-8 rounded-full bg-foreground/20 flex items-center justify-center text-xs text-foreground font-medium border-2 border-border">
 									+{selectedUsers.length - 3}
 								</div>
 							)}
 						</div>
 						<div className="text-left">
-							<p className="text-sm font-medium text-white">
+							<p className="text-sm font-medium text-foreground">
 								{selectedUsers.length === 0 ? "No one selected" : `${selectedUsers.length} selected`}
 							</p>
-							<p className="text-xs text-muted">Tap to view & manage</p>
+							<p className="text-xs text-muted-foreground">Tap to view & manage</p>
 						</div>
 					</div>
 					<div className="flex items-center gap-3">
 						{selectedUsers.length > 0 && (
 							<span className="px-2.5 py-1 bg-accent/20 text-accent text-xs font-medium rounded-full">{selectedUsers.length}</span>
 						)}
-						<svg className="w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
 						</svg>
 					</div>
@@ -830,12 +830,12 @@ export default function UserSelector({
 				createPortal(
 					<div className="lg:hidden fixed inset-0 z-[100]">
 						{/* Backdrop */}
-						<div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileSheetOpen(false)} />
+						<div className="absolute inset-0 bg-overlay backdrop-blur-sm" onClick={() => setMobileSheetOpen(false)} />
 						{/* Sheet */}
 						<div className="absolute bottom-0 left-0 right-0 bg-surface rounded-t-2xl border-t border-border max-h-[85vh] flex flex-col animate-in slide-in-from-bottom duration-300">
 							{/* Handle */}
 							<div className="flex justify-center py-3">
-								<div className="w-10 h-1 rounded-full bg-white/20" />
+								<div className="w-10 h-1 rounded-full bg-foreground/20" />
 							</div>
 							{/* Content */}
 							<div className="px-4 pb-8 flex flex-col flex-1 overflow-hidden">

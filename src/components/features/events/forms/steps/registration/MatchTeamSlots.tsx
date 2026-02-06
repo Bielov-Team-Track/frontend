@@ -17,16 +17,16 @@ export function MatchTeamSlots() {
 	const [awayTeam, setAwayTeam] = useState<MatchTeamSlot | null>(null);
 
 	return (
-		<div className="space-y-6">
-			<div className="space-y-4">
-				<h3 className="text-sm font-medium text-white">Team Selection</h3>
+		<div className="space-y-4 sm:space-y-6">
+			<div className="space-y-3 sm:space-y-4">
+				<h3 className="text-xs sm:text-sm font-medium text-foreground">Team Selection</h3>
 
 				<TeamSlotCard label="Home Team" slot={homeTeam} onChange={setHomeTeam} />
 
-				<div className="flex items-center gap-4">
-					<div className="flex-1 h-px bg-white/10" />
-					<span className="text-xs text-muted font-medium">VS</span>
-					<div className="flex-1 h-px bg-white/10" />
+				<div className="flex items-center gap-3 sm:gap-4">
+					<div className="flex-1 h-px bg-hover" />
+					<span className="text-[10px] sm:text-xs text-muted font-medium">VS</span>
+					<div className="flex-1 h-px bg-hover" />
 				</div>
 
 				<TeamSlotCard label="Away Team" slot={awayTeam} onChange={setAwayTeam} />

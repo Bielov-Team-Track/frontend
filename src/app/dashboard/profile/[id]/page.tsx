@@ -101,7 +101,7 @@ function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
 		return null; // Redirect handled in useEffect
 	}
 
-	const isOwnProfile = userProfile?.id === profile.userId;
+	const isOwnProfile = userProfile?.id === profile.userProfile?.id;
 
 	const tabs = [
 		{ id: "overview", label: "Overview", icon: <LayoutDashboard size={18} /> },
@@ -113,10 +113,22 @@ function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
 
 	return (
 		<div className="flex flex-col w-full max-w-7xl mx-auto pb-12">
-			<ProfileHeader profile={profile} onFollow={handleFollowToggle} isOwnProfile={isOwnProfile} />
+			<ProfileHeader
+				profile={{
+					...profile.userProfile!,
+					location: profile.location,
+					website: profile.website,
+					followersCount: profile.followersCount,
+					followingCount: profile.followingCount,
+					joinedAt: profile.joinedAt,
+					isFollowing: profile.isFollowing,
+				}}
+				onFollow={handleFollowToggle}
+				isOwnProfile={isOwnProfile}
+			/>
 
 			{/* Tabs Navigation */}
-			<div className="mt-12 px-6 border-b border-white/10 flex overflow-x-auto no-scrollbar gap-1">
+			<div className="mt-12 px-6 border-b border-border flex overflow-x-auto no-scrollbar gap-1">
 				{tabs.map((tab) => (
 					<button
 						key={tab.id}
@@ -126,7 +138,7 @@ function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
                             ${
 								activeTab === tab.id
 									? "border-accent text-accent bg-accent/5"
-									: "border-transparent text-muted hover:text-white hover:border-white/20 hover:bg-white/5"
+									: "border-transparent text-muted hover:text-foreground hover:border-border hover:bg-hover"
 							}
                         `}>
 						{tab.icon}
@@ -137,7 +149,7 @@ function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
 
 			{/* Content Area */}
 			<div className="px-6 py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-				{activeTab === "overview" && <ProfileOverview badges={profile.badges} stats={profile.stats} />}
+				{activeTab === "overview" && <ProfileOverview />}
 
 				{activeTab === "player" && <PlayerStats playerProfile={profile.playerProfile} />}
 

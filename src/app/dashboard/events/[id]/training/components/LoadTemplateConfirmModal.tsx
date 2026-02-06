@@ -32,7 +32,7 @@ export default function LoadTemplateConfirmModal({ isOpen, onClose, onConfirm, t
 							onConfirm(true);
 							onClose();
 						}}
-						className="w-full p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-accent/50 transition-all text-left group">
+						className="w-full p-4 rounded-xl bg-surface hover:bg-hover border border-border hover:border-accent/50 transition-all text-left group">
 						<div className="font-medium text-white group-hover:text-accent transition-colors">Replace All Drills</div>
 						<div className="text-xs text-muted mt-1">Clear your current timeline and load the template</div>
 					</button>
@@ -42,14 +42,14 @@ export default function LoadTemplateConfirmModal({ isOpen, onClose, onConfirm, t
 							onConfirm(false);
 							onClose();
 						}}
-						className="w-full p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-accent/50 transition-all text-left group">
+						className="w-full p-4 rounded-xl bg-surface hover:bg-hover border border-border hover:border-accent/50 transition-all text-left group">
 						<div className="font-medium text-white group-hover:text-accent transition-colors">Append to End</div>
 						<div className="text-xs text-muted mt-1">Keep your current drills and add the template after them</div>
 					</button>
 				</div>
 
 				{/* Cancel */}
-				<div className="pt-2 border-t border-white/10">
+				<div className="pt-2 border-t border-border">
 					<Button variant="ghost" color="neutral" onClick={onClose} className="w-full">
 						Cancel
 					</Button>

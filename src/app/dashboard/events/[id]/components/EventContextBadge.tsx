@@ -37,7 +37,7 @@ const contextConfig = {
 	event: {
 		icon: Building2,
 		label: "Standalone",
-		color: "from-white/10 to-white/5 border-white/20 text-muted",
+		color: "from-surface to-surface border-border text-muted",
 		iconColor: "text-muted",
 		href: () => "#",
 	},
@@ -94,8 +94,8 @@ export default function EventContextBadge({ contextId, contextType }: EventConte
 		// Loading state - show skeleton
 		return (
 			<div className="flex items-center gap-2 animate-pulse">
-				<div className="w-6 h-6 rounded-md bg-white/10" />
-				<div className="h-4 w-20 rounded bg-white/10" />
+				<div className="w-6 h-6 rounded-md bg-hover" />
+				<div className="h-4 w-20 rounded bg-hover" />
 			</div>
 		);
 	}
@@ -110,7 +110,7 @@ export default function EventContextBadge({ contextId, contextType }: EventConte
 			`}>
 			{/* Logo or Icon */}
 			{logoUrl ? (
-				<div className="w-5 h-5 rounded-md overflow-hidden bg-white/10 shrink-0">
+				<div className="w-5 h-5 rounded-md overflow-hidden bg-hover shrink-0">
 					<Image src={logoUrl} alt="" width={20} height={20} className="w-full h-full object-cover" />
 				</div>
 			) : (

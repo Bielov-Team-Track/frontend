@@ -40,7 +40,7 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 		.filter((id, index, self) => self.indexOf(id) === index); // unique IDs
 
 	return (
-		<div className="min-h-screen bg-background text-white font-sans pb-20">
+		<div className="min-h-screen bg-background text-foreground font-sans pb-20">
 			{/* --- HERO SECTION --- */}
 			<div className="relative w-full">
 				{/* Banner & Gradient */}
@@ -71,15 +71,15 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 									</span>
 								)}
 							</div>
-							<h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight">{event.name}</h1>
+							<h1 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight leading-tight">{event.name}</h1>
 							<p className="text-muted text-sm md:text-base flex flex-wrap items-center gap-x-4 gap-y-2 mt-1">
-								<span className="flex items-center gap-1.5 text-white">
+								<span className="flex items-center gap-1.5 text-foreground">
 									<Clock size={16} className="text-accent" />
 									{getFormattedTime(event.startTime)} - {getFormattedTime(event.endTime)}
 									<span className="text-muted">({duration})</span>
 								</span>
 								<span className="w-1 h-1 bg-muted rounded-full hidden sm:block" />
-								<span className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer">
+								<span className="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-pointer">
 									<MapPin size={16} className="text-accent" />
 									{event.location?.address || "TBD"}
 								</span>
@@ -94,7 +94,7 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 								<EventPageButtons event={event} participantIds={participantIds} />
 							</div>
 						)}
-						<button className="btn btn-square btn-ghost bg-white/5 hover:bg-white/10 border border-white/10 text-white">
+						<button className="btn btn-square btn-ghost bg-surface hover:bg-hover border border-border text-foreground">
 							<Share2 size={18} />
 						</button>
 					</div>
@@ -109,21 +109,21 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 				{/* --- LEFT SIDEBAR (Details & Admin) --- */}
 				<div className="lg:col-span-4 space-y-6 order-2 lg:order-1">
 					{/* Status Card (Mobile Date) */}
-					<div className="md:hidden p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center gap-4">
-						<div className="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-surface-elevated border border-white/10">
+					<div className="md:hidden p-4 rounded-2xl bg-surface border border-border flex items-center gap-4">
+						<div className="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-surface-elevated border border-border">
 							<span className="text-xl font-bold text-accent">{day}</span>
 							<span className="text-[10px] font-bold text-muted uppercase">{month}</span>
 						</div>
 						<div>
-							<div className="text-sm font-medium text-white">Date & Time</div>
+							<div className="text-sm font-medium text-foreground">Date & Time</div>
 							<div className="text-xs text-muted">{getFormattedDateWithDay(event.startTime)}</div>
 						</div>
 					</div>
 
 					{/* Location Map */}
-					<div className="rounded-2xl bg-white/5 border border-white/5 overflow-hidden">
-						<div className="p-4 border-b border-white/5 flex justify-between items-center">
-							<h3 className="text-sm font-bold text-white flex items-center gap-2">
+					<div className="rounded-2xl bg-surface border border-border overflow-hidden">
+						<div className="p-4 border-b border-border flex justify-between items-center">
+							<h3 className="text-sm font-bold text-foreground flex items-center gap-2">
 								<MapPin size={16} className="text-accent" /> Location
 							</h3>
 							{event.location?.address && (
@@ -151,14 +151,14 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 				{/* --- RIGHT MAIN CONTENT (Tabs) --- */}
 				<div className="lg:col-span-8 order-1 lg:order-2">
 					{/* Tabs Navigation */}
-					<div className="flex items-center border-b border-white/10 mb-6 overflow-x-auto no-scrollbar">
+					<div className="flex items-center border-b border-border mb-6 overflow-x-auto no-scrollbar">
 						{["overview", "teams", "payments", "comments"].map((tab) => (
 							<button
 								key={tab}
 								onClick={() => setActiveTab(tab)}
 								className={`
                   px-6 pb-4 text-sm font-bold capitalize relative transition-colors whitespace-nowrap
-                  ${activeTab === tab ? "text-accent" : "text-muted hover:text-white"}
+                  ${activeTab === tab ? "text-accent" : "text-muted hover:text-foreground"}
                 `}>
 								{tab}
 								{activeTab === tab && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-accent rounded-t-full z-10" />}
@@ -180,8 +180,8 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 									/>
 								)}
 
-								<div className="p-6 rounded-2xl bg-white/5 border border-white/5">
-									<h3 className="text-lg font-bold text-white mb-3">About Event</h3>
+								<div className="p-6 rounded-2xl bg-surface border border-border">
+									<h3 className="text-lg font-bold text-foreground mb-3">About Event</h3>
 									<div className="prose prose-invert max-w-none text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
 										{event.description || "No description provided."}
 									</div>
@@ -189,25 +189,25 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 
 								{/* Registration Info / Quick Stats */}
 								<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-									<div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+									<div className="p-4 rounded-xl bg-surface border border-border text-center">
 										<div className="text-xs text-muted uppercase font-bold mb-1">Teams</div>
-										<div className="text-2xl font-black text-white">{teams.length}</div>
+										<div className="text-2xl font-black text-foreground">{teams.length}</div>
 									</div>
-									<div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+									<div className="p-4 rounded-xl bg-surface border border-border text-center">
 										<div className="text-xs text-muted uppercase font-bold mb-1">Format</div>
-										<div className="text-lg font-bold text-white truncate">
+										<div className="text-lg font-bold text-foreground truncate">
 											{event.registrationUnit === Unit.Team ? "Team" : "Individual"}
 										</div>
 									</div>
-									<div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+									<div className="p-4 rounded-xl bg-surface border border-border text-center">
 										<div className="text-xs text-muted uppercase font-bold mb-1">Cost</div>
 										<div className="text-lg font-bold text-accent">
 											{event.budget ? `${event.budget.currency || "£"}${event.budget.cost}` : "Free"}
 										</div>
 									</div>
-									<div className="p-4 rounded-xl bg-white/5 border border-white/5 text-center">
+									<div className="p-4 rounded-xl bg-surface border border-border text-center">
 										<div className="text-xs text-muted uppercase font-bold mb-1">Status</div>
-										<div className="text-lg font-bold text-white capitalize">{event.canceled ? "Canceled" : "Active"}</div>
+										<div className="text-lg font-bold text-foreground capitalize">{event.canceled ? "Canceled" : "Active"}</div>
 									</div>
 								</div>
 							</>
@@ -217,12 +217,12 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 						{activeTab === "teams" && (
 							<div className="space-y-4">
 								<div className="flex justify-between items-center mb-2">
-									<h3 className="text-lg font-bold text-white">Registered Teams</h3>
+									<h3 className="text-lg font-bold text-foreground">Registered Teams</h3>
 								</div>
 								{teams && teams.length > 0 ? (
 									<TeamsList teams={teams} userId={user?.id} isAdmin={isAdmin} registrationType={event.registrationUnit} />
 								) : (
-									<div className="text-center py-12 bg-white/5 rounded-2xl border border-white/5 border-dashed text-muted">
+									<div className="text-center py-12 bg-surface rounded-2xl border border-border border-dashed text-muted">
 										<Users size={48} className="mx-auto mb-4 opacity-50" />
 										<p>No teams registered yet.</p>
 									</div>

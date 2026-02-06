@@ -40,7 +40,7 @@ export interface WizardConfig<TData extends FieldValues> {
 	steps: WizardStep<TData>[];
 	defaultValues: TData;
 	validationSchema: ObjectSchema<TData>;
-	onSubmit: (data: TData, context: WizardContext) => Promise<void>;
+	onSubmit: (data: TData, context: WizardContext) => Promise<{ id: string }>;
 	successConfig: WizardSuccessConfig;
 }
 

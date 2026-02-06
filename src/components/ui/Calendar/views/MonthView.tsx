@@ -66,28 +66,28 @@ function MonthView({
 	};
 
 	return (
-		<div className="w-full h-full flex flex-col border border-white/5 rounded-2xl backdrop-blur-xl overflow-hidden shadow-2xl">
+		<div className="w-full h-full flex flex-col border border-border rounded-2xl backdrop-blur-xl overflow-hidden shadow-2xl">
 			{/* Header */}
-			<div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/2">
-				<h2 className="text-2xl font-bold text-white tracking-tight">
+			<div className="p-4 flex items-center justify-between border-b border-border bg-surface">
+				<h2 className="text-2xl font-bold text-foreground tracking-tight">
 					{format(currentDate, "MMMM yyyy")}
 				</h2>
-				<div className="flex items-center bg-black/20 rounded-lg p-1 border border-white/5">
+				<div className="flex items-center bg-hover rounded-lg p-1 border border-border">
 					<Button
 						size="sm"
 						variant="ghost"
 						color="neutral"
 						onClick={handlePrevMonth}
-						className="h-8 w-8 p-0 hover:bg-white/10 hover:text-white rounded-md">
+						className="h-8 w-8 p-0 hover:bg-hover hover:text-foreground rounded-md">
 						<ChevronLeft size={16} />
 					</Button>
-					<div className="w-px h-4 bg-white/10 mx-1"></div>
+					<div className="w-px h-4 bg-hover mx-1"></div>
 					<Button
 						onClick={handleNextMonth}
 						variant="ghost"
 						color="neutral"
 						size="sm"
-						className="h-8 w-8 p-0 hover:bg-white/10 hover:text-white rounded-md">
+						className="h-8 w-8 p-0 hover:bg-hover hover:text-foreground rounded-md">
 						<ChevronRight size={16} />
 					</Button>
 				</div>
@@ -95,11 +95,11 @@ function MonthView({
 
 			<div className="flex-1 flex flex-col min-h-0">
 				{/* Weekday headers */}
-				<div className="grid grid-cols-7 border-b border-white/5 bg-white/2">
+				<div className="grid grid-cols-7 border-b border-border bg-surface">
 					{weekDays.map((day) => (
 						<div
 							key={day}
-							className="text-center text-[11px] font-bold text-muted uppercase tracking-widest py-3">
+							className="text-center text-[11px] font-bold text-muted-foreground uppercase tracking-widest py-3">
 							{day}
 						</div>
 					))}
@@ -110,7 +110,7 @@ function MonthView({
 					{[0, 1, 2, 3, 4, 5].map((week) => (
 						<div
 							key={week}
-							className="grid grid-cols-7 border-b border-white/5 last:border-b-0">
+							className="grid grid-cols-7 border-b border-border last:border-b-0">
 							{allDays
 								.slice(week * 7, (week + 1) * 7)
 								.map((day, dayIndex) => {
@@ -175,9 +175,9 @@ const DayCell = memo(function DayCell({
 		<div
 			onClick={handleDayClick}
 			className={`
-                p-2 flex flex-col cursor-pointer border-r border-white/5 last:border-r-0 relative transition-all duration-200 group
-                ${!isCurrentMonth ? "bg-white/1" : "bg-transparent"}
-                ${isToday ? "bg-accent/8" : "hover:bg-white/3"}
+                p-2 flex flex-col cursor-pointer border-r border-border last:border-r-0 relative transition-all duration-200 group
+                ${!isCurrentMonth ? "bg-surface/50" : "bg-transparent"}
+                ${isToday ? "bg-accent/8" : "hover:bg-hover"}
             `}>
 			{/* Top Bar for Today */}
 			{isToday && (
@@ -192,8 +192,8 @@ const DayCell = memo(function DayCell({
 						isToday
 							? "bg-accent text-white shadow-md shadow-accent/20"
 							: isCurrentMonth
-							? "text-white group-hover:bg-white/10"
-							: "text-muted/30"
+							? "text-white group-hover:bg-hover"
+							: "text-muted-foreground/30"
 					}
                 `}>
 					{format(day, "d")}
@@ -213,15 +213,15 @@ const DayCell = memo(function DayCell({
                             px-2 py-1 rounded text-[10px] font-medium truncate transition-all cursor-pointer border-l-2
                             ${
 								isToday
-									? "bg-white/10 text-white border-accent hover:bg-white/20"
-									: "bg-white/5 text-muted/80 border-white/10 hover:text-white hover:bg-white/10 hover:border-white/30"
+									? "bg-hover text-white border-accent hover:bg-surface0"
+									: "bg-surface text-muted-foreground/80 border-border hover:text-foreground hover:bg-hover hover:border-border/80"
 							}
                         `}>
 						{event.name}
 					</div>
 				))}
 				{events.length > 3 && (
-					<div className="text-[9px] text-muted pl-1 font-medium group-hover:text-white transition-colors">
+					<div className="text-[9px] text-muted-foreground pl-1 font-medium group-hover:text-foreground transition-colors">
 						+{events.length - 3} more
 					</div>
 				)}

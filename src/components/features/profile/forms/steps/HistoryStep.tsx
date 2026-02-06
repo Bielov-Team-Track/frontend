@@ -125,7 +125,7 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 	];
 
 	const { handleSubmit } = useForm<FormData>({
-		resolver: yupResolver(schema),
+		resolver: yupResolver(schema) as any,
 	});
 
 	// Handle clicks outside for suggestions
@@ -322,30 +322,30 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 	};
 
 	const renderSuggestionItem = (item: Suggestion, onSelect: (item: Suggestion) => void) => (
-		<li key={item.id} className="px-4 py-2 hover:bg-white/5 cursor-pointer flex items-center gap-3" onMouseDown={() => onSelect(item)}>
+		<li key={item.id} className="px-4 py-2 hover:bg-hover cursor-pointer flex items-center gap-3" onMouseDown={() => onSelect(item)}>
 			{item.logoUrl ? (
-				<div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0 bg-white/10">
+				<div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0 bg-foreground/10">
 					<Image src={item.logoUrl} alt={item.name} fill className="object-cover" />
 				</div>
 			) : (
-				<div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-muted">
+				<div className="w-6 h-6 rounded-full bg-foreground/10 flex items-center justify-center shrink-0 text-muted">
 					<Shield size={14} />
 				</div>
 			)}
-			<span className="text-sm text-white truncate">{item.name}</span>
+			<span className="text-sm text-foreground truncate">{item.name}</span>
 		</li>
 	);
 
 	return (
 		<form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 			<div className="flex flex-col gap-2">
-				<h2 className="text-xl font-semibold text-white">Experience & History</h2>
-				<p className="text-sm text-muted">Add your past teams, clubs, and roles.</p>
+				<h2 className="text-xl font-semibold text-foreground">Experience & History</h2>
+				<p className="text-sm text-muted-foreground">Add your past teams, clubs, and roles.</p>
 			</div>
 
 			{/* Add Entry Form */}
-			<div className="bg-white/5 rounded-xl border border-white/10 p-4 flex flex-col gap-4">
-				<h3 className="font-medium text-white flex items-center gap-2">
+			<div className="bg-surface rounded-xl border border-border p-4 flex flex-col gap-4">
+				<h3 className="font-medium text-foreground flex items-center gap-2">
 					<Plus size={16} className="text-accent" /> Add New Entry
 				</h3>
 
@@ -370,18 +370,18 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 							required
 						/>
 						{showClubSuggestions && filteredClubSuggestions.length > 0 && !isLoadingClubs && (
-							<ul className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
+							<ul className="absolute z-10 w-full bg-surface-elevated border border-border rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
 								{filteredClubSuggestions.map((club) => renderSuggestionItem(club, handleSelectClubSuggestion))}
 							</ul>
 						)}
 						{showClubSuggestions && isLoadingClubs && (
-							<div className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg p-3 mt-1 flex items-center justify-center gap-2 text-muted text-sm">
+							<div className="absolute z-10 w-full bg-surface-elevated border border-border rounded-md shadow-lg p-3 mt-1 flex items-center justify-center gap-2 text-muted-foreground text-sm">
 								<Loader2 size={14} className="animate-spin" />
 								Searching clubs...
 							</div>
 						)}
 						{showClubSuggestions && !isLoadingClubs && filteredClubSuggestions.length === 0 && clubName.length >= 2 && (
-							<div className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg p-3 mt-1 text-muted text-sm text-center">
+							<div className="absolute z-10 w-full bg-surface-elevated border border-border rounded-md shadow-lg p-3 mt-1 text-muted-foreground text-sm text-center">
 								No clubs found. You can still enter manually.
 							</div>
 						)}
@@ -411,12 +411,12 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 							disabled={!selectedClub}
 						/>
 						{showTeamSuggestions && filteredTeamSuggestions.length > 0 && (
-							<ul className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
+							<ul className="absolute z-10 w-full bg-surface-elevated border border-border rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
 								{filteredTeamSuggestions.map((team) => renderSuggestionItem(team, handleSelectTeamSuggestion))}
 							</ul>
 						)}
 						{isLoadingTeams && (
-							<div className="absolute z-10 w-full bg-[#1e1e1e] border border-white/10 rounded-md shadow-lg p-3 mt-1 flex items-center justify-center gap-2 text-muted text-sm">
+							<div className="absolute z-10 w-full bg-surface-elevated border border-border rounded-md shadow-lg p-3 mt-1 flex items-center justify-center gap-2 text-muted-foreground text-sm">
 								<Loader2 size={14} className="animate-spin" />
 								Loading teams...
 							</div>
@@ -445,7 +445,7 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 
 			{/* Timeline Visualization */}
 			{sortedYears.length > 0 && (
-				<div className="relative pl-4 ml-2 border-l-2 border-white/10 space-y-8 py-2">
+				<div className="relative pl-4 ml-2 border-l-2 border-border space-y-8 py-2">
 					{sortedYears.map((year) => (
 						<div key={year} className="relative animate-in fade-in slide-in-from-left-4">
 							{/* Dot on line */}
@@ -464,41 +464,41 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 
 									return (
 										<div key={clubNameKey} className="flex flex-col gap-2 ml-1">
-											<div className="flex items-center gap-2 border-b border-white/5 pb-1 mb-1">
+											<div className="flex items-center gap-2 border-b border-border pb-1 mb-1">
 												{firstEntry.clubLogoUrl ? (
-													<div className="relative w-6 h-6 rounded-full overflow-hidden bg-white/10 shrink-0">
+													<div className="relative w-6 h-6 rounded-full overflow-hidden bg-foreground/10 shrink-0">
 														<Image src={firstEntry.clubLogoUrl} alt={clubNameKey} fill className="object-cover" />
 													</div>
 												) : (
-													<div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-muted shrink-0">
+													<div className="w-6 h-6 rounded-full bg-foreground/10 flex items-center justify-center text-muted-foreground shrink-0">
 														<Shield size={14} />
 													</div>
 												)}
-												<span className="text-white font-semibold text-base">{clubNameKey}</span>
+												<span className="text-foreground font-semibold text-base">{clubNameKey}</span>
 											</div>
 
 											<div className="flex flex-col gap-3">
 												{clubEntries.map((entry) => (
 													<div
 														key={entry.id}
-														className="flex justify-between items-start group bg-white/5 p-3 rounded-lg border border-white/5 hover:border-white/10 transition-colors">
+														className="flex justify-between items-start group bg-surface p-3 rounded-lg border border-border hover:border-border/80 transition-colors">
 														<div className="flex flex-col gap-1">
 															{entry.teamName && (
 																<div className="flex items-center gap-2 mb-1">
 																	{entry.teamLogoUrl && (
-																		<div className="relative w-4 h-4 rounded-full overflow-hidden bg-white/10 shrink-0">
+																		<div className="relative w-4 h-4 rounded-full overflow-hidden bg-foreground/10 shrink-0">
 																			<Image src={entry.teamLogoUrl} alt={entry.teamName} fill className="object-cover" />
 																		</div>
 																	)}
-																	<span className="text-white text-sm font-medium">{entry.teamName}</span>
+																	<span className="text-foreground text-sm font-medium">{entry.teamName}</span>
 																</div>
 															)}
 
-															<div className="text-white/90 text-sm flex items-center gap-2">
+															<div className="text-foreground/90 text-sm flex items-center gap-2">
 																<span className={entry.teamName ? "text-muted" : "font-medium"}>{entry.role}</span>
 
 																{entry.positions.length > 0 && (
-																	<span className="text-muted text-xs italic before:content-['•'] before:mr-2">
+																	<span className="text-muted-foreground text-xs italic before:content-['•'] before:mr-2">
 																		{entry.positions.join(", ")}
 																	</span>
 																)}
@@ -508,7 +508,7 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 														<button
 															type="button"
 															onClick={() => handleRemoveEntry(entry.id)}
-															className="text-muted hover:text-red-400 transition-colors p-1"
+															className="text-muted-foreground hover:text-red-400 transition-colors p-1"
 															title="Remove entry">
 															<Trash2 size={14} />
 														</button>
@@ -525,7 +525,7 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 			)}
 
 			{sortedYears.length === 0 && (
-				<div className="text-center py-8 text-muted border border-dashed border-white/10 rounded-xl">No history entries added yet.</div>
+				<div className="text-center py-8 text-muted-foreground border border-dashed border-border rounded-xl">No history entries added yet.</div>
 			)}
 		</form>
 	);

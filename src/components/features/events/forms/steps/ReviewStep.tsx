@@ -69,7 +69,7 @@ export default function ReviewStep() {
 			</div>
 
 			{/* Event Preview Card */}
-			<div className="relative w-full rounded-xl sm:rounded-2xl overflow-hidden bg-surface-elevated border border-white/10 shadow-xl">
+			<div className="relative w-full rounded-xl sm:rounded-2xl overflow-hidden bg-surface-elevated border border-border shadow-xl">
 				{/* Header Banner */}
 				<div className="h-16 sm:h-24 w-full bg-linear-to-br from-accent/30 via-accent/10 to-transparent relative">
 					<div className="absolute inset-0 bg-linear-to-t from-surface-elevated via-transparent to-transparent" />
@@ -127,22 +127,22 @@ export default function ReviewStep() {
 					</div>
 
 					{/* Settings Summary */}
-					<div className="pt-3 sm:pt-4 border-t border-white/5 relative group">
+					<div className="pt-3 sm:pt-4 border-t border-border relative group">
 						<div className="absolute right-0 top-3 sm:top-4 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-							<button onClick={() => goToStep(3)} className="text-muted-foreground hover:text-foreground p-1 sm:p-1.5" title="Edit Settings">
+							<button onClick={() => goToStep(4)} className="text-muted-foreground hover:text-foreground p-1 sm:p-1.5" title="Edit Settings">
 								<Pencil size={12} />
 							</button>
 						</div>
 						<div className="flex flex-wrap gap-2 sm:gap-3">
 							{/* Payment Badge */}
-							<div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10">
+							<div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-surface border border-border">
 								<Coins size={10} className="text-accent sm:hidden" />
 								<Coins size={12} className="text-accent hidden sm:block" />
 								<span className="text-[10px] sm:text-xs text-foreground">{!values.usePaymentConfig ? "Free" : getPaymentConfigSummary()}</span>
 							</div>
 
 							{/* Privacy Badge */}
-							<div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10">
+							<div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-surface border border-border">
 								{values.isPublic ? (
 									<>
 										<Eye size={10} className="text-accent sm:hidden" />

@@ -14,7 +14,7 @@ interface TemplateCardProps {
 }
 
 export default function TemplateCard({ template, href, showCreator = false, variant = "default" }: TemplateCardProps) {
-	const cardHref = href || `/dashboard/training/plans/templates/${template.id}`;
+	const cardHref = href || `/dashboard/coaching/training/plans/${template.id}`;
 
 	// Calculate display values
 	const displaySkills = template.skills.slice(0, 3);
@@ -29,22 +29,22 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 		return (
 			<Link
 				href={cardHref}
-				className="group block p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+				className="group block p-3 rounded-xl bg-surface hover:bg-hover transition-all">
 				<div className="flex items-start justify-between gap-3">
 					<div className="flex-1 min-w-0">
 						<div className="flex items-center gap-2 mb-1">
 							<Badge
 								size="xs"
 								color={template.visibility === "Public" ? "info" : "secondary"}
-								variant="soft"
+								variant="ghost"
 								icon={template.visibility === "Public" ? <Eye size={10} /> : <Lock size={10} />}>
 								{template.visibility}
 							</Badge>
 						</div>
-						<h4 className="font-semibold text-white text-sm group-hover:text-accent transition-colors">
+						<h4 className="font-semibold text-foreground text-sm group-hover:text-accent transition-colors">
 							{template.name}
 						</h4>
-						<div className="flex items-center gap-3 mt-1.5 text-xs text-muted">
+						<div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
 							<span>{template.totalDuration}m</span>
 							{displaySkills.length > 0 && (
 								<span className="truncate">
@@ -58,8 +58,8 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 							<Link
 								href={`/dashboard/profile/${template.author?.id}`}
 								onClick={(e) => e.stopPropagation()}
-								className="flex items-center gap-1.5 mt-1.5 text-[10px] text-muted/70 hover:text-white transition-colors group/source">
-								<span className="text-muted/50">by</span>
+								className="flex items-center gap-1.5 mt-1.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors group/source">
+								<span className="text-muted-foreground/50">by</span>
 								<Avatar size="sm" className="size-4">
 									{template.author?.avatarUrl ? (
 										<AvatarImage src={template.author.avatarUrl} alt={authorName} />
@@ -76,7 +76,7 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 							<Link
 								href={`/dashboard/clubs/${template.clubId}`}
 								onClick={(e) => e.stopPropagation()}
-								className="flex items-center gap-1.5 mt-1 text-[10px] text-muted/70 hover:text-white transition-colors group/club">
+								className="flex items-center gap-1.5 mt-1 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors group/club">
 								<Avatar size="sm" className="size-4">
 									{template.clubLogoUrl ? (
 										<AvatarImage src={template.clubLogoUrl} alt={template.clubName} />
@@ -97,21 +97,21 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 	return (
 		<Link
 			href={cardHref}
-			className="group block rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/[0.07] transition-all">
+			className="group block rounded-2xl bg-surface border border-border hover:border-border/80 hover:bg-hover transition-all">
 			<div className="p-5">
 				{/* Header: Visibility Badge */}
 				<div className="flex items-center justify-between mb-3">
 					<Badge
 						size="xs"
 						color={template.visibility === "Public" ? "info" : "secondary"}
-						variant="soft"
+						variant="ghost"
 						icon={template.visibility === "Public" ? <Eye size={11} /> : <Lock size={11} />}>
 						{template.visibility}
 					</Badge>
 				</div>
 
 				{/* Title */}
-				<h3 className="font-semibold text-white text-base leading-snug group-hover:text-accent transition-colors">
+				<h3 className="font-semibold text-foreground text-base leading-snug group-hover:text-accent transition-colors">
 					{template.name}
 				</h3>
 
@@ -120,8 +120,8 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 					<Link
 						href={`/dashboard/profile/${template.author?.id}`}
 						onClick={(e) => e.stopPropagation()}
-						className="flex items-center gap-1.5 mt-1 text-xs text-muted/70 hover:text-white transition-colors group/source">
-						<span className="text-muted/50">by</span>
+						className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground/70 hover:text-foreground transition-colors group/source">
+						<span className="text-muted-foreground/50">by</span>
 						<Avatar size="sm" className="size-5">
 							{template.author?.avatarUrl ? (
 								<AvatarImage src={template.author.avatarUrl} alt={authorName} />
@@ -136,7 +136,7 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 
 				{/* Description */}
 				{template.description && (
-					<p className="text-sm text-muted line-clamp-2 mt-2 leading-relaxed">{template.description}</p>
+					<p className="text-sm text-muted-foreground line-clamp-2 mt-2 leading-relaxed">{template.description}</p>
 				)}
 
 				{/* Skills Tags */}
@@ -145,12 +145,12 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 						{displaySkills.map((skill) => (
 							<span
 								key={skill}
-								className="text-xs px-2 py-0.5 rounded-md bg-white/5 text-muted border border-white/10">
+								className="text-xs px-2 py-0.5 rounded-md bg-surface text-muted-foreground border border-border">
 								{skill}
 							</span>
 						))}
 						{remainingSkills > 0 && (
-							<span className="text-xs px-2 py-0.5 rounded-md bg-white/5 text-muted border border-white/10">
+							<span className="text-xs px-2 py-0.5 rounded-md bg-surface text-muted-foreground border border-border">
 								+{remainingSkills} more
 							</span>
 						)}
@@ -158,8 +158,8 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 				)}
 
 				{/* Footer: Meta Info */}
-				<div className="flex items-center justify-between mt-4 pt-3 border-t border-white/10">
-					<div className="flex items-center gap-3 text-xs text-muted">
+				<div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
+					<div className="flex items-center gap-3 text-xs text-muted-foreground">
 						<span className="flex items-center gap-1">
 							<Clock size={12} />
 							{template.totalDuration}m
@@ -174,14 +174,14 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 				</div>
 
 				{/* Engagement Stats */}
-				<div className="flex items-center gap-3 mt-2 text-xs text-muted">
+				<div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
 					{/* Club Label */}
 					{template.clubName && (
 						<>
 							<Link
 								href={`/dashboard/clubs/${template.clubId}`}
 								onClick={(e) => e.stopPropagation()}
-								className="flex items-center gap-1.5 text-muted hover:text-white transition-colors group/club">
+								className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors group/club">
 								<Avatar size="sm" className="size-5">
 									{template.clubLogoUrl ? (
 										<AvatarImage src={template.clubLogoUrl} alt={template.clubName} />
@@ -192,7 +192,7 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 								</Avatar>
 								<span className="truncate max-w-[80px] group-hover/club:underline">{template.clubName}</span>
 							</Link>
-							<div className="w-px h-4 bg-white/10" />
+							<div className="w-px h-4 bg-border" />
 						</>
 					)}
 					{template.likeCount > 0 && (
@@ -217,7 +217,7 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 
 				{/* Creator Info (if shown) - Only show if not already displaying author label above */}
 				{showCreator && !authorName && (
-					<div className="text-xs text-muted mt-3 pt-3 border-t border-white/10">
+					<div className="text-xs text-muted-foreground mt-3 pt-3 border-t border-border">
 						By {template.createdByUserId}
 					</div>
 				)}

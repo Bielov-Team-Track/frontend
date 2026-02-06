@@ -49,14 +49,14 @@ const MentionSuggestions = forwardRef<MentionSuggestionsRef, MentionSuggestionsP
 
 	if (allItems.length === 0) {
 		return (
-			<div className="bg-raised/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-xl p-3">
+			<div className="bg-raised/95 backdrop-blur-lg border border-border rounded-xl shadow-xl p-3">
 				<p className="text-sm text-muted-foreground">No users found</p>
 			</div>
 		);
 	}
 
 	return (
-		<div className="bg-raised/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-xl py-1 max-h-64 overflow-y-auto">
+		<div className="bg-raised/95 backdrop-blur-lg border border-border rounded-xl shadow-xl py-1 max-h-64 overflow-y-auto">
 			{allItems.map((item, index) => {
 				const isEveryone = "isEveryone" in item && item.isEveryone;
 				return (
@@ -65,7 +65,7 @@ const MentionSuggestions = forwardRef<MentionSuggestionsRef, MentionSuggestionsP
 						onClick={() => command({ id: item.userId, label: item.displayName })}
 						className={cn(
 							"w-full flex items-center gap-3 px-3 py-2 text-left transition-colors",
-							index === selectedIndex ? "bg-white/10" : "hover:bg-white/5"
+							index === selectedIndex ? "bg-hover" : "hover:bg-hover"
 						)}>
 						{isEveryone ? (
 							<div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">

@@ -11,7 +11,7 @@ interface VideoEmbedProps {
 export default function VideoEmbed({ media }: VideoEmbedProps) {
 	const [isLoaded, setIsLoaded] = useState(false);
 
-	if (media.type !== "videoEmbed" || !media.embedProvider || !media.embedId) {
+	if (media.mediaType !== "videoEmbed" || !media.embedProvider || !media.embedId) {
 		return null;
 	}
 

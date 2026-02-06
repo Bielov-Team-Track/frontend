@@ -7,6 +7,12 @@ import { ClubRole } from "@/lib/models/Club";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
+// Helper to extract role strings from role objects or strings
+function extractRoleStrings(roles: any[] | undefined): string[] {
+	if (!roles) return [];
+	return roles.map((r) => (typeof r === "string" ? r : r?.role)).filter(Boolean);
+}
+
 interface TransferOwnershipModalProps {
 	isOpen: boolean;
 	clubId: string;
@@ -27,7 +33,7 @@ export default function TransferOwnershipModal({ isOpen, clubId, clubName, onClo
 	});
 
 	// Only admins can receive ownership
-	const eligibleMembers = members.filter((m) => m.role === ClubRole.Admin);
+	const eligibleMembers = members.filter((m) => extractRoleStrings(m.roles).includes(ClubRole.Admin));
 
 	const isValid = selectedUserId && confirmName === clubName;
 

@@ -43,11 +43,11 @@ function PositionWithUser({ position, userId, team, onPositionLeave, open = fals
 
 	if (!collapsable) {
 		return (
-			<div className="p-3 rounded-xl bg-surface-elevated border border-white/5 w-full flex justify-between items-center transition-all hover:bg-white/5">
+			<div className="p-3 rounded-xl bg-surface-elevated border border-border w-full flex justify-between items-center transition-all hover:bg-hover">
 				<Link href={`/profiles/${userProfile?.id}`} className="flex gap-3 items-center z-50 group">
-					<Avatar profile={userProfile!} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors" />
+					<Avatar src={userProfile?.imageUrl} name={`${userProfile?.name} ${userProfile?.surname}`} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors" />
 					<div className="flex flex-col">
-						<span className="whitespace-nowrap font-bold text-sm text-white group-hover:text-accent transition-colors">
+						<span className="whitespace-nowrap font-bold text-sm text-foreground group-hover:text-accent transition-colors">
 							{userProfile?.name} {userProfile?.surname}
 						</span>
 						<span className="text-muted text-[10px] uppercase font-bold tracking-wider">{position.name}</span>
@@ -60,11 +60,11 @@ function PositionWithUser({ position, userId, team, onPositionLeave, open = fals
 	return (
 		<div
 			className={`rounded-xl border transition-all duration-300 overflow-hidden ${
-				isExpanded ? "bg-[#1E1E1E] border-white/10 shadow-lg" : "bg-surface-elevated border-white/5"
+				isExpanded ? "bg-surface-elevated border-border shadow-lg" : "bg-surface-elevated border-border"
 			}`}>
 			{/* Header / Trigger */}
 			<div
-				className="p-3 flex items-center justify-between cursor-pointer hover:bg-white/5 transition-colors"
+				className="p-3 flex items-center justify-between cursor-pointer hover:bg-hover transition-colors"
 				onClick={() => {
 					const newValue = !isExpanded;
 					setIsExpanded(newValue);
@@ -75,10 +75,10 @@ function PositionWithUser({ position, userId, team, onPositionLeave, open = fals
 					className="flex gap-3 items-center group flex-1 min-w-0"
 					onClick={(e) => e.stopPropagation()} // Prevent expansion when clicking profile
 				>
-					<Avatar profile={userProfile!} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors shrink-0" />
+					<Avatar src={userProfile?.imageUrl} name={`${userProfile?.name} ${userProfile?.surname}`} className="w-9 h-9 border-2 border-transparent group-hover:border-accent transition-colors shrink-0" />
 					<div className="flex flex-col min-w-0">
 						<div className="flex items-center gap-1.5">
-							<span className="whitespace-nowrap font-bold text-sm text-white group-hover:text-accent transition-colors truncate">
+							<span className="whitespace-nowrap font-bold text-sm text-foreground group-hover:text-accent transition-colors truncate">
 								{userProfile?.name} {userProfile?.surname}
 							</span>
 							{team.captain?.id === userProfile?.id && <Crown size={12} className="text-accent shrink-0 fill-accent" />}
@@ -96,9 +96,9 @@ function PositionWithUser({ position, userId, team, onPositionLeave, open = fals
 			{/* Collapsible Content */}
 			<div
 				className={`transition-all duration-300 ease-in-out ${
-					isExpanded ? "max-h-96 opacity-100 border-t border-white/5" : "max-h-0 opacity-0 border-none"
+					isExpanded ? "max-h-96 opacity-100 border-t border-border" : "max-h-0 opacity-0 border-none"
 				}`}>
-				<div className="p-3 bg-black/20">
+				<div className="p-3 bg-hover">
 					{(userProfile?.id === userId || editable) && (
 						<button
 							onClick={(e) => {

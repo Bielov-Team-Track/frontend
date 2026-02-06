@@ -47,6 +47,8 @@ export enum ClubRole {
 	Treasurer = "Treasurer",
 	Admin = "Admin",
 	HeadCoach = "HeadCoach",
+	Coach = "Coach",
+	Assistant = "Assistant",
 	Owner = "Owner",
 }
 
@@ -56,6 +58,8 @@ export enum GroupRole {
 	Admin = "Admin",
 	AssistantCoach = "AssistantCoach",
 	Coach = "Coach",
+	Leader = "Leader",
+	Captain = "Captain",
 }
 
 export enum TeamRole {
@@ -67,11 +71,44 @@ export enum TeamRole {
 	Coach = "Coach",
 }
 
+// Role Summary Types
+export interface RoleSummaryResponse {
+	isPlayer: boolean;
+	isCoach: boolean;
+	isWelfareOfficer: boolean;
+	isTreasurer: boolean;
+	isClubAdmin: boolean;
+	isClubOwner: boolean;
+	clubs: ClubRoleSummary[];
+	teams: TeamRoleSummary[];
+	groups: GroupRoleSummary[];
+}
+
+export interface ClubRoleSummary {
+	clubId: string;
+	clubName: string;
+	roles: ClubRole[];
+}
+
+export interface TeamRoleSummary {
+	teamId: string;
+	teamName: string;
+	clubId: string;
+	roles: TeamRole[];
+}
+
+export interface GroupRoleSummary {
+	groupId: string;
+	groupName: string;
+	clubId: string;
+	roles: GroupRole[];
+}
+
 export interface ClubMember {
 	id: string;
 	clubId: string;
 	userId: string;
-	role: ClubRole;
+	roles: ClubRole[];
 	skillLevel?: SkillLevel;
 	isActive: boolean;
 	userProfile?: UserProfile;
@@ -85,7 +122,7 @@ export interface ClubMember {
  */
 export interface MyClubMembership {
 	clubId: string;
-	role: ClubRole;
+	roles: ClubRole[];
 	isActive: boolean;
 }
 
@@ -175,6 +212,7 @@ export interface TeamMember {
 	clubMemberId: string;
 	positions?: VolleyballPosition[];
 	jerseyNumber?: string;
+	roles?: TeamRole[];
 	isActive: boolean;
 	userProfile?: UserProfile;
 }
@@ -193,6 +231,7 @@ export interface TeamLineup {
 export interface UpdateTeamMemberRequest {
 	positions?: VolleyballPosition[];
 	jerseyNumber?: string;
+	roles?: TeamRole[];
 	isActive?: boolean;
 }
 
@@ -235,7 +274,7 @@ export interface GroupMember {
 	id: string;
 	groupId: string;
 	clubMemberId: string;
-	role?: GroupRole;
+	roles: GroupRole[];
 	isActive: boolean;
 	clubMember?: ClubMember;
 	userProfile?: UserProfile;

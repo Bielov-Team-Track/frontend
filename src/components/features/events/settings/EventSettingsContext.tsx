@@ -32,9 +32,9 @@ interface EventSettingsFormData {
 	registrationDeadline?: Date;
 	registrationOpenTime?: Date;
 
-	// Budget
-	useBudget: boolean;
-	budget?: {
+	// Payment Config
+	usePaymentConfig: boolean;
+	paymentConfig?: {
 		pricingModel?: string;
 		cost?: number;
 		payToJoin?: boolean;
@@ -86,8 +86,8 @@ function eventToFormData(event: Event): EventSettingsFormData {
 		capacity: undefined, // TODO: Get from event when available
 		registrationDeadline: undefined,
 		registrationOpenTime: undefined,
-		useBudget: !!event.budget,
-		budget: event.budget
+		usePaymentConfig: !!event.budget,
+		paymentConfig: event.budget
 			? {
 					pricingModel: event.budget.pricingModel,
 					cost: event.budget.cost,

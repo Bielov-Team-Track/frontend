@@ -68,7 +68,7 @@ export default function ClubPage() {
 
 	if (!club) {
 		return (
-			<div className="min-h-screen bg-background flex flex-col items-center justify-center text-white">
+			<div className="min-h-screen bg-background flex flex-col items-center justify-center text-foreground">
 				<Shield className="w-16 h-16 text-muted mb-4" />
 				<h1 className="text-2xl font-bold mb-2">Club Not Found</h1>
 				<p className="text-muted mb-6">The club you&apos;re looking for doesn&apos;t exist.</p>
@@ -78,7 +78,7 @@ export default function ClubPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-background text-white font-sans pb-20">
+		<div className="min-h-screen bg-background text-foreground font-sans pb-20">
 			{/* --- HERO SECTION --- */}
 			<div className="relative w-full">
 				{/* Banner Image with Gradient Overlay */}
@@ -107,7 +107,7 @@ export default function ClubPage() {
 						{/* Text Info */}
 						<div className="flex-1 mb-2 w-full">
 							<div className="flex items-center gap-2 mb-1">
-								<h1 className="text-2xl md:text-4xl font-bold text-white tracking-tight">{club.name}</h1>
+								<h1 className="text-2xl md:text-4xl font-bold text-foreground tracking-tight">{club.name}</h1>
 								{/* Verified Badge */}
 								{club.isPublic && (
 									<div className="bg-primary/20 text-primary p-1 rounded-full">
@@ -150,7 +150,7 @@ export default function ClubPage() {
 				<div className="lg:col-span-4 space-y-6">
 					{/* About Card */}
 					<div className="p-6 rounded-2xl bg-surface border border-border backdrop-blur-xs">
-						<h3 className="text-lg font-bold text-white mb-3">About</h3>
+						<h3 className="text-lg font-bold text-foreground mb-3">About</h3>
 						<p className="text-muted text-sm leading-relaxed mb-4">{club.description || "No description available."}</p>
 						{club.contactEmail && <div className="text-xs text-muted mb-2">Contact: {club.contactEmail}</div>}
 						{club.contactPhone && <div className="text-xs text-muted">Phone: {club.contactPhone}</div>}
@@ -159,7 +159,7 @@ export default function ClubPage() {
 					{/* Teams List */}
 					<div className="p-6 rounded-2xl bg-surface border border-border">
 						<div className="flex justify-between items-center mb-4">
-							<h3 className="text-lg font-bold text-white">Teams ({teams.length})</h3>
+							<h3 className="text-lg font-bold text-foreground">Teams ({teams.length})</h3>
 						</div>
 						{teams.length === 0 ? (
 							<p className="text-muted text-sm">No teams yet.</p>
@@ -170,11 +170,11 @@ export default function ClubPage() {
 										key={team.id}
 										className="flex items-center justify-between group cursor-pointer hover:bg-hover p-2 rounded-lg transition-all">
 										<div className="flex items-center gap-3">
-											<div className="w-10 h-10 rounded-full bg-surface-elevated flex items-center justify-center text-xs font-bold text-muted group-hover:text-white transition-colors">
+											<div className="w-10 h-10 rounded-full bg-surface-elevated flex items-center justify-center text-xs font-bold text-muted group-hover:text-foreground transition-colors">
 												{team.name.substring(0, 1)}
 											</div>
 											<div>
-												<div className="text-sm font-semibold text-white group-hover:text-accent transition-colors">{team.name}</div>
+												<div className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors">{team.name}</div>
 												<div className="text-xs text-muted">{team.members?.length || 0} members</div>
 											</div>
 										</div>
@@ -192,7 +192,7 @@ export default function ClubPage() {
 					{/* Gallery Preview */}
 					<div className="p-6 rounded-2xl bg-surface border border-border">
 						<div className="flex justify-between items-center mb-4">
-							<h3 className="text-lg font-bold text-white">Media</h3>
+							<h3 className="text-lg font-bold text-foreground">Media</h3>
 							<ImageIcon size={16} className="text-muted" />
 						</div>
 						<div className="grid grid-cols-3 gap-2">
@@ -216,7 +216,7 @@ export default function ClubPage() {
 									/>
 								</div>
 							))}
-							<div className="aspect-square rounded-lg bg-surface-elevated border border-border flex items-center justify-center text-xs text-muted cursor-pointer hover:text-white hover:border-white/20 transition-colors">
+							<div className="aspect-square rounded-lg bg-surface-elevated border border-border flex items-center justify-center text-xs text-muted cursor-pointer hover:text-foreground hover:border-border transition-colors">
 								+24
 							</div>
 						</div>
@@ -228,7 +228,7 @@ export default function ClubPage() {
 					{/* Section: Upcoming Events (Horizontal Scroll) */}
 					<section>
 						<div className="flex justify-between items-end mb-4">
-							<h2 className="text-xl font-bold text-white">Upcoming Events</h2>
+							<h2 className="text-xl font-bold text-foreground">Upcoming Events</h2>
 							<div className="flex gap-2">{/* Custom arrows could go here */}</div>
 						</div>
 
@@ -242,7 +242,7 @@ export default function ClubPage() {
 								MOCK_EVENTS.map((event) => (
 									<div
 										key={event.id}
-										className="snap-start min-w-[280px] p-4 rounded-2xl bg-background border border-white/5 hover:border-accent/50 transition-all group cursor-pointer">
+										className="snap-start min-w-[280px] p-4 rounded-2xl bg-background border border-border hover:border-accent/50 transition-all group cursor-pointer">
 										<div className="flex items-start justify-between mb-3">
 											{/* Date Box */}
 											<div className="flex flex-col items-center justify-center w-12 h-14 rounded-lg bg-surface border border-border">
@@ -252,7 +252,7 @@ export default function ClubPage() {
 											<div className="px-2 py-1 rounded text-[10px] bg-surface text-muted border border-border">2h Duration</div>
 										</div>
 
-										<h4 className="font-bold text-white text-lg truncate pr-2 group-hover:text-accent transition-colors">{event.title}</h4>
+										<h4 className="font-bold text-foreground text-lg truncate pr-2 group-hover:text-accent transition-colors">{event.title}</h4>
 
 										<div className="mt-2 space-y-1">
 											<div className="flex items-center gap-2 text-xs text-muted">
@@ -321,11 +321,11 @@ export default function ClubPage() {
 												</div>
 											</div>
 											<div>
-												<div className="text-sm font-bold text-white">{club.name}</div>
+												<div className="text-sm font-bold text-foreground">{club.name}</div>
 												<div className="text-xs text-muted">{post.time}</div>
 											</div>
 										</div>
-										<button className="text-muted hover:text-white">
+										<button className="text-muted hover:text-foreground">
 											<MoreHorizontal size={18} />
 										</button>
 									</div>
@@ -347,11 +347,11 @@ export default function ClubPage() {
 											<Heart size={18} className="group-hover:fill-accent" />
 											<span>{post.likes}</span>
 										</button>
-										<button className="flex items-center gap-2 text-sm text-muted hover:text-white transition-colors">
+										<button className="flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors">
 											<MessageCircle size={18} />
 											<span>{post.comments}</span>
 										</button>
-										<button className="flex items-center gap-2 text-sm text-muted hover:text-white transition-colors ml-auto">
+										<button className="flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors ml-auto">
 											<Share2 size={18} />
 										</button>
 									</div>

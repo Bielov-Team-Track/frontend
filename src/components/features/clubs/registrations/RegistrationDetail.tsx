@@ -1,13 +1,13 @@
 "use client";
 
-import { ClubRegistrationDto, RegistrationStatus } from "@/lib/models/Club";
+import { ClubRegistration, RegistrationStatus } from "@/lib/models/Club";
 import { format } from "date-fns";
 import { Calendar, CheckCircle, Clock, FileText, Users, XCircle } from "lucide-react";
-import { FormAnswersView } from "../forms/FormAnswersView";
+import FormAnswersView from "../forms/FormAnswersView";
 import { RegistrationStatusActions } from "./RegistrationStatusActions";
 
 type Props = {
-	registration: ClubRegistrationDto;
+	registration: ClubRegistration;
 	onStatusChange: (status: RegistrationStatus, note?: string) => void;
 	isUpdating: boolean;
 };
@@ -42,7 +42,7 @@ export const RegistrationDetail = ({ registration, onStatusChange, isUpdating }:
 			</div>
 
 			{/* Timeline */}
-			<div className="p-4 bg-white/5 rounded-xl border border-white/10">
+			<div className="p-4 bg-surface rounded-xl border border-border">
 				<div className="flex items-center gap-3 text-sm">
 					<Calendar size={16} className="text-muted" />
 					<span className="text-muted">Submitted:</span>
@@ -55,20 +55,20 @@ export const RegistrationDetail = ({ registration, onStatusChange, isUpdating }:
 						<span className="text-white">{format(new Date(registration.statusChangedAt), "PPP 'at' p")}</span>
 					</div>
 				)}
-				{registration.statusNote && (
+				{registration.publicNote && (
 					<div className="flex items-start gap-3 text-sm mt-2">
 						<FileText size={16} className="text-muted mt-0.5" />
 						<span className="text-muted">Note:</span>
-						<span className="text-white">{registration.statusNote}</span>
+						<span className="text-white">{registration.publicNote}</span>
 					</div>
 				)}
 			</div>
 
 			{/* Form Answers */}
-			{registration.formResponse && registration.formResponse.answers.length > 0 && (
-				<div className="p-4 bg-white/5 rounded-xl border border-white/10">
+			{registration.formTemplate && registration.formResponse && registration.formResponse.answers.length > 0 && (
+				<div className="p-4 bg-surface rounded-xl border border-border">
 					<h3 className="text-lg font-medium text-white mb-4">Form Responses</h3>
-					<FormAnswersView answers={registration.formResponse.answers} />
+					<FormAnswersView fields={registration.formTemplate.fields} answers={registration.formResponse.answers} />
 				</div>
 			)}
 

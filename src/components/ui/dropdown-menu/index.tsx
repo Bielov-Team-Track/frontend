@@ -19,7 +19,7 @@ export interface DropdownMenuProps {
 function DropdownMenu({ items }: DropdownMenuProps) {
 	return (
 		<DropdownMenuPrimitive>
-			<DropdownMenuTrigger className="p-2 rounded-lg hover:bg-white/10 text-muted-foreground transition-colors">
+			<DropdownMenuTrigger className="p-2 rounded-lg hover:bg-hover text-muted-foreground transition-colors">
 				<MoreHorizontal size={18} />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-48">

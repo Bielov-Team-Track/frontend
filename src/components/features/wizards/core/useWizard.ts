@@ -2,17 +2,17 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useCallback, useMemo, useState } from "react";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { FieldValues, useForm, UseFormReturn } from "react-hook-form";
 import { WizardConfig, WizardContext, WizardState, WizardStep } from "./types";
 
-interface UseWizardOptions<TData> {
+interface UseWizardOptions<TData extends FieldValues> {
 	config: WizardConfig<TData>;
 	context: WizardContext;
 	hasClubs: boolean;
 	onClose: () => void;
 }
 
-interface UseWizardReturn<TData> {
+interface UseWizardReturn<TData extends FieldValues> {
 	form: UseFormReturn<TData>;
 	state: WizardState;
 	activeSteps: WizardStep<TData>[];
@@ -39,7 +39,7 @@ export function useWizard<TData extends Record<string, any>>({ config, context, 
 	});
 
 	const form = useForm<TData>({
-		resolver: yupResolver(config.validationSchema),
+		resolver: yupResolver(config.validationSchema) as any,
 		defaultValues: config.defaultValues as any,
 		mode: "onChange",
 	});

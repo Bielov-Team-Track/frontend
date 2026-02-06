@@ -1,9 +1,14 @@
 "use client";
 
-import { Button, Input } from "@/components";
+import { Button, Input, Select } from "@/components";
 import Modal from "@/components/ui/modal";
 import { CreateTeamRequest, SkillLevel, Team, UpdateTeamRequest } from "@/lib/models/Club";
 import { useEffect, useState } from "react";
+
+const SKILL_LEVEL_OPTIONS = Object.values(SkillLevel).map((level) => ({
+	value: level,
+	label: level,
+}));
 
 interface TeamFormModalProps {
 	isOpen: boolean;
@@ -65,30 +70,25 @@ export default function TeamFormModal({ isOpen, team, clubId, onClose, onSubmit,
 						onChange={(e) => setDescription(e.target.value)}
 						placeholder="Describe your team"
 						rows={3}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent resize-none"
+						className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent resize-none"
 					/>
 				</div>
 
-				<div>
-					<label className="block text-sm font-medium text-white mb-2">Skill Level</label>
-					<select
-						value={skillLevel}
-						onChange={(e) => setSkillLevel(e.target.value)}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent">
-						<option value="">Select skill level</option>
-						{Object.values(SkillLevel).map((level) => (
-							<option key={level} value={level}>
-								{level}
-							</option>
-						))}
-					</select>
-				</div>
+				<Select
+					label="Skill Level"
+					options={SKILL_LEVEL_OPTIONS}
+					value={skillLevel}
+					onChange={(value) => setSkillLevel(value || "")}
+					placeholder="Select skill level"
+					clearable
+					fullWidth
+				/>
 
-				<div className="flex gap-3 pt-4">
-					<Button type="button" variant="ghost" color="neutral" fullWidth onClick={onClose}>
+				<div className="flex justify-end gap-3 pt-4">
+					<Button type="button" variant="ghost" color="neutral" onClick={onClose}>
 						Cancel
 					</Button>
-					<Button type="submit" variant="solid" color="accent" fullWidth disabled={!name.trim()} loading={isLoading}>
+					<Button type="submit" variant="default" color="accent" disabled={!name.trim()} loading={isLoading}>
 						{isEditing ? "Save Changes" : "Create Team"}
 					</Button>
 				</div>

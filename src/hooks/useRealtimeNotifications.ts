@@ -19,6 +19,7 @@ export function useRealtimeNotifications({ enabled = true }: UseRealtimeNotifica
 	const queryClient = useQueryClient();
 
 	const showNotificationToast = useNotificationStore((s) => s.showNotificationToast);
+	const updateNotificationToast = useNotificationStore((s) => s.updateNotificationToast);
 	const incrementUnread = useNotificationStore((s) => s.incrementUnread);
 	const setConnectionStatus = useNotificationStore((s) => s.setConnectionStatus);
 
@@ -67,6 +68,13 @@ export function useRealtimeNotifications({ enabled = true }: UseRealtimeNotifica
 					});
 				});
 
+				connection.on("UpdateNotification", (notification: Notification) => {
+					updateNotificationToast(notification);
+					queryClient.invalidateQueries({
+						queryKey: [NOTIFICATIONS_QUERY_KEY],
+					});
+				});
+
 				connection.on("Connected", () => {
 					setConnectionStatus("connected");
 				});
@@ -87,5 +95,5 @@ export function useRealtimeNotifications({ enabled = true }: UseRealtimeNotifica
 				stopped = true;
 			}
 		};
-	}, [enabled, token, showNotificationToast, incrementUnread, setConnectionStatus, handleConnectionError, queryClient]);
+	}, [enabled, token, showNotificationToast, updateNotificationToast, incrementUnread, setConnectionStatus, handleConnectionError, queryClient]);
 }

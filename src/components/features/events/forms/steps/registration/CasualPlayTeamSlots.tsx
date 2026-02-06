@@ -56,10 +56,10 @@ export function CasualPlayTeamSlots({ slots, onChange }: CasualPlayTeamSlotsProp
 				{slots.map((slot, index) => (
 					<div
 						key={index}
-						className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center gap-4"
+						className="p-4 rounded-xl bg-surface border border-border flex items-center gap-4"
 					>
 						<div
-							className="w-6 h-6 rounded-full border border-white/20 cursor-pointer relative group"
+							className="w-6 h-6 rounded-full border border-border cursor-pointer relative group"
 							style={{ backgroundColor: slot.color }}
 						>
 							<input
@@ -74,7 +74,7 @@ export function CasualPlayTeamSlots({ slots, onChange }: CasualPlayTeamSlotsProp
 							type="text"
 							value={slot.name}
 							onChange={(e) => updateSlot(index, { name: e.target.value })}
-							className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-muted focus:outline-none focus:border-accent"
+							className="flex-1 px-3 py-2 bg-surface border border-border rounded-lg text-sm text-white placeholder:text-muted focus:outline-none focus:border-accent"
 							placeholder="Team name"
 						/>
 

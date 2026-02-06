@@ -108,9 +108,9 @@ const ImageCropper = ({ imageFile, onImageSave, onCancel, aspect = 1, className 
 	};
 
 	return (
-		<div className={cn("flex flex-col -m-4", className)}>
+		<div className={cn("flex flex-col", className)}>
 			{/* Cropper Area */}
-			<div className="relative w-full aspect-4/3 bg-muted/50">
+			<div className="relative w-full aspect-4/3 bg-muted/50 rounded-lg overflow-hidden">
 				{image ? (
 					<Cropper
 						image={image}

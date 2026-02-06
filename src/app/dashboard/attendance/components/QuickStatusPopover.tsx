@@ -20,8 +20,8 @@ const STATUS_OPTIONS = [
 		label: "Invited",
 		shortcut: "1",
 		icon: HelpCircle,
-		bg: "bg-white/10 hover:bg-white/20 active:scale-95",
-		activeBg: "bg-white/30 ring-2 ring-white/50",
+		bg: "bg-hover hover:bg-hover active:scale-95",
+		activeBg: "bg-hover ring-2 ring-border",
 		textColor: "text-muted",
 	},
 	{
@@ -74,7 +74,7 @@ export default function QuickStatusPopover({
 	anchorRect,
 }: QuickStatusPopoverProps) {
 	const currentStatus = record?.status ?? AttendanceStatus.Invited;
-	const currentPaymentStatus = record?.paymentStatus;
+	const currentPaymentStatus = record?.paymentStatus ?? undefined;
 	const showPayment = !event.isFree;
 
 	const [pendingStatus, setPendingStatus] = useState<AttendanceStatus | null>(null);
@@ -190,7 +190,7 @@ export default function QuickStatusPopover({
 	return (
 		<>
 			{/* Backdrop */}
-			<div className="fixed inset-0 z-50 bg-black/20" onClick={onClose} />
+			<div className="fixed inset-0 z-50 bg-overlay-light" onClick={onClose} />
 
 			{/* Popover */}
 			<div
@@ -201,10 +201,10 @@ export default function QuickStatusPopover({
 					left: position.left,
 					width: isMobile ? `calc(100% - 16px)` : "320px",
 				}}>
-				<div className="bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+				<div className="bg-surface border border-border rounded-xl shadow-2xl overflow-hidden">
 					{/* Header - compact */}
-					<div className="flex items-center gap-2 px-3 py-2 bg-white/5 border-b border-white/10">
-						<span className="text-sm font-medium text-white truncate flex-1">{member.name}</span>
+					<div className="flex items-center gap-2 px-3 py-2 bg-surface-elevated border-b border-border">
+						<span className="text-sm font-medium text-foreground truncate flex-1">{member.name}</span>
 						<span className="text-xs text-muted truncate max-w-[120px]">{event.name}</span>
 						{isLoading && <Loader2 size={14} className="animate-spin text-primary" />}
 					</div>
@@ -253,7 +253,7 @@ export default function QuickStatusPopover({
 									value={reason}
 									onChange={(e) => setReason(e.target.value)}
 									placeholder="e.g., Sick, Family emergency..."
-									className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-muted focus:outline-none focus:border-white/30"
+									className="w-full px-3 py-2 rounded-lg bg-surface border border-border text-foreground text-sm placeholder:text-muted focus:outline-none focus:border-border"
 									onKeyDown={(e) => {
 										if (e.key === "Enter") {
 											e.preventDefault();
@@ -267,7 +267,7 @@ export default function QuickStatusPopover({
 											setPendingStatus(null);
 											setReason("");
 										}}
-										className="flex-1 py-2 rounded-lg bg-white/5 text-white/70 text-sm hover:bg-white/10 transition-colors">
+										className="flex-1 py-2 rounded-lg bg-surface text-foreground/70 text-sm hover:bg-hover transition-colors">
 										Cancel
 									</button>
 									<button
@@ -286,7 +286,7 @@ export default function QuickStatusPopover({
 
 						{/* Payment toggle - only for paid events */}
 						{showPayment && !pendingStatus && (
-							<div className="flex gap-1.5 mt-2 pt-2 border-t border-white/10">
+							<div className="flex gap-1.5 mt-2 pt-2 border-t border-border">
 								<button
 									onClick={() => handlePaymentClick(PaymentStatus.Unpaid)}
 									disabled={isLoading}
@@ -324,7 +324,7 @@ export default function QuickStatusPopover({
 
 						{/* Admin note toggle */}
 						{!pendingStatus && (
-							<div className="mt-2 pt-2 border-t border-white/10">
+							<div className="mt-2 pt-2 border-t border-border">
 								{!showNoteInput ? (
 									<button
 										onClick={() => setShowNoteInput(true)}
@@ -340,7 +340,7 @@ export default function QuickStatusPopover({
 											value={adminNote}
 											onChange={(e) => setAdminNote(e.target.value)}
 											placeholder="Internal note..."
-											className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-muted focus:outline-none focus:border-white/30"
+											className="w-full px-3 py-2 rounded-lg bg-surface border border-border text-foreground text-sm placeholder:text-muted focus:outline-none focus:border-border"
 											autoFocus
 										/>
 										<div className="flex gap-2">
@@ -349,7 +349,7 @@ export default function QuickStatusPopover({
 													setShowNoteInput(false);
 													setAdminNote("");
 												}}
-												className="flex-1 py-1.5 rounded-lg bg-white/5 text-white/70 text-xs hover:bg-white/10">
+												className="flex-1 py-1.5 rounded-lg bg-surface text-foreground/70 text-xs hover:bg-hover">
 												Cancel
 											</button>
 											<button
@@ -357,7 +357,7 @@ export default function QuickStatusPopover({
 													// Save admin note with current status
 													onUpdate(currentStatus, adminNote || undefined, currentPaymentStatus);
 												}}
-												className="flex-1 py-1.5 rounded-lg bg-primary text-white text-xs hover:bg-primary/80">
+												className="flex-1 py-1.5 rounded-lg bg-primary text-foreground text-xs hover:bg-primary/80">
 												Save note
 											</button>
 										</div>
@@ -368,7 +368,7 @@ export default function QuickStatusPopover({
 
 						{/* Existing reason display */}
 						{record?.declineNote && !pendingStatus && !showNoteInput && (
-							<div className="mt-2 pt-2 border-t border-white/10">
+							<div className="mt-2 pt-2 border-t border-border">
 								<div className="text-xs text-muted">
 									<span className="text-error">Reason:</span> {record.declineNote}
 								</div>
@@ -377,7 +377,7 @@ export default function QuickStatusPopover({
 					</div>
 
 					{/* Keyboard hints - desktop only */}
-					<div className="hidden sm:flex items-center justify-center gap-3 px-3 py-1.5 bg-white/5 border-t border-white/10 text-[10px] text-muted">
+					<div className="hidden sm:flex items-center justify-center gap-3 px-3 py-1.5 bg-surface border-t border-border text-[10px] text-muted">
 						<span>1-5 Status</span>
 						{showPayment && <span>P/U Payment</span>}
 						<span>Esc Close</span>

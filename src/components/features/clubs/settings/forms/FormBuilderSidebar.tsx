@@ -24,7 +24,7 @@ export default function FormBuilderSidebar({ forms, selectedFormId, onSelectForm
 	};
 
 	return (
-		<div className="w-56 shrink-0 border-r border-white/10 pr-4">
+		<div className="w-56 shrink-0 border-r border-border pr-4">
 			<div className="sticky top-0 space-y-3">
 				<div className="flex items-center justify-between">
 					<h3 className="text-sm font-medium text-muted uppercase tracking-wide">Forms</h3>
@@ -32,7 +32,7 @@ export default function FormBuilderSidebar({ forms, selectedFormId, onSelectForm
 
 				<button
 					onClick={onCreateNew}
-					className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-white/20 text-muted hover:text-white hover:border-white/40 transition-colors text-sm">
+					className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-border text-muted hover:text-white hover:border-border transition-colors text-sm">
 					<Plus size={16} />
 					New Form
 				</button>
@@ -44,7 +44,7 @@ export default function FormBuilderSidebar({ forms, selectedFormId, onSelectForm
 							onClick={() => handleSelect(form.id)}
 							className={cn(
 								"w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors",
-								selectedFormId === form.id ? "bg-accent/20 text-accent" : "text-white/80 hover:bg-white/5"
+								selectedFormId === form.id ? "bg-accent/20 text-accent" : "text-white/80 hover:bg-hover"
 							)}>
 							<FileText size={14} className="shrink-0" />
 							<span className="truncate">{form.name}</span>

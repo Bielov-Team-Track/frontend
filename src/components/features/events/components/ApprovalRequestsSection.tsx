@@ -47,7 +47,7 @@ export default function ApprovalRequestsSection({ eventId }: { eventId: string }
 
 	return (
 		<div className="collapse collapse-arrow bg-primary/5 relative">
-			{isLoading && <Loader className="absolute inset-0 bg-black/55" />}
+			{isLoading && <Loader className="absolute inset-0 bg-overlay" />}
 			<input type="checkbox" />
 			<div className="collapse-title text-xl font-bold">
 				<div className="flex justify-between items-center">

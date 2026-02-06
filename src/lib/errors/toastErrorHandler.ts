@@ -43,6 +43,16 @@ export function showErrorToast(
 }
 
 /**
+ * Show a success toast message.
+ * Use this for successful operations to maintain consistent styling.
+ */
+export function showSuccessToast(message: string, duration?: number): void {
+  toast.success(message, {
+    duration: duration ?? 5000,
+  });
+}
+
+/**
  * Get error message from any error type.
  * Use this when you need the message but don't want to show a toast.
  */

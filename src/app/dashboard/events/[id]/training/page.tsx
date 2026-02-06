@@ -35,7 +35,7 @@ export default function TrainingPlanPage() {
 				</div>
 
 				{/* Mode Toggle */}
-				<div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10">
+				<div className="flex items-center gap-1 p-1 rounded-xl bg-surface border border-border">
 					<Button
 						variant={mode === "edit" ? "default" : "ghost"}
 						color={mode === "edit" ? "primary" : "neutral"}

@@ -93,7 +93,7 @@ const Avatar = ({ src, alt, name, icon, variant, size = "md", color, className }
 
 	return (
 		<AvatarRoot className={cn(SIZE_CLASSES[size], className)}>
-			{src && <AvatarImage src={src} alt={alt ?? name ?? "Avatar"} className={"bg-black"} />}
+			{src && <AvatarImage src={src} alt={alt ?? name ?? "Avatar"} className={"bg-foreground"} />}
 			<AvatarFallback
 				style={backgroundColor ? { backgroundColor } : undefined}
 				className={cn("bg-surface-elevated", backgroundColor ? "text-white" : undefined)}>

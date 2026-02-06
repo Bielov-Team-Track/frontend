@@ -45,7 +45,7 @@ export default async function DashboardPage() {
 
 	// Calculate unpaid events (events with cost where payment isn't completed)
 	const unpaidEvents = allEvents.filter((e) => {
-		const cost = e.budget?.amount || e.costToEnter || 0;
+		const cost = e.budget?.cost || e.costToEnter || 0;
 		return cost > 0;
 	});
 
@@ -63,7 +63,7 @@ export default async function DashboardPage() {
 				const userMember = members.find((m) => m.userId === userProfile.id);
 				return {
 					...club,
-					userRole: userMember?.role,
+					userRole: userMember?.roles[0],
 					pendingCount: 0,
 				};
 			} catch {

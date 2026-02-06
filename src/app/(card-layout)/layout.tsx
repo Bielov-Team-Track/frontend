@@ -1,3 +1,4 @@
+import { FeedbackButton } from "@/components/features/feedback";
 import { ThemeScript } from "@/components/ui/theme-script";
 import { AuthProvider, QueryProvider, ThemeProvider } from "@/providers";
 import { inter } from "@/lib/fonts";
@@ -25,8 +26,9 @@ export default async function RootLayout({
 					<AuthProvider>
 						<QueryProvider>
 							<div className="min-h-screen flex items-center justify-center p-4">
-								<div className="w-fit max-w-2xl relative bg-surface p-6 sm:p-8 rounded-lg shadow-lg flex flex-col gap-6">{children}</div>
+								<div className="w-full max-w-md relative bg-surface p-6 sm:p-8 rounded-lg shadow-lg flex flex-col gap-6 min-h-[400px]">{children}</div>
 							</div>
+							<FeedbackButton />
 						</QueryProvider>
 					</AuthProvider>
 				</ThemeProvider>

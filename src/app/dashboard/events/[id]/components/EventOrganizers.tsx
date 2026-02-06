@@ -98,7 +98,7 @@ export default function EventOrganizers({ participants }: EventOrganizersProps) 
 								className={`
 									absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full
 									flex items-center justify-center
-									${config?.bgColor || "bg-white/10"} border
+									${config?.bgColor || "bg-hover"} border
 									ring-1 ring-background
 								`}>
 								<Icon size={10} className={config?.color || "text-white"} />
@@ -109,7 +109,7 @@ export default function EventOrganizers({ participants }: EventOrganizersProps) 
 								className={`
 									absolute bottom-full left-1/2 -translate-x-1/2 mb-2
 									px-2 py-1 rounded-lg whitespace-nowrap
-									bg-raised/95 backdrop-blur-sm border border-white/10 shadow-lg
+									bg-raised/95 backdrop-blur-sm border border-border shadow-lg
 									text-xs font-medium text-white
 									opacity-0 invisible group-hover:opacity-100 group-hover:visible
 									transition-all duration-200 z-30
@@ -136,7 +136,7 @@ export default function EventOrganizers({ participants }: EventOrganizersProps) 
 					<div
 						className={`
 							w-8 h-8 rounded-full
-							bg-white/5 border border-white/20
+							bg-surface border border-border
 							flex items-center justify-center
 							ring-2 ring-background
 							text-xs font-bold text-muted

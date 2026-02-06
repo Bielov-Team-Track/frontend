@@ -131,7 +131,7 @@ export default function PostMediaUploader({ mediaIds, onMediaChange, maxFiles = 
 
 							{/* Status overlay */}
 							{upload.status === "uploading" && (
-								<div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+								<div className="absolute inset-0 bg-overlay flex items-center justify-center">
 									<Loader2 className="animate-spin text-white" size={24} />
 								</div>
 							)}
@@ -146,7 +146,7 @@ export default function PostMediaUploader({ mediaIds, onMediaChange, maxFiles = 
 							<button
 								type="button"
 								onClick={() => removeMedia(upload.id)}
-								className="absolute top-1 right-1 p-1 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+								className="absolute top-1 right-1 p-1 rounded-full bg-overlay text-foreground opacity-0 group-hover:opacity-100 transition-opacity">
 								<X size={14} />
 							</button>
 						</div>
@@ -163,7 +163,7 @@ export default function PostMediaUploader({ mediaIds, onMediaChange, maxFiles = 
 					onClick={() => inputRef.current?.click()}
 					className={cn(
 						"border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors",
-						isDragActive ? "border-primary bg-primary/10" : "border-border hover:border-white/20"
+						isDragActive ? "border-primary bg-primary/10" : "border-border hover:border-border"
 					)}>
 					<input ref={inputRef} type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onChange={handleInputChange} className="hidden" />
 					<Upload size={24} className="mx-auto text-muted-foreground mb-2" />

@@ -80,7 +80,7 @@ function GroupSettingsForm({ group, onSubmit, isLoading }: { group: Group; onSub
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="rounded-2xl bg-white/5 border border-white/10 p-6 space-y-6">
+		<form onSubmit={handleSubmit} className="rounded-2xl bg-surface border border-border p-6 space-y-6">
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<div className="space-y-4">
 					<Input type="text" value={name} label="Group Name" onChange={(e) => setName(e.target.value)} />
@@ -89,7 +89,7 @@ function GroupSettingsForm({ group, onSubmit, isLoading }: { group: Group; onSub
 						value={description}
 						onChange={(e) => setDescription(e.target.value)}
 						rows={3}
-						className="w-full px-4 py-3 rounded-xl bg-black/20 border border-white/10 text-white focus:outline-hidden focus:border-accent resize-none"
+						className="w-full px-4 py-3 rounded-xl bg-input border border-border text-foreground focus:outline-hidden focus:border-accent resize-none"
 					/>
 				</div>
 				<div className="space-y-4">
@@ -103,7 +103,7 @@ function GroupSettingsForm({ group, onSubmit, isLoading }: { group: Group; onSub
 					<ColorPicker label="Color Theme" value={color} onChange={setColor} presetColors={DEFAULT_PRESET_COLORS} />
 				</div>
 			</div>
-			<div className="flex justify-end pt-4 border-t border-white/10">
+			<div className="flex justify-end pt-4 border-t border-border">
 				<Button type="submit" disabled={isLoading} leftIcon={<Save size={16} />}>
 					Save changes
 				</Button>

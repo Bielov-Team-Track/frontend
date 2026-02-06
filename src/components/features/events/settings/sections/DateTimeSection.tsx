@@ -66,7 +66,7 @@ export function DateTimeSection({ event }: DateTimeSectionProps) {
 			</div>
 
 			{duration && (
-				<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+				<div className="p-4 rounded-xl bg-surface border border-border">
 					<div className="flex items-center gap-3">
 						<div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
 							<Clock size={16} className="text-accent" />

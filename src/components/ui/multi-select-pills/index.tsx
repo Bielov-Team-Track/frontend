@@ -37,9 +37,9 @@ const MultiSelectPills = ({ label, helperText, options, selectedItems, onSelecte
 	return (
 		<div className="form-control w-full">
 			{label && (
-				<label className={cn("block text-sm font-medium text-white mb-2", disabled && "opacity-50")}>
+				<label className={cn("block text-sm font-medium text-foreground mb-2", disabled && "opacity-50")}>
 					{label}
-					{optional && <span className="text-muted ml-1.5 font-normal text-xs">(optional)</span>}
+					{optional && <span className="text-muted-foreground ml-1.5 font-normal text-xs">(optional)</span>}
 				</label>
 			)}
 
@@ -55,8 +55,8 @@ const MultiSelectPills = ({ label, helperText, options, selectedItems, onSelecte
 							className={cn(
 								"px-2 py-1 rounded-full border transition-colors duration-200 text-sm font-medium",
 								isSelected
-									? "bg-active text-white/90"
-									: "bg-hover border-border text-white/70 hover:bg-active hover:border-white/20",
+									? "bg-active text-foreground"
+									: "bg-hover border-border text-foreground/70 hover:bg-active hover:border-border/80",
 								disabled && "opacity-50 cursor-not-allowed"
 							)}>
 							{option.label}
@@ -68,7 +68,7 @@ const MultiSelectPills = ({ label, helperText, options, selectedItems, onSelecte
 			{error ? (
 				<p className="mt-1.5 text-xs text-error">{error}</p>
 			) : (
-				helperText && <p className="mt-1.5 text-xs text-muted">{helperText}</p>
+				helperText && <p className="mt-1.5 text-xs text-muted-foreground">{helperText}</p>
 			)}
 		</div>
 	);

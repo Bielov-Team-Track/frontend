@@ -1,11 +1,12 @@
 "use client";
 
-import { Button, Loader, ResizableContainer } from "@/components";
+import { Button, Loader } from "@/components";
 import { getChat, loadConversationsForUser, loadMessagesForChat, markChatAsRead, sendMessage } from "@/lib/api/messages";
 import { MESSAGES_API_URL } from "@/lib/constants";
 import { Chat } from "@/lib/models/Messages";
 import { useChatConnectionStore } from "@/lib/realtime/chatsConnectionStore";
 import signalr from "@/lib/realtime/signalrClient";
+import { cn } from "@/lib/utils";
 import { HubConnectionState } from "@microsoft/signalr";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, ChevronLeft, MessageSquare, RefreshCw } from "lucide-react";
@@ -110,6 +111,20 @@ const MessagesPage = () => {
 		[queryClient, setCurrentChatId]
 	);
 
+	const deselectChat = useCallback(async () => {
+		try {
+			const conn = signalr.getConnection(MESSAGES_API_URL, "messaging");
+			if (conn?.state === HubConnectionState.Connected && currentChatGroupRef.current) {
+				await conn.invoke("LeaveChatGroup", currentChatGroupRef.current);
+				currentChatGroupRef.current = null;
+			}
+		} catch (error) {
+			console.error("Failed to leave chat group:", error);
+		}
+		setSelectedChatId(null);
+		setCurrentChatId(null);
+	}, [setCurrentChatId]);
+
 	const handleOnChatCreated = useCallback(
 		(newChat: Chat) => {
 			// Add new chat to cache
@@ -164,7 +179,7 @@ const MessagesPage = () => {
 					<AlertCircle size={32} className="text-error" />
 				</div>
 				<h2 className="text-xl font-bold text-error">Failed to load conversations</h2>
-				<span className="text-muted text-center max-w-md">
+				<span className="text-muted-foreground text-center max-w-md">
 					{chatsError instanceof Error ? chatsError.message : "An unexpected error occurred. Please try again."}
 				</span>
 				<Button loading={chatsLoading} variant={"outline"} onClick={() => refetchChats()} leftIcon={<RefreshCw size={16} />}>
@@ -182,8 +197,16 @@ const MessagesPage = () => {
 	return (
 		<div className="relative h-full w-full rounded-2xl overflow-hidden shadow-md bg-surface">
 			<ChatsRealtimeClient />
-			<ResizableContainer
-				leftPanel={
+			<div className="flex h-full min-h-0">
+				{/* Left Panel - Chat List */}
+				<div
+					className={cn(
+						"h-full min-h-0 shrink-0",
+						// Mobile: full width when no chat selected, hidden when chat is open
+						selectedChatId ? "hidden md:block" : "w-full",
+						// Desktop: fixed sidebar width
+						"md:w-96",
+					)}>
 					<div className="rounded-2xl h-full min-h-0">
 						{isNewChatModalOpen ? (
 							<div className="flex flex-col gap-4 h-full min-h-0 bg-background/50 backdrop-blur-xl border border-border p-6 rounded-r-0 rounded-2xl overflow-hidden">
@@ -196,7 +219,7 @@ const MessagesPage = () => {
 										onClick={() => setIsNewChatModalOpen(false)}
 										className="h-8 w-8 p-0 rounded-full bg-hover hover:bg-active"
 									/>
-									<span className="font-bold text-2xl text-white tracking-tight">New chat</span>
+									<span className="font-bold text-2xl text-foreground tracking-tight">New chat</span>
 								</div>
 								<NewChat onChatCreated={handleOnChatCreated} />
 							</div>
@@ -209,16 +232,26 @@ const MessagesPage = () => {
 							/>
 						)}
 					</div>
-				}
-				rightPanel={
-					<div className="h-full min-h-0 flex flex-col rounded-l-0">
+				</div>
+
+				{/* Divider - desktop only */}
+				<div className="hidden md:block w-px bg-border shrink-0" />
+
+				{/* Right Panel - Chat Window */}
+				<div
+					className={cn(
+						"h-full min-h-0 min-w-0",
+						// Mobile: visible only when chat is selected
+						selectedChatId ? "flex-1" : "hidden md:flex md:flex-1",
+					)}>
+					<div className="h-full min-h-0 flex flex-col w-full">
 						{selectedChat ? (
 							messagesLoading ? (
-								<div className="flex-1 flex items-center justify-center bg-background/50 backdrop-blur-xl border border-border">
+								<div className="flex-1 flex items-center justify-center bg-background/50 backdrop-blur-xl border-l-0 md:border-l border-border">
 									<Loader />
 								</div>
 							) : messagesError ? (
-								<div className="flex-1 flex flex-col items-center justify-center gap-4 bg-background/50 backdrop-blur-xl border border-border">
+								<div className="flex-1 flex flex-col items-center justify-center gap-4 bg-background/50 backdrop-blur-xl border-l-0 md:border-l border-border">
 									<div className="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center">
 										<AlertCircle size={24} className="text-error" />
 									</div>
@@ -228,7 +261,7 @@ const MessagesPage = () => {
 									</Button>
 								</div>
 							) : (
-								<div className="flex flex-col flex-1 min-h-0 h-[calc(100vh-4rem)] bg-background/50 backdrop-blur-xl border border-border overflow-hidden">
+								<div className="flex flex-col flex-1 min-h-0 h-[calc(100vh-4rem)] bg-background/50 backdrop-blur-xl border-l-0 md:border-l border-border overflow-hidden">
 									{sendError && (
 										<div className="shrink-0 bg-error text-white p-2 text-center text-sm z-10">
 											{sendError}
@@ -237,17 +270,24 @@ const MessagesPage = () => {
 											</button>
 										</div>
 									)}
-									<ChatWindow chat={selectedChat} messages={messages} onSendMessage={handleSendMessage} onChatUpdated={handleChatUpdated} />
+									<ChatWindow
+										chat={selectedChat}
+										messages={messages}
+										onSendMessage={handleSendMessage}
+										onViewChatInfo={() => {}}
+										onChatUpdated={handleChatUpdated}
+										onBack={deselectChat}
+									/>
 								</div>
 							)
 						) : (
-							<div className="grid flex-1 min-h-0 place-items-center bg-background/30 backdrop-blur-xl border border-border">
+							<div className="grid flex-1 min-h-0 place-items-center bg-background/30 backdrop-blur-xl border-l border-border">
 								<div className="flex flex-col items-center p-8 text-center">
-									<div className="w-20 h-20 rounded-full bg-hover flex items-center justify-center mb-6 text-muted">
+									<div className="w-20 h-20 rounded-full bg-hover flex items-center justify-center mb-6 text-muted-foreground">
 										<MessageSquare size={40} className="opacity-50" />
 									</div>
-									<h3 className="text-xl font-bold text-white mb-2">Your Messages</h3>
-									<span className="text-muted max-w-xs">Select a conversation from the list or start a new chat to begin messaging.</span>
+									<h3 className="text-xl font-bold text-foreground mb-2">Your Messages</h3>
+									<span className="text-muted-foreground max-w-xs">Select a conversation from the list or start a new chat to begin messaging.</span>
 									<Button className="mt-6" onClick={() => setIsNewChatModalOpen(true)} color="accent">
 										Start New Chat
 									</Button>
@@ -255,8 +295,8 @@ const MessagesPage = () => {
 							</div>
 						)}
 					</div>
-				}
-			/>
+				</div>
+			</div>
 		</div>
 	);
 };

@@ -19,7 +19,7 @@ async function EventPage({ params }: EventPageParams) {
 		notFound();
 	}
 
-	const user: UserProfile = await getUserProfile();
+	const user: UserProfile | null = await getUserProfile();
 	const event = await loadEvent(parameters.id);
 
 	if (!event) {
@@ -37,11 +37,11 @@ async function EventPage({ params }: EventPageParams) {
 	return (
 		<EventDetailsV2
 			event={event}
-			user={user}
+			user={user!}
 			isAdmin={true}
 			teams={teams}
 			userParticipant={userParticipant}
-			paymentsSection={<PaymentsSection event={event} teams={teams} userProfile={user} />}
+			paymentsSection={<PaymentsSection event={event} teams={teams} userProfile={user!} />}
 			positionsRealtime={<PositionsRealtimeClient />}
 		/>
 	);

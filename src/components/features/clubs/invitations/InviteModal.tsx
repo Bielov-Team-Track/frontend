@@ -120,7 +120,7 @@ const InviteModal = ({ clubId, isOpen, onClose, defaultRequirePlayerProfile = fa
 					<div className="flex gap-2">
 						<Button
 							type="button"
-							variant={method === "link" ? "solid" : "ghost"}
+							variant={method === "link" ? "default" : "ghost"}
 							size="sm"
 							onClick={() => setMethod("link")}
 							leftIcon={<Link size={14} />}>
@@ -128,7 +128,7 @@ const InviteModal = ({ clubId, isOpen, onClose, defaultRequirePlayerProfile = fa
 						</Button>
 						<Button
 							type="button"
-							variant={method === "email" ? "solid" : "ghost"}
+							variant={method === "email" ? "default" : "ghost"}
 							size="sm"
 							onClick={() => setMethod("email")}
 							leftIcon={<Mail size={14} />}>
@@ -136,7 +136,7 @@ const InviteModal = ({ clubId, isOpen, onClose, defaultRequirePlayerProfile = fa
 						</Button>
 						<Button
 							type="button"
-							variant={method === "user" ? "solid" : "ghost"}
+							variant={method === "user" ? "default" : "ghost"}
 							size="sm"
 							onClick={() => setMethod("user")}
 							leftIcon={<Search size={14} />}>
@@ -187,7 +187,7 @@ const InviteModal = ({ clubId, isOpen, onClose, defaultRequirePlayerProfile = fa
 						<Button type="button" variant="ghost" onClick={handleClose}>
 							Cancel
 						</Button>
-						<Button type="submit" variant="solid" color="primary" isLoading={createMutation.isPending}>
+						<Button type="submit" variant="default" color="primary" loading={createMutation.isPending}>
 							{method === "link" ? "Generate Link" : "Send Invitation"}
 						</Button>
 					</div>

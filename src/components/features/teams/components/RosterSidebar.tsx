@@ -96,12 +96,12 @@ export default function RosterSidebar({
 	};
 
 	return (
-		<div className="rounded-2xl bg-white/5 border border-white/10 flex flex-col h-[600px] overflow-hidden">
-			<div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-xs">
+		<div className="rounded-2xl bg-surface border border-border flex flex-col h-[600px] overflow-hidden">
+			<div className="p-4 border-b border-border bg-surface backdrop-blur-xs">
 				<div className="flex items-center justify-between">
-					<h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+					<h4 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
 						<span>Team Roster</span>
-						<span className="text-xs bg-white/10 px-2 py-1 rounded-full text-muted font-normal">{members.length}</span>
+						<span className="text-xs bg-hover px-2 py-1 rounded-full text-muted font-normal">{members.length}</span>
 					</h4>
 
 					{/* Arrow Controls Toggle */}
@@ -109,7 +109,7 @@ export default function RosterSidebar({
 						<button
 							onClick={() => setShowArrowControls(!showArrowControls)}
 							className={`p-1.5 rounded-lg transition-colors ${
-								showArrowControls ? "bg-accent text-white" : "bg-white/10 text-muted hover:bg-white/20 hover:text-white"
+								showArrowControls ? "bg-accent text-foreground" : "bg-hover text-muted hover:bg-hover hover:text-foreground"
 							}`}
 							title={showArrowControls ? "Hide reorder controls" : "Show reorder controls"}>
 							<ArrowUpDown size={14} />
@@ -128,10 +128,10 @@ export default function RosterSidebar({
 							return (
 								<div key={position}>
 									{/* Position Header */}
-									<div className="flex items-center gap-2 mb-3 sticky top-0 py-1 z-1000 backdrop-blur-xs bg-white/5">
+									<div className="flex items-center gap-2 mb-3 sticky top-0 py-1 z-10 backdrop-blur-xs bg-surface">
 										<div className="text-xs font-bold text-muted uppercase tracking-wider">{getPositionLabel(position)}</div>
-										<div className="flex-1 h-px bg-white/10" />
-										<span className="text-[10px] font-medium text-muted bg-white/5 px-1.5 py-0.5 rounded">{positionMembers.length}</span>
+										<div className="flex-1 h-px bg-hover" />
+										<span className="text-[10px] font-medium text-muted bg-surface px-1.5 py-0.5 rounded">{positionMembers.length}</span>
 									</div>
 
 									{/* Members in this position */}
@@ -161,7 +161,7 @@ export default function RosterSidebar({
 					</div>
 				) : (
 					<div className="flex flex-col items-center justify-center h-full text-muted text-sm gap-2">
-						<div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-2">
+						<div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center mb-2">
 							<UsersIcon className="opacity-20" size={24} />
 						</div>
 						<p>No players in roster</p>
@@ -275,15 +275,16 @@ function DraggableMemberRow({
 		<div
 			ref={setNodeRef}
 			style={style}
-			className={`flex items-center gap-1.5 rounded-xl transition-all ${
+			{...(isDragEnabled && !showArrowControls ? { ...listeners, ...attributes } : {})}
+			className={`flex items-center gap-1 rounded-xl transition-all ${
+				isDragEnabled && !showArrowControls ? "cursor-grab active:cursor-grabbing" : ""
+			} ${
 				isDragging ? "opacity-50 bg-accent/20 ring-2 ring-accent z-50" : isOver && !isDragging ? "ring-2 ring-accent/50 bg-accent/10" : ""
 			}`}>
-			{/* Drag Handle */}
+			{/* Drag Handle (visual indicator) */}
 			{isDragEnabled && !showArrowControls && (
 				<div
-					{...listeners}
-					{...attributes}
-					className="hidden lg:flex cursor-grab active:cursor-grabbing p-2 rounded-lg hover:bg-white/10 text-muted hover:text-white transition-colors items-center justify-center"
+					className="hidden lg:flex p-2 rounded-lg text-muted items-center justify-center"
 					title="Drag to reorder or to court position">
 					<GripVertical size={16} />
 				</div>
@@ -291,7 +292,7 @@ function DraggableMemberRow({
 
 			{/* Arrow Controls for reordering */}
 			{showArrowControls && canReorder && (
-				<div className="flex flex-col gap-0.5 bg-white/5 rounded-lg p-0.5">
+				<div className="flex flex-col gap-0.5 bg-surface rounded-lg p-0.5">
 					<button
 						onClick={(e) => {
 							e.preventDefault();
@@ -300,7 +301,7 @@ function DraggableMemberRow({
 						}}
 						disabled={isFirst}
 						className={`p-1 rounded transition-colors ${
-							isFirst ? "text-muted/30 cursor-not-allowed" : "text-muted hover:text-white hover:bg-white/10"
+							isFirst ? "text-muted/30 cursor-not-allowed" : "text-muted hover:text-foreground hover:bg-hover"
 						}`}>
 						<ChevronUp size={14} />
 					</button>
@@ -312,7 +313,7 @@ function DraggableMemberRow({
 						}}
 						disabled={isLast}
 						className={`p-1 rounded transition-colors ${
-							isLast ? "text-muted/30 cursor-not-allowed" : "text-muted hover:text-white hover:bg-white/10"
+							isLast ? "text-muted/30 cursor-not-allowed" : "text-muted hover:text-foreground hover:bg-hover"
 						}`}>
 						<ChevronDown size={14} />
 					</button>
@@ -324,7 +325,7 @@ function DraggableMemberRow({
 				{position !== "Unassigned" && (
 					<div
 						className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 z-10 ${
-							index === 0 ? "bg-yellow-500 text-black" : "bg-white/10 text-muted"
+							index === 0 ? "bg-yellow-500 text-black" : "bg-hover text-muted"
 						}`}>
 						{index + 1}
 					</div>
@@ -336,8 +337,8 @@ function DraggableMemberRow({
 					className="relative z-10 shrink-0"
 					onClick={(e) => isDragging && e.preventDefault()}>
 					<div className="relative">
-						<div className="rounded-lg overflow-hidden ring-1 ring-white/10 hover:ring-accent/50 transition-all">
-							{member.userProfile && <Avatar profile={member.userProfile} size="small" />}
+						<div className="rounded-lg overflow-hidden ring-1 ring-border hover:ring-accent/50 transition-all">
+							{member.userProfile && <Avatar src={member.userProfile.imageUrl} name={`${member.userProfile.name} ${member.userProfile.surname}`} size="sm" />}
 						</div>
 						{member.jerseyNumber && (
 							<div className="absolute -bottom-1.5 -right-1.5 w-5 h-5 rounded-full bg-accent text-background-dark text-[10px] font-bold flex items-center justify-center border-2 border-background-dark shadow-xs">
@@ -352,12 +353,12 @@ function DraggableMemberRow({
 					href={`/dashboard/clubs/${clubId}/members/${member.userId}`}
 					className="flex-1 min-w-0 z-10"
 					onClick={(e) => isDragging && e.preventDefault()}>
-					<div className="text-sm font-medium text-white hover:text-accent transition-colors truncate flex items-center gap-1.5">
+					<div className="text-sm font-medium text-foreground hover:text-accent transition-colors truncate flex items-center gap-1.5">
 						{member.userProfile?.name} {member.userProfile?.surname}
 						{/* Star icon next to name for starter */}
 						{index === 0 && position !== "Unassigned" && <Star size={12} className="text-yellow-500 fill-yellow-500 shrink-0" />}
 					</div>
-					<div className="text-xs text-muted/70 truncate flex items-center gap-1">
+					<div className="text-xs text-muted/70 flex items-center gap-1">
 						{index === 0 && position !== "Unassigned" && <span className="text-yellow-500/80">Starter</span>}
 						{index > 0 && position !== "Unassigned" && <span>Backup</span>}
 					</div>
@@ -371,7 +372,7 @@ function DraggableMemberRow({
 							e.stopPropagation();
 							onEdit(member);
 						}}
-						className="p-1.5 rounded-lg bg-white/0 hover:bg-white/10 text-muted hover:text-accent transition-colors z-10 opacity-100 lg:opacity-0 group-hover:opacity-100"
+						className="p-1.5 rounded-lg bg-white/0 hover:bg-hover text-muted hover:text-accent transition-colors z-10 opacity-100 lg:opacity-0 group-hover:opacity-100"
 						title="Edit player">
 						<Pencil size={14} />
 					</button>
@@ -401,7 +402,7 @@ export function PlayerDragOverlay({ member }: { member: TeamMember }) {
 		<div className="flex items-center gap-3 p-3 rounded-xl bg-background border-2 border-accent shadow-2xl min-w-[200px]">
 			<div className="relative">
 				<div className="rounded-lg overflow-hidden ring-2 ring-accent">
-					{member.userProfile && <Avatar profile={member.userProfile} size="small" />}
+					{member.userProfile && <Avatar src={member.userProfile.imageUrl} name={`${member.userProfile.name} ${member.userProfile.surname}`} size="sm" />}
 				</div>
 				{member.jerseyNumber && (
 					<div className="absolute -bottom-1.5 -right-1.5 w-5 h-5 rounded-full bg-accent text-background-dark text-[10px] font-bold flex items-center justify-center border-2 border-background-dark shadow-xs">
@@ -410,7 +411,7 @@ export function PlayerDragOverlay({ member }: { member: TeamMember }) {
 				)}
 			</div>
 			<div className="flex-1 min-w-0">
-				<div className="text-sm font-medium text-white truncate">
+				<div className="text-sm font-medium text-foreground truncate">
 					{member.userProfile?.name} {member.userProfile?.surname}
 				</div>
 			</div>

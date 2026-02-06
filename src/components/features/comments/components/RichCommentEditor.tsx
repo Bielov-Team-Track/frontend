@@ -48,7 +48,7 @@ interface RichCommentEditorProps {
 
 // Convert Media objects to UploadedAttachment format
 function mediaToAttachment(media: Media): UploadedAttachment {
-	const type = media.type.toLowerCase();
+	const type = media.mediaType.toLowerCase();
 	return {
 		id: media.id,
 		preview: media.url, // Use the actual URL as preview
@@ -227,8 +227,8 @@ export default function RichCommentEditor({
 
 	if (!isAuthenticated) {
 		return (
-			<div className="bg-white/5 border border-white/5 border-dashed rounded-xl p-4 text-center">
-				<p className="text-sm text-muted mb-2">Join the conversation</p>
+			<div className="bg-surface border border-border border-dashed rounded-xl p-4 text-center">
+				<p className="text-sm text-muted-foreground mb-2">Join the conversation</p>
 				<Button variant="default" size="sm">
 					Log in to Comment
 				</Button>
@@ -241,12 +241,12 @@ export default function RichCommentEditor({
 		return replyingTo ? (
 			<div
 				onClick={() => setIsFocused(true)}
-				className="flex-1 flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm cursor-text hover:bg-white/8 transition-colors overflow-hidden">
+				className="flex-1 flex items-center gap-2 bg-surface border border-border rounded-xl px-4 py-2.5 text-sm cursor-text hover:bg-hover transition-colors overflow-hidden">
 				<Reply size={14} className="text-primary shrink-0" />
 				<div className="flex-1 min-w-0 flex items-center gap-1.5">
-					<span className="text-muted shrink-0">Reply to</span>
-					<span className="text-white shrink-0">{replyingTo.authorName}</span>
-					<span className="text-muted/60 truncate">&quot;{replyingTo.contentPreview}&quot;</span>
+					<span className="text-muted-foreground shrink-0">Reply to</span>
+					<span className="text-foreground shrink-0">{replyingTo.authorName}</span>
+					<span className="text-muted-foreground/60 truncate">&quot;{replyingTo.contentPreview}&quot;</span>
 				</div>
 				<button
 					type="button"
@@ -254,7 +254,7 @@ export default function RichCommentEditor({
 						e.stopPropagation();
 						onCancelReply?.();
 					}}
-					className="shrink-0 p-0.5 rounded hover:bg-white/10 text-muted hover:text-white transition-colors"
+					className="shrink-0 p-0.5 rounded hover:bg-hover text-muted-foreground hover:text-foreground transition-colors"
 					title="Cancel reply">
 					<X size={14} />
 				</button>
@@ -262,7 +262,7 @@ export default function RichCommentEditor({
 		) : (
 			<div
 				onClick={() => setIsFocused(true)}
-				className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-muted cursor-text hover:bg-white/8 transition-colors">
+				className="flex-1 bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-muted-foreground cursor-text hover:bg-hover transition-colors">
 				{placeholder}
 			</div>
 		);
@@ -272,27 +272,27 @@ export default function RichCommentEditor({
 		<div
 			onKeyDown={handleKeyDown}
 			className={cn(
-				"flex-1 rounded-xl border bg-white/3 overflow-hidden transition-colors",
-				isDragOver && !hideAttachments ? "border-primary bg-primary/5" : "border-white/10",
+				"flex-1 rounded-xl border bg-surface overflow-hidden transition-colors",
+				isDragOver && !hideAttachments ? "border-primary bg-primary/5" : "border-border",
 			)}
 			onDragOver={!hideAttachments ? handleDragOver : undefined}
 			onDragLeave={!hideAttachments ? handleDragLeave : undefined}
 			onDrop={!hideAttachments ? handleDrop : undefined}>
 			{/* Reply indicator inside editor */}
 			{replyingTo && (
-				<div className="flex items-center gap-2 px-3 py-2 bg-white/5 border-b border-white/5 overflow-hidden">
+				<div className="flex items-center gap-2 px-3 py-2 bg-hover border-b border-border overflow-hidden">
 					<Reply size={14} className="text-primary shrink-0" />
 					<div className="flex-1 min-w-0 flex items-center gap-1.5 text-xs">
-						<span className="text-muted shrink-0">Replying to</span>
+						<span className="text-muted-foreground shrink-0">Replying to</span>
 						<button type="button" onClick={() => onScrollToReply?.(replyingTo.id)} className="min-w-0 flex items-center gap-1.5 hover:underline">
-							<span className="text-white font-medium shrink-0">{replyingTo.authorName}</span>
-							<span className="text-muted/60 truncate">&quot;{replyingTo.contentPreview}&quot;</span>
+							<span className="text-foreground font-medium shrink-0">{replyingTo.authorName}</span>
+							<span className="text-muted-foreground/60 truncate">&quot;{replyingTo.contentPreview}&quot;</span>
 						</button>
 					</div>
 					<button
 						type="button"
 						onClick={onCancelReply}
-						className="shrink-0 p-0.5 rounded hover:bg-white/10 text-muted hover:text-white transition-colors"
+						className="shrink-0 p-0.5 rounded hover:bg-hover text-muted-foreground hover:text-foreground transition-colors"
 						title="Cancel reply">
 						<X size={14} />
 					</button>
@@ -311,7 +311,7 @@ export default function RichCommentEditor({
 
 			{/* Attachments row - above toolbar */}
 			{!hideAttachments && hasAttachments && (
-				<div className="px-3 py-2 border-t border-white/5">
+				<div className="px-3 py-2 border-t border-border">
 					<AttachmentsUploader
 						attachments={attachments}
 						onAttachmentsChange={setAttachments}
@@ -325,7 +325,7 @@ export default function RichCommentEditor({
 			)}
 
 			{/* Toolbar row */}
-			<div className={cn("flex items-center justify-between px-3 py-2 bg-white/2", !hasAttachments && "border-t border-white/5")}>
+			<div className={cn("flex items-center justify-between px-3 py-2 bg-hover/50", !hasAttachments && "border-t border-border")}>
 				{/* Left: Attachment button + Emoji button + drag hint */}
 				<div className="flex items-center gap-2">
 					<button
@@ -334,7 +334,7 @@ export default function RichCommentEditor({
 						onClick={() => setShowEmojiPicker(!showEmojiPicker)}
 						className={cn(
 							"p-1.5 rounded-lg transition-colors",
-							showEmojiPicker ? "text-white bg-white/10" : "text-muted hover:text-white hover:bg-white/10",
+							showEmojiPicker ? "text-foreground bg-hover" : "text-muted-foreground hover:text-foreground hover:bg-hover",
 						)}>
 						<Smile size={16} />
 					</button>
@@ -343,11 +343,11 @@ export default function RichCommentEditor({
 							<button
 								type="button"
 								onClick={handleAttachClick}
-								className="p-1.5 rounded-lg transition-colors text-muted hover:text-white hover:bg-white/10">
+								className="p-1.5 rounded-lg transition-colors text-muted-foreground hover:text-foreground hover:bg-hover">
 								<Paperclip size={16} />
 							</button>
 							{/* Drag and drop hint - desktop only */}
-							<span className="hidden sm:block text-[10px] text-muted/50">or drag & drop</span>
+							<span className="hidden sm:block text-[10px] text-muted-foreground/50">or drag & drop</span>
 						</>
 					)}
 				</div>
@@ -358,13 +358,13 @@ export default function RichCommentEditor({
 				{/* Right: Hint + Actions */}
 				<div className="flex items-center gap-2">
 					{/* Keyboard hint - hidden on mobile */}
-					<span className="hidden sm:block text-[10px] text-muted/60">Ctrl + Enter</span>
+					<span className="hidden sm:block text-[10px] text-muted-foreground/60">Ctrl + Enter</span>
 
 					{(showCancel || (compact && isFocused)) && (
 						<button
 							type="button"
 							onClick={handleCancel}
-							className="text-xs text-muted hover:text-white px-2 py-1 rounded-lg hover:bg-white/10 transition-colors">
+							className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded-lg hover:bg-hover transition-colors">
 							Cancel
 						</button>
 					)}
@@ -375,7 +375,7 @@ export default function RichCommentEditor({
 						disabled={!hasContent || isSubmitting}
 						className={cn(
 							"flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
-							hasContent && !isSubmitting ? "bg-primary text-white hover:bg-primary/90" : "bg-white/10 text-muted cursor-not-allowed",
+							hasContent && !isSubmitting ? "bg-primary text-white hover:bg-primary/90" : "bg-foreground/10 text-muted-foreground cursor-not-allowed",
 						)}>
 						{isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
 						<span className="hidden sm:inline">Send</span>

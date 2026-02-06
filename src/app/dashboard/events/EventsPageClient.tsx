@@ -4,7 +4,7 @@ import { Button } from "@/components";
 import { ListToolbar } from "@/components/ui/list-toolbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Loader from "@/components/ui/loader";
-import { Event } from "@/lib/models/Event";
+import { Event, EventType } from "@/lib/models/Event";
 import { useCreateModals } from "@/providers/CreateModalsProvider";
 import { Calendar as CalendarIcon, Clock, Grid, List, MapPin, Plus } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -27,9 +27,13 @@ const EventsCalendar = dynamic(
 import EventsListEmptyState from "./components/EmptyState";
 import { EventListView } from "./components/EventListView";
 
-// Event type filter options
-const EVENT_TYPES = ["Casual Play", "Tournament", "Practice", "Training"] as const;
-type EventType = (typeof EVENT_TYPES)[number];
+// Event type filter options using the actual EventType enum
+const EVENT_TYPE_FILTERS = [
+	{ value: EventType.CasualPlay, label: "Casual Play" },
+	{ value: EventType.Match, label: "Match" },
+	{ value: EventType.TrainingSession, label: "Training" },
+	{ value: EventType.Social, label: "Social" },
+] as const;
 
 // Time filter options
 const TIME_FILTERS = [
@@ -60,7 +64,7 @@ function EventsPageClient({ events, title = "Events" }: EventsPageClientProps) {
 				return false;
 			}
 			// Type filter
-			if (selectedTypes.length > 0 && !selectedTypes.includes(e.type as EventType)) {
+			if (selectedTypes.length > 0 && !selectedTypes.includes(e.type)) {
 				return false;
 			}
 			// Time filter
@@ -130,18 +134,18 @@ function EventsPageClient({ events, title = "Events" }: EventsPageClientProps) {
 			<div className="space-y-2">
 				<p className="text-xs font-medium text-muted-foreground">Event Type</p>
 				<div className="flex flex-wrap gap-2">
-					{EVENT_TYPES.map((type) => (
+					{EVENT_TYPE_FILTERS.map((filter) => (
 						<button
-							key={type}
+							key={filter.value}
 							type="button"
-							onClick={() => toggleType(type)}
+							onClick={() => toggleType(filter.value)}
 							className={cn(
 								"px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
-								selectedTypes.includes(type)
+								selectedTypes.includes(filter.value)
 									? "bg-foreground/10 text-foreground border-foreground/30"
 									: "bg-card/50 text-muted-foreground border-border hover:bg-card hover:text-foreground hover:border-foreground/20"
 							)}>
-							{type}
+							{filter.label}
 						</button>
 					))}
 				</div>
@@ -223,11 +227,11 @@ function EventGridCard({ event }: { event: Event }) {
 
 	return (
 		<Link href={`/dashboard/events/${event.id}`} className="group block h-full">
-			<div className="flex flex-col h-full rounded-2xl bg-white/5 border border-white/5 hover:border-accent/40 hover:bg-white/[0.07] hover:-translate-y-1 transition-all duration-300 shadow-xs hover:shadow-xl">
+			<div className="flex flex-col h-full rounded-2xl bg-surface border border-border hover:border-accent/40 hover:bg-hover hover:-translate-y-1 transition-all duration-300 shadow-xs hover:shadow-xl">
 				{/* Image / Header Placeholder */}
 				<div className="h-32 bg-surface relative overflow-hidden rounded-t-2xl">
 					<div className="absolute top-3 right-3 z-10">
-						<span className="px-2 py-1 rounded-lg bg-black/60 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">
+						<span className="px-2 py-1 rounded-lg bg-overlay backdrop-blur-md text-[10px] font-bold text-foreground border border-border">
 							{event.type}
 						</span>
 					</div>
@@ -237,7 +241,7 @@ function EventGridCard({ event }: { event: Event }) {
 				{/* Content */}
 				<div className="p-5 flex-1 flex flex-col">
 					<div className="flex gap-3 mb-2">
-						<div className="flex flex-col items-center justify-center w-10 h-12 rounded-lg bg-white/5 border border-white/10 shrink-0">
+						<div className="flex flex-col items-center justify-center w-10 h-12 rounded-lg bg-surface border border-border shrink-0">
 							<span className="text-sm font-bold text-white leading-none">{date.getDate()}</span>
 							<span className="text-[9px] font-bold text-muted uppercase">
 								{date.toLocaleString("default", {
@@ -258,7 +262,7 @@ function EventGridCard({ event }: { event: Event }) {
 					</div>
 
 					{event.location && (
-						<div className="mt-auto pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-muted">
+						<div className="mt-auto pt-4 border-t border-border flex items-center gap-2 text-xs text-muted">
 							<MapPin size={12} className="shrink-0" />
 							<span className="truncate">{event.location.name}</span>
 						</div>

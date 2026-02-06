@@ -17,7 +17,7 @@ export async function loadEventsByFilterServer(
 		return [];
 	}
 
-	const params = getParamsFromObject(filter);
+	const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
 	const queryString = params ? `?${params.toString()}` : "";
 	const url = `${EVENTS_API_V1}/events${queryString}`;
 

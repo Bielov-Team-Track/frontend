@@ -3,7 +3,7 @@ import { Chat, Message } from "@/lib/models/Messages";
 import { stringToColor } from "@/lib/utils/color";
 import { getFormattedDate } from "@/lib/utils/date";
 import { useAuth } from "@/providers";
-import { ChevronDown, Image as ImageIcon, Info, Paperclip, Send, Smile } from "lucide-react";
+import { ChevronDown, ChevronLeft, Image as ImageIcon, Info, Paperclip, Send, Smile } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ChatInfoPanel from "./ChatInfoPanel";
@@ -15,9 +15,10 @@ type ChatWindowProps = {
 	onSendMessage: (text: string) => Promise<void>;
 	onViewChatInfo: () => void;
 	onChatUpdated: (chatId: string) => void;
+	onBack?: () => void;
 };
 
-const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdated }: ChatWindowProps) => {
+const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdated, onBack }: ChatWindowProps) => {
 	const { userProfile: currentUser } = useAuth();
 	const [messageText, setMessageText] = useState("");
 	const [isSending, setIsSending] = useState(false);
@@ -117,26 +118,40 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdat
 	return (
 		<div className="flex flex-col flex-1 min-h-0 h-full relative bg-background">
 			{/* Header */}
-			<div className="flex justify-between items-center h-16 bg-background/80 backdrop-blur-md shrink-0 px-4 border-b border-white/10 z-10">
+			<div className="flex justify-between items-center h-16 bg-background/80 backdrop-blur-md shrink-0 px-4 border-b border-border z-10">
 				<div className="flex items-center gap-3 cursor-pointer" onClick={() => setShowInfoPanel(!showInfoPanel)}>
+					{onBack && (
+						<Button
+							size="icon"
+							variant="ghost"
+							color="neutral"
+							onClick={(e) => {
+								e.stopPropagation();
+								onBack();
+							}}
+							className="md:hidden h-8 w-8 p-0 rounded-full shrink-0"
+							title="Back to chats">
+							<ChevronLeft size={20} />
+						</Button>
+					)}
 					<div
 						className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden shrink-0 relative"
 						style={{ backgroundColor: !chatImage ? fallbackColor : undefined }}>
 						{chatImage ? (
 							<Image src={chatImage} alt={chatTitle} fill className="object-cover" />
 						) : (
-							<span className="text-white font-bold">{fallbackInitial}</span>
+							<span className="text-foreground font-bold">{fallbackInitial}</span>
 						)}
 					</div>
 					<div className="flex flex-col">
-						<span className="font-bold text-base leading-tight truncate text-white max-w-[200px] md:max-w-md">{chatTitle}</span>
-						<span className="text-xs text-muted">{chatSubtitle}</span>
+						<span className="font-bold text-base leading-tight truncate text-foreground max-w-[200px] md:max-w-md">{chatTitle}</span>
+						<span className="text-xs text-muted-foreground">{chatSubtitle}</span>
 					</div>
 				</div>
 
 				<div className="flex items-center gap-1">
 					<Button
-						variant="icon"
+						size="icon" variant="ghost"
 						color="neutral"
 						leftIcon={<Info size={20} />}
 						onClick={() => setShowInfoPanel(!showInfoPanel)}
@@ -149,8 +164,8 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdat
 			{/* Messages Area */}
 			<div ref={scrollAreaRef} onScroll={handleScroll} className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-6 relative">
 				{messages.length === 0 ? (
-					<div className="absolute inset-0 flex flex-col items-center justify-center text-muted opacity-50 gap-2">
-						<div className="bg-white/5 p-4 rounded-full">
+					<div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground opacity-50 gap-2">
+						<div className="bg-surface p-4 rounded-full">
 							<Smile size={48} />
 						</div>
 						<p>No messages yet. Start the conversation!</p>
@@ -159,7 +174,7 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdat
 					groupedMessages.map((group) => (
 						<div key={group.date} className="space-y-4">
 							<div className="flex justify-center sticky top-0 z-0">
-								<span className="bg-background/80 backdrop-blur-xs border border-white/5 text-xs font-medium px-3 py-1 rounded-full text-muted shadow-xs">
+								<span className="bg-background/80 backdrop-blur-xs border border-border text-xs font-medium px-3 py-1 rounded-full text-muted shadow-xs">
 									{group.date}
 								</span>
 							</div>
@@ -178,15 +193,15 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdat
 			{showScrollToBottom && (
 				<button
 					onClick={scrollToBottom}
-					className="absolute bottom-28 right-8 bg-white/10 text-white p-2 rounded-full shadow-lg hover:bg-accent/90 transition-all z-20 animate-in fade-in zoom-in">
+					className="absolute bottom-28 right-8 bg-hover text-foreground p-2 rounded-full shadow-lg hover:bg-accent/90 transition-all z-20 animate-in fade-in zoom-in">
 					<ChevronDown size={20} />
 				</button>
 			)}
 
 			{/* Input Area */}
-			<div className="shrink-0 p-4 bg-background/50 backdrop-blur-md border-t border-white/5 z-10">
-				<div className="max-w-4xl mx-auto flex items-center gap-2 bg-white/5 p-2 rounded-3xl border border-white/10 focus-within:border-accent/50 focus-within:ring-1 focus-within:ring-accent/50 transition-all shadow-xs">
-					<button className="p-2.5 rounded-full text-muted hover:text-white hover:bg-white/10 transition-colors">
+			<div className="shrink-0 p-4 bg-background/50 backdrop-blur-md border-t border-border z-10">
+				<div className="max-w-4xl mx-auto flex items-center gap-2 bg-surface p-2 rounded-3xl border border-border focus-within:border-accent/50 focus-within:ring-1 focus-within:ring-accent/50 transition-all shadow-xs">
+					<button className="p-2.5 rounded-full text-muted hover:text-foreground hover:bg-hover transition-colors">
 						<Paperclip size={20} />
 					</button>
 
@@ -196,23 +211,23 @@ const ChatWindow = ({ chat, messages, onSendMessage, onViewChatInfo, onChatUpdat
 						onChange={handleTextChange}
 						onKeyDown={handleKeyDown}
 						placeholder="Type a message..."
-						className="flex-1 bg-transparent border-0 focus:ring-0 text-sm text-white placeholder:text-muted resize-none py-2.5 max-h-32 min-h-[40px] leading-relaxed outline-hidden"
+						className="flex-1 bg-transparent border-0 focus:ring-0 text-sm text-foreground placeholder:text-muted resize-none py-2.5 max-h-32 min-h-[40px] leading-relaxed outline-hidden"
 						rows={1}
 						disabled={isSending}
 					/>
 
 					<div className="flex items-center gap-1">
-						<button className="p-2.5 rounded-full text-muted hover:text-white hover:bg-white/10 transition-colors">
+						<button className="p-2.5 rounded-full text-muted hover:text-foreground hover:bg-hover transition-colors">
 							<ImageIcon size={20} />
 						</button>
-						<button className="p-2.5 rounded-full text-muted hover:text-white hover:bg-white/10 transition-colors">
+						<button className="p-2.5 rounded-full text-muted hover:text-foreground hover:bg-hover transition-colors">
 							<Smile size={20} />
 						</button>
 						<button
 							onClick={handleSend}
 							disabled={isSending || !messageText.trim()}
 							className={`ml-1 p-2.5 rounded-full transition-all ${
-								messageText.trim() ? "bg-accent text-white hover:bg-accent/90" : "text-muted hover:text-white hover:bg-white/10"
+								messageText.trim() ? "bg-accent text-white hover:bg-accent/90" : "text-muted hover:text-foreground hover:bg-hover"
 							} disabled:opacity-50`}>
 							<Send size={18} />
 						</button>

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import LocationForm from "@/components/features/locations/forms/LocationForm";
 import BackButton from "@/components/ui/back-button";

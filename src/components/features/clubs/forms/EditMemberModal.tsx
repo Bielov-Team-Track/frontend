@@ -2,9 +2,17 @@
 
 import { Button } from "@/components";
 import Modal from "@/components/ui/modal";
+import { RoleCheckboxGroup } from "@/components/ui/role-checkbox-group";
 import { UpdateClubMemberRequest } from "@/lib/api/clubs";
+import { CLUB_ROLE_OPTIONS } from "@/lib/constants/roles";
 import { ClubMember, ClubRole, SkillLevel } from "@/lib/models/Club";
 import { useEffect, useState } from "react";
+
+// Helper to extract role strings from role objects or strings
+function extractRoleStrings(roles: any[] | undefined): string[] {
+	if (!roles) return [];
+	return roles.map((r) => (typeof r === "string" ? r : r?.role)).filter(Boolean);
+}
 
 interface EditMemberModalProps {
 	isOpen: boolean;
@@ -15,13 +23,13 @@ interface EditMemberModalProps {
 }
 
 export default function EditMemberModal({ isOpen, member, onClose, onSubmit, isLoading = false }: EditMemberModalProps) {
-	const [role, setRole] = useState<string>(ClubRole.Member);
+	const [roles, setRoles] = useState<ClubRole[]>([]);
 	const [skillLevel, setSkillLevel] = useState<string>("");
 	const [isActive, setIsActive] = useState(true);
 
 	useEffect(() => {
 		if (member) {
-			setRole(member.role);
+			setRoles(extractRoleStrings(member.roles) as ClubRole[]);
 			setSkillLevel(member.skillLevel || "");
 			setIsActive(member.isActive);
 		}
@@ -30,7 +38,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSubmit, isL
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		onSubmit({
-			role,
+			roles,
 			skillLevel: skillLevel || undefined,
 			isActive,
 		});
@@ -43,31 +51,12 @@ export default function EditMemberModal({ isOpen, member, onClose, onSubmit, isL
 			<form onSubmit={handleSubmit} className="space-y-5">
 				{/* Role Selection */}
 				<div>
-					<label className="block text-sm font-medium text-white mb-2">Role</label>
-					<div className="space-y-2">
-						{Object.values(ClubRole).map((r) => (
-							<label
-								key={r}
-								className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${
-									role === r ? "bg-accent/20 border-accent" : "bg-white/5 border-white/10 hover:border-white/20"
-								}`}>
-								<div className="flex items-center gap-3">
-									<input
-										type="radio"
-										name="role"
-										value={r}
-										checked={role === r}
-										onChange={(e) => setRole(e.target.value)}
-										className="accent-accent"
-									/>
-									<div>
-										<span className="text-white">{r}</span>
-										<p className="text-xs text-muted mt-0.5">{getRoleDescription(r)}</p>
-									</div>
-								</div>
-							</label>
-						))}
-					</div>
+					<label className="block text-sm font-medium text-white mb-3">Assign Roles</label>
+					<RoleCheckboxGroup
+						availableRoles={CLUB_ROLE_OPTIONS}
+						selectedRoles={roles}
+						onChange={setRoles}
+					/>
 				</div>
 
 				{/* Skill Level */}
@@ -76,7 +65,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSubmit, isL
 					<select
 						value={skillLevel}
 						onChange={(e) => setSkillLevel(e.target.value)}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent">
+						className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-white focus:outline-hidden focus:border-accent">
 						<option value="">Not specified</option>
 						{Object.values(SkillLevel).map((level) => (
 							<option key={level} value={level}>
@@ -87,20 +76,20 @@ export default function EditMemberModal({ isOpen, member, onClose, onSubmit, isL
 				</div>
 
 				{/* Active Status */}
-				<div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+				<div className="flex items-center justify-between p-4 rounded-xl bg-surface border border-border">
 					<div>
 						<p className="text-sm font-medium text-white">Active Status</p>
 						<p className="text-xs text-muted mt-0.5">Inactive members cannot participate in club activities</p>
 					</div>
 					<label className="relative inline-flex items-center cursor-pointer">
 						<input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="sr-only peer" />
-						<div className="w-11 h-6 bg-white/10 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:rtl:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+						<div className="w-11 h-6 bg-hover peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:rtl:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
 					</label>
 				</div>
 
 				{/* Member Info (Read-only) */}
 				{member?.createdAt && (
-					<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+					<div className="p-4 rounded-xl bg-surface border border-border">
 						<p className="text-xs text-muted mb-1">Member since</p>
 						<p className="text-sm text-white">
 							{new Date(member.createdAt).toLocaleDateString("en-US", {
@@ -117,28 +106,11 @@ export default function EditMemberModal({ isOpen, member, onClose, onSubmit, isL
 					<Button type="button" variant="ghost" color="neutral" fullWidth onClick={onClose}>
 						Cancel
 					</Button>
-					<Button type="submit" variant="solid" color="accent" fullWidth loading={isLoading}>
+					<Button type="submit" variant="default" color="accent" fullWidth loading={isLoading}>
 						Save Changes
 					</Button>
 				</div>
 			</form>
 		</Modal>
 	);
-}
-
-function getRoleDescription(role: ClubRole): string {
-	switch (role) {
-		case ClubRole.Owner:
-			return "Full control over club settings and members";
-		case ClubRole.Admin:
-			return "Can manage members, teams, and groups";
-		case ClubRole.Coach:
-			return "Can manage teams and training sessions";
-		case ClubRole.Assistant:
-			return "Can help with club activities";
-		case ClubRole.Member:
-			return "Regular club member";
-		default:
-			return "";
-	}
 }

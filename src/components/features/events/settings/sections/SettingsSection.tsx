@@ -12,7 +12,7 @@ interface SettingsSectionProps {
 
 export function SettingsSection({ title, description, children, className }: SettingsSectionProps) {
 	return (
-		<div className={cn("rounded-2xl bg-white/5 border border-white/10 p-6", className)}>
+		<div className={cn("rounded-2xl bg-surface border border-border p-6", className)}>
 			<div className="mb-5">
 				<h3 className="text-lg font-bold text-white">{title}</h3>
 				{description && <p className="text-sm text-muted mt-1">{description}</p>}

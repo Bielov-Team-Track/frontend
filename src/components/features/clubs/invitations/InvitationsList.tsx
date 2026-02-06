@@ -17,8 +17,8 @@ const statusColors: Record<InvitationStatus, string> = {
 	[InvitationStatus.Pending]: "bg-warning/20 text-warning",
 	[InvitationStatus.Accepted]: "bg-success/20 text-success",
 	[InvitationStatus.Declined]: "bg-red-500/20 text-red-400",
-	[InvitationStatus.Expired]: "bg-muted/20 text-muted-foreground",
-	[InvitationStatus.Revoked]: "bg-muted/20 text-muted-foreground",
+	[InvitationStatus.Expired]: "bg-muted/20 text-muted-foreground-foreground",
+	[InvitationStatus.Revoked]: "bg-muted/20 text-muted-foreground-foreground",
 };
 
 const InvitationsList = ({ clubId }: InvitationsListProps) => {
@@ -67,26 +67,26 @@ const InvitationsList = ({ clubId }: InvitationsListProps) => {
 				placeholder="Filter by status"
 			/>
 			{!invitations || invitations.length === 0 ? (
-				<div className="p-8 bg-white/5 rounded-xl text-center">
-					<p className="text-muted">No invitations found</p>
+				<div className="p-8 bg-surface rounded-xl text-center">
+					<p className="text-muted-foreground-foreground">No invitations found</p>
 				</div>
 			) : (
 				<div className="flex flex-col gap-2">
 					{invitations.map((invitation) => (
-						<div key={invitation.id} className="p-4 bg-white/5 rounded-xl border border-white/10 flex items-center justify-between gap-4">
+						<div key={invitation.id} className="p-4 bg-surface rounded-xl border border-border flex items-center justify-between gap-4">
 							<div className="flex items-center gap-3">
 								<div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center">
 									{invitation.targetEmail ? (
-										<Mail size={18} className="text-muted" />
+										<Mail size={18} className="text-muted-foreground" />
 									) : invitation.targetUserId ? (
-										<User size={18} className="text-muted" />
+										<User size={18} className="text-muted-foreground" />
 									) : (
-										<Link size={18} className="text-muted" />
+										<Link size={18} className="text-muted-foreground" />
 									)}
 								</div>
 								<div>
-									<p className="text-sm font-medium text-white">{invitation.targetEmail || invitation.targetUserId || "Link Invitation"}</p>
-									<p className="text-xs text-muted">Created {new Date(invitation.createdAt).toLocaleDateString()}</p>
+									<p className="text-sm font-medium text-foreground">{invitation.targetEmail || invitation.targetUserId || "Link Invitation"}</p>
+									<p className="text-xs text-muted-foreground">Created {new Date(invitation.createdAt).toLocaleDateString()}</p>
 								</div>
 							</div>
 							<div className="flex items-center gap-2">

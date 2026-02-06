@@ -14,10 +14,17 @@ export const useNavigation = () => {
 		);
 	};
 
+	const isSubItemActive = (items: NavigationItem[]): boolean => {
+		return items.some((sub) =>
+			(sub.href && pathname === sub.href) ||
+			(sub.subItems && isSubItemActive(sub.subItems))
+		);
+	};
+
 	const isItemOrSubItemActive = (item: NavigationItem) => {
-		if (pathname === item.href) return true;
+		if (item.href && pathname === item.href) return true;
 		if (item.subItems) {
-			return item.subItems.some((subItem) => pathname === subItem.href);
+			return isSubItemActive(item.subItems);
 		}
 		return false;
 	};
@@ -25,8 +32,7 @@ export const useNavigation = () => {
 	const isExpanded = (item: NavigationItem, items: NavigationItem[]) => {
 		return (
 			expandedItems.includes(item.name) ||
-			item.subItems?.some((sub) => pathname === sub.href) ||
-			false
+			(item.subItems ? isSubItemActive(item.subItems) : false)
 		);
 	};
 

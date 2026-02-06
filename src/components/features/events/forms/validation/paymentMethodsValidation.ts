@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { PaymentMethod } from "@/lib/models/EventBudget";
+import { PaymentMethod } from "@/lib/models/EventPaymentConfig";
 import { PaymentAccountStatus } from "@/lib/models/Payment";
 
 export const paymentMethodsValidationSchema = yup.object().shape({

@@ -89,9 +89,9 @@ export default function AttendanceFilters({
 		return (
 			<div className="flex items-center gap-2.5">
 				{option.data?.logoUrl ? (
-					<img src={option.data.logoUrl} alt="" className="w-5 h-5 rounded-full object-cover bg-white/5" />
+					<img src={option.data.logoUrl} alt="" className="w-5 h-5 rounded-full object-cover bg-surface" />
 				) : (
-					<div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+					<div className="w-5 h-5 rounded-full bg-hover flex items-center justify-center shrink-0">
 						<Building2 size={12} className="text-muted" />
 					</div>
 				)}
@@ -115,7 +115,7 @@ export default function AttendanceFilters({
 		if (!option.value) return <span className="text-white/70">{option.label}</span>;
 		return (
 			<div className="flex items-center gap-2.5">
-				<div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center shrink-0">{icon}</div>
+				<div className="w-5 h-5 rounded-full bg-hover flex items-center justify-center shrink-0">{icon}</div>
 				<span className="truncate">{option.label}</span>
 			</div>
 		);

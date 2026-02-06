@@ -17,7 +17,7 @@ const STATUS_OPTIONS = [
 		status: AttendanceStatus.Invited,
 		label: "Invited",
 		icon: HelpCircle,
-		bg: "bg-white/10 hover:bg-white/20",
+		bg: "bg-hover hover:bg-hover",
 		textColor: "text-muted",
 	},
 	{
@@ -60,19 +60,19 @@ export default function BulkActionBar({
 }: BulkActionBarProps) {
 	return (
 		<div className="fixed bottom-0 left-0 right-0 z-40 animate-in slide-in-from-bottom-4 duration-200">
-			<div className="bg-[#1a1a1a] border-t border-white/10 shadow-2xl">
+			<div className="bg-surface border-t border-border shadow-2xl">
 				<div className="max-w-7xl mx-auto px-4 py-3">
 					<div className="flex flex-col sm:flex-row items-center gap-3">
 						{/* Selection info & controls */}
 						<div className="flex items-center gap-3 w-full sm:w-auto">
 							<div className="flex items-center gap-2">
-								<span className="text-sm font-medium text-white">
+								<span className="text-sm font-medium text-foreground">
 									{selectedCount} selected
 								</span>
 								<div className="flex items-center gap-1">
 									<button
 										onClick={onSelectAll}
-										className="p-1.5 rounded hover:bg-white/10 text-muted hover:text-white transition-colors"
+										className="p-1.5 rounded hover:bg-hover text-muted hover:text-foreground transition-colors"
 										title="Select all"
 									>
 										<CheckSquare size={16} />
@@ -80,7 +80,7 @@ export default function BulkActionBar({
 									<button
 										onClick={onClearSelection}
 										disabled={selectedCount === 0}
-										className="p-1.5 rounded hover:bg-white/10 text-muted hover:text-white transition-colors disabled:opacity-50"
+										className="p-1.5 rounded hover:bg-hover text-muted hover:text-foreground transition-colors disabled:opacity-50"
 										title="Clear selection"
 									>
 										<Square size={16} />
@@ -89,7 +89,7 @@ export default function BulkActionBar({
 							</div>
 
 							{/* Divider */}
-							<div className="hidden sm:block w-px h-6 bg-white/10" />
+							<div className="hidden sm:block w-px h-6 bg-hover" />
 						</div>
 
 						{/* Status buttons */}
@@ -117,7 +117,7 @@ export default function BulkActionBar({
 							})}
 
 							{/* Divider */}
-							<div className="hidden sm:block w-px h-6 bg-white/10 mx-1" />
+							<div className="hidden sm:block w-px h-6 bg-hover mx-1" />
 
 							{/* Payment buttons */}
 							<button
@@ -141,7 +141,7 @@ export default function BulkActionBar({
 						{/* Exit button */}
 						<button
 							onClick={onExitBulkMode}
-							className="px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+							className="px-4 py-2 rounded-lg text-sm font-medium bg-surface text-foreground/70 hover:bg-hover hover:text-foreground transition-colors"
 						>
 							Done
 						</button>

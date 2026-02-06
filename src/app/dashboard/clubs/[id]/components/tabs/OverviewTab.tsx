@@ -4,6 +4,12 @@ import { Button } from "@/components";
 import { Club, ClubMember, ClubRole, Group, Team } from "@/lib/models/Club";
 import { Layers, Mail, MapPin, Phone, UserPlus, Users } from "lucide-react";
 
+// Helper to extract role strings from role objects or strings
+function extractRoleStrings(roles: any[] | undefined): string[] {
+	if (!roles) return [];
+	return roles.map((r) => (typeof r === "string" ? r : r?.role)).filter(Boolean);
+}
+
 interface OverviewTabProps {
 	club: Club;
 	members: ClubMember[];
@@ -17,7 +23,7 @@ export default function OverviewTab({ club, members, teams, groups, onInvite }: 
 		<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 			{/* Club Info Card */}
 			<div className="lg:col-span-2 space-y-6">
-				<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+				<div className="rounded-2xl bg-surface border border-border p-6">
 					<h3 className="text-lg font-bold text-white mb-4">Club Information</h3>
 					<div className="space-y-4">
 						{club.description && <p className="text-muted text-sm">{club.description}</p>}
@@ -45,7 +51,7 @@ export default function OverviewTab({ club, members, teams, groups, onInvite }: 
 				</div>
 
 				{/* Recent Activity */}
-				<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+				<div className="rounded-2xl bg-surface border border-border p-6">
 					<h3 className="text-lg font-bold text-white mb-4">Recent Activity</h3>
 					<div className="text-center py-8 text-muted">
 						<p>No recent activity</p>
@@ -55,7 +61,7 @@ export default function OverviewTab({ club, members, teams, groups, onInvite }: 
 
 			{/* Quick Actions */}
 			<div className="space-y-6">
-				<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+				<div className="rounded-2xl bg-surface border border-border p-6">
 					<h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
 					<div className="space-y-2">
 						<Button variant="ghost" color="neutral" fullWidth onClick={onInvite} leftIcon={<UserPlus size={16} />} className="justify-start">
@@ -71,11 +77,11 @@ export default function OverviewTab({ club, members, teams, groups, onInvite }: 
 				</div>
 
 				{/* Role Distribution */}
-				<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+				<div className="rounded-2xl bg-surface border border-border p-6">
 					<h3 className="text-lg font-bold text-white mb-4">Role Distribution</h3>
 					<div className="space-y-3">
 						{Object.values(ClubRole).map((role) => {
-							const count = members.filter((m) => m.role === role).length;
+							const count = members.filter((m) => extractRoleStrings(m.roles).includes(role)).length;
 							return (
 								<div key={role} className="flex items-center justify-between">
 									<span className="text-sm text-muted">{role}</span>

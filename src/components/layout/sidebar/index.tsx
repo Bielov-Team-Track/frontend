@@ -1,6 +1,7 @@
 "use client";
 
 import { useUnreadMessageCount } from "@/hooks/useUnreadMessageCount";
+import { useRoleSummary } from "@/hooks/useRoleSummary";
 import { useClub } from "@/providers";
 import { ChevronDown, ChevronRight, Volleyball } from "lucide-react";
 import Image from "next/image";
@@ -19,6 +20,7 @@ interface SidebarItemProps {
 	checkActive: (item: NavigationItem) => boolean;
 	checkExpanded: (item: NavigationItem, items: NavigationItem[]) => boolean;
 	allItems: NavigationItem[];
+	onLinkClick?: () => void;
 }
 
 interface BadgeProps {
@@ -40,7 +42,7 @@ const ItemIcon = ({ item, size, isActive, className = "" }: { item: NavigationIt
 
 	const Icon = item.icon;
 	// Dynamic color classes based on active state
-	const colorClass = isActive ? "text-white" : "text-muted group-hover:text-white";
+	const colorClass = isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground";
 
 	return <Icon size={size} className={`shrink-0 ${colorClass} ${className}`} />;
 };
@@ -69,7 +71,7 @@ const Badge = ({ value, isCollapsed = false }: BadgeProps) => {
 
 // --- Recursive Item Component ---
 
-const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkExpanded, allItems }: SidebarItemProps) => {
+const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkExpanded, allItems, onLinkClick }: SidebarItemProps) => {
 	const isActive = checkActive(item);
 	const isExpanded = checkExpanded(item, allItems);
 	const hasSubItems = !!item.subItems?.length;
@@ -83,7 +85,7 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 		? "group relative flex items-center justify-center xl:justify-start px-3 py-3 rounded-xl transition-all duration-200"
 		: "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors";
 
-	const activeStyles = isActive ? (isRoot ? "bg-surface text-white" : "bg-hover text-white") : "text-muted hover:bg-hover hover:text-white";
+	const activeStyles = isActive ? (isRoot ? "bg-surface text-foreground" : "bg-hover text-foreground") : "text-muted-foreground hover:bg-hover hover:text-foreground";
 
 	const iconSize = isRoot ? 20 : 16;
 	const indentSize = isRoot ? "ml-5 pl-3" : "ml-4 pl-3";
@@ -109,10 +111,24 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 	return (
 		<div>
 			<div className={`${containerBaseStyles} ${activeStyles} cursor-pointer`}>
-				{hasSubItems ? (
-					// Parent Item (Click to Toggle or Link)
+				{hasSubItems && !item.href ? (
+					// Expand-only Parent (no URL — click anywhere to toggle)
+					<button
+						onClick={() => onToggle(item.name)}
+						className="flex min-w-0 flex-1 items-center w-full text-left"
+					>
+						<ItemContent />
+						<span className={`p-1 text-muted/50 group-hover:text-foreground ${isRoot ? "hidden xl:block ml-2 -mr-1" : "-mr-1"}`}>
+							{isExpanded ? <ChevronDown size={isRoot ? 14 : 12} /> : <ChevronRight size={isRoot ? 14 : 12} />}
+						</span>
+					</button>
+				) : hasSubItems ? (
+					// Parent Item with URL (Click to navigate, toggle button separate)
 					<>
-						<Link href={item.href} className="flex min-w-0 flex-1 items-center" onClick={(e) => isRoot && e.stopPropagation()}>
+						<Link href={item.href!} className="flex min-w-0 flex-1 items-center" onClick={(e) => {
+							if (isRoot) e.stopPropagation();
+							onLinkClick?.();
+						}}>
 							<ItemContent />
 						</Link>
 
@@ -122,13 +138,13 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 								e.stopPropagation();
 								onToggle(item.name);
 							}}
-							className={`p-1 text-muted/50 hover:text-white ${isRoot ? "hidden xl:block ml-2 -mr-1" : "-mr-1"}`}>
+							className={`p-1 text-muted/50 hover:text-foreground ${isRoot ? "hidden xl:block ml-2 -mr-1" : "-mr-1"}`}>
 							{isExpanded ? <ChevronDown size={isRoot ? 14 : 12} /> : <ChevronRight size={isRoot ? 14 : 12} />}
 						</button>
 					</>
 				) : (
 					// Leaf Item (Direct Link)
-					<Link href={item.href} className="flex min-w-0 flex-1 items-center w-full">
+					<Link href={item.href!} className="flex min-w-0 flex-1 items-center w-full" onClick={() => onLinkClick?.()}>
 						<ItemContent />
 					</Link>
 				)}
@@ -147,6 +163,7 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 							checkActive={checkActive}
 							checkExpanded={checkExpanded}
 							allItems={allItems}
+							onLinkClick={onLinkClick}
 						/>
 					))}
 				</div>
@@ -174,9 +191,9 @@ const MobileDrawer = ({ isOpen, onClose, children }: { isOpen: boolean; onClose:
 					<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-tr from-accent to-primary text-white shadow-lg shadow-orange-500/20">
 						<Volleyball size={18} />
 					</div>
-					<span className="text-xl font-bold tracking-tight text-white">Volleyer</span>
+					<span className="text-xl font-bold tracking-tight text-foreground">Volleyer</span>
 				</div>
-				<button onClick={onClose} className="rounded-lg p-2 text-muted transition-colors hover:bg-hover hover:text-white" aria-label="Close menu">
+				<button onClick={onClose} className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-hover hover:text-foreground" aria-label="Close menu">
 					<ChevronDown size={20} className="-rotate-90" />
 				</button>
 			</div>
@@ -204,16 +221,31 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 	const { pathname, toggleExpanded, isItemOrSubItemActive, isExpanded } = useNavigation();
 	const unreadMessageCount = useUnreadMessageCount();
 	const { clubs } = useClub();
+	const { data: roleSummary } = useRoleSummary();
 
 	// Data Preparation
 	const navigationItems = useMemo(
-		() => getNavigationItems(unreadMessageCount, clubs),
-		[unreadMessageCount, clubs]
+		() => getNavigationItems(unreadMessageCount, clubs, roleSummary ?? null),
+		[unreadMessageCount, clubs, roleSummary]
 	);
 
-	const renderNavItems = () => (
+	// Filter items based on role visibility
+	const visibleNavigationItems = useMemo(() => {
+		const filterVisibleItems = (items: NavigationItem[]): NavigationItem[] => {
+			return items
+				.filter((item) => !item.visible || item.visible(roleSummary ?? null))
+				.map((item) => ({
+					...item,
+					subItems: item.subItems ? filterVisibleItems(item.subItems) : undefined,
+				}));
+		};
+
+		return filterVisibleItems(navigationItems);
+	}, [navigationItems, roleSummary]);
+
+	const renderNavItems = (onLinkClick?: () => void) => (
 		<nav className="space-y-1">
-			{navigationItems.map((item) => (
+			{visibleNavigationItems.map((item) => (
 				<SidebarItem
 					key={item.name}
 					item={item}
@@ -222,7 +254,8 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 					onToggle={toggleExpanded}
 					checkActive={isItemOrSubItemActive}
 					checkExpanded={isExpanded}
-					allItems={navigationItems}
+					allItems={visibleNavigationItems}
+					onLinkClick={onLinkClick}
 				/>
 			))}
 		</nav>
@@ -231,7 +264,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 	return (
 		<>
 			<MobileDrawer isOpen={isOpen} onClose={onClose!}>
-				{renderNavItems()}
+				{renderNavItems(onClose)}
 			</MobileDrawer>
 
 			<DesktopSidebar>{renderNavItems()}</DesktopSidebar>

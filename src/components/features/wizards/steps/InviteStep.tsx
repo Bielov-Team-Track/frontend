@@ -34,9 +34,10 @@ export function InvitePeopleStep({
 
 		setIsSearching(true);
 		try {
-			const results = await searchUsers(value);
+			const response = await searchUsers({ query: value });
+			const results = response.items || [];
 			// Filter out already selected users
-			const filtered = results.filter((user) => !selectedUsers.some((s) => s.id === user.userId));
+			const filtered = results.filter((user) => !selectedUsers.some((s) => s.id === user.id));
 			setSearchResults(filtered);
 		} finally {
 			setIsSearching(false);

@@ -79,10 +79,10 @@ export async function getClubMembersServer(clubId: string): Promise<ClubMember[]
 }
 
 /**
- * Get user's role in a specific club
+ * Get user's roles in a specific club
  */
-export async function getUserRoleInClub(clubId: string, userId: string): Promise<ClubRole | null> {
+export async function getUserRolesInClub(clubId: string, userId: string): Promise<ClubRole[]> {
 	const members = await getClubMembersServer(clubId);
 	const userMember = members.find((m) => m.userId === userId);
-	return userMember?.role || null;
+	return userMember?.roles || [];
 }

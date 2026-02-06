@@ -23,8 +23,5 @@ export const Preview: Story = {
 			appDirectory: true,
 		},
 	},
-	args: {
-		mockPathname: "/events",
-	},
-	render: (args) => <Sidebar></Sidebar>,
+	render: () => <Sidebar></Sidebar>,
 };

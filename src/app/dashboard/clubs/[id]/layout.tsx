@@ -5,6 +5,7 @@ import { InviteeSelectorModal } from "@/components/features/events/forms/steps/r
 import { getClub, getClubMembers, getGroupsByClub, getPendingRegistrationsCount, getTeamsByClub, inviteMembers } from "@/lib/api/clubs";
 import { Club } from "@/lib/models/Club";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ScrollableTabBar } from "@/components";
 import { ArrowLeft, Building2, Calendar, ImageOff, Layers, Newspaper, Settings, Shield, UserPlus, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -138,7 +139,7 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 		return (
 			<div className="text-center py-20">
 				<Shield className="w-16 h-16 text-muted mx-auto mb-4" />
-				<h2 className="text-xl font-bold text-white mb-2">Club not found</h2>
+				<h2 className="text-xl font-bold text-foreground mb-2">Club not found</h2>
 				<Link href="/dashboard/clubs" className="text-accent hover:underline">
 					Back to clubs
 				</Link>
@@ -160,84 +161,82 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 			<div className="space-y-6">
 				{/* Header */}
 				<div className="flex items-center gap-4">
-					<Link href="/dashboard/clubs" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+					<Link href="/dashboard/clubs" className="p-2 rounded-lg bg-surface hover:bg-hover transition-colors">
 						<ArrowLeft size={20} />
 					</Link>
 					<div className="flex-1">
-						<h1 className="text-2xl font-bold text-white">{club.name}</h1>
-						<p className="text-sm text-muted">Club Management</p>
+						<h1 className="text-2xl font-bold text-foreground">{club.name}</h1>
+						<p className="text-sm text-muted-foreground">Club Management</p>
 					</div>
 				</div>
 
 				{/* Club Banner and Info */}
-				<div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+				<div className="rounded-2xl overflow-hidden border border-border bg-surface">
 					{/* Banner */}
-					<div className="h-60 relative bg-linear-to-r from-accent/20 to-primary/20 overflow-hidden">
+					<div className="h-40 sm:h-60 relative bg-linear-to-r from-accent/20 to-primary/20 overflow-hidden">
 						{club.bannerUrl && !bannerError ? (
 							<>
-								<Image src={club.bannerUrl} alt="" width={1920} height={823} className="object-cover" onError={() => setBannerError(true)} />
-								<div className="absolute inset-0 bg-black/30" />
+								<Image src={club.bannerUrl} alt="" fill className="object-cover" onError={() => setBannerError(true)} />
+								<div className="absolute inset-0 bg-overlay-light" />
 							</>
 						) : (
 							<div className="w-full h-full flex items-center justify-center">
-								<ImageOff className="text-white/20" size={32} />
+								<ImageOff className="text-muted/20" size={32} />
 							</div>
 						)}
 					</div>
 
 					{/* Info Row */}
-					<div className="p-6 flex items-center gap-6">
-						{/* Logo */}
-						<div className="-mt-16 relative z-10">
-							<Avatar size={"xl"} variant="club" src={club.logoUrl || undefined} />
-						</div>
-
-						{/* Details */}
-						<div className="flex-1 min-w-0">
-							<h2 className="text-xl font-bold text-white truncate">{club.name}</h2>
-							{club.description && <p className="text-sm text-muted wrap-normal">{club.description}</p>}
+					<div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+						{/* Logo + Details (mobile: side by side) */}
+						<div className="flex items-center gap-4 sm:contents">
+							<div className="-mt-12 sm:-mt-16 relative z-10 shrink-0">
+								<Avatar size={"xl"} variant="club" src={club.logoUrl || undefined} />
+							</div>
+							<div className="flex-1 min-w-0 sm:order-none">
+								<h2 className="text-lg sm:text-xl font-bold text-foreground truncate">{club.name}</h2>
+								{club.description && <p className="text-sm text-muted-foreground line-clamp-2">{club.description}</p>}
+							</div>
 						</div>
 
 						{/* Quick Stats */}
-						<div className="flex gap-6">
+						<div className="flex gap-6 sm:shrink-0">
 							<div className="text-center">
-								<div className="text-2xl font-bold text-white">{members.length}</div>
-								<div className="text-xs text-muted">Members</div>
+								<div className="text-xl sm:text-2xl font-bold text-foreground">{members.length}</div>
+								<div className="text-xs text-muted-foreground">Members</div>
 							</div>
 							<div className="text-center">
-								<div className="text-2xl font-bold text-white">{teams.length}</div>
-								<div className="text-xs text-muted">Teams</div>
+								<div className="text-xl sm:text-2xl font-bold text-foreground">{teams.length}</div>
+								<div className="text-xs text-muted-foreground">Teams</div>
 							</div>
 							<div className="text-center">
-								<div className="text-2xl font-bold text-white">{groups.length}</div>
-								<div className="text-xs text-muted">Groups</div>
+								<div className="text-xl sm:text-2xl font-bold text-foreground">{groups.length}</div>
+								<div className="text-xs text-muted-foreground">Groups</div>
 							</div>
 						</div>
 					</div>
 
 					{/* Tabs */}
-					<div className="border-t border-white/10 overflow-x-auto">
-						<div className="flex gap-1 px-6">
-							{TABS.map((tab) => {
-								const count = getTabCount(tab.id);
-								const isActive = activeTab === tab.id;
-								return (
-									<Link
-										key={tab.id}
-										href={getTabHref(tab.id)}
-										prefetch={true}
-										className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap shrink-0 ${
-											isActive ? "text-accent" : "text-muted hover:text-white"
-										}`}>
-										<tab.icon size={16} />
-										{tab.label}
-										{count !== undefined && <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-xs">{count}</span>}
-										{isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
-									</Link>
-								);
-							})}
-						</div>
-					</div>
+					<ScrollableTabBar>
+						{TABS.map((tab) => {
+							const count = getTabCount(tab.id);
+							const isActive = activeTab === tab.id;
+							return (
+								<Link
+									key={tab.id}
+									href={getTabHref(tab.id)}
+									prefetch={true}
+									className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap shrink-0 ${
+										isActive ? "text-accent" : "text-muted-foreground hover:text-foreground"
+									}`}>
+									<tab.icon size={16} />
+									{tab.label}
+									{count !== undefined && <span className="px-1.5 py-0.5 rounded-full bg-foreground/10 text-xs">{count}</span>}
+									{isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
+								</Link>
+							);
+						})}
+					</ScrollableTabBar>
 				</div>
 
 				{/* Tab Content */}

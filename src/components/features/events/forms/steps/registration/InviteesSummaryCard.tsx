@@ -19,7 +19,7 @@ export default function InviteesSummaryCard({ selectedUsers, onEdit, disabled = 
 	}));
 
 	return (
-		<div className="p-4 border border-white/10 rounded-xl bg-white/5">
+		<div className="p-4 border border-border rounded-xl bg-surface">
 			<div className="flex items-center justify-between gap-4">
 				<AvatarStack items={avatarItems} max={maxAvatars} size="sm" emptyText="No invitees selected" />
 				<Button

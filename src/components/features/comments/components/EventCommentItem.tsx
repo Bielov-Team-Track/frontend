@@ -96,7 +96,7 @@ export default function EventCommentItem({
 				<div className="flex-1">
 					<div className="bg-surface rounded-xl px-3 py-2">
 						<div
-							className="text-sm text-white prose prose-invert prose-sm max-w-none"
+							className="text-sm text-foreground prose prose-invert prose-sm max-w-none"
 							dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithSafeLinks(comment.content) }}
 						/>
 					</div>
@@ -119,7 +119,7 @@ export default function EventCommentItem({
 				<div className="flex-1">
 					<div className="bg-destructive/10 border border-destructive/30 rounded-xl px-3 py-2">
 						<div
-							className="text-sm text-white prose prose-invert prose-sm max-w-none"
+							className="text-sm text-foreground prose prose-invert prose-sm max-w-none"
 							dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithSafeLinks(comment.content) }}
 						/>
 					</div>
@@ -188,7 +188,7 @@ export default function EventCommentItem({
 					)}>
 					{/* Header */}
 					<div className="flex items-center gap-2 mb-1">
-						<span className="text-sm font-medium text-white">
+						<span className="text-sm font-medium text-foreground">
 							{comment.author.name} {comment.author.surname}
 						</span>
 						<span className="text-xs text-muted-foreground">{timeAgo}</span>
@@ -197,7 +197,7 @@ export default function EventCommentItem({
 
 					{/* Content - rich HTML */}
 					<div
-						className="text-sm text-white prose prose-invert prose-sm max-w-none [&_a]:text-primary [&_a]:no-underline hover:[&_a]:underline [&_.mention]:bg-primary/20 [&_.mention]:text-primary [&_.mention]:px-1 [&_.mention]:rounded"
+						className="text-sm text-foreground prose prose-invert prose-sm max-w-none [&_a]:text-primary [&_a]:no-underline hover:[&_a]:underline [&_.mention]:bg-primary/20 [&_.mention]:text-primary [&_.mention]:px-1 [&_.mention]:rounded"
 						dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithSafeLinks(comment.content) }}
 					/>
 
@@ -223,7 +223,7 @@ export default function EventCommentItem({
 												onEdit?.(comment);
 												setShowMenu(false);
 											}}
-											className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-white hover:bg-active">
+											className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-foreground hover:bg-active">
 											<Pencil size={12} />
 											Edit
 										</button>
@@ -253,7 +253,7 @@ export default function EventCommentItem({
 					{!isReply && (
 						<button
 							onClick={() => onReply?.(comment)}
-							className="text-xs text-muted-foreground hover:text-white flex items-center gap-1 transition-colors">
+							className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors">
 							<Reply size={12} />
 							Reply
 						</button>
@@ -300,12 +300,12 @@ function CommentMediaGallery({ media }: CommentMediaGalleryProps) {
 		() =>
 			media
 				.filter((m) => {
-					const type = m.type.toLowerCase();
+					const type = m.mediaType.toLowerCase();
 					return type === "image" || type === "document" || type === "video";
 				})
 				.map((m) => ({
 					id: m.id,
-					type: m.type.toLowerCase() as "image" | "video" | "document",
+					type: m.mediaType.toLowerCase() as "image" | "video" | "document",
 					url: m.url,
 					thumbnailUrl: m.thumbnailUrl,
 					fileName: m.fileName,

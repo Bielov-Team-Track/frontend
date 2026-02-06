@@ -6,14 +6,12 @@ import { ContextSelection } from "../components/ContextSelector";
 import { useEventForm } from "../hooks/useEventForm";
 import { useEventWizard } from "../hooks/useEventWizard";
 import { EventFormData } from "../validation/eventValidationSchema";
+import { useFormPersistence } from "../hooks/useFormPersistence";
+
+type EventFormReturnType = ReturnType<typeof useEventForm>;
 
 interface EventFormContextType {
-	form: UseFormReturn<EventFormData> & {
-		saveEvent: (data: EventFormData) => void;
-		isPending: boolean;
-		isError: boolean;
-		error: any;
-	};
+	form: EventFormReturnType;
 	wizard: {
 		currentStep: number;
 		nextStep: (e?: React.MouseEvent) => Promise<void>;
@@ -42,6 +40,8 @@ export function EventFormProvider({ children, event, contextSelection, onSuccess
 		trigger: form.trigger as any,
 		watch: form.watch,
 	});
+
+	useFormPersistence(form, wizard.currentStep);
 
 	const value: EventFormContextType = {
 		form,

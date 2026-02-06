@@ -31,6 +31,7 @@ interface DrillCardProps {
 	onLikeClick?: (drillId: string) => void;
 	onBookmarkClick?: (drillId: string) => void;
 	highlightedSkills?: DrillSkill[];
+	onClick?: () => void;
 }
 
 // Intensity config with Tailwind color classes
@@ -59,6 +60,7 @@ export default function DrillCard({
 	onLikeClick,
 	onBookmarkClick,
 	highlightedSkills = [],
+	onClick,
 }: DrillCardProps) {
 	const handleAdd = (e: React.MouseEvent) => {
 		e.preventDefault();
@@ -96,11 +98,19 @@ export default function DrillCard({
 		? `${drill.author.firstName} ${drill.author.lastName}`
 		: drill.author?.firstName || drill.author?.lastName || null;
 
+	const handleCardClick = (e: React.MouseEvent) => {
+		if (onClick) {
+			e.preventDefault();
+			onClick();
+		}
+	};
+
 	if (variant === "compact") {
 		return (
 			<Link
-				href={`/dashboard/training/drills/${drill.id}`}
-				className="group block p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+				href={`/dashboard/coaching/training/drills/${drill.id}`}
+				onClick={handleCardClick}
+				className="group block p-3 rounded-xl bg-surface hover:bg-hover transition-all">
 				<div className="flex items-start justify-between gap-3">
 					<div className="flex-1 min-w-0">
 						<div className="flex items-center gap-2 mb-1">
@@ -113,8 +123,8 @@ export default function DrillCard({
 								{category.label}
 							</span>
 						</div>
-						<h4 className="font-semibold text-white text-sm group-hover:text-accent transition-colors">{drill.name}</h4>
-						<div className="flex items-center gap-3 mt-1.5 text-xs text-muted">
+						<h4 className="font-semibold text-foreground text-sm group-hover:text-accent transition-colors">{drill.name}</h4>
+						<div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
 							{drill.duration && <span>{drill.duration}m</span>}
 							<span className="truncate">{drill.skills.slice(0, 2).join(" · ")}</span>
 						</div>
@@ -123,7 +133,7 @@ export default function DrillCard({
 							<Link
 								href={`/dashboard/clubs/${drill.clubId}`}
 								onClick={(e) => e.stopPropagation()}
-								className="flex items-center gap-1.5 mt-1.5 text-[10px] text-muted/70 hover:text-white transition-colors group/club">
+								className="flex items-center gap-1.5 mt-1.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors group/club">
 								<Avatar size="sm" className="size-4">
 									{drill.clubLogoUrl ? (
 										<AvatarImage src={drill.clubLogoUrl} alt={drill.clubName} />
@@ -138,7 +148,7 @@ export default function DrillCard({
 							<Link
 								href={`/dashboard/profile/${drill.author?.id}`}
 								onClick={(e) => e.stopPropagation()}
-								className="flex items-center gap-1.5 mt-1.5 text-[10px] text-muted/70 hover:text-white transition-colors group/author">
+								className="flex items-center gap-1.5 mt-1.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors group/author">
 								<Avatar size="sm" className="size-4">
 									{drill.author?.avatarUrl ? (
 										<AvatarImage src={drill.author.avatarUrl} alt={authorName} />
@@ -154,7 +164,7 @@ export default function DrillCard({
 					{showAddButton && onAdd && (
 						<button
 							onClick={handleAdd}
-							className="shrink-0 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-muted hover:bg-accent hover:text-white transition-colors">
+							className="shrink-0 w-8 h-8 rounded-full bg-surface flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-white transition-colors">
 							<Plus size={16} />
 						</button>
 					)}
@@ -165,8 +175,9 @@ export default function DrillCard({
 
 	return (
 		<Link
-			href={`/dashboard/training/drills/${drill.id}`}
-			className="group block h-full rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/[0.07] transition-all">
+			href={`/dashboard/coaching/training/drills/${drill.id}`}
+			onClick={handleCardClick}
+			className="group block h-full rounded-2xl bg-surface border border-border hover:border-border/80 hover:bg-hover transition-all">
 			<div className="p-5 h-full flex flex-col">
 				{/* Header: Intensity + Category + Add button */}
 				<div className="flex items-center justify-between mb-3">
@@ -183,20 +194,20 @@ export default function DrillCard({
 					{showAddButton && onAdd && (
 						<button
 							onClick={handleAdd}
-							className="shrink-0 w-7 h-7 rounded-full bg-white/5 flex items-center justify-center text-muted hover:bg-accent hover:text-white transition-all opacity-0 group-hover:opacity-100">
+							className="shrink-0 w-7 h-7 rounded-full bg-surface flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-white transition-all opacity-0 group-hover:opacity-100">
 							<Plus size={14} />
 						</button>
 					)}
 				</div>
 
 				{/* Title */}
-				<h3 className="font-semibold text-white text-base leading-snug group-hover:text-accent transition-colors">
+				<h3 className="font-semibold text-foreground text-base leading-snug group-hover:text-accent transition-colors">
 					{drill.name}
 				</h3>
 
 				{/* Meta: Duration + Players */}
 				{(drill.duration || drill.minPlayers) && (
-					<div className="flex items-center gap-3 mt-2 text-xs text-muted">
+					<div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
 						{drill.duration && (
 							<span className="flex items-center gap-1">
 								<Clock size={12} />
@@ -219,7 +230,7 @@ export default function DrillCard({
 
 				{/* Description */}
 				{drill.description && (
-					<p className="text-sm text-muted line-clamp-2 mt-2 leading-relaxed">{drill.description}</p>
+					<p className="text-sm text-muted-foreground line-clamp-2 mt-2 leading-relaxed">{drill.description}</p>
 				)}
 
 				{/* Spacer to push skills and footer to bottom */}
@@ -228,7 +239,7 @@ export default function DrillCard({
 				{/* Skills */}
 				{drill.skills.length > 0 && (
 					<div className="flex items-center gap-2 mt-3">
-						<span className="text-xs text-muted shrink-0">Skills:</span>
+						<span className="text-xs text-muted-foreground shrink-0">Skills:</span>
 						<div className="flex flex-wrap items-center gap-1.5">
 							{drill.skills.map((skill) => {
 								const isHighlighted = highlightedSkills.includes(skill);
@@ -239,7 +250,7 @@ export default function DrillCard({
 										className={`px-2 py-0.5 rounded-md text-xs font-medium transition-colors ${
 											isHighlighted
 												? "bg-accent/20 text-accent ring-1 ring-accent/50"
-												: "bg-white/5 text-muted hover:bg-white/10 hover:text-white"
+												: "bg-surface text-muted hover:bg-hover hover:text-white"
 										}`}
 									>
 										{skill}
@@ -251,7 +262,7 @@ export default function DrillCard({
 				)}
 
 				{/* Footer: Likes/Saves on left, Author/Club on right */}
-				<div className="flex items-end justify-between gap-3 mt-3 pt-3 border-t border-white/10">
+				<div className="flex items-end justify-between gap-3 mt-3 pt-3 border-t border-border">
 					{/* Left: Likes + Saves */}
 					<div className="flex items-center gap-3">
 						<button
@@ -287,7 +298,7 @@ export default function DrillCard({
 						<Link
 							href={`/dashboard/clubs/${drill.clubId}`}
 							onClick={(e) => e.stopPropagation()}
-							className="flex items-center gap-1.5 text-[11px] text-muted/70 hover:text-white transition-colors group/club">
+							className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors group/club">
 							<span className="truncate max-w-[100px] group-hover/club:underline">{drill.clubName}</span>
 							<Avatar size="sm" className="size-4">
 								{drill.clubLogoUrl ? (
@@ -302,7 +313,7 @@ export default function DrillCard({
 						<Link
 							href={`/dashboard/profile/${drill.author?.id}`}
 							onClick={(e) => e.stopPropagation()}
-							className="flex items-center gap-1.5 text-[11px] text-muted/70 hover:text-white transition-colors group/author">
+							className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors group/author">
 							<span className="truncate max-w-[100px] group-hover/author:underline">{authorName}</span>
 							<Avatar size="sm" className="size-4">
 								{drill.author?.avatarUrl ? (

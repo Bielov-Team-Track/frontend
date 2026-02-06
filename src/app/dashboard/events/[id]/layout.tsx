@@ -129,8 +129,8 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 	const isAdmin = myParticipation?.role === "Organizer" || myParticipation?.role === "Admin" || myParticipation?.role === "Owner";
 	const isOpen = !event?.canceled && new Date(event?.startTime || 0) > new Date();
 	const isFull = totalSpots > 0 && totalParticipants >= totalSpots;
-	// API returns status as string, not enum number
-	const hasInvitation = myParticipation?.status === "Invited" || myParticipation?.status === ParticipationStatus.Invited;
+	// API may return status as string or enum value
+	const hasInvitation = myParticipation?.status === ParticipationStatus.Invited;
 
 	// Memoize context value to prevent unnecessary re-renders of consumers
 	// Must be before early returns to maintain hook order
@@ -180,7 +180,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 			<div className="space-y-6">
 				{/* Header */}
 				<div className="flex items-center gap-4">
-					<Link href="/dashboard/events" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+					<Link href="/dashboard/events" className="p-2 rounded-lg bg-surface hover:bg-hover transition-colors">
 						<ArrowLeft size={20} />
 					</Link>
 					<div className="flex-1">
@@ -220,21 +220,21 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 								{showAdminMenu && (
 									<>
 										<div className="fixed inset-0 z-40" onClick={() => setShowAdminMenu(false)} />
-										<div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-raised border border-white/10 shadow-xl z-50 py-1">
-											<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-white/5 flex items-center gap-3">
+										<div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-raised border border-border shadow-xl z-50 py-1">
+											<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3">
 												<Edit size={16} className="text-muted" />
 												Edit Event
 											</button>
-											<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-white/5 flex items-center gap-3">
+											<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3">
 												<MessageCircle size={16} className="text-muted" />
 												Message All
 											</button>
-											<div className="border-t border-white/10 my-1" />
-											<button className="w-full px-4 py-2.5 text-left text-sm text-warning hover:bg-white/5 flex items-center gap-3">
+											<div className="border-t border-border my-1" />
+											<button className="w-full px-4 py-2.5 text-left text-sm text-warning hover:bg-surface flex items-center gap-3">
 												<XCircle size={16} />
 												Cancel Event
 											</button>
-											<button className="w-full px-4 py-2.5 text-left text-sm text-error hover:bg-white/5 flex items-center gap-3">
+											<button className="w-full px-4 py-2.5 text-left text-sm text-error hover:bg-surface flex items-center gap-3">
 												<Trash2 size={16} />
 												Delete Event
 											</button>
@@ -247,13 +247,13 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 				</div>
 
 				{/* Event Banner and Info Card */}
-				<div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+				<div className="rounded-2xl overflow-hidden border border-border bg-surface">
 					{/* Banner */}
 					<div className="h-48 md:h-60 relative bg-gradient-to-r from-accent/20 to-secondary/20 overflow-hidden">
 						{event.imageUrl && !bannerError && (
 							<>
 								<Image src={event.imageUrl} alt="" fill className="object-cover" onError={() => setBannerError(true)} />
-								<div className="absolute inset-0 bg-black/30" />
+								<div className="absolute inset-0 bg-overlay-light" />
 							</>
 						)}
 					</div>
@@ -301,7 +301,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 									</span>
 								)}
 								{/* Organizers Display - inline with other meta */}
-								<div className="flex items-center gap-1.5 border-l border-white/10 pl-4 ml-1">
+								<div className="flex items-center gap-1.5 border-l border-border pl-4 ml-1">
 									<EventOrganizers participants={participants} />
 								</div>
 							</div>
@@ -325,7 +325,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 					</div>
 
 					{/* Tabs */}
-					<div className="border-t border-white/10 overflow-x-auto">
+					<div className="border-t border-border overflow-x-auto">
 						<div className="flex gap-1 px-6">
 							{TABS.filter((tab) => !tab.trainingOnly || event.type === EventType.TrainingSession).map((tab) => {
 								const count = getTabCount(tab.id);
@@ -340,7 +340,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 										}`}>
 										<tab.icon size={16} />
 										{tab.label}
-										{count !== undefined && count > 0 && <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-xs">{count}</span>}
+										{count !== undefined && count > 0 && <span className="px-1.5 py-0.5 rounded-full bg-hover text-xs">{count}</span>}
 										{isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
 									</Link>
 								);

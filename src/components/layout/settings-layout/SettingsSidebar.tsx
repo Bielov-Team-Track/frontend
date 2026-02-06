@@ -36,10 +36,10 @@ export function SettingsSidebar({ items, activeSection }: SettingsSidebarProps) 
 									isActive
 										? item.danger
 											? "bg-red-500/20 text-red-400"
-											: "bg-track text-white"
+											: "bg-track text-foreground"
 										: item.danger
 											? "text-red-400/70 hover:bg-red-500/10 hover:text-red-400"
-											: "text-muted hover:bg-hover hover:text-white"
+											: "text-muted hover:bg-hover hover:text-foreground"
 								)}>
 								<Icon size={18} />
 								{item.label}
@@ -65,7 +65,7 @@ export function SettingsSidebar({ items, activeSection }: SettingsSidebarProps) 
 									isActive
 										? item.danger
 											? "bg-red-500/20 text-red-400"
-											: "bg-track text-white"
+											: "bg-track text-foreground"
 										: item.danger
 											? "text-red-400/70 hover:bg-red-500/10"
 											: "text-muted hover:bg-hover"

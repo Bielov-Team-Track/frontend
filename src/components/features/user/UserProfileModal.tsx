@@ -51,14 +51,14 @@ export default function UserProfileModal({ user, isOpen, onClose, onChatCreated 
 	const bgColor = stringToColor(user.email || "default");
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} title="User Profile" className="max-w-sm bg-[#141414] border border-white/10">
+		<Modal isOpen={isOpen} onClose={onClose} title="User Profile" className="max-w-sm bg-surface border border-border">
 			<div className="flex flex-col gap-6">
 				{/* Header / Cover */}
 				<div className="relative">
 					<div className="h-24 w-full bg-linear-to-r from-blue-900 to-purple-900 rounded-xl overflow-hidden opacity-80" />
 					<div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
 						<div
-							className="w-20 h-20 rounded-full border-4 border-[#141414] flex items-center justify-center overflow-hidden bg-[#141414]"
+							className="w-20 h-20 rounded-full border-4 border-surface flex items-center justify-center overflow-hidden bg-surface"
 							style={{ backgroundColor: !user.imageUrl ? bgColor : undefined }}>
 							{user.imageUrl ? (
 								<Image src={user.imageUrl} alt={user.name} fill className="object-cover" />
@@ -71,20 +71,20 @@ export default function UserProfileModal({ user, isOpen, onClose, onChatCreated 
 
 				{/* User Info */}
 				<div className="mt-8 text-center space-y-1">
-					<h2 className="text-xl font-bold text-white">
+					<h2 className="text-xl font-bold text-foreground">
 						{user.name} {user.surname}
 					</h2>
 					<p className="text-sm text-muted">{user.email}</p>
 				</div>
 
 				{/* Stats Row (Placeholder based on design) */}
-				{/* <div className="flex justify-center gap-8 py-2 border-y border-white/5">
+				{/* <div className="flex justify-center gap-8 py-2 border-y border-border">
 					<div className="text-center">
-						<div className="font-bold text-white">0</div>
+						<div className="font-bold text-foreground">0</div>
 						<div className="text-xs text-muted">Followers</div>
 					</div>
 					<div className="text-center">
-						<div className="font-bold text-white">0</div>
+						<div className="font-bold text-foreground">0</div>
 						<div className="text-xs text-muted">Following</div>
 					</div>
 				</div> */}
@@ -96,7 +96,7 @@ export default function UserProfileModal({ user, isOpen, onClose, onChatCreated 
 						loading={isCreatingChat}
 						fullWidth
 						leftIcon={<MessageSquare size={18} />}
-						className="bg-accent text-white hover:bg-accent/90">
+						className="bg-accent text-foreground hover:bg-accent/90">
 						Direct Message
 					</Button>
 					<Button
@@ -104,7 +104,7 @@ export default function UserProfileModal({ user, isOpen, onClose, onChatCreated 
 						fullWidth
 						variant="ghost"
 						leftIcon={<ExternalLink size={18} />}
-						className="text-white hover:bg-white/10">
+						className="text-foreground hover:bg-hover">
 						View Full Profile
 					</Button>
 				</div>

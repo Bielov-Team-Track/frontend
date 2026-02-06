@@ -61,7 +61,7 @@ const PlayerProfileCard = ({
 				<div className="flex flex-col md:flex-row gap-6 items-start">
 					{/* Avatar */}
 					<div className="relative">
-						<Avatar profile={player} size="large" />
+						<Avatar src={player.imageUrl} name={`${player.name} ${player.surname}`} size="lg" />
 						{player.experienceLevel && (
 							<div
 								className={cn(
@@ -75,7 +75,7 @@ const PlayerProfileCard = ({
 
 					{/* Basic Info */}
 					<div className="flex-1">
-						<h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+						<h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
 							{player.name} {player.surname}
 						</h1>
 
@@ -114,13 +114,13 @@ const PlayerProfileCard = ({
 						{/* Social counts */}
 						<div className="flex gap-6 mt-4">
 							<div className="text-center">
-								<span className="text-xl font-bold text-white">
+								<span className="text-xl font-bold text-foreground">
 									{player.followersCount}
 								</span>
 								<span className="text-sm text-muted-foreground ml-1">Followers</span>
 							</div>
 							<div className="text-center">
-								<span className="text-xl font-bold text-white">
+								<span className="text-xl font-bold text-foreground">
 									{player.followingCount}
 								</span>
 								<span className="text-sm text-muted-foreground ml-1">Following</span>
@@ -134,8 +134,7 @@ const PlayerProfileCard = ({
 							<Button
 								leftIcon={<Mail size={16} />}
 								onClick={onMessage}
-								variant="solid"
-								color="primary">
+								variant="default">
 								Message
 							</Button>
 							{player.isFollowing ? (
@@ -163,7 +162,7 @@ const PlayerProfileCard = ({
 			{/* Physical Attributes */}
 			{(player.height || player.verticalJump || player.reach) && (
 				<div className="bg-background px-6 md:px-8 py-6 border-t border-border">
-					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+					<h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
 						<Ruler size={18} className="text-primary" />
 						Physical Attributes
 					</h2>
@@ -205,7 +204,7 @@ const PlayerProfileCard = ({
 			{/* Preferred Positions */}
 			{player.preferredPositions && player.preferredPositions.length > 0 && (
 				<div className="bg-background px-6 md:px-8 py-6 border-t border-border">
-					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+					<h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
 						<Circle size={18} className="text-primary" />
 						Preferred Positions
 					</h2>
@@ -229,7 +228,7 @@ const PlayerProfileCard = ({
 			{/* Skill Ratings */}
 			{player.skillRatings && (
 				<div className="bg-background px-6 md:px-8 py-6 border-t border-border">
-					<h2 className="text-lg font-semibold text-white mb-4">
+					<h2 className="text-lg font-semibold text-foreground mb-4">
 						Skill Ratings
 					</h2>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
@@ -270,7 +269,7 @@ const PlayerProfileCard = ({
 			{/* Statistics */}
 			{player.stats && (
 				<div className="bg-background px-6 md:px-8 py-6 border-t border-border">
-					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+					<h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
 						<Trophy size={18} className="text-primary" />
 						Statistics
 					</h2>
@@ -303,7 +302,7 @@ const PlayerProfileCard = ({
 			{/* Badges */}
 			{player.badges && player.badges.length > 0 && (
 				<div className="bg-background px-6 md:px-8 py-6 border-t border-border rounded-b-2xl">
-					<h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+					<h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
 						<span className="text-primary">🏅</span>
 						Achievements
 					</h2>

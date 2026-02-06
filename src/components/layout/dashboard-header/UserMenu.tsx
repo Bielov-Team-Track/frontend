@@ -83,7 +83,7 @@ function UserMenu({ user, isLoading }: UserMenuProps) {
 
 					{/* Dropdown Menu */}
 					{isMenuOpen && (
-						<div className="absolute top-14 right-0 w-56 bg-background shadow-black/30 shadow-xl rounded-lg border border-base-200 z-50">
+						<div className="absolute top-14 right-0 w-56 bg-background shadow-xl rounded-lg border border-border z-50">
 							<div className="px-4 py-3 border-b border-base-200 sm:hidden">
 								<p className="text-lg font-medium ">
 									{user.name} {user.surname}

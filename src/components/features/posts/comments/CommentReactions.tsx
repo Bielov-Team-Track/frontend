@@ -56,7 +56,7 @@ export default function CommentReactions({ commentId, reactions, compact = true 
 			<button
 				ref={triggerRef}
 				onClick={() => setShowPicker(!showPicker)}
-				className="p-1 rounded-full text-muted-foreground hover:text-white hover:bg-active transition-colors"
+				className="p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-active transition-colors"
 				title="Add reaction">
 				<SmilePlus size={14} />
 			</button>

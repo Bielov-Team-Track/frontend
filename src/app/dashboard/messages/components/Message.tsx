@@ -168,7 +168,7 @@ const MessageComponent = ({ message, onReplyClick, onForwardClick }: MessageProp
 					{/* Message actions (reaction picker trigger, reply, forward) */}
 					<div
 						className={clsx(
-							"absolute top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 bg-background/80 backdrop-blur-xs rounded-full border border-white/5 p-0.5 shadow-xs",
+							"absolute top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 bg-background/80 backdrop-blur-xs rounded-full border border-border p-0.5 shadow-xs",
 							currentUserMessage ? "left-0 -translate-x-full mr-2" : "right-0 translate-x-full ml-2",
 						)}>
 						<button

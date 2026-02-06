@@ -411,7 +411,7 @@ export function useCanEditDrill(drill: Drill | undefined, currentUserId: string 
 
         // If drill belongs to a club, check if user has edit permissions
         if (drill.clubId && membership) {
-            if (membership.isActive && DRILL_EDIT_ROLES.includes(membership.role)) {
+            if (membership.isActive && membership.roles.some(role => DRILL_EDIT_ROLES.includes(role))) {
                 return true;
             }
         }

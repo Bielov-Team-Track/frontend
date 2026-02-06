@@ -1,43 +1,60 @@
 "use client";
 
-import { Avatar, Button, EmptyState, Input, Modal, Select, UserSelectorModal } from "@/components";
+import { Avatar, Button, EmptyState, Modal, UserSelectorModal } from "@/components";
 import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
+import { ListToolbar } from "@/components/ui/list-toolbar";
+import { RoleCheckboxGroup } from "@/components/ui/role-checkbox-group";
+import { RoleBadgeList } from "@/components/ui/role-badge";
 import { getGroupMembers, removeGroupMember, updateGroupMember, UpdateGroupMemberRequest } from "@/lib/api/clubs";
 import { addGroupMembers } from "@/lib/api/clubs/clubs";
-import { Group, GroupMember, GroupRole } from "@/lib/models/Club";
-import { SortDirection } from "@/lib/models/filteringAndPagination";
+import { GROUP_ROLE_OPTIONS } from "@/lib/constants/roles";
+import { Club, ClubMember, Group, GroupMember, GroupRole } from "@/lib/models/Club";
+import { UserProfile } from "@/lib/models/User";
+import { cn } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowDownUp, Calendar, Clock, Edit, Filter, Plus, RotateCcw, Search, UserMinus, UserPlus, X } from "lucide-react";
+import { ArrowDownAZ, Clock, Edit, Plus, RotateCcw, Search, UserMinus, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface MembersTabProps {
 	group: Group;
 	groupId: string;
+	club?: Club;
+	clubMembers?: ClubMember[];
 }
 
-// Sort options for members dropdown
-const memberSortOptions = [
-	{ value: "joinedAt", label: "Joined Date" },
-	{ value: "name", label: "Name" },
-	{ value: "role", label: "Role" },
+// Sort options for members (matching club members pattern)
+const MEMBER_SORT_OPTIONS = [
+	{ value: "joined-desc", label: "Newest First", icon: <Clock size={14} /> },
+	{ value: "joined-asc", label: "Oldest First", icon: <Clock size={14} /> },
+	{ value: "name-asc", label: "Name (A-Z)", icon: <ArrowDownAZ size={14} /> },
 ];
 
-const memberDirectionOptions = [
-	{ value: SortDirection.Descending, label: "Newest First" },
-	{ value: SortDirection.Ascending, label: "Oldest First" },
+// Role filter options for groups
+const ROLE_FILTERS = [
+	{ value: "all", label: "All Roles" },
+	{ value: "Leader", label: "Leader" },
+	{ value: "Captain", label: "Captain" },
+	{ value: "Coach", label: "Coach" },
 ];
 
-export default function MembersTab({ group, groupId }: MembersTabProps) {
+// Helper to extract role strings from role objects or strings
+function extractRoleStrings(roles: any[] | undefined): string[] {
+	if (!roles) return [];
+	return roles.map((r) => (typeof r === "string" ? r : r?.role)).filter(Boolean);
+}
+
+export default function MembersTab({ group, groupId, club, clubMembers = [] }: MembersTabProps) {
+	// Extract user profiles from club members for the user selector
+	const clubMemberUsers: UserProfile[] = clubMembers
+		.filter((m) => m.userProfile)
+		.map((m) => m.userProfile!);
+
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [editingMember, setEditingMember] = useState<GroupMember | null>(null);
 	const [removingMember, setRemovingMember] = useState<GroupMember | null>(null);
 	const [search, setSearch] = useState("");
-	const [sortBy, setSortBy] = useState<string>("joinedAt");
-	const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Descending);
-	const [dateFrom, setDateFrom] = useState("");
-	const [dateTo, setDateTo] = useState("");
-	const [showFilters, setShowFilters] = useState(false);
+	const [sortBy, setSortBy] = useState<string>("joined-desc");
+	const [roleFilter, setRoleFilter] = useState<string>("all");
 
 	const queryClient = useQueryClient();
 
@@ -82,13 +99,10 @@ export default function MembersTab({ group, groupId }: MembersTabProps) {
 	};
 
 	const clearFilters = () => {
-		setDateFrom("");
-		setDateTo("");
-		setSortBy("joinedAt");
-		setSortDirection(SortDirection.Descending);
+		setRoleFilter("all");
 	};
 
-	const hasActiveFilters = dateFrom || dateTo || sortBy !== "joinedAt" || sortDirection !== SortDirection.Descending;
+	const activeFilterCount = roleFilter !== "all" ? 1 : 0;
 
 	// Use groupMembers from query if available, otherwise fall back to group.members
 	const members = groupMembers.length > 0 ? groupMembers : group.members || [];
@@ -105,31 +119,46 @@ export default function MembersTab({ group, groupId }: MembersTabProps) {
 					return false;
 				}
 			}
-			// Date filters (using clubMember's joinedAt as proxy)
-			if (dateFrom && member.clubMember?.createdAt) {
-				if (new Date(member.clubMember.createdAt) < new Date(dateFrom)) return false;
-			}
-			if (dateTo && member.clubMember?.createdAt) {
-				if (new Date(member.clubMember.createdAt) > new Date(dateTo)) return false;
+			// Role filter
+			if (roleFilter !== "all" && !extractRoleStrings(member.roles).includes(roleFilter)) {
+				return false;
 			}
 			return true;
 		})
 		.sort((a, b) => {
-			let comparison = 0;
 			switch (sortBy) {
-				case "name":
-					comparison = getMemberDisplayName(a).localeCompare(getMemberDisplayName(b));
-					break;
-				case "role":
-					comparison = (a.role || "Member").localeCompare(b.role || "Member");
-					break;
-				case "joinedAt":
+				case "name-asc":
+					return getMemberDisplayName(a).localeCompare(getMemberDisplayName(b));
+				case "joined-asc":
+					return new Date(a.clubMember?.createdAt || 0).getTime() - new Date(b.clubMember?.createdAt || 0).getTime();
+				case "joined-desc":
 				default:
-					comparison = new Date(a.clubMember?.createdAt || 0).getTime() - new Date(b.clubMember?.createdAt || 0).getTime();
-					break;
+					return new Date(b.clubMember?.createdAt || 0).getTime() - new Date(a.clubMember?.createdAt || 0).getTime();
 			}
-			return sortDirection === SortDirection.Ascending ? comparison : -comparison;
 		});
+
+	// Filter content for ListToolbar
+	const filterContent = (
+		<div className="space-y-2">
+			<p className="text-xs font-medium text-muted-foreground">Role</p>
+			<div className="flex flex-wrap gap-2">
+				{ROLE_FILTERS.map((filter) => (
+					<button
+						key={filter.value}
+						type="button"
+						onClick={() => setRoleFilter(filter.value)}
+						className={cn(
+							"px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
+							roleFilter === filter.value
+								? "bg-foreground/10 text-foreground border-foreground/30"
+								: "bg-card/50 text-muted-foreground border-border hover:bg-card hover:text-foreground hover:border-foreground/20"
+						)}>
+						{filter.label}
+					</button>
+				))}
+			</div>
+		</div>
+	);
 
 	return (
 		<div className="flex flex-col gap-4 h-full">
@@ -141,98 +170,21 @@ export default function MembersTab({ group, groupId }: MembersTabProps) {
 				</Button>
 			</div>
 
-			{/* Search and Filters Row */}
-			<div className="flex items-center gap-2 shrink-0">
-				<div className="flex-1 relative">
-					<Input
-						placeholder="Search by name or email..."
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-						leftIcon={<Search size={16} />}
-						aria-label="Search members"
-					/>
-					{search && (
-						<button
-							type="button"
-							onClick={() => setSearch("")}
-							className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted transition-colors">
-							<X size={14} className="text-muted-foreground" />
-						</button>
-					)}
-				</div>
-				<Button
-					variant="ghost"
-					className="relative"
-					onClick={() => setShowFilters(!showFilters)}
-					leftIcon={<Filter size={16} />}
-					aria-expanded={showFilters}
-					aria-controls="member-filter-panel">
-					{hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-accent absolute -top-0.5 -right-0.5" />}
-					<span className="hidden sm:inline">Filters</span>
-				</Button>
-			</div>
-
-			{/* Collapsible Filter Panel */}
-			<AnimatePresence>
-				{showFilters && (
-					<motion.div
-						id="member-filter-panel"
-						initial={{ opacity: 0, y: -10 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -10 }}
-						transition={{ duration: 0.2 }}
-						className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
-						<div className="flex h-7 items-center justify-between">
-							<span className="text-sm font-medium text-white">Filter Options</span>
-							{hasActiveFilters && (
-								<Button variant="ghost" size="sm" onClick={clearFilters} leftIcon={<RotateCcw size={14} />} className="text-muted hover:text-white">
-									Clear All
-								</Button>
-							)}
-						</div>
-
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-							{/* Date From */}
-							<Input
-								type="date"
-								inlineLabel="From Date"
-								value={dateFrom}
-								onChange={(e) => setDateFrom(e.target.value)}
-								leftIcon={<Calendar size={16} />}
-							/>
-
-							{/* Date To */}
-							<Input type="date" inlineLabel="To Date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} leftIcon={<Calendar size={16} />} />
-
-							{/* Sort By */}
-							<Select
-								inlineLabel="Sort By"
-								options={memberSortOptions}
-								value={sortBy}
-								onChange={(val) => setSortBy(val || "createdAt")}
-								leftIcon={<ArrowDownUp size={16} />}
-							/>
-
-							{/* Sort Direction */}
-							<Select
-								inlineLabel="Order"
-								options={memberDirectionOptions}
-								value={sortDirection}
-								onChange={(val) => setSortDirection(val as SortDirection)}
-								leftIcon={<Clock size={16} />}
-							/>
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
-
-			{/* Results Count */}
-			<div className="shrink-0">
-				<p className="text-sm text-muted-foreground">
-					{filteredMembers.length} member{filteredMembers.length !== 1 ? "s" : ""}
-					{filteredMembers.length !== members.length && ` (filtered from ${members.length})`}
-				</p>
-			</div>
+			{/* Toolbar */}
+			<ListToolbar
+				search={search}
+				onSearchChange={setSearch}
+				searchPlaceholder="Search by name or email..."
+				sortOptions={MEMBER_SORT_OPTIONS}
+				sortBy={sortBy}
+				onSortChange={setSortBy}
+				filterContent={filterContent}
+				activeFilterCount={activeFilterCount}
+				onClearFilters={clearFilters}
+				count={filteredMembers.length}
+				itemLabel="member"
+				showViewToggle={false}
+			/>
 
 			{/* Content Area */}
 			<div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
@@ -251,24 +203,30 @@ export default function MembersTab({ group, groupId }: MembersTabProps) {
 				<EmptyState
 					icon={Search}
 					title="No members found"
-					description={search || hasActiveFilters ? "Try adjusting your filters or search terms." : "No members match your criteria."}
+					description={search || activeFilterCount > 0 ? "Try adjusting your filters or search terms." : "No members match your criteria."}
 					action={
-						hasActiveFilters
+						activeFilterCount > 0
 							? {
 									label: "Clear Filters",
 									onClick: clearFilters,
 									icon: RotateCcw,
 								}
-							: undefined
+							: search
+								? {
+										label: "Clear Search",
+										onClick: () => setSearch(""),
+										icon: Search,
+									}
+								: undefined
 					}
 				/>
 			) : (
-				<div className="rounded-xl bg-white/5 border border-white/10 overflow-hidden">
+				<div className="rounded-xl bg-surface border border-border overflow-hidden">
 					<table className="w-full">
 						<thead>
-							<tr className="border-b border-white/10">
+							<tr className="border-b border-border">
 								<th className="text-left text-xs font-medium text-muted px-4 py-3">Member</th>
-								<th className="text-left text-xs font-medium text-muted px-4 py-3">Group Role</th>
+								<th className="text-left text-xs font-medium text-muted px-4 py-3">Group Roles</th>
 								<th className="text-left text-xs font-medium text-muted px-4 py-3">Club Role</th>
 								<th className="text-left text-xs font-medium text-muted px-4 py-3">Status</th>
 								<th className="text-right text-xs font-medium text-muted px-4 py-3">Actions</th>
@@ -291,12 +249,13 @@ export default function MembersTab({ group, groupId }: MembersTabProps) {
 
 			{/* Add Member Modal */}
 			<UserSelectorModal
+				isOpen={showAddModal}
 				onClose={() => setShowAddModal(false)}
 				selectedUsers={[]}
-				isOpen={showAddModal}
 				onConfirm={(users) => addMemberMutation.mutate(users.map((u) => u.id))}
-				restrictToClub={group.club}
+				users={clubMemberUsers}
 				excludeUserIds={group.members?.map((m) => m.userId) || []}
+				title="Add Group Member"
 			/>
 
 			{/* Edit Member Modal */}
@@ -327,18 +286,7 @@ export default function MembersTab({ group, groupId }: MembersTabProps) {
 	);
 }
 
-// Helper functions for badge colors
-const getGroupRoleBadgeColor = (role?: GroupRole) => {
-	switch (role) {
-		case GroupRole.Leader:
-			return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-		case GroupRole.Captain:
-			return "bg-purple-500/20 text-purple-400 border-purple-500/30";
-		default:
-			return "bg-white/10 text-muted border-white/10";
-	}
-};
-
+// Helper function for badge color (club roles only)
 const getClubRoleBadgeColor = (role?: string) => {
 	switch (role) {
 		case "Owner":
@@ -350,7 +298,7 @@ const getClubRoleBadgeColor = (role?: string) => {
 		case "Assistant":
 			return "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
 		default:
-			return "bg-white/10 text-muted border-white/10";
+			return "bg-hover text-muted border-border";
 	}
 };
 
@@ -360,7 +308,7 @@ function GroupMemberRow({ member, onEdit, onRemove }: { member: GroupMember; onE
 	const displayName = userProfile ? `${userProfile.name} ${userProfile.surname}` : "Unknown Member";
 
 	return (
-		<tr className="border-b border-white/5 hover:bg-white/5 group">
+		<tr className="border-b border-border hover:bg-hover group">
 			<td className="px-4 py-3">
 				<div className="flex items-center gap-3">
 					{userProfile ? (
@@ -375,11 +323,11 @@ function GroupMemberRow({ member, onEdit, onRemove }: { member: GroupMember; onE
 				</div>
 			</td>
 			<td className="px-4 py-3">
-				<span className={`px-2 py-1 rounded text-xs font-medium border ${getGroupRoleBadgeColor(member.role)}`}>{member.role || "Member"}</span>
+				<RoleBadgeList roles={extractRoleStrings(member.roles)} emptyText="Member" />
 			</td>
 			<td className="px-4 py-3">
-				<span className={`px-2 py-1 rounded text-xs font-medium border ${getClubRoleBadgeColor(member.clubMember?.role)}`}>
-					{member.clubMember?.role || "Member"}
+				<span className={`px-2 py-1 rounded text-xs font-medium border ${getClubRoleBadgeColor(member.clubMember?.roles[0])}`}>
+					{member.clubMember?.roles[0] || "Member"}
 				</span>
 			</td>
 			<td className="px-4 py-3">
@@ -403,7 +351,7 @@ function GroupMemberRow({ member, onEdit, onRemove }: { member: GroupMember; onE
 							e.stopPropagation();
 							onEdit();
 						}}
-						className="p-2 rounded-lg hover:bg-white/10 text-muted hover:text-white transition-colors"
+						className="p-2 rounded-lg hover:bg-hover text-muted hover:text-white transition-colors"
 						title="Edit member">
 						<Edit size={16} />
 					</button>
@@ -437,18 +385,19 @@ function EditGroupMemberModal({
 	onSubmit: (data: UpdateGroupMemberRequest) => void;
 	isLoading: boolean;
 }) {
-	const [role, setRole] = useState<GroupRole>(GroupRole.Member);
+	const [roles, setRoles] = useState<GroupRole[]>([]);
 
-	// Reset role when member changes
+	// Reset roles when member changes
+	// Handle both string roles and role assignment objects from backend
 	useEffect(() => {
 		if (member) {
-			setRole(member.role || GroupRole.Member);
+			setRoles(extractRoleStrings(member.roles) as GroupRole[]);
 		}
 	}, [member?.id]);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		onSubmit({ role });
+		onSubmit({ roles });
 	};
 
 	if (!isOpen || !member) return null;
@@ -461,7 +410,7 @@ function EditGroupMemberModal({
 		<Modal isOpen={isOpen} onClose={onClose} title="Edit Group Member">
 			<form onSubmit={handleSubmit} className="space-y-6">
 				{/* Member Info */}
-				<div className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
+				<div className="flex items-center gap-3 p-4 rounded-xl bg-surface border border-border">
 					{member.clubMember?.userProfile && <Avatar name={displayName} src={member.clubMember.userProfile.imageUrl} />}
 					<div>
 						<div className="font-medium text-white">{displayName}</div>
@@ -470,12 +419,14 @@ function EditGroupMemberModal({
 				</div>
 
 				{/* Role Selection */}
-				<Select
-					label="Group Role"
-					value={role}
-					onChange={(val) => setRole(val as GroupRole)}
-					options={Object.values(GroupRole).map((r) => ({ value: r, label: r }))}
-				/>
+				<div className="space-y-2">
+					<label className="text-sm font-medium text-foreground">Group Roles</label>
+					<RoleCheckboxGroup
+						availableRoles={GROUP_ROLE_OPTIONS}
+						selectedRoles={roles}
+						onChange={setRoles}
+					/>
+				</div>
 
 				{/* Actions */}
 				<div className="flex gap-3 pt-4">

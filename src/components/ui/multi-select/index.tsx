@@ -149,7 +149,7 @@ function MultiSelect<T = any>({
 					{displayedChips.map((option) => (
 						<span
 							key={option.value}
-							className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-accent/20 text-xs text-white">
+							className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-accent/20 text-xs text-foreground">
 							{renderChip ? renderChip(option) : option.label}
 							<button
 								type="button"
@@ -162,7 +162,7 @@ function MultiSelect<T = any>({
 					))}
 
 					{remainingCount > 0 && (
-						<span className="px-2 py-0.5 rounded-md bg-white/10 text-xs text-muted">
+						<span className="px-2 py-0.5 rounded-md bg-foreground/10 text-xs text-muted-foreground">
 							+{remainingCount} more
 						</span>
 					)}
@@ -177,7 +177,7 @@ function MultiSelect<T = any>({
 						onKeyDown={handleKeyDown}
 						placeholder={value.length === 0 ? placeholder : ""}
 						disabled={disabled}
-						className="flex-1 min-w-[60px] bg-transparent outline-none text-sm placeholder:text-muted"
+						className="flex-1 min-w-[60px] bg-transparent outline-none text-sm placeholder:text-muted-foreground"
 					/>
 
 					{/* Clear button and dropdown indicator */}
@@ -186,23 +186,23 @@ function MultiSelect<T = any>({
 							<button
 								type="button"
 								onClick={handleClearAll}
-								className="p-0.5 text-muted hover:text-white transition-colors"
+								className="p-0.5 text-muted-foreground hover:text-foreground transition-colors"
 								disabled={disabled}>
 								<X size={14} />
 							</button>
 						)}
 						<ChevronDown
 							size={14}
-							className={cn("text-muted transition-transform", isOpen && "rotate-180")}
+							className={cn("text-muted-foreground transition-transform", isOpen && "rotate-180")}
 						/>
 					</div>
 				</div>
 
 				{/* Dropdown */}
 				{isOpen && (
-					<div className="absolute left-0 right-0 top-full mt-1 z-50 max-h-60 overflow-auto rounded-lg border border-white/10 bg-popover shadow-lg">
+					<div className="absolute left-0 right-0 top-full mt-1 z-50 max-h-60 overflow-auto rounded-lg border border-border bg-popover shadow-lg">
 						{filteredOptions.length === 0 ? (
-							<div className="px-3 py-2 text-sm text-muted text-center">
+							<div className="px-3 py-2 text-sm text-muted-foreground text-center">
 								{searchQuery ? "No matching options" : "No options available"}
 							</div>
 						) : (
@@ -214,7 +214,7 @@ function MultiSelect<T = any>({
 										onClick={() => !option.disabled && handleToggleOption(option.value)}
 										className={cn(
 											"flex items-center gap-2 px-3 py-2 text-sm cursor-pointer transition-colors",
-											isSelected ? "bg-accent/10 text-white" : "hover:bg-white/5",
+											isSelected ? "bg-accent/10 text-foreground" : "hover:bg-hover",
 											option.disabled && "opacity-50 cursor-not-allowed"
 										)}>
 										<div
@@ -222,7 +222,7 @@ function MultiSelect<T = any>({
 												"w-4 h-4 rounded border flex items-center justify-center transition-colors",
 												isSelected
 													? "bg-accent border-accent"
-													: "border-white/30"
+													: "border-muted-foreground/30"
 											)}>
 											{isSelected && <CheckIcon size={12} className="text-white" />}
 										</div>

@@ -27,7 +27,7 @@ export default function EventPaymentsPage() {
 					{/* Main Content */}
 					<div className="lg:col-span-2 space-y-6">
 						{/* Event Fee Card */}
-						<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+						<div className="rounded-2xl bg-surface border border-border p-6">
 							<div className="flex items-center justify-between">
 								<div>
 									<h3 className="text-lg font-bold text-white">Event Fee</h3>
@@ -40,7 +40,7 @@ export default function EventPaymentsPage() {
 						</div>
 
 						{/* Your Payment Status */}
-						<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+						<div className="rounded-2xl bg-surface border border-border p-6">
 							<h3 className="text-lg font-bold text-white mb-4">Your Payment</h3>
 							<div className="flex items-center justify-between p-4 rounded-xl bg-background/50">
 								<div className="flex items-center gap-3">
@@ -59,14 +59,14 @@ export default function EventPaymentsPage() {
 						</div>
 
 						{/* Payment Methods */}
-						<div className="rounded-2xl bg-white/5 border border-white/10 p-6">
+						<div className="rounded-2xl bg-surface border border-border p-6">
 							<h3 className="text-lg font-bold text-white mb-4">Accepted Payment Methods</h3>
 							<div className="flex flex-wrap gap-3">
-								<div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
+								<div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface border border-border">
 									<CreditCard size={16} className="text-accent" />
 									<span className="text-sm text-white">Card</span>
 								</div>
-								<div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
+								<div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface border border-border">
 									<span className="text-sm text-white">💵 Cash</span>
 								</div>
 							</div>
@@ -76,7 +76,7 @@ export default function EventPaymentsPage() {
 					{/* Sidebar */}
 					<div className="space-y-6">
 						{/* Payment Summary */}
-						<div className="rounded-2xl bg-white/5 border border-white/10 p-5">
+						<div className="rounded-2xl bg-surface border border-border p-5">
 							<h3 className="text-sm font-bold text-white mb-4">Payment Summary</h3>
 							<div className="space-y-3">
 								<div className="flex justify-between items-center">
@@ -104,7 +104,7 @@ export default function EventPaymentsPage() {
 					</div>
 				</div>
 			) : (
-				<div className="rounded-2xl bg-white/5 border border-white/10 p-12 text-center">
+				<div className="rounded-2xl bg-surface border border-border p-12 text-center">
 					<CreditCard className="w-16 h-16 mx-auto mb-4 text-muted/30" />
 					<h3 className="text-lg font-bold text-white mb-2">Free Event</h3>
 					<p className="text-muted text-sm">This event has no registration fee.</p>

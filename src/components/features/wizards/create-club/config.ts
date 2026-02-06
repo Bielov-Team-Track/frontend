@@ -9,8 +9,14 @@ export const clubValidationSchema = yup.object().shape({
 	name: yup.string().required("Club name is required").min(3, "Name must be at least 3 characters"),
 	description: yup.string().max(500, "Description cannot exceed 500 characters"),
 	isPublic: yup.boolean().default(true),
+	logo: yup.mixed<File>().nullable(),
+	banner: yup.mixed<File>().nullable(),
+	logoPreview: yup.string(),
+	bannerPreview: yup.string(),
 	contactEmail: yup.string().email("Must be a valid email").nullable(),
 	contactPhone: yup.string().nullable(),
+	venues: yup.array(),
+	invitees: yup.array(),
 });
 
 const defaultValues: ClubFormData = {
@@ -61,7 +67,7 @@ export const createClubWizardConfig: WizardConfig<ClubFormData> = {
 		},
 	],
 	defaultValues,
-	validationSchema: clubValidationSchema,
+	validationSchema: clubValidationSchema as any,
 	onSubmit: async (data, context) => {
 		// Create club first
 		const club = await createClub({

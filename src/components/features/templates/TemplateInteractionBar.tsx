@@ -56,7 +56,7 @@ export default function TemplateInteractionBar({
 			{showComments && (
 				<button
 					onClick={onCommentsClick}
-					className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white/5 text-muted hover:text-white hover:bg-white/10 transition-all"
+					className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-surface text-muted hover:text-white hover:bg-hover transition-all"
 				>
 					<MessageCircle size={16} />
 					{commentCount !== undefined && commentCount > 0 && <span>{commentCount}</span>}

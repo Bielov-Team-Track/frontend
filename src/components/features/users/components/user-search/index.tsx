@@ -17,8 +17,8 @@ const UserSearch = ({ onUserSelect }: UserSearchProps) => {
 	const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const query = e.target.value;
 		setQuery(query);
-		const results = await searchUsers(query);
-		setSearchResults(results);
+		const results = await searchUsers({ query });
+		setSearchResults(results.items || []);
 	};
 
 	return (
@@ -37,7 +37,7 @@ const UserSearch = ({ onUserSelect }: UserSearchProps) => {
 							key={user.id}
 							onClick={() => onUserSelect && onUserSelect(user)}
 							className="flex gap-2 p-2 items-center cursor-pointer hover:bg-primary/10 rounded-lg">
-							<Avatar profile={user} />
+							<Avatar src={user.imageUrl} name={`${user.name} ${user.surname}`} />
 							<span>
 								{user.name} {user.surname}
 							</span>

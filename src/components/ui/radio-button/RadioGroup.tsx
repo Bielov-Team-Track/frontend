@@ -111,7 +111,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
 						icon={option.icon}
 						mode={mode}
 						radioSize={radioSize}
-						variant={variant}
+						color={variant}
 						checked={value === option.value}
 						disabled={disabled || option.disabled}
 						onChange={() => handleChange(option.value)}

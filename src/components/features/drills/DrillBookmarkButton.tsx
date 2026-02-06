@@ -82,7 +82,7 @@ export default function DrillBookmarkButton({
 					"p-2 rounded-lg transition-all",
 					isBookmarked
 						? "text-accent bg-accent/10 hover:bg-accent/20"
-						: "text-muted hover:text-accent hover:bg-white/5",
+						: "text-muted hover:text-accent hover:bg-hover",
 					(isLoading || isLoadingBookmarks) && "opacity-50 cursor-not-allowed",
 					className
 				)}
@@ -128,7 +128,7 @@ export default function DrillBookmarkButton({
 				"flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
 				isBookmarked
 					? "bg-accent/10 text-accent hover:bg-accent/20"
-					: "bg-white/5 text-muted hover:text-white hover:bg-white/10",
+					: "bg-surface text-muted hover:text-white hover:bg-hover",
 				(isLoading || isLoadingBookmarks) && "opacity-50 cursor-not-allowed",
 				className
 			)}

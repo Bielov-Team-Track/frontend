@@ -19,6 +19,11 @@ export interface UserProfile {
 	surname: string;
 	imageUrl: string;
 	dateOfBirth?: Date;
+	// Aliases for backward compatibility
+	firstName?: string;
+	lastName?: string;
+	userName?: string;
+	avatar?: string;
 }
 
 export interface Suspension {

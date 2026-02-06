@@ -118,7 +118,7 @@ export default function TrainingViewMode({ timeline, onExitToEdit }: TrainingVie
 	if (state === "completed") {
 		return (
 			<div className="max-w-2xl mx-auto">
-				<div className="rounded-2xl bg-white/5 border border-white/10 p-8 text-center">
+				<div className="rounded-2xl bg-surface border border-border p-8 text-center">
 					<div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-6">
 						<Check size={40} className="text-success" />
 					</div>
@@ -147,18 +147,18 @@ export default function TrainingViewMode({ timeline, onExitToEdit }: TrainingVie
 		<>
 			<div className="max-w-4xl mx-auto space-y-6">
 				{/* Progress */}
-				<div className="rounded-2xl bg-white/5 border border-white/10 p-4">
+				<div className="rounded-2xl bg-surface border border-border p-4">
 					<div className="flex items-center justify-between mb-2 text-sm text-muted">
 						<span>Session Progress</span>
 						<span>{currentIndex + 1} of {timeline.length} drills</span>
 					</div>
-					<div className="h-2 rounded-full bg-white/10 overflow-hidden">
+					<div className="h-2 rounded-full bg-hover overflow-hidden">
 						<div className="h-full bg-accent transition-all duration-500" style={{ width: `${progressPercent}%` }} />
 					</div>
 				</div>
 
 				{/* Current Drill */}
-				<div className={`rounded-2xl border p-8 transition-all ${timeUp ? "bg-warning/10 border-warning/50" : "bg-white/5 border-white/10"}`}>
+				<div className={`rounded-2xl border p-8 transition-all ${timeUp ? "bg-warning/10 border-warning/50" : "bg-surface border-border"}`}>
 					{timeUp && (
 						<div className="flex justify-center mb-4">
 							<span className="px-4 py-2 rounded-full bg-warning text-white font-bold text-sm animate-bounce">
@@ -168,7 +168,7 @@ export default function TrainingViewMode({ timeline, onExitToEdit }: TrainingVie
 					)}
 
 					<div className="flex items-center gap-2 mb-4">
-						<Badge color={CATEGORY_COLORS[currentDrill.category].color} variant="soft">
+						<Badge color={CATEGORY_COLORS[currentDrill.category].color} variant="ghost">
 							{currentDrill.category}
 						</Badge>
 						<Badge color={INTENSITY_COLORS[currentDrill.intensity].color} variant="outline">
@@ -187,7 +187,7 @@ export default function TrainingViewMode({ timeline, onExitToEdit }: TrainingVie
 						<p className="text-sm text-muted mt-2">
 							{timeUp ? `Over by ${formatTime(elapsed - drillDuration)}` : "remaining"}
 						</p>
-						<div className="mt-4 h-2 rounded-full bg-white/10 overflow-hidden max-w-md mx-auto">
+						<div className="mt-4 h-2 rounded-full bg-hover overflow-hidden max-w-md mx-auto">
 							<div
 								className={`h-full transition-all ${timeUp ? "bg-warning" : "bg-accent"}`}
 								style={{ width: `${Math.min((elapsed / drillDuration) * 100, 100)}%` }}
@@ -233,11 +233,11 @@ export default function TrainingViewMode({ timeline, onExitToEdit }: TrainingVie
 
 				{/* Up Next */}
 				{nextDrill && (
-					<div className="rounded-2xl bg-white/5 border border-white/10 p-4">
+					<div className="rounded-2xl bg-surface border border-border p-4">
 						<h3 className="text-sm font-bold text-muted uppercase tracking-wider mb-3">Up Next</h3>
 						<div className="flex items-center justify-between">
 							<div>
-								<Badge size="xs" color={CATEGORY_COLORS[nextDrill.category].color} variant="soft" className="mb-1">
+								<Badge size="xs" color={CATEGORY_COLORS[nextDrill.category].color} variant="ghost" className="mb-1">
 									{nextDrill.category}
 								</Badge>
 								<h4 className="font-bold text-white">{nextDrill.name}</h4>
@@ -260,7 +260,7 @@ export default function TrainingViewMode({ timeline, onExitToEdit }: TrainingVie
 					<div className="flex items-center gap-4">
 						<button
 							onClick={() => setSoundEnabled(!soundEnabled)}
-							className="p-2 rounded-lg bg-white/5 text-muted hover:text-white transition-colors">
+							className="p-2 rounded-lg bg-surface text-muted hover:text-white transition-colors">
 							{soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
 						</button>
 						{(state === "running" || state === "paused") && (

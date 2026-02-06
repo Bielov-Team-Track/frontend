@@ -1,7 +1,7 @@
 "use client";
 
 import { Checkbox, Input, RadioCards } from "@/components/ui";
-import { PricingModel } from "@/lib/models/EventBudget";
+import { PricingModel } from "@/lib/models/EventPaymentConfig";
 import { Calculator, Clock, Coins, User, Users } from "lucide-react";
 import { useEventSettingsContext } from "../EventSettingsContext";
 import { SettingsSection } from "./SettingsSection";
@@ -30,10 +30,10 @@ const pricingModelCards = [
 export function PaymentsSection() {
 	const { formData, updateField, updateNestedField } = useEventSettingsContext();
 
-	const handleBudgetToggle = (enabled: boolean) => {
-		updateField("useBudget", enabled);
-		if (enabled && !formData.budget) {
-			updateField("budget", {
+	const handlePaymentConfigToggle = (enabled: boolean) => {
+		updateField("usePaymentConfig", enabled);
+		if (enabled && !formData.paymentConfig) {
+			updateField("paymentConfig", {
 				pricingModel: PricingModel.Individual,
 				cost: 0,
 				payToJoin: false,
@@ -42,23 +42,23 @@ export function PaymentsSection() {
 	};
 
 	return (
-		<SettingsSection title="Payments" description="Configure event pricing and budget">
-			<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+		<SettingsSection title="Payments" description="Configure event pricing and payment configuration">
+			<div className="p-4 rounded-xl bg-surface border border-border">
 				<Checkbox
-					checked={formData.useBudget}
-					onChange={handleBudgetToggle}
-					label="Enable budget management"
+					checked={formData.usePaymentConfig}
+					onChange={handlePaymentConfigToggle}
+					label="Enable payment configuration management"
 					helperText="Track payments and manage event finances"
 				/>
 			</div>
 
-			{formData.useBudget && (
+			{formData.usePaymentConfig && (
 				<>
 					<RadioCards
 						label="Pricing Model"
 						options={pricingModelCards}
-						value={formData.budget?.pricingModel as PricingModel}
-						onChange={(value) => updateNestedField("budget", "pricingModel", value)}
+						value={formData.paymentConfig?.pricingModel as PricingModel}
+						onChange={(value) => updateNestedField("paymentConfig", "pricingModel", value)}
 						columns={3}
 						size="sm"
 					/>
@@ -66,14 +66,14 @@ export function PaymentsSection() {
 					<Input
 						type="number"
 						label={
-							formData.budget?.pricingModel === PricingModel.Event
-								? "Total Budget"
+							formData.paymentConfig?.pricingModel === PricingModel.Event
+								? "Total Cost"
 								: "Cost per Unit"
 						}
-						value={formData.budget?.cost?.toString() || ""}
+						value={formData.paymentConfig?.cost?.toString() || ""}
 						onChange={(e) =>
 							updateNestedField(
-								"budget",
+								"paymentConfig",
 								"cost",
 								e.target.value ? parseFloat(e.target.value) : undefined
 							)
@@ -83,9 +83,9 @@ export function PaymentsSection() {
 						step={0.01}
 						required
 						helperText={
-							formData.budget?.pricingModel === PricingModel.Event
+							formData.paymentConfig?.pricingModel === PricingModel.Event
 								? "Total event cost to be split between all participants"
-								: formData.budget?.pricingModel === PricingModel.Team
+								: formData.paymentConfig?.pricingModel === PricingModel.Team
 									? "Fixed price each team will pay"
 									: "Fixed price each person will pay"
 						}
@@ -94,10 +94,10 @@ export function PaymentsSection() {
 					<Input
 						type="number"
 						label="Dropout Deadline (hours)"
-						value={formData.budget?.dropoutDeadlineHours?.toString() || ""}
+						value={formData.paymentConfig?.dropoutDeadlineHours?.toString() || ""}
 						onChange={(e) =>
 							updateNestedField(
-								"budget",
+								"paymentConfig",
 								"dropoutDeadlineHours",
 								e.target.value ? parseInt(e.target.value) : undefined
 							)
@@ -108,11 +108,11 @@ export function PaymentsSection() {
 						helperText="Hours before event start when participants can no longer drop out"
 					/>
 
-					{formData.budget?.pricingModel === PricingModel.Individual && (
-						<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+					{formData.paymentConfig?.pricingModel === PricingModel.Individual && (
+						<div className="p-4 rounded-xl bg-surface border border-border">
 							<Checkbox
-								checked={formData.budget?.payToJoin || false}
-								onChange={(checked) => updateNestedField("budget", "payToJoin", checked)}
+								checked={formData.paymentConfig?.payToJoin || false}
+								onChange={(checked) => updateNestedField("paymentConfig", "payToJoin", checked)}
 								label="Require payment to join"
 								helperText="Participants must complete payment to confirm their registration"
 							/>

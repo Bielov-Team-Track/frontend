@@ -55,7 +55,7 @@ function StatCard({
 	value,
 	icon: Icon,
 	colorClass = "text-muted",
-	bgClass = "bg-white/5",
+	bgClass = "bg-surface",
 }: {
 	label: string;
 	value: string | number;
@@ -64,7 +64,7 @@ function StatCard({
 	bgClass?: string;
 }) {
 	return (
-		<div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 border border-white/10">
+		<div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface border border-border">
 			<div className={`p-2 rounded-md ${bgClass}`}>
 				<Icon size={18} className={colorClass} />
 			</div>
@@ -255,7 +255,7 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 			</div>
 
 			{/* --- FILTERS (Always Visible) --- */}
-			<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+			<div className="p-4 rounded-xl bg-surface border border-border">
 				<AttendanceFilters
 					clubId={clubId}
 					organizerId={organizerId}
@@ -311,7 +311,7 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 						placeholder="Search members by name..."
 						value={memberSearch}
 						onChange={(e) => setMemberSearch(e.target.value)}
-						className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors"
+						className="w-full pl-10 pr-4 py-2 rounded-lg bg-surface border border-border text-white text-sm placeholder:text-muted focus:outline-none focus:border-primary/50 transition-colors"
 					/>
 				</div>
 
@@ -322,7 +322,7 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 							type="checkbox"
 							checked={showOnlyAttention}
 							onChange={(e) => setShowOnlyAttention(e.target.checked)}
-							className="w-4 h-4 rounded border-white/20 bg-white/5 text-warning focus:ring-warning/50 focus:ring-offset-0"
+							className="w-4 h-4 rounded border-border bg-surface text-warning focus:ring-warning/50 focus:ring-offset-0"
 						/>
 						<span className="flex items-center gap-1.5 text-sm text-white/80">
 							<AlertTriangle size={14} className="text-warning" />
@@ -335,7 +335,7 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 							type="checkbox"
 							checked={showOnlyUnpaid}
 							onChange={(e) => setShowOnlyUnpaid(e.target.checked)}
-							className="w-4 h-4 rounded border-white/20 bg-white/5 text-error focus:ring-error/50 focus:ring-offset-0"
+							className="w-4 h-4 rounded border-border bg-surface text-error focus:ring-error/50 focus:ring-offset-0"
 						/>
 						<span className="flex items-center gap-1.5 text-sm text-white/80">
 							<DollarSign size={14} className="text-error" />
@@ -353,7 +353,7 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 			</div>
 
 			{/* --- TABLE --- */}
-			<div className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
+			<div className="rounded-2xl bg-surface border border-border overflow-hidden">
 				{isLoading ? (
 					<div className="flex items-center justify-center h-96">
 						<Loader />

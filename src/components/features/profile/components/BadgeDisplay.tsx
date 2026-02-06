@@ -57,7 +57,7 @@ const BadgeDisplay = ({
 						"opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none",
 						"whitespace-nowrap z-10 min-w-max"
 					)}>
-					<div className="text-sm font-semibold text-white">{badge.name}</div>
+					<div className="text-sm font-semibold text-foreground">{badge.name}</div>
 					<div className="text-xs text-muted-foreground">{badge.description}</div>
 					<div
 						className={cn(

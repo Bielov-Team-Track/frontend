@@ -1,7 +1,6 @@
 "use client";
 
-import { Modal, Button, Input, TextArea, Select } from "@/components";
-import { SelectOption } from "@/components/ui/select";
+import { Modal, Button, Input, TextArea, Select, SelectOption } from "@/components";
 import { RadioGroup } from "@/components/ui/radio-button/RadioGroup";
 import { TemplateVisibility } from "@/lib/models/Template";
 import { Eye, Lock } from "lucide-react";
@@ -119,27 +118,26 @@ export default function SaveAsTemplateModal({ isOpen, onClose, onSave, isLoading
 				<div className="space-y-2">
 					<label className="text-sm font-medium text-foreground">Visibility</label>
 					<RadioGroup
+						name="visibility"
 						value={visibility}
 						onChange={(value) => setVisibility(value as TemplateVisibility)}
 						options={[
 							{
 								value: "Private",
 								label: "Private",
-								description: "Only you can see this template",
-								icon: <Lock size={18} />,
+								icon: Lock,
 							},
 							{
 								value: "Public",
 								label: "Public",
-								description: "Anyone can discover and use this template",
-								icon: <Eye size={18} />,
+								icon: Eye,
 							},
 						]}
 					/>
 				</div>
 
 				{/* Actions */}
-				<div className="flex gap-3 justify-end pt-4 border-t border-white/10">
+				<div className="flex gap-3 justify-end pt-4 border-t border-border">
 					<Button variant="outline" color="neutral" onClick={handleClose} disabled={isLoading}>
 						Cancel
 					</Button>

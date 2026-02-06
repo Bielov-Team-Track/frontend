@@ -108,7 +108,7 @@ export default function CommentsList({ postId, commentCount }: CommentsListProps
 					<div ref={loadMoreRef} className="py-2 flex justify-center">
 						{isFetchingNextPage && <Loader2 className="animate-spin text-muted-foreground" size={16} />}
 						{hasNextPage && !isFetchingNextPage && (
-							<button onClick={() => fetchNextPage()} className="text-xs text-muted-foreground hover:text-white">
+							<button onClick={() => fetchNextPage()} className="text-xs text-muted-foreground hover:text-foreground">
 								Load more comments
 							</button>
 						)}

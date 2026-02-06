@@ -167,9 +167,9 @@ export default function ClaudeRosterSidebarV2({
 	};
 
 	return (
-		<div className="broadcast-gradient rounded-2xl border border-white/10 flex flex-col h-[700px] overflow-hidden">
+		<div className="broadcast-gradient rounded-2xl border border-border flex flex-col h-[700px] overflow-hidden">
 			{/* Header */}
-			<div className="px-5 py-4 border-b border-white/10 diagonal-lines">
+			<div className="px-5 py-4 border-b border-border diagonal-lines">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3">
 						<div className="w-1 h-8 bg-accent rounded-full" />
@@ -189,7 +189,7 @@ export default function ClaudeRosterSidebarV2({
 							className={`p-2 rounded-xl transition-all font-condensed text-xs uppercase tracking-wider flex items-center gap-2 ${
 								showArrowControls
 									? "bg-accent text-white shadow-lg shadow-accent/30"
-									: "bg-white/5 text-muted hover:bg-white/10 hover:text-white border border-white/10"
+									: "bg-surface text-muted hover:bg-hover hover:text-white border border-border"
 							}`}
 							title={showArrowControls ? "Hide reorder controls" : "Show reorder controls"}
 						>
@@ -273,7 +273,7 @@ export default function ClaudeRosterSidebarV2({
 					</div>
 				) : (
 					<div className="flex flex-col items-center justify-center h-full text-muted p-8">
-						<div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mb-4 border border-white/10">
+						<div className="w-20 h-20 rounded-2xl bg-surface flex items-center justify-center mb-4 border border-border">
 							<User className="opacity-30" size={40} />
 						</div>
 						<p className="font-display text-lg text-white/50 uppercase tracking-wider">No Players</p>
@@ -376,7 +376,7 @@ function ClaudeDraggableMemberRow({
 				<div
 					{...listeners}
 					{...attributes}
-					className="hidden lg:flex cursor-grab active:cursor-grabbing p-2 rounded-lg bg-white/5 hover:bg-white/10 text-muted hover:text-white transition-colors items-center justify-center border border-white/5"
+					className="hidden lg:flex cursor-grab active:cursor-grabbing p-2 rounded-lg bg-surface hover:bg-hover text-muted hover:text-white transition-colors items-center justify-center border border-border"
 					title="Drag to reorder or assign to court"
 				>
 					<GripVertical size={14} />
@@ -385,7 +385,7 @@ function ClaudeDraggableMemberRow({
 
 			{/* Arrow Controls */}
 			{showArrowControls && canReorder && (
-				<div className="flex flex-col gap-0.5 bg-white/5 rounded-lg p-0.5 border border-white/10">
+				<div className="flex flex-col gap-0.5 bg-surface rounded-lg p-0.5 border border-border">
 					<button
 						onClick={(e) => {
 							e.preventDefault();
@@ -396,7 +396,7 @@ function ClaudeDraggableMemberRow({
 						className={`p-1 rounded transition-colors ${
 							isFirst
 								? "text-muted/30 cursor-not-allowed"
-								: "text-muted hover:text-white hover:bg-white/10"
+								: "text-muted hover:text-white hover:bg-hover"
 						}`}
 					>
 						<ChevronUp size={12} />
@@ -411,7 +411,7 @@ function ClaudeDraggableMemberRow({
 						className={`p-1 rounded transition-colors ${
 							isLast
 								? "text-muted/30 cursor-not-allowed"
-								: "text-muted hover:text-white hover:bg-white/10"
+								: "text-muted hover:text-white hover:bg-hover"
 						}`}
 					>
 						<ChevronDown size={12} />
@@ -425,7 +425,7 @@ function ClaudeDraggableMemberRow({
 					? "bg-accent/20 ring-2 ring-accent"
 					: isOver
 					? "bg-accent/10 ring-1 ring-accent/50"
-					: "bg-white/5 hover:bg-white/8 border border-white/5 hover:border-white/10"
+					: "bg-surface hover:bg-hover border border-border hover:border-border"
 			}`}>
 				{/* Starter indicator line */}
 				{isStarter && (
@@ -436,7 +436,7 @@ function ClaudeDraggableMemberRow({
 				<div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-display font-bold shrink-0 ${
 					isStarter
 						? "bg-linear-to-br from-yellow-400 to-yellow-600 text-black shadow-lg shadow-yellow-500/30"
-						: "bg-white/10 text-muted border border-white/10"
+						: "bg-hover text-muted border border-border"
 				}`}>
 					{isStarter ? <Crown size={14} /> : index + 1}
 				</div>
@@ -449,9 +449,9 @@ function ClaudeDraggableMemberRow({
 				>
 					<div className="relative">
 						<div className={`rounded-xl overflow-hidden ring-2 transition-all ${
-							isStarter ? "ring-yellow-500/50" : "ring-white/10 hover:ring-accent/50"
+							isStarter ? "ring-yellow-500/50" : "ring-border hover:ring-accent/50"
 						}`}>
-							{member.userProfile && <Avatar profile={member.userProfile} size="small" />}
+							{member.userProfile && <Avatar src={member.userProfile.imageUrl} name={`${member.userProfile.name} ${member.userProfile.surname}`} size="sm" />}
 						</div>
 						{member.jerseyNumber && (
 							<div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-md bg-accent text-black text-[10px] font-display font-bold flex items-center justify-center border-2 border-(--broadcast-dark) shadow-xs">
@@ -492,7 +492,7 @@ function ClaudeDraggableMemberRow({
 								e.stopPropagation();
 								onEdit(member);
 							}}
-							className="p-2 rounded-lg bg-white/0 hover:bg-white/10 text-muted hover:text-accent transition-colors"
+							className="p-2 rounded-lg bg-white/0 hover:bg-hover text-muted hover:text-accent transition-colors"
 							title="Edit player"
 						>
 							<Pencil size={14} />
@@ -524,7 +524,7 @@ export function ClaudePlayerDragOverlay({ member }: { member: TeamMember }) {
 		<div className="flex items-center gap-3 p-4 rounded-xl bg-(--broadcast-dark) border-2 border-accent shadow-2xl shadow-accent/30 min-w-[220px]">
 			<div className="relative">
 				<div className="rounded-xl overflow-hidden ring-2 ring-accent">
-					{member.userProfile && <Avatar profile={member.userProfile} size="small" />}
+					{member.userProfile && <Avatar src={member.userProfile.imageUrl} name={`${member.userProfile.name} ${member.userProfile.surname}`} size="sm" />}
 				</div>
 				{member.jerseyNumber && (
 					<div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-md bg-accent text-black text-[10px] font-display font-bold flex items-center justify-center border-2 border-(--broadcast-dark)">

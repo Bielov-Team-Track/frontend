@@ -37,7 +37,7 @@ const PREFIX = "/events";
  */
 export async function loadDrills(filter?: DrillFilterRequest): Promise<Drill[]> {
     const endpoint = "/v1/drills";
-    const params = getParamsFromObject(filter);
+    const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
     const response = await client.get<DrillDto[]>(PREFIX + endpoint, { params });
     return response.data.map(transformDrillDto);
 }

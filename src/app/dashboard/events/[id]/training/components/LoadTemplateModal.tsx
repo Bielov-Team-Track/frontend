@@ -46,11 +46,11 @@ export default function LoadTemplateModal({ isOpen, onClose, onSelectTemplate, c
 	const getTemplatesForTab = (): TrainingPlanTemplate[] => {
 		switch (activeTab) {
 			case "my":
-				return myTemplatesResponse?.items || [];
+				return myTemplatesResponse || [];
 			case "club":
-				return clubTemplatesResponse?.items || [];
+				return clubTemplatesResponse || [];
 			case "bookmarked":
-				return bookmarkedTemplatesResponse?.items || [];
+				return bookmarkedTemplatesResponse || [];
 			default:
 				return [];
 		}

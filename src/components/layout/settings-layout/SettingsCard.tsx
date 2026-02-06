@@ -13,7 +13,7 @@ export function SettingsCard({ title, description, children, danger, className }
 		<div
 			className={cn(
 				"rounded-2xl border p-6",
-				danger ? "bg-red-500/5 border-red-500/20" : "bg-white/5 border-white/10",
+				danger ? "bg-red-500/5 border-red-500/20" : "bg-surface border-border",
 				className
 			)}>
 			{(title || description) && (

@@ -6,7 +6,7 @@ import {
 	EventType,
 	PlayingSurface,
 } from "@/lib/models/Event";
-import { Unit } from "@/lib/models/EventBudget";
+import { Unit } from "@/lib/models/EventPaymentConfig";
 
 const meta: Meta<typeof EventCard> = {
 	title: "Events/EventCard",
@@ -26,7 +26,6 @@ const mockEvent: Event = {
 	startTime: new Date("2024-01-20T10:00:00"),
 	endTime: new Date("2024-01-20T14:00:00"),
 	location: {
-		id: "loc_xyz789",
 		name: "Downtown Sports Complex",
 		address: "123 Main Street",
 	},
@@ -39,15 +38,6 @@ const mockEvent: Event = {
 	teamsNumber: 4,
 	description:
 		"Join us for a fun-filled day of volleyball with teams from all over the city. Prizes for the winners!",
-	admins: [
-		{
-			userId: "usr_admin1",
-			surname: "Smith",
-			imageUrl: "https://example.com/avatar1.jpg",
-			name: "John Doe",
-			email: "john@example.com",
-		},
-	],
 };
 
 export const Preview: Story = {

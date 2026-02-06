@@ -100,9 +100,9 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(functi
 	if (!editor) return null;
 
 	return (
-		<div className={cn("border border-white/10 rounded-xl overflow-hidden bg-white/5", className)}>
+		<div className={cn("border border-border rounded-xl overflow-hidden bg-surface", className)}>
 			{/* Toolbar */}
-			<div className="flex items-center gap-1 px-3 py-2 border-b border-white/10 bg-white/5">
+			<div className="flex items-center gap-1 px-3 py-2 border-b border-border bg-surface">
 				<ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive("bold")} title="Bold">
 					<Bold size={16} />
 				</ToolbarButton>
@@ -112,7 +112,7 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(functi
 				<ToolbarButton onClick={setLink} isActive={editor.isActive("link")} title="Link">
 					<LinkIcon size={16} />
 				</ToolbarButton>
-				<div className="w-px h-5 bg-white/10 mx-1" />
+				<div className="w-px h-5 bg-border mx-1" />
 				<ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive("bulletList")} title="Bullet List">
 					<List size={16} />
 				</ToolbarButton>
@@ -133,7 +133,7 @@ function ToolbarButton({ onClick, isActive, title, children }: { onClick: () => 
 			type="button"
 			onClick={onClick}
 			title={title}
-			className={cn("p-2 rounded-lg transition-colors", isActive ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-white/10")}>
+			className={cn("p-2 rounded-lg transition-colors", isActive ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-hover")}>
 			{children}
 		</button>
 	);

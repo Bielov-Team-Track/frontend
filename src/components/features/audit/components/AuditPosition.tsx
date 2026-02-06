@@ -50,7 +50,7 @@ const AuditPostition = ({
 	return (
 		<div className="p-4 h-14 rounded-md bg-neutral/5 w-full flex justify-between items-center relative">
 			{isMarkingAsPaid && (
-				<div className="absolute inset-0 bg-black/30 flex justify-center items-center rounded-md">
+				<div className="absolute inset-0 bg-overlay-light flex justify-center items-center rounded-md">
 					<Loader />
 				</div>
 			)}
@@ -59,7 +59,7 @@ const AuditPostition = ({
 					href={`/profiles/${defaultPosition.eventParticipant!.userId}`}
 					className="flex gap-2 items-center"
 				>
-					<Avatar profile={defaultPosition.eventParticipant?.userProfile!} />
+					<Avatar src={defaultPosition.eventParticipant?.userProfile?.imageUrl} name={`${defaultPosition.eventParticipant?.userProfile?.name} ${defaultPosition.eventParticipant?.userProfile?.surname}`} />
 					<div className="flex flex-col">
 						<span className="whitespace-nowrap font-bold text-sm  hover:underline">
 							{defaultPosition.eventParticipant?.userProfile?.name}{" "}

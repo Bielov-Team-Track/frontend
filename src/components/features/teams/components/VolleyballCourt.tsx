@@ -78,10 +78,10 @@ export default function VolleyballCourt({
 
 	return (
 		<div>
-			<div className="aspect-[1.8] bg-orange-500/20 rounded-xl border-4 border-white/20 relative p-8 shadow-inner" onClick={() => onPositionClick(null)}>
+			<div className="aspect-[1.8] bg-orange-500/20 rounded-xl border-4 border-border relative p-8 shadow-inner" onClick={() => onPositionClick(null)}>
 				{/* Court Lines */}
-				<div className="absolute inset-0 m-4 border-2 border-white/20 pointer-events-none" />
-				<div className="absolute top-[33%] left-4 right-4 h-0.5 bg-white/20 border-t-2 border-dashed border-white/20 pointer-events-none" />
+				<div className="absolute inset-0 m-4 border-2 border-border pointer-events-none" />
+				<div className="absolute top-[33%] left-4 right-4 h-0.5 bg-hover border-t-2 border-dashed border-border pointer-events-none" />
 
 				{/* Positions */}
 				{COURT_POSITIONS.map((pos) => {
@@ -183,12 +183,12 @@ function DroppableCourtPosition({
 				onClick={onPositionClick}
 				className={`w-full h-full flex flex-col items-center justify-center transition-all ${
 					isSelecting ? "scale-110 z-20" : "hover:scale-105 active:scale-95"
-				} ${isOver ? "scale-110" : ""}`}>
+				} ${isOver ? "scale-110 cursor-copy" : ""}`}>
 				{isAssigned ? (
 					<>
 						<div
 							className={`relative w-14 h-14 transition-all ${
-								isOver ? "ring-4 ring-accent ring-offset-2 ring-offset-transparent rounded-full" : ""
+								isOver ? "ring-4 ring-accent ring-offset-2 ring-offset-transparent rounded-full animate-pulse shadow-lg shadow-accent/30" : ""
 							}`}>
 							{assignedMembers.slice(0, 2).map((member, idx) => (
 								<div
@@ -229,14 +229,14 @@ function DroppableCourtPosition({
 						<div
 							className={`w-12 h-12 rounded-full border-2 border-dashed flex items-center justify-center transition-all ${
 								isOver
-									? "bg-accent text-white border-accent scale-110 ring-4 ring-accent/30"
+									? "bg-accent text-white border-accent scale-110 ring-4 ring-accent/50 animate-pulse shadow-lg shadow-accent/30"
 									: isSelecting
 									? "bg-accent text-white border-accent"
-									: "bg-white/10 border-white/30 text-white/50 hover:bg-white/20 hover:text-white"
+									: "bg-hover border-border text-white/50 hover:bg-hover hover:text-white"
 							}`}>
-							<Plus size={20} />
+							<Plus size={20} className={isOver ? "animate-bounce" : ""} />
 						</div>
-						<span className={`mt-1 text-xs ${isOver ? "text-accent font-medium" : "text-white/50"}`}>{label}</span>
+						<span className={`mt-1 text-xs ${isOver ? "text-accent font-semibold" : "text-white/50"}`}>{label}</span>
 					</>
 				)}
 			</button>
@@ -290,19 +290,19 @@ function DroppableRolePosition({
 	return (
 		<div ref={setNodeRef} className="relative" onClick={(e) => e.stopPropagation()}>
 			<div
-				className={`p-3 rounded-xl border flex items-center gap-3 cursor-pointer transition-all ${
-					isOver ? "bg-accent/20 border-accent ring-2 ring-accent/30" : "bg-white/5 border-white/10 hover:bg-white/10"
+				className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${
+					isOver ? "bg-accent/20 border-accent ring-2 ring-accent/50 cursor-copy animate-pulse shadow-lg shadow-accent/20" : "bg-surface border-border hover:bg-hover cursor-pointer"
 				}`}
 				onClick={onPositionClick}>
 				<div className="text-xs text-muted font-bold uppercase tracking-wider">{role}</div>
 				<div
 					className={`w-10 h-10 rounded-full border flex items-center justify-center relative transition-all ${
-						isOver ? "bg-accent/20 border-accent" : "bg-white/10 border-white/20"
+						isOver ? "bg-accent/30 border-accent ring-2 ring-accent/30" : "bg-hover border-border"
 					}`}>
 					{assignedMembers.length > 0 ? (
 						<span className="text-white font-bold">{assignedMembers[0].userProfile?.name?.[0]}</span>
 					) : (
-						<Plus size={16} className={isOver ? "text-accent" : "text-muted"} />
+						<Plus size={16} className={isOver ? "text-accent animate-bounce" : "text-muted"} />
 					)}
 					{assignedMembers.length > 1 && (
 						<div className="absolute -top-1 -right-1 w-4 h-4 bg-accent text-[10px] rounded-full flex items-center justify-center text-white border border-background-dark">

@@ -23,7 +23,7 @@ interface ActionCardProps {
 function ActionCard({ icon, title, description, buttonText, onClick, isLoading, danger }: ActionCardProps) {
 	return (
 		<div className="flex items-start gap-4">
-			<div className={`p-3 rounded-xl ${danger ? "bg-red-500/20 text-red-400" : "bg-white/10 text-white"}`}>{icon}</div>
+			<div className={`p-3 rounded-xl ${danger ? "bg-red-500/20 text-red-400" : "bg-hover text-white"}`}>{icon}</div>
 			<div className="flex-1">
 				<h3 className={`font-medium mb-1 ${danger ? "text-red-400" : "text-white"}`}>{title}</h3>
 				<p className="text-sm text-muted mb-4">{description}</p>

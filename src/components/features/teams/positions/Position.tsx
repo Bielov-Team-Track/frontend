@@ -4,7 +4,7 @@ import { UserSearch } from "@/components/features/users";
 import { Loader, Modal } from "@/components/ui";
 import { usePosition } from "@/hooks/usePosition";
 import { deletePosition } from "@/lib/api/positions";
-import { Unit } from "@/lib/models/EventBudget";
+import { Unit } from "@/lib/models/EventPaymentConfig";
 import { Position as PositionModel } from "@/lib/models/Position";
 import { Team } from "@/lib/models/Team";
 import { UserProfile } from "@/lib/models/User";
@@ -37,7 +37,7 @@ function Position({ position: defaultPosition, team, open = false, editable = fa
 
 	return (
 		<div className="relative group/position">
-			{isLoading && <Loader className="absolute inset-0 bg-black/55 rounded-xl z-50" />}
+			{isLoading && <Loader className="absolute inset-0 bg-overlay rounded-xl z-50" />}
 			{position.eventParticipant?.userProfile ? (
 				audit ? (
 					<AuditPosition position={position} team={team} />
@@ -105,7 +105,7 @@ const AvailablePosition = ({ position, team, editable, open, takePosition, handl
 				<div
 					tabIndex={0}
 					role="button"
-					className="p-3 rounded-xl bg-white/5 border border-white/5 w-full flex justify-between items-center cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all group-hover/position:border-white/10">
+					className="p-3 rounded-xl bg-surface border border-border w-full flex justify-between items-center cursor-pointer hover:bg-hover hover:border-border transition-all group-hover/position:border-border">
 					<span className="text-gray-300 text-sm font-medium">{position.name}</span>
 					<div className="flex items-center gap-2">
 						{(open || editable) && <span className="text-muted text-[10px] uppercase font-bold tracking-wider">Available</span>}
@@ -113,14 +113,14 @@ const AvailablePosition = ({ position, team, editable, open, takePosition, handl
 					</div>
 				</div>
 
-				<ul tabIndex={0} className="dropdown-content z-1 menu p-2 shadow-lg bg-[#1E1E1E] border border-white/10 rounded-xl w-52 mt-1">
+				<ul tabIndex={0} className="dropdown-content z-1 menu p-2 shadow-lg bg-surface-elevated border border-border rounded-xl w-52 mt-1">
 					{!showRemoveConfirm ? (
 						<>
 							{/* Take position option for all users */}
 							<li>
 								<button
 									onClick={team.event.budget?.payToJoin && team.event.registrationUnit === Unit.Individual ? handlePayment : takePosition}
-									className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2">
+									className="text-xs hover:bg-hover hover:text-foreground text-gray-300 gap-2">
 									<Plus size={14} />
 									{team.event.budget?.payToJoin && team.event.registrationUnit === Unit.Individual
 										? `Pay ${team.event.budget.cost} to join`
@@ -132,7 +132,7 @@ const AvailablePosition = ({ position, team, editable, open, takePosition, handl
 							{editable && (
 								<>
 									<li>
-										<button onClick={() => setIsModalOpen(true)} className="text-xs hover:bg-white/5 hover:text-white text-gray-300 gap-2">
+										<button onClick={() => setIsModalOpen(true)} className="text-xs hover:bg-hover hover:text-foreground text-gray-300 gap-2">
 											<UserPlus size={14} /> Assign player
 										</button>
 									</li>
@@ -168,7 +168,7 @@ const AvailablePosition = ({ position, team, editable, open, takePosition, handl
 								</button>
 							</li>
 							<li>
-								<button onClick={() => setShowRemoveConfirm(false)} className="text-xs text-gray-400 hover:text-white">
+								<button onClick={() => setShowRemoveConfirm(false)} className="text-xs text-gray-400 hover:text-foreground">
 									Cancel
 								</button>
 							</li>
@@ -181,7 +181,7 @@ const AvailablePosition = ({ position, team, editable, open, takePosition, handl
 			<Modal isLoading={false} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Assign Player">
 				<div className="p-4">
 					<p className="text-sm text-muted mb-4">
-						Select a player to assign to the <span className="text-white font-bold">{position.name}</span> position.
+						Select a player to assign to the <span className="text-foreground font-bold">{position.name}</span> position.
 					</p>
 					<UserSearch onUserSelect={assignPosition} />
 				</div>

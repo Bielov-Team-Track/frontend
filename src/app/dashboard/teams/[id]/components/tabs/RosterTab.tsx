@@ -4,7 +4,8 @@ import { Button, UserSelectorModal } from "@/components";
 import { EditTeamMemberModal, RosterSidebar, VolleyballCourt } from "@/components/features/teams";
 import { PlayerDragOverlay } from "@/components/features/teams/components/RosterSidebar";
 import { addTeamMember, updateTeamMember } from "@/lib/api/clubs";
-import { ClubMember, PositionAssignment, Team, TeamMember, VolleyballPosition } from "@/lib/models/Club";
+import { Club, ClubMember, PositionAssignment, Team, TeamMember, VolleyballPosition } from "@/lib/models/Club";
+import { UserProfile } from "@/lib/models/User";
 import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, PointerSensor, rectIntersection, useSensor, useSensors } from "@dnd-kit/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserPlus } from "lucide-react";
@@ -14,6 +15,7 @@ interface RosterTabProps {
 	team: Team;
 	clubMembers: ClubMember[];
 	teamId: string;
+	club?: Club;
 }
 
 // Map court position IDs to VolleyballPosition enum
@@ -27,7 +29,12 @@ const COURT_TO_POSITION: Record<string, VolleyballPosition> = {
 	Libero: VolleyballPosition.Libero,
 };
 
-export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps) {
+export default function RosterTab({ team, clubMembers, teamId, club }: RosterTabProps) {
+	// Extract user profiles from club members for the user selector
+	const clubMemberUsers: UserProfile[] = clubMembers
+		.filter((m) => m.userProfile)
+		.map((m) => m.userProfile!);
+
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
 	const [assigningPosition, setAssigningPosition] = useState<string | null>(null);
@@ -50,7 +57,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 	);
 
 	const addMemberMutation = useMutation({
-		mutationFn: ({ userId, positions }: { userId: string; positions: string[]; jerseyNumber?: string }) =>
+		mutationFn: ({ userId, positions, jerseyNumber }: { userId: string; positions: string[]; jerseyNumber?: string }) =>
 			addTeamMember(teamId, userId, positions, jerseyNumber),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["team", teamId] });
@@ -353,7 +360,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 				{/* Action Header */}
 				<div className="flex items-center justify-between lg:justify-end">
 					{/* Mobile Title */}
-					<h3 className="lg:hidden text-lg font-bold text-white">Team Roster</h3>
+					<h3 className="lg:hidden text-lg font-bold text-foreground">Team Roster</h3>
 
 					<Button variant="outline" onClick={() => setShowAddModal(true)} leftIcon={<UserPlus size={16} />}>
 						Add Member
@@ -364,7 +371,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 					{/* Volleyball Court Visualization - Hidden on mobile */}
 					<div className="hidden lg:block lg:col-span-2 space-y-4">
 						<div className="flex items-center justify-between">
-							<h3 className="text-lg font-bold text-white">Starting Lineup</h3>
+							<h3 className="text-lg font-bold text-foreground">Starting Lineup</h3>
 							<div className="text-xs text-muted">Drag & Drop or Click to assign positions</div>
 						</div>
 						<VolleyballCourt
@@ -402,7 +409,7 @@ export default function RosterTab({ team, clubMembers, teamId }: RosterTabProps)
 						const userToAdd = selectedUsers[0];
 						addMemberMutation.mutate({ userId: userToAdd.id, positions: [] });
 					}}
-					restrictToClub={team.club}
+					users={clubMemberUsers}
 					excludeUserIds={team.members?.map((u) => u.userId)}
 					title="Add Team Member"
 				/>

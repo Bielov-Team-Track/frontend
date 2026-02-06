@@ -14,12 +14,17 @@ import {
 	getDefaultFormValues,
 } from "../utils/eventFormUtils";
 import { ContextSelection } from "../components/ContextSelector";
+import { getSavedDraft, clearSavedDraft } from "./useFormPersistence";
 
 export function useEventForm(event?: Event, contextSelection?: ContextSelection, onSuccess?: () => void) {
 	const router = useRouter();
 
+	const savedDraft = !event ? getSavedDraft() : null;
+
 	const form = useForm<EventFormData>({
-		resolver: yupResolver(eventValidationSchema),
+		resolver: yupResolver(eventValidationSchema) as any,
+		mode: "onBlur",
+		reValidateMode: "onChange",
 		defaultValues: event
 			? {
 					...getDefaultFormValues(),
@@ -28,7 +33,7 @@ export function useEventForm(event?: Event, contextSelection?: ContextSelection,
 					endTime: event.endTime,
 					// Add other event fields as needed
 				}
-			: getDefaultFormValues(),
+			: savedDraft?.values ?? getDefaultFormValues(),
 	});
 
 	const mutation = useMutation({
@@ -43,12 +48,19 @@ export function useEventForm(event?: Event, contextSelection?: ContextSelection,
 			}
 		},
 		onSuccess: (result) => {
+			clearSavedDraft();
 			// Call the onSuccess callback if provided (e.g., to close modal first)
 			if (onSuccess) {
 				onSuccess();
 			} else {
-				// Default: navigate to the events page
-				router.push("/dashboard/events");
+				// Default: navigate to the event detail page if available
+				const eventId = result?.id;
+				if (eventId) {
+					router.push(`/dashboard/events/${eventId}`);
+				} else {
+					router.push("/dashboard/events");
+				}
+				router.refresh();
 			}
 		},
 		onError: (error) => {

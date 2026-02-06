@@ -118,11 +118,11 @@ export default function EvaluationPage() {
 	}, [drillScores]);
 
 	return (
-		<div className="h-screen bg-background text-white font-sans flex flex-col lg:flex-row overflow-hidden">
+		<div className="h-screen bg-background text-foreground font-sans flex flex-col lg:flex-row overflow-hidden">
 			{/* --- 1. ROSTER SIDEBAR --- */}
-			<div className="w-full lg:w-72 bg-[#161616] border-b lg:border-r border-white/5 flex flex-col z-20 shrink-0 h-48 lg:h-full">
-				<div className="p-4 lg:p-6 border-b border-white/5 bg-[#161616] sticky top-0 z-10">
-					<h1 className="font-bold text-white text-lg">Evaluation Day</h1>
+			<div className="w-full lg:w-72 bg-surface border-b lg:border-r border-border flex flex-col z-20 shrink-0 h-48 lg:h-full">
+				<div className="p-4 lg:p-6 border-b border-border bg-surface sticky top-0 z-10">
+					<h1 className="font-bold text-foreground text-lg">Evaluation Day</h1>
 					<p className="text-xs text-muted">Select a player to grade</p>
 				</div>
 				<div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
@@ -135,7 +135,7 @@ export default function EvaluationPage() {
                 ${
 					selectedPlayerId === player.id
 						? "bg-accent/10 border-accent/50 shadow-[inset_0_0_10px_rgba(249,115,22,0.1)]"
-						: "border-transparent hover:bg-white/5"
+						: "border-transparent hover:bg-hover"
 				}
               `}>
 							<div className="w-10 h-10 rounded-full bg-surface-elevated overflow-hidden flex items-center justify-center shrink-0">
@@ -155,7 +155,7 @@ export default function EvaluationPage() {
 								/>
 							</div>
 							<div>
-								<div className={`text-sm font-bold ${selectedPlayerId === player.id ? "text-white" : "text-muted"}`}>{player.name}</div>
+								<div className={`text-sm font-bold ${selectedPlayerId === player.id ? "text-foreground" : "text-muted"}`}>{player.name}</div>
 								<div className="text-xs text-muted/60">
 									#{player.number} • {player.position}
 								</div>
@@ -167,9 +167,9 @@ export default function EvaluationPage() {
 
 			{/* --- 2. MAIN: DRILL LIST --- */}
 			<div className="flex-1 flex flex-col bg-background relative overflow-hidden">
-				<div className="h-16 border-b border-white/5 flex items-center justify-between px-4 lg:px-8 bg-background/95 backdrop-blur-sm z-10 shrink-0">
-					<h2 className="text-base lg:text-lg font-bold text-white truncate mr-4">Drills & Assessments</h2>
-					<button className="btn btn-sm bg-accent text-white border-none gap-2 hover:bg-accent/90 shadow-[0_0_15px_rgba(249,115,22,0.3)] shrink-0">
+				<div className="h-16 border-b border-border flex items-center justify-between px-4 lg:px-8 bg-background/95 backdrop-blur-sm z-10 shrink-0">
+					<h2 className="text-base lg:text-lg font-bold text-foreground truncate mr-4">Drills & Assessments</h2>
+					<button className="btn btn-sm bg-accent text-accent-foreground border-none gap-2 hover:bg-accent/90 shadow-[0_0_15px_rgba(249,115,22,0.3)] shrink-0">
 						<Save size={16} /> <span className="hidden sm:inline">Save Evaluation</span>
 					</button>
 				</div>
@@ -179,15 +179,15 @@ export default function EvaluationPage() {
 					{DRILLS.map((drill, index) => (
 						<div
 							key={drill.id}
-							className="bg-[#161616] border border-white/5 rounded-2xl p-4 lg:p-6 shadow-lg transition-all hover:border-white/10">
+							className="bg-surface border border-border rounded-2xl p-4 lg:p-6 shadow-lg transition-all hover:border-border">
 							{/* Header */}
 							<div className="flex justify-between items-start mb-4">
 								<div className="flex items-start gap-4">
-									<div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-sm font-bold text-muted border border-white/5 shrink-0">
+									<div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-sm font-bold text-muted border border-border shrink-0">
 										{index + 1}
 									</div>
 									<div>
-										<h3 className="text-base lg:text-lg font-bold text-white">{drill.name}</h3>
+										<h3 className="text-base lg:text-lg font-bold text-foreground">{drill.name}</h3>
 										<p className="text-xs lg:text-sm text-muted mt-1">{drill.description}</p>
 
 										{/* Drill Impact Tags */}
@@ -221,7 +221,7 @@ export default function EvaluationPage() {
 							</div>
 
 							{/* Input Slider */}
-							<div className="mt-2 bg-white/5 rounded-xl p-4">
+							<div className="mt-2 bg-surface rounded-xl p-4">
 								<input
 									type="range"
 									min="0"
@@ -243,9 +243,9 @@ export default function EvaluationPage() {
 			</div>
 
 			{/* --- 3. RIGHT: LIVE STAT BREAKDOWN --- */}
-			<div className="hidden xl:flex w-80 bg-[#1E1E1E] border-l border-white/5 flex-col shadow-2xl z-20 shrink-0">
-				<div className="p-6 border-b border-white/5 bg-linear-to-b from-white/5 to-transparent">
-					<h2 className="text-xl font-bold text-white mb-1">Live Analysis</h2>
+			<div className="hidden xl:flex w-80 bg-surface border-l border-border flex-col shadow-2xl z-20 shrink-0">
+				<div className="p-6 border-b border-border bg-linear-to-b from-surface to-transparent">
+					<h2 className="text-xl font-bold text-foreground mb-1">Live Analysis</h2>
 					<p className="text-sm text-muted">Real-time category calculation</p>
 				</div>
 
@@ -267,9 +267,9 @@ export default function EvaluationPage() {
 					<StatCard label="Mental" score={stats.Mental} icon={Brain} color="text-purple-400" bg="bg-purple-500" desc="IQ, Composure, Leadership" />
 
 					{/* Total Weighted Score */}
-					<div className="mt-8 p-6 rounded-2xl bg-linear-to-br from-gray-800 to-black border border-white/10 text-center shadow-lg">
+					<div className="mt-8 p-6 rounded-2xl bg-surface-elevated border border-border text-center shadow-lg">
 						<div className="text-xs text-muted uppercase font-bold tracking-widest mb-2">Estimated OVR</div>
-						<div className="text-5xl font-black text-white tracking-tighter">
+						<div className="text-5xl font-black text-foreground tracking-tighter">
 							{/* Simple average for demo */}
 							{(
 								(Number(stats.Physical === "-" ? 0 : stats.Physical) +
@@ -278,7 +278,7 @@ export default function EvaluationPage() {
 								(Object.values(drillScores).length > 0 ? 3 : 1)
 							).toFixed(0)}
 						</div>
-						<div className="mt-2 inline-block px-3 py-1 rounded bg-accent text-white text-xs font-bold">PROSPECT</div>
+						<div className="mt-2 inline-block px-3 py-1 rounded bg-accent text-accent-foreground text-xs font-bold">PROSPECT</div>
 					</div>
 				</div>
 			</div>
@@ -299,8 +299,8 @@ function StatCard({ label, score, icon: Icon, color, bg, desc }: any) {
 		<div>
 			<div className="flex items-center gap-2 mb-2">
 				<Icon size={18} className={color} />
-				<span className="font-bold text-white text-lg">{label}</span>
-				<span className={`ml-auto font-mono font-bold text-xl ${isRated ? "text-white" : "text-muted-foreground"}`}>{score}</span>
+				<span className="font-bold text-foreground text-lg">{label}</span>
+				<span className={`ml-auto font-mono font-bold text-xl ${isRated ? "text-foreground" : "text-muted-foreground"}`}>{score}</span>
 			</div>
 
 			{/* Progress Bar */}

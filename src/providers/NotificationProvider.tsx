@@ -34,10 +34,10 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
 				style={{ top: 72 }}
 				theme="dark"
 				toastOptions={{
-					className: "!bg-popover !text-popover-foreground !border-white/10",
+					className: "!bg-popover !text-popover-foreground !border-border",
 					style: {
 						background: "var(--popover)",
-						border: "1px solid rgba(255, 255, 255, 0.1)",
+						border: "1px solid hsl(var(--border))",
 						boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
 					},
 				}}

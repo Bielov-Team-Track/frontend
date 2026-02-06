@@ -70,7 +70,7 @@ export default function PollCreator({ onSave, onCancel }: PollCreatorProps) {
 		<div className="rounded-xl border border-border bg-surface p-4 space-y-4">
 			{/* Header */}
 			<div className="flex items-center justify-between">
-				<h4 className="text-sm font-medium text-white">Create Poll</h4>
+				<h4 className="text-sm font-medium text-foreground">Create Poll</h4>
 				<button onClick={onCancel} className="p-1 rounded hover:bg-active text-muted-foreground">
 					<X size={16} />
 				</button>
@@ -82,7 +82,7 @@ export default function PollCreator({ onSave, onCancel }: PollCreatorProps) {
 				value={question}
 				onChange={(e) => setQuestion(e.target.value)}
 				placeholder="Ask a question..."
-				className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+				className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
 			/>
 
 			{/* Options */}
@@ -95,7 +95,7 @@ export default function PollCreator({ onSave, onCancel }: PollCreatorProps) {
 							value={option.content}
 							onChange={(e) => updateOption(option.id, e.target.value)}
 							placeholder={`Option ${index + 1}`}
-							className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+							className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
 						/>
 						{options.length > 2 && (
 							<button
@@ -108,7 +108,7 @@ export default function PollCreator({ onSave, onCancel }: PollCreatorProps) {
 				))}
 
 				{options.length < 10 && (
-					<button onClick={addOption} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors">
+					<button onClick={addOption} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
 						<Plus size={14} />
 						Add option
 					</button>

@@ -1,19 +1,19 @@
 import { Input, RadioCards } from "@/components/ui";
 import { EventFormat } from "@/lib/models/Event";
-import { Unit } from "@/lib/models/EventBudget";
+import { Unit } from "@/lib/models/EventPaymentConfig";
 import { LayoutGrid, User, UserPlus, Users, UsersRound } from "lucide-react";
 import { Controller } from "react-hook-form";
 import { useEventFormContext } from "../context/EventFormContext";
 
 const eventFormatCards = [
 	{
-		value: EventFormat.Open,
+		value: EventFormat.List,
 		label: "Open",
 		description: "Individual registration, no teams",
 		icon: UserPlus,
 	},
 	{
-		value: EventFormat.OpenTeams,
+		value: EventFormat.ListTeams,
 		label: "Open Teams",
 		description: "Teams with flexible player slots",
 		icon: UsersRound,
@@ -88,13 +88,14 @@ export function EventSettingsStep() {
 					)}
 				/>
 
-				{values.eventFormat !== EventFormat.Open && (
+				{values.eventFormat !== EventFormat.List && (
 					<Controller
 						name="teamsNumber"
 						control={control}
 						render={({ field }) => (
 							<Input
 								{...field}
+								value={field.value ?? ""}
 								type="number"
 								label="Number of Teams"
 								leftIcon={<Users size={16} />}
@@ -105,7 +106,7 @@ export function EventSettingsStep() {
 					/>
 				)}
 
-				{values.eventFormat === EventFormat.Open && (
+				{values.eventFormat === EventFormat.List && (
 					<Controller
 						name="capacity"
 						control={control}

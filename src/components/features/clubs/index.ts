@@ -1,4 +1,5 @@
 // Components
+export { default as ClubCard } from "./components/ClubCard";
 export { default as TeamCard } from "./components/TeamCard";
 export { default as GroupCard } from "./components/GroupCard";
 export { default as ManageMembersModal } from "./components/ManageMembersModal";

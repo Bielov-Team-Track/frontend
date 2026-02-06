@@ -1,46 +1,20 @@
 "use client";
 
 import { Button, Checkbox, Input, TextArea } from "@/components";
+import { StaticMapPreview } from "@/components/features/locations";
 import { VenueForm, VenueFormData } from "@/components/features/venues";
 import ImageCropper from "@/components/ui/image-cropper";
 import Modal from "@/components/ui/modal";
 import Steps from "@/components/ui/steps";
 import { createClub, updateClub, uploadClubImage } from "@/lib/api/clubs";
 import { CreateClubRequest, CreateVenueRequest } from "@/lib/models/Club";
+import { showErrorToast, showSuccessToast } from "@/lib/errors";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ArrowLeft, ArrowRight, Check, Image as ImageIcon, MapPin, Shield, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
-
-// --- Toast Component ---
-interface ToastState {
-	message: string;
-	type: "success" | "error";
-}
-
-function Toast({ toast, onClose }: { toast: ToastState | null; onClose: () => void }) {
-	useEffect(() => {
-		if (toast) {
-			const timer = setTimeout(onClose, 5000);
-			return () => clearTimeout(timer);
-		}
-	}, [toast, onClose]);
-
-	if (!toast) return null;
-
-	return (
-		<div className="toast toast-top toast-center z-50">
-			<div className={`alert ${toast.type === "success" ? "alert-success" : "alert-error"}`}>
-				<span>{toast.message}</span>
-				<button onClick={onClose} className="btn btn-sm btn-ghost">
-					✕
-				</button>
-			</div>
-		</div>
-	);
-}
 
 // --- Types & Schema ---
 
@@ -57,7 +31,7 @@ interface CreateClubFormValues {
 
 const clubSchema = yup.object().shape({
 	name: yup.string().required("Club name is required").min(3, "Name must be at least 3 characters"),
-	description: yup.string().max(500, "Description cannot exceed 500 characters"),
+	description: yup.string().max(2000, "Description cannot exceed 2000 characters"),
 	is_public: yup.boolean().default(true),
 	logo: yup.mixed().nullable(), // We'll validate manually or check if File
 	banner: yup.mixed().nullable(),
@@ -92,9 +66,6 @@ export default function CreateClubPage() {
 	// Previews (Blob URLs)
 	const [logoPreview, setLogoPreview] = useState<string | null>(null);
 	const [bannerPreview, setBannerPreview] = useState<string | null>(null);
-
-	// Toast State
-	const [toast, setToast] = useState<ToastState | null>(null);
 
 	const {
 		register,
@@ -156,6 +127,7 @@ export default function CreateClubPage() {
 				addressLine1: v.addressLine1,
 				city: v.city,
 				country: v.country,
+				postalCode: v.postalCode,
 				latitude: v.latitude,
 				longitude: v.longitude,
 			}));
@@ -199,15 +171,13 @@ export default function CreateClubPage() {
 				});
 			}
 
-			setToast({
-				message: "Club created successfully!",
-				type: "success",
-			});
+			showSuccessToast("Club created successfully!");
 			router.push(`/clubs/${createdClub.id}`);
 		} catch (error: any) {
 			console.error("Failed to create club", error);
-			const errorMessage = error?.response?.data?.message || error?.message || "Failed to create club. Please try again.";
-			setToast({ message: errorMessage, type: "error" });
+			showErrorToast(error, {
+				fallback: "Failed to create club. Please try again.",
+			});
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -286,7 +256,7 @@ export default function CreateClubPage() {
 	const renderStep1 = () => (
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
 			<div>
-				<h2 className="text-xl font-bold text-white mb-1">Basic Information</h2>
+				<h2 className="text-xl font-bold text-foreground mb-1">Basic Information</h2>
 				<p className="text-muted text-sm">Tell us about your club.</p>
 			</div>
 
@@ -303,7 +273,9 @@ export default function CreateClubPage() {
 					label="Description"
 					placeholder="Describe your club's mission, skill levels, etc..."
 					error={errors.description?.message}
-					rows={4}
+					rows={6}
+					maxLength={2000}
+					showCharCount
 					className="bg-overlay-light"
 					{...register("description")}
 				/>
@@ -328,13 +300,13 @@ export default function CreateClubPage() {
 	const renderStep2 = () => (
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
 			<div>
-				<h2 className="text-xl font-bold text-white mb-1">Branding</h2>
+				<h2 className="text-xl font-bold text-foreground mb-1">Branding</h2>
 				<p className="text-muted text-sm">Add a logo and banner to make your club stand out.</p>
 			</div>
 
 			{/* Banner Upload */}
 			<div className="space-y-2">
-				<label className="block font-medium text-white text-sm">Club Banner</label>
+				<label className="block font-medium text-foreground text-sm">Club Banner</label>
 				<div
 					className={`relative w-full h-40 md:h-48 rounded-xl border-2 border-dashed transition-colors overflow-hidden group 
             ${isDraggingBanner ? "border-primary bg-primary/10" : "border-border bg-overlay-light hover:border-primary/50"}`}
@@ -347,7 +319,7 @@ export default function CreateClubPage() {
 							<img src={bannerPreview} alt="Banner Preview" className="w-full h-full object-cover" />
 							<div className="absolute inset-0 bg-overlay flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
 								<div className="flex gap-2">
-									<label className="cursor-pointer btn btn-sm btn-ghost text-white border border-white/20 hover:bg-active">
+									<label className="cursor-pointer btn btn-sm btn-ghost text-foreground border border-border hover:bg-active">
 										Change
 										<input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileSelect(e, "banner")} />
 									</label>
@@ -357,7 +329,7 @@ export default function CreateClubPage() {
 											setValue("banner", null);
 											setBannerPreview(null);
 										}}
-										className="btn btn-sm btn-ghost text-error border border-white/20 hover:bg-red-500/10">
+										className="btn btn-sm btn-ghost text-error border border-border hover:bg-red-500/10">
 										<Trash size={14} />
 									</button>
 								</div>
@@ -367,7 +339,7 @@ export default function CreateClubPage() {
 						<label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-hover transition-colors">
 							<ImageIcon
 								size={32}
-								className={`mb-2 transition-colors ${isDraggingBanner ? "text-primary" : "text-muted group-hover:text-white"}`}
+								className={`mb-2 transition-colors ${isDraggingBanner ? "text-primary" : "text-muted group-hover:text-foreground"}`}
 							/>
 							<span className={`text-sm font-medium ${isDraggingBanner ? "text-primary" : "text-muted"}`}>
 								{isDraggingBanner ? "Drop banner here" : "Click or drag to upload banner"}
@@ -381,7 +353,7 @@ export default function CreateClubPage() {
 
 			{/* Logo Upload */}
 			<div className="space-y-2">
-				<label className="block font-medium text-white text-sm">Club Logo</label>
+				<label className="block font-medium text-foreground text-sm">Club Logo</label>
 				<div className="flex items-center gap-6">
 					<div
 						className={`relative w-32 h-32 rounded-full border-2 border-dashed transition-colors overflow-hidden group shrink-0
@@ -395,7 +367,7 @@ export default function CreateClubPage() {
 								<img src={logoPreview} alt="Logo Preview" className="w-full h-full object-cover" />
 								<div className="absolute inset-0 bg-overlay flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
 									<div className="flex flex-col gap-2">
-										<label className="cursor-pointer text-xs font-medium text-white hover:underline">
+										<label className="cursor-pointer text-xs font-medium text-foreground hover:underline">
 											Change
 											<input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileSelect(e, "logo")} />
 										</label>
@@ -415,7 +387,7 @@ export default function CreateClubPage() {
 							<label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-hover transition-colors">
 								<Shield
 									size={24}
-									className={`mb-1 transition-colors ${isDraggingLogo ? "text-primary" : "text-muted group-hover:text-white"}`}
+									className={`mb-1 transition-colors ${isDraggingLogo ? "text-primary" : "text-muted group-hover:text-foreground"}`}
 								/>
 								<span className={`text-xs font-medium ${isDraggingLogo ? "text-primary" : "text-muted"}`}>
 									{isDraggingLogo ? "Drop" : "Upload"}
@@ -425,7 +397,7 @@ export default function CreateClubPage() {
 						)}
 					</div>
 					<div className="flex-1 space-y-1">
-						<h3 className="text-sm font-medium text-white">Logo Guidelines</h3>
+						<h3 className="text-sm font-medium text-foreground">Logo Guidelines</h3>
 						<p className="text-xs text-muted leading-relaxed">
 							Recommended size: 500x500px.
 							<br />
@@ -443,7 +415,7 @@ export default function CreateClubPage() {
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
 			{/* Contact Details */}
 			<div>
-				<h2 className="text-xl font-bold text-white mb-1">Contact Details</h2>
+				<h2 className="text-xl font-bold text-foreground mb-1">Contact Details</h2>
 				<p className="text-muted text-sm">How can members reach you?</p>
 			</div>
 			<div className="space-y-4">
@@ -470,7 +442,7 @@ export default function CreateClubPage() {
 			{/* Venues Section */}
 			<div className="pt-6 border-t border-border">
 				<div className="mb-4">
-					<h2 className="text-xl font-bold text-white mb-1">Club Venues</h2>
+					<h2 className="text-xl font-bold text-foreground mb-1">Club Venues</h2>
 					<p className="text-muted text-sm">Add locations where your club hosts activities (optional)</p>
 				</div>
 
@@ -478,24 +450,28 @@ export default function CreateClubPage() {
 				{venues.length > 0 && (
 					<div className="space-y-2 mb-6">
 						{venues.map((venue) => (
-							<div key={venue.tempId} className="flex items-start justify-between p-4 rounded-lg border border-border bg-hover">
-								<div className="flex items-start gap-3">
-									<MapPin size={18} className="text-muted mt-0.5 shrink-0" />
-									<div>
-										<div className="font-medium text-white">{venue.name}</div>
-										<div className="text-sm text-muted">{venue.addressLine1}</div>
-										{venue.city && (
-											<div className="text-sm text-muted">
-												{venue.city}
-												{venue.country && `, ${venue.country}`}
-											</div>
-										)}
-									</div>
+							<div key={venue.tempId} className="flex items-start gap-3 p-4 rounded-lg border border-border bg-hover">
+								<StaticMapPreview
+									latitude={venue.latitude}
+									longitude={venue.longitude}
+									width={100}
+									height={72}
+									className="shrink-0"
+								/>
+								<div className="flex-1 min-w-0">
+									<div className="font-medium text-foreground">{venue.name}</div>
+									<div className="text-sm text-muted truncate">{venue.addressLine1}</div>
+									{venue.city && (
+										<div className="text-sm text-muted">
+											{venue.city}
+											{venue.country && `, ${venue.country}`}
+										</div>
+									)}
 								</div>
 								<button
 									type="button"
 									onClick={() => handleRemoveVenue(venue.tempId)}
-									className="p-2 text-muted hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors">
+									className="p-2 text-muted hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors shrink-0">
 									<Trash size={16} />
 								</button>
 							</div>
@@ -514,7 +490,7 @@ export default function CreateClubPage() {
 	const renderStep4 = () => (
 		<div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
 			<div>
-				<h2 className="text-xl font-bold text-white mb-1">Review & Create</h2>
+				<h2 className="text-xl font-bold text-foreground mb-1">Review & Create</h2>
 				<p className="text-muted text-sm">Double check everything before creating your club.</p>
 			</div>
 
@@ -527,7 +503,7 @@ export default function CreateClubPage() {
 						<img src={bannerPreview} alt="Banner" className="w-full h-full object-cover opacity-80" />
 					) : (
 						<div className="w-full h-full flex items-center justify-center bg-hover">
-							<ImageIcon className="text-white/10" size={48} />
+							<ImageIcon className="text-muted/30" size={48} />
 						</div>
 					)}
 					<div className="absolute inset-0 bg-linear-to-t from-surface-elevated via-transparent to-transparent" />
@@ -548,20 +524,20 @@ export default function CreateClubPage() {
 
 					<div className="space-y-4">
 						<div>
-							<h3 className="text-xl font-bold text-white">{formData.name || "Untitled Club"}</h3>
+							<h3 className="text-xl font-bold text-foreground">{formData.name || "Untitled Club"}</h3>
 							<p className="text-sm text-muted">{formData.is_public ? "Public Club" : "Private Club"}</p>
 						</div>
 
-						<p className="text-sm text-gray-300">{formData.description || "No description provided."}</p>
+						<p className="text-sm text-muted-foreground">{formData.description || "No description provided."}</p>
 
 						<div className="pt-4 border-t border-border grid grid-cols-2 gap-4">
 							<div>
 								<span className="text-xs text-muted block uppercase tracking-wider">Contact Email</span>
-								<span className="text-sm text-white">{formData.contact_email || "N/A"}</span>
+								<span className="text-sm text-foreground">{formData.contact_email || "N/A"}</span>
 							</div>
 							<div>
 								<span className="text-xs text-muted block uppercase tracking-wider">Phone</span>
-								<span className="text-sm text-white">{formData.contact_phone || "N/A"}</span>
+								<span className="text-sm text-foreground">{formData.contact_phone || "N/A"}</span>
 							</div>
 						</div>
 
@@ -571,10 +547,18 @@ export default function CreateClubPage() {
 								<span className="text-xs text-muted block uppercase tracking-wider mb-2">Venues ({venues.length})</span>
 								<div className="space-y-2">
 									{venues.map((venue) => (
-										<div key={venue.tempId} className="flex items-center gap-2 text-sm">
-											<MapPin size={14} className="text-muted shrink-0" />
-											<span className="text-white">{venue.name}</span>
-											<span className="text-muted">- {venue.city || venue.addressLine1}</span>
+										<div key={venue.tempId} className="flex items-center gap-3 text-sm">
+											<StaticMapPreview
+												latitude={venue.latitude}
+												longitude={venue.longitude}
+												width={64}
+												height={48}
+												className="shrink-0"
+											/>
+											<div className="min-w-0">
+												<span className="text-foreground font-medium">{venue.name}</span>
+												<div className="text-muted truncate">{venue.city || venue.addressLine1}</div>
+											</div>
 										</div>
 									))}
 								</div>
@@ -594,10 +578,10 @@ export default function CreateClubPage() {
 	);
 
 	return (
-		<div className="w-full max-w-3xl mx-auto py-8 px-4 font-sans text-white">
+		<div className="w-full max-w-3xl mx-auto py-8 px-4 font-sans text-foreground">
 			{/* Header */}
 			<div className="mb-10 text-center">
-				<h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Create a New Club</h1>
+				<h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2 tracking-tight">Create a New Club</h1>
 				<p className="text-muted text-lg">Set up your space for teams, events, and community.</p>
 			</div>
 
@@ -625,7 +609,7 @@ export default function CreateClubPage() {
 						onClick={handleBack}
 						disabled={currentStep === 1 || isSubmitting}
 						leftIcon={<ArrowLeft size={16} />}
-						className="text-muted hover:text-white">
+						className="text-muted hover:text-foreground">
 						Back
 					</Button>
 
@@ -638,7 +622,7 @@ export default function CreateClubPage() {
 							color="primary"
 							onClick={handleSubmit(onSubmit)}
 							loading={isSubmitting}
-							className="px-8 bg-success hover:bg-success text-white border-none shadow-lg shadow-green-600/20"
+							className="px-8 bg-success hover:bg-success text-success-foreground border-none shadow-lg shadow-green-600/20"
 							rightIcon={!isSubmitting && <Check size={16} />}>
 							Create Club
 						</Button>
@@ -655,24 +639,18 @@ export default function CreateClubPage() {
 				}}
 				title={`Adjust ${activeField === "banner" ? "Banner" : "Logo"}`}
 				size="lg">
-				<div className="p-1">
-					{selectedFile && (
-						<ImageCropper
-							imageFile={selectedFile}
-							onImageSave={onCropSave}
-							onCancel={() => {
-								setCropModalOpen(false);
-								setSelectedFile(null);
-							}}
-							aspect={activeField === "banner" ? 3 / 1 : 1} // 3:1 for banner, 1:1 for logo
-							className="border-0 bg-transparent rounded-none"
-						/>
-					)}
-				</div>
+				{selectedFile && (
+					<ImageCropper
+						imageFile={selectedFile}
+						onImageSave={onCropSave}
+						onCancel={() => {
+							setCropModalOpen(false);
+							setSelectedFile(null);
+						}}
+						aspect={activeField === "banner" ? 3 / 1 : 1} // 3:1 for banner, 1:1 for logo
+					/>
+				)}
 			</Modal>
-
-			{/* Toast Notification */}
-			<Toast toast={toast} onClose={() => setToast(null)} />
 		</div>
 	);
 }

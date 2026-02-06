@@ -154,7 +154,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 							paddingLeft: leftPadding ? `${leftPadding}px` : undefined,
 						}}
 						className={cn(
-							"outline-none border-none ring-2 ring-white/10 focus:ring-primary transition-colors",
+							"outline-none border-none ring-2 ring-border focus:ring-primary transition-colors",
 							// Error state
 							hasError && "border-destructive focus-visible:ring-destructive/30",
 							// Only apply class-based padding if no inline label (for leftIcon)

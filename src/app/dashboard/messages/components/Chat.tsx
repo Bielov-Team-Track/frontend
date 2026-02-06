@@ -16,7 +16,7 @@ const Chat = ({ chat, active, onClick }: ChatProps) => {
 			className={`flex items-center gap-4 p-4 mx-2 my-1 rounded-xl cursor-pointer transition-all border border-transparent ${
 				active
 					? "bg-accent/10 border-accent/20"
-					: "hover:bg-white/5 hover:border-white/5"
+					: "hover:bg-hover hover:border-border"
 			}`}>
 			{chat.imageUrl ? (
 				<Image
@@ -30,8 +30,8 @@ const Chat = ({ chat, active, onClick }: ChatProps) => {
 				<div
 					className={`w-12 h-12 rounded-full flex items-center justify-center ${
 						active
-							? "bg-accent text-white shadow-lg shadow-accent/20"
-							: "bg-white/5 text-muted"
+							? "bg-accent text-foreground shadow-lg shadow-accent/20"
+							: "bg-surface text-muted"
 					}`}>
 					<MessageCircle size={20} />
 				</div>
@@ -40,7 +40,7 @@ const Chat = ({ chat, active, onClick }: ChatProps) => {
 				<div className="flex justify-between items-center gap-1">
 					<span
 						className={`text-sm font-semibold truncate ${
-							active ? "text-white" : "text-gray-200"
+							active ? "text-foreground" : "text-foreground"
 						}`}>
 						{chat.title}
 					</span>
@@ -59,14 +59,14 @@ const Chat = ({ chat, active, onClick }: ChatProps) => {
 					className={clsx(
 						"text-xs text-ellipsis overflow-hidden whitespace-nowrap",
 						chat.unreadCount > 0
-							? "text-white font-medium"
+							? "text-foreground font-medium"
 							: "text-muted"
 					)}>
 					{chat.lastMessage?.content || "No messages yet"}
 				</span>
 			</div>
 			{chat.unreadCount > 0 && (
-				<div className="min-w-5 h-5 px-1.5 flex items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white shadow-xs">
+				<div className="min-w-5 h-5 px-1.5 flex items-center justify-center rounded-full bg-accent text-[10px] font-bold text-foreground shadow-xs">
 					{chat.unreadCount}
 				</div>
 			)}

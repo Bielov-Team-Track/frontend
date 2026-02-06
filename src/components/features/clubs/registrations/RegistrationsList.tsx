@@ -1,15 +1,15 @@
 "use client";
 
 import { Dropdown, Input, Spinner } from "@/components/ui";
-import { ClubRegistrationDto, RegistrationStatus } from "@/lib/models/Club";
+import { ClubRegistration, RegistrationStatus } from "@/lib/models/Club";
 import { formatDistanceToNow } from "date-fns";
 import { CheckCircle, Clock, Filter, Search, Users, XCircle } from "lucide-react";
 import { useState } from "react";
 
 type Props = {
-	registrations: ClubRegistrationDto[];
+	registrations: ClubRegistration[];
 	isLoading: boolean;
-	onViewDetails: (registration: ClubRegistrationDto) => void;
+	onViewDetails: (registration: ClubRegistration) => void;
 };
 
 const statusConfig: Record<RegistrationStatus, { label: string; icon: React.ReactNode; color: string }> = {
@@ -77,7 +77,7 @@ export const RegistrationsList = ({ registrations, isLoading, onViewDetails }: P
 						return (
 							<div
 								key={registration.id}
-								className="p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors cursor-pointer"
+								className="p-4 bg-surface rounded-xl border border-border hover:bg-hover transition-colors cursor-pointer"
 								onClick={() => onViewDetails(registration)}>
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-3">

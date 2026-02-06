@@ -23,7 +23,7 @@ export default function PollOption({ option, isSelected, canVote, canSeeResults,
 			disabled={!canVote}
 			className={cn(
 				"relative w-full text-left rounded-xl border transition-all overflow-hidden",
-				isSelected ? "border-primary bg-primary/10" : "border-border bg-surface hover:border-white/20",
+				isSelected ? "border-primary bg-primary/10" : "border-border bg-surface hover:border-border",
 				!canVote && "cursor-default"
 			)}>
 			{/* Progress bar background */}
@@ -36,7 +36,7 @@ export default function PollOption({ option, isSelected, canVote, canSeeResults,
 						className={cn(
 							"w-5 h-5 shrink-0 border-2 flex items-center justify-center transition-colors",
 							allowMultiple ? "rounded" : "rounded-full",
-							isSelected ? "border-primary bg-primary" : "border-white/30"
+							isSelected ? "border-primary bg-primary" : "border-border"
 						)}>
 						{isSelected && <Check size={12} className="text-white" />}
 					</div>

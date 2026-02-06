@@ -124,7 +124,7 @@ export default function TrainingEditMode({ timeline, setTimeline, eventDuration,
 				{/* Left: Drill Library */}
 				<div className="lg:col-span-4 space-y-6">
 					{/* Skill Filter */}
-					<div className="rounded-2xl bg-white/5 border border-white/10 p-5">
+					<div className="rounded-2xl bg-surface border border-border p-5">
 						<SkillFilter selectedSkills={selectedSkills} onSelectedSkillsChange={setSelectedSkills} />
 						{selectedSkills.length > 0 && (
 							<button
@@ -136,8 +136,8 @@ export default function TrainingEditMode({ timeline, setTimeline, eventDuration,
 					</div>
 
 					{/* Drill List */}
-					<div className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex flex-col max-h-[600px]">
-						<div className="p-4 border-b border-white/10">
+					<div className="rounded-2xl bg-surface border border-border overflow-hidden flex flex-col max-h-[600px]">
+						<div className="p-4 border-b border-border">
 							<h3 className="font-bold text-white">Drill Library</h3>
 							<p className="text-xs text-muted mt-1">{filteredDrills.length} drills available</p>
 						</div>
@@ -174,7 +174,7 @@ export default function TrainingEditMode({ timeline, setTimeline, eventDuration,
 
 					{/* Timeline */}
 					{timeline.length === 0 ? (
-						<div className="rounded-2xl bg-white/5 border border-white/10 p-12">
+						<div className="rounded-2xl bg-surface border border-border p-12">
 							<EmptyState
 								icon={Dumbbell}
 								title="Your timeline is empty"
@@ -278,7 +278,7 @@ function TimeBudgetCard({
 	const isOver = remainingTime < 0;
 
 	return (
-		<div className="rounded-2xl bg-white/5 border border-white/10 p-6 relative overflow-hidden">
+		<div className="rounded-2xl bg-surface border border-border p-6 relative overflow-hidden">
 			<div
 				className={`absolute bottom-0 left-0 h-1 transition-all duration-500 ${isOver ? "bg-error" : "bg-accent"}`}
 				style={{ width: `${progressPercent}%` }}
@@ -328,7 +328,7 @@ function TimelineList({
 	onRemove: (instanceId: string) => void;
 }) {
 	return (
-		<div className="relative pl-6 border-l-2 border-white/10 space-y-4 min-h-[200px]">
+		<div className="relative pl-6 border-l-2 border-border space-y-4 min-h-[200px]">
 			{/* Start node */}
 			<div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-accent border-4 border-background" />
 
@@ -343,7 +343,7 @@ function TimelineList({
 
 						<div
 							onClick={() => onDrillClick(item)}
-							className="group ml-4 rounded-xl bg-white/5 border border-white/10 p-4 hover:border-accent/50 transition-all cursor-pointer">
+							className="group ml-4 rounded-xl bg-surface border border-border p-4 hover:border-accent/50 transition-all cursor-pointer">
 							<div className="flex items-start gap-4">
 								<GripVertical size={18} className="text-muted/50 mt-1 cursor-grab" />
 
@@ -358,7 +358,7 @@ function TimelineList({
 										<span className="flex items-center gap-1">
 											<Clock size={14} /> {item.duration} mins
 										</span>
-										<Badge size="xs" color={CATEGORY_COLORS[item.category].color} variant="soft">
+										<Badge size="xs" color={CATEGORY_COLORS[item.category].color} variant="ghost">
 											{item.category}
 										</Badge>
 									</div>

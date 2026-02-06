@@ -97,9 +97,9 @@ export function BrandingStep({ form }: WizardStepProps<ClubFormData>) {
 					{bannerPreview ? (
 						<>
 							<img src={bannerPreview} alt="Banner Preview" className="w-full h-full object-cover" />
-							<div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+							<div className="absolute inset-0 bg-overlay flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
 								<div className="flex gap-2">
-									<label className="cursor-pointer px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-lg text-white">
+									<label className="cursor-pointer px-3 py-1.5 text-sm bg-surface hover:bg-hover rounded-lg text-white">
 										Change
 										<input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileSelect(e, "banner")} />
 									</label>
@@ -141,7 +141,7 @@ export function BrandingStep({ form }: WizardStepProps<ClubFormData>) {
 						{logoPreview ? (
 							<>
 								<img src={logoPreview} alt="Logo Preview" className="w-full h-full object-cover" />
-								<div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+								<div className="absolute inset-0 bg-overlay flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
 									<label className="cursor-pointer text-xs font-medium text-white hover:underline">
 										Change
 										<input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileSelect(e, "logo")} />

@@ -512,7 +512,7 @@ export function useCanEditTemplate(template: TrainingPlanTemplateDetail | undefi
 
         // If template belongs to a club, check if user has edit permissions
         if (template.clubId && membership) {
-            if (membership.isActive && TEMPLATE_EDIT_ROLES.includes(membership.role)) {
+            if (membership.isActive && membership.roles.some(role => TEMPLATE_EDIT_ROLES.includes(role))) {
                 return true;
             }
         }

@@ -173,7 +173,7 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 				<div className="flex items-center gap-3">
 					{userProfile && <Avatar name={userProfile.name + " " + userProfile.surname} src={userProfile.imageUrl} variant="user" />}
 					<div>
-						<p className="text-sm font-medium text-white">
+						<p className="text-sm font-medium text-foreground">
 							{userProfile?.name} {userProfile?.surname}
 						</p>
 						<p className="text-xs text-muted-foreground">Posting to {contextName}</p>
@@ -183,8 +183,8 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 				{/* Editor with drag & drop */}
 				<div
 					className={cn(
-						"rounded-xl border bg-white/3 overflow-hidden transition-colors",
-						isDragOver ? "border-primary bg-primary/5" : "border-white/10"
+						"rounded-xl border bg-surface overflow-hidden transition-colors",
+						isDragOver ? "border-primary bg-primary/5" : "border-border"
 					)}
 					onDragOver={handleDragOver}
 					onDragLeave={handleDragLeave}
@@ -201,7 +201,7 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 
 					{/* Attachments row - above toolbar */}
 					{hasAttachments && (
-						<div className="px-3 py-2 border-t border-white/5">
+						<div className="px-3 py-2 border-t border-border">
 							<AttachmentsUploader
 								attachments={attachments}
 								onAttachmentsChange={setAttachments}
@@ -215,7 +215,7 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 					)}
 
 					{/* Toolbar row */}
-					<div className={cn("flex items-center justify-between px-3 py-2 bg-white/2", !hasAttachments && "border-t border-white/5")}>
+					<div className={cn("flex items-center justify-between px-3 py-2 bg-surface", !hasAttachments && "border-t border-border")}>
 						{/* Left: Actions */}
 						<div className="flex items-center gap-1">
 							<button
@@ -224,7 +224,7 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 								onClick={() => setShowEmojiPicker(!showEmojiPicker)}
 								className={cn(
 									"p-2 rounded-lg transition-colors",
-									showEmojiPicker ? "text-white bg-white/10" : "text-muted hover:text-white hover:bg-white/10"
+									showEmojiPicker ? "text-foreground bg-foreground/10" : "text-muted hover:text-foreground hover:bg-foreground/10"
 								)}
 								title="Add emoji">
 								<Smile size={18} />
@@ -232,7 +232,7 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 							<button
 								type="button"
 								onClick={handleAttachClick}
-								className="p-2 rounded-lg transition-colors text-muted hover:text-white hover:bg-white/10"
+								className="p-2 rounded-lg transition-colors text-muted hover:text-foreground hover:bg-foreground/10"
 								title="Attach files">
 								<Paperclip size={18} />
 							</button>
@@ -242,7 +242,7 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 								disabled={poll !== null}
 								className={cn(
 									"p-2 rounded-lg transition-colors",
-									showPollCreator || poll ? "text-primary bg-primary/20" : "text-muted hover:text-white hover:bg-white/10",
+									showPollCreator || poll ? "text-primary bg-primary/20" : "text-muted hover:text-foreground hover:bg-foreground/10",
 									"disabled:opacity-50"
 								)}
 								title="Add poll">
@@ -253,7 +253,7 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 								onClick={() => setIsPinned(!isPinned)}
 								className={cn(
 									"p-2 rounded-lg transition-colors",
-									isPinned ? "text-primary bg-primary/20" : "text-muted hover:text-white hover:bg-white/10"
+									isPinned ? "text-primary bg-primary/20" : "text-muted hover:text-foreground hover:bg-foreground/10"
 								)}
 								title="Pin post">
 								<Pin size={18} />
@@ -290,7 +290,7 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 								Remove
 							</button>
 						</div>
-						<p className="text-sm text-white">{poll.question}</p>
+						<p className="text-sm text-foreground">{poll.question}</p>
 						<p className="text-xs text-muted-foreground mt-1">{poll.options.length} options</p>
 					</div>
 				)}

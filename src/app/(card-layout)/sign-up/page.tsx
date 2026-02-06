@@ -66,7 +66,7 @@ function SignUpPage() {
 	return (
 		<>
 			{" "}
-			{isLoading && <Loader className="bg-black/55 absolute inset-0 rounded-md" />}
+			{isLoading && <Loader className="bg-overlay absolute inset-0 rounded-md" />}
 			<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
 				<h1 className="text-5xl font-bold text-accent self-center mb-4">Spike</h1>
 				<div>

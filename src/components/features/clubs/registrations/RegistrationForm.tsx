@@ -86,7 +86,7 @@ export const RegistrationForm = ({
 				/>
 
 				{formTemplate && formTemplate.fields.length > 0 && (
-					<div className="p-6 bg-white/5 rounded-xl border border-white/10">
+					<div className="p-6 bg-surface rounded-xl border border-border">
 						<h3 className="text-lg font-medium text-white mb-4">Registration Questions</h3>
 						<FormRenderer fields={formTemplate.fields} />
 					</div>

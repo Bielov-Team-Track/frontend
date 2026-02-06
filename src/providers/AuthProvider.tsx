@@ -28,12 +28,16 @@ const getCookie = (name: string): string | null => {
 
 const setCookie = (name: string, value: string, maxAge: number): void => {
 	if (typeof window === "undefined") return;
-	document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Strict`;
+	const isSecure = window.location.protocol === "https:";
+	const secureFlag = isSecure ? "; Secure" : "";
+	document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
 };
 
 const deleteCookie = (name: string): void => {
 	if (typeof window === "undefined") return;
-	document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+	const isSecure = window.location.protocol === "https:";
+	const secureFlag = isSecure ? "; Secure" : "";
+	document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax${secureFlag}`;
 };
 
 // Parse JWT to get expiration time

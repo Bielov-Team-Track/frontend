@@ -70,7 +70,7 @@ export async function deleteTemplate(id: string): Promise<void> {
  */
 export async function loadMyTemplates(filter?: TemplateFilterRequest): Promise<TemplateListResponse> {
     const endpoint = "/v1/me/templates";
-    const params = getParamsFromObject(filter);
+    const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
     const response = await client.get<TemplateListResponse>(PREFIX + endpoint, { params });
     return response.data;
 }
@@ -80,7 +80,7 @@ export async function loadMyTemplates(filter?: TemplateFilterRequest): Promise<T
  */
 export async function loadClubTemplates(clubId: string, filter?: TemplateFilterRequest): Promise<TemplateListResponse> {
     const endpoint = `/v1/clubs/${clubId}/templates`;
-    const params = getParamsFromObject(filter);
+    const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
     const response = await client.get<TemplateListResponse>(PREFIX + endpoint, { params });
     return response.data;
 }
@@ -90,7 +90,7 @@ export async function loadClubTemplates(clubId: string, filter?: TemplateFilterR
  */
 export async function loadPublicTemplates(filter?: TemplateFilterRequest): Promise<TemplateListResponse> {
     const endpoint = "/v1/templates";
-    const params = getParamsFromObject(filter);
+    const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
     const response = await client.get<TemplateListResponse>(PREFIX + endpoint, { params });
     return response.data;
 }
@@ -100,7 +100,7 @@ export async function loadPublicTemplates(filter?: TemplateFilterRequest): Promi
  */
 export async function loadBookmarkedTemplates(filter?: TemplateFilterRequest): Promise<TemplateListResponse> {
     const endpoint = "/v1/me/templates/bookmarks";
-    const params = getParamsFromObject(filter);
+    const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
     const response = await client.get<TemplateListResponse>(PREFIX + endpoint, { params });
     return response.data;
 }

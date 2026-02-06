@@ -6,5 +6,5 @@ import { useTeamContext } from "../layout";
 export default function TeamPostsPage() {
 	const { team, teamId } = useTeamContext();
 
-	return <PostFeed contextType="team" contextId={teamId} contextName={team?.name} />;
+	return <PostFeed contextType="team" contextId={teamId} contextName={team?.name || ""} />;
 }

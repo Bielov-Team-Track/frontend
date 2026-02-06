@@ -77,17 +77,17 @@ export function TeamSlotCard({ label, slot, onChange, disabled }: TeamSlotCardPr
 		<div
 			className={cn(
 				"rounded-xl border transition-all",
-				slot ? "bg-white/5 border-white/20" : "bg-white/5 border-white/10",
+				slot ? "bg-surface border-border/50" : "bg-surface border-border",
 				disabled && "opacity-50 pointer-events-none"
 			)}>
 			{/* Header */}
-			<button type="button" onClick={() => setIsExpanded(!isExpanded)} className="w-full p-4 flex items-center justify-between text-left">
-				<div className="flex items-center gap-3">
-					{slot?.color && <div className="w-4 h-4 rounded-full border border-white/20" style={{ backgroundColor: slot.color }} />}
+			<button type="button" onClick={() => setIsExpanded(!isExpanded)} className="w-full p-3 sm:p-4 flex items-center justify-between text-left">
+				<div className="flex items-center gap-2 sm:gap-3">
+					{slot?.color && <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border border-border/50" style={{ backgroundColor: slot.color }} />}
 					<div>
-						<div className="text-sm font-medium text-white">{label}</div>
+						<div className="text-xs sm:text-sm font-medium text-foreground">{label}</div>
 						{slot?.team ? (
-							<div className="text-xs text-muted flex items-center gap-1.5 mt-0.5">
+							<div className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1 sm:gap-1.5 mt-0.5">
 								{slot.name}
 								{getStatusIcon()}
 								{getStatusText() && (
@@ -103,52 +103,52 @@ export function TeamSlotCard({ label, slot, onChange, disabled }: TeamSlotCardPr
 								)}
 							</div>
 						) : (
-							<div className="text-xs text-muted mt-0.5">Not selected</div>
+							<div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Not selected</div>
 						)}
 					</div>
 				</div>
-				<ChevronDown size={16} className={cn("text-muted transition-transform", isExpanded && "rotate-180")} />
+				<ChevronDown size={14} className={cn("text-muted-foreground transition-transform sm:w-4 sm:h-4", isExpanded && "rotate-180")} />
 			</button>
 
 			{/* Expanded Content */}
 			{isExpanded && (
-				<div className="px-4 pb-4 space-y-3 border-t border-white/10 pt-3">
+				<div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-2.5 sm:space-y-3 border-t border-border pt-2.5 sm:pt-3">
 					{/* Mode Selection */}
-					<div className="grid grid-cols-3 gap-2">
+					<div className="grid grid-cols-3 gap-1.5 sm:gap-2">
 						<button
 							type="button"
 							onClick={() => handleModeSelect("own")}
 							className={cn(
-								"p-2 rounded-lg text-xs font-medium transition-colors",
+								"p-1.5 sm:p-2 rounded-lg text-[10px] sm:text-xs font-medium transition-colors",
 								mode === "own"
 									? "bg-accent/20 text-accent border border-accent"
-									: "bg-white/5 text-muted border border-white/10 hover:bg-white/10"
+									: "bg-surface text-muted-foreground border border-border hover:bg-hover"
 							)}>
-							<Users size={14} className="mx-auto mb-1" />
+							<Users size={12} className="mx-auto mb-0.5 sm:mb-1 sm:w-3.5 sm:h-3.5" />
 							Your Team
 						</button>
 						<button
 							type="button"
 							onClick={() => handleModeSelect("invite")}
 							className={cn(
-								"p-2 rounded-lg text-xs font-medium transition-colors",
+								"p-1.5 sm:p-2 rounded-lg text-[10px] sm:text-xs font-medium transition-colors",
 								mode === "invite"
 									? "bg-accent/20 text-accent border border-accent"
-									: "bg-white/5 text-muted border border-white/10 hover:bg-white/10"
+									: "bg-surface text-muted-foreground border border-border hover:bg-hover"
 							)}>
-							<Users size={14} className="mx-auto mb-1" />
-							Invite Team
+							<Users size={12} className="mx-auto mb-0.5 sm:mb-1 sm:w-3.5 sm:h-3.5" />
+							Invite
 						</button>
 						<button
 							type="button"
 							onClick={() => handleModeSelect("manual")}
 							className={cn(
-								"p-2 rounded-lg text-xs font-medium transition-colors",
+								"p-1.5 sm:p-2 rounded-lg text-[10px] sm:text-xs font-medium transition-colors",
 								mode === "manual"
 									? "bg-accent/20 text-accent border border-accent"
-									: "bg-white/5 text-muted border border-white/10 hover:bg-white/10"
+									: "bg-surface text-muted-foreground border border-border hover:bg-hover"
 							)}>
-							<Mail size={14} className="mx-auto mb-1" />
+							<Mail size={12} className="mx-auto mb-0.5 sm:mb-1 sm:w-3.5 sm:h-3.5" />
 							Manual
 						</button>
 					</div>
@@ -178,7 +178,7 @@ export function TeamSlotCard({ label, slot, onChange, disabled }: TeamSlotCardPr
 								onChange(null);
 								setMode(null);
 							}}
-							className="w-full p-2 text-xs text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
+							className="w-full p-1.5 sm:p-2 text-[10px] sm:text-xs text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
 							Clear Selection
 						</button>
 					)}
@@ -202,11 +202,11 @@ function OwnTeamSelector({ selectedId, onSelect }: { selectedId?: string; onSele
 	const teams = clubs?.flatMap((c) => c.teams).filter(Boolean);
 
 	if (!teams || teams.length === 0) {
-		return <div className="p-4 text-center text-muted text-sm">You don't have any teams yet.</div>;
+		return <div className="p-3 sm:p-4 text-center text-muted-foreground text-xs sm:text-sm">You don't have any teams yet.</div>;
 	}
 
 	return (
-		<div className="space-y-2 max-h-48 overflow-y-auto">
+		<div className="space-y-1.5 sm:space-y-2 max-h-40 sm:max-h-48 overflow-y-auto">
 			{teams.map(
 				(team) =>
 					team && (
@@ -215,15 +215,15 @@ function OwnTeamSelector({ selectedId, onSelect }: { selectedId?: string; onSele
 							type="button"
 							onClick={() => onSelect(team)}
 							className={cn(
-								"w-full p-3 rounded-lg text-left transition-colors flex items-center gap-3",
-								selectedId === team.id ? "bg-accent/20 border border-accent" : "bg-white/5 border border-white/10 hover:bg-white/10"
+								"w-full p-2 sm:p-3 rounded-lg text-left transition-colors flex items-center gap-2 sm:gap-3",
+								selectedId === team.id ? "bg-accent/20 border border-accent" : "bg-surface border border-border hover:bg-hover"
 							)}>
 							<Avatar variant="team" size="sm" name={team?.name} color={team?.color} />
-							<div>
-								<div className="text-sm font-medium text-white">{team.name}</div>
-								<div className="text-xs text-muted">{team.club?.name}</div>
+							<div className="min-w-0 flex-1">
+								<div className="text-xs sm:text-sm font-medium text-foreground truncate">{team.name}</div>
+								<div className="text-[10px] sm:text-xs text-muted-foreground truncate">{team.club?.name}</div>
 							</div>
-							{selectedId === team.id && <Check size={14} className="ml-auto text-accent" />}
+							{selectedId === team.id && <Check size={12} className="ml-auto text-accent shrink-0 sm:w-3.5 sm:h-3.5" />}
 						</button>
 					)
 			)}
@@ -234,10 +234,10 @@ function OwnTeamSelector({ selectedId, onSelect }: { selectedId?: string; onSele
 function InviteTeamSelector({ onInvite }: { onInvite: (teamId: string, teamName: string) => void }) {
 	// TODO: Implement team search - for now show placeholder
 	return (
-		<div className="p-4 text-center text-muted text-sm border-2 border-dashed border-white/20 rounded-lg">
+		<div className="p-3 sm:p-4 text-center text-muted-foreground text-xs sm:text-sm border-2 border-dashed border-border/50 rounded-lg">
 			Team search coming soon...
 			<br />
-			<span className="text-xs">Search for clubs and teams to invite</span>
+			<span className="text-[10px] sm:text-xs">Search for clubs and teams to invite</span>
 		</div>
 	);
 }
@@ -254,33 +254,33 @@ function ManualTeamEntry({ onSubmit }: { onSubmit: (name: string, email: string,
 	};
 
 	return (
-		<div className="space-y-3">
+		<div className="space-y-2 sm:space-y-3">
 			<input
 				type="text"
 				placeholder="Team name"
 				value={name}
 				onChange={(e) => setName(e.target.value)}
-				className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-muted focus:outline-none focus:border-accent"
+				className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 bg-surface border border-border rounded-lg text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-accent"
 			/>
 			<input
 				type="email"
 				placeholder="Contact email"
 				value={email}
 				onChange={(e) => setEmail(e.target.value)}
-				className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-muted focus:outline-none focus:border-accent"
+				className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 bg-surface border border-border rounded-lg text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-accent"
 			/>
-			<div className="flex items-center gap-2">
-				<Palette size={14} className="text-muted" />
-				<input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
-				<span className="text-xs text-muted">Team color</span>
+			<div className="flex items-center gap-1.5 sm:gap-2">
+				<Palette size={12} className="text-muted-foreground sm:w-3.5 sm:h-3.5" />
+				<input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-6 h-6 sm:w-8 sm:h-8 rounded cursor-pointer" />
+				<span className="text-[10px] sm:text-xs text-muted-foreground">Team color</span>
 			</div>
 			<button
 				type="button"
 				onClick={handleSubmit}
 				disabled={!name || !email}
 				className={cn(
-					"w-full p-2 rounded-lg text-sm font-medium transition-colors",
-					name && email ? "bg-accent hover:bg-accent/90 text-white" : "bg-white/10 text-muted cursor-not-allowed"
+					"w-full p-1.5 sm:p-2 rounded-lg text-xs sm:text-sm font-medium transition-colors",
+					name && email ? "bg-accent hover:bg-accent/90 text-white" : "bg-foreground/10 text-muted-foreground cursor-not-allowed"
 				)}>
 				Add Team
 			</button>

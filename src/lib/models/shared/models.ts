@@ -1,4 +1,4 @@
-export type ContextType = "club" | "group" | "team" | "event";
+export type ContextType = "club" | "group" | "team" | "event" | "None" | "Club" | "Group" | "Team" | "Event";
 
 // Shared media types
 export type MediaType = "image" | "video" | "document" | "videoEmbed";

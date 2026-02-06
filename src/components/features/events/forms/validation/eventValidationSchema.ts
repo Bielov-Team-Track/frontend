@@ -147,6 +147,16 @@ export const eventValidationSchema = yup.object().shape({
 		.transform((v, o) => (o === "" ? null : v))
 		.min(1, "Must be at least 1")
 		.optional(),
+	teamsNumber: yup
+		.number()
+		.nullable()
+		.transform((v, o) => (o === "" ? null : v))
+		.min(1, "Must be at least 1")
+		.when("eventFormat", {
+			is: (eventFormat: EventFormat) => eventFormat !== EventFormat.List,
+			then: (schema) => schema.required("Number of teams is required"),
+			otherwise: (schema) => schema.optional(),
+		}),
 	usePayments: yup.boolean().default(false),
 	paymentsConfig: yup
 		.object()
@@ -252,6 +262,61 @@ export const eventValidationSchema = yup.object().shape({
 		.default(undefined),
 	description: yup.string().optional(),
 	payToEnter: yup.boolean().required("Pay to enter is required").default(false),
+	// Budget management fields (used by EventBudgetStep)
+	useBudget: yup.boolean().default(false),
+	budget: yup
+		.object()
+		.shape({
+			paymentMethods: yup
+				.array()
+				.of(
+					yup
+						.mixed<PaymentMethod>()
+						.oneOf(Object.values(PaymentMethod) as PaymentMethod[])
+						.required(),
+				)
+				.optional(),
+			pricingModel: yup
+				.mixed<PricingModel>()
+				.oneOf(Object.values(PricingModel) as PricingModel[])
+				.test("required-when-budget-enabled", "Pricing model is required", function (value) {
+					const root = this.from?.[1]?.value;
+					if (root?.useBudget && !value) {
+						return false;
+					}
+					return true;
+				}),
+			cost: yup
+				.number()
+				.transform((v, o) => (o === "" ? 0 : v))
+				.test("required-when-budget-enabled", "Cost is required", function (value) {
+					const root = this.from?.[1]?.value;
+					if (root?.useBudget && (!value || value < 1)) {
+						return this.createError({ message: "Cost must be at least 1" });
+					}
+					return true;
+				}),
+			payToJoin: yup.boolean().optional().default(false),
+			minUnitsForBudget: yup
+				.number()
+				.min(1, "Must be at least 1")
+				.optional()
+				.nullable()
+				.transform((v, o) => (o === "" ? null : v)),
+			dropoutDeadlineHours: yup
+				.number()
+				.min(0, "Cannot be negative")
+				.optional()
+				.nullable()
+				.transform((v, o) => (o === "" ? null : v)),
+			paymentReminderDaysBefore: yup
+				.number()
+				.min(0, "Cannot be negative")
+				.optional()
+				.nullable()
+				.transform((v, o) => (o === "" ? null : v)),
+		})
+		.default(undefined),
 });
 
 export type EventFormData = yup.InferType<typeof eventValidationSchema>;

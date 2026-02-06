@@ -180,11 +180,11 @@ function ColorPicker({
 				className={cn("fixed z-50 rounded-xl overflow-hidden", "bg-surface border border-border shadow-2xl", "transition-opacity duration-150")}>
 				{/* Header */}
 				<div className="flex items-center justify-between px-4 py-3 border-b border-border">
-					<span className="text-sm font-medium text-white">Custom Color</span>
+					<span className="text-sm font-medium text-foreground">Custom Color</span>
 					<button
 						type="button"
 						onClick={() => setIsPopoverOpen(false)}
-						className="p-1 -mr-1 rounded-md hover:bg-active text-muted-foreground hover:text-white transition-colors"
+						className="p-1 -mr-1 rounded-md hover:bg-active text-muted-foreground hover:text-foreground transition-colors"
 						aria-label="Close">
 						<X size={16} />
 					</button>
@@ -203,7 +203,7 @@ function ColorPicker({
 							prefixed={false}
 							className={cn(
 								"flex-1 px-3 py-2 rounded-lg text-sm font-mono uppercase",
-								"bg-hover border border-border text-white",
+								"bg-hover border border-border text-foreground",
 								"focus:outline-none focus:border-primary"
 							)}
 						/>
@@ -212,7 +212,7 @@ function ColorPicker({
 					{/* Preview & Apply */}
 					<div className="flex items-center gap-3">
 						<div
-							className="w-10 h-10 rounded-lg border border-white/20"
+							className="w-10 h-10 rounded-lg border border-border"
 							style={{ backgroundColor: customColor }}
 							aria-label={`Preview: ${customColor}`}
 						/>
@@ -255,7 +255,7 @@ function ColorPicker({
 						className={cn(
 							"w-8 h-8 rounded-lg transition-all flex items-center justify-center",
 							"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-							value === color ? "ring-2 ring-white ring-offset-2 ring-offset-background scale-110" : "hover:scale-105",
+							value === color ? "ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110" : "hover:scale-105",
 							disabled && "opacity-50 cursor-not-allowed"
 						)}
 						style={{ backgroundColor: color }}>
@@ -275,7 +275,7 @@ function ColorPicker({
 						className={cn(
 							"w-8 h-8 rounded-lg transition-all flex items-center justify-center",
 							"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-							"ring-2 ring-white ring-offset-2 ring-offset-background scale-110",
+							"ring-2 ring-foreground ring-offset-2 ring-offset-background scale-110",
 							disabled && "opacity-50 cursor-not-allowed"
 						)}
 						style={{ backgroundColor: value }}>
@@ -295,7 +295,7 @@ function ColorPicker({
 						onClick={() => setIsPopoverOpen(!isPopoverOpen)}
 						className={cn(
 							"w-8 h-8 rounded-lg transition-all flex items-center justify-center",
-							"bg-active border-2 border-dashed border-white/30 hover:border-white/50",
+							"bg-active border-2 border-dashed border-border hover:border-border/80",
 							"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
 							"hover:scale-105",
 							disabled && "opacity-50 cursor-not-allowed"

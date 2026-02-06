@@ -69,7 +69,7 @@ const InvitationAcceptForm = ({ invitation, hasPlayerProfile, hasCoachProfile, o
 			/>
 
 			{invitation.formTemplate?.fields && invitation.formTemplate.fields.length > 0 && (
-				<div className="p-4 bg-white/5 rounded-xl border border-white/10">
+				<div className="p-4 bg-surface rounded-xl border border-border">
 					<h3 className="text-lg font-semibold text-white mb-4">{invitation.formTemplate.name}</h3>
 					<FormProvider {...methods}>
 						<FormRenderer fields={invitation.formTemplate.fields} />
@@ -78,13 +78,13 @@ const InvitationAcceptForm = ({ invitation, hasPlayerProfile, hasCoachProfile, o
 			)}
 
 			{showDeclineReason && (
-				<div className="p-4 bg-white/5 rounded-xl border border-white/10">
+				<div className="p-4 bg-surface rounded-xl border border-border">
 					<label className="text-sm font-medium text-white mb-2 block">Reason for declining (optional)</label>
 					<textarea
 						value={declineReason}
 						onChange={(e) => setDeclineReason(e.target.value)}
 						placeholder="Let them know why you're declining..."
-						className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-muted resize-none"
+						className="w-full p-3 bg-surface border border-border rounded-lg text-white placeholder:text-muted resize-none"
 						rows={3}
 					/>
 				</div>
@@ -92,19 +92,19 @@ const InvitationAcceptForm = ({ invitation, hasPlayerProfile, hasCoachProfile, o
 
 			<div className="flex flex-col sm:flex-row gap-3">
 				<Button
-					variant="solid"
+					variant="default"
 					color="primary"
 					onClick={handleAccept}
-					isLoading={isAccepting}
+					loading={isAccepting}
 					disabled={!requirementsComplete || isDeclining}
 					className="flex-1">
 					Join Club
 				</Button>
 				<Button
-					variant={showDeclineReason ? "solid" : "ghost"}
+					variant={showDeclineReason ? "default" : "ghost"}
 					color={showDeclineReason ? "error" : "neutral"}
 					onClick={handleDecline}
-					isLoading={isDeclining}
+					loading={isDeclining}
 					disabled={isAccepting}>
 					{showDeclineReason ? "Confirm Decline" : "Decline"}
 				</Button>

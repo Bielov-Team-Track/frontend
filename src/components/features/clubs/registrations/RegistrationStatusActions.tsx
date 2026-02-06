@@ -24,17 +24,17 @@ export const RegistrationStatusActions = ({ currentStatus, onStatusChange, isUpd
 	};
 
 	return (
-		<div className="p-4 bg-white/5 rounded-xl border border-white/10">
+		<div className="p-4 bg-surface rounded-xl border border-border">
 			<h3 className="text-lg font-medium text-white mb-4">Actions</h3>
 
 			<div className="flex flex-col gap-3">
 				<div className="flex gap-3">
 					<Button
-						variant="solid"
+						variant="default"
 						color="success"
 						onClick={() => onStatusChange(RegistrationStatus.Accepted)}
 						disabled={isUpdating}
-						isLoading={isUpdating}
+						loading={isUpdating}
 						leftIcon={<CheckCircle size={16} />}
 						className="flex-1">
 						Accept
@@ -70,12 +70,12 @@ export const RegistrationStatusActions = ({ currentStatus, onStatusChange, isUpd
 								Cancel
 							</Button>
 							<Button
-								variant="solid"
-								color="danger"
+								variant="default"
+								color="error"
 								size="sm"
 								onClick={() => onStatusChange(RegistrationStatus.Declined, declineNote || undefined)}
 								disabled={isUpdating}
-								isLoading={isUpdating}>
+								loading={isUpdating}>
 								Confirm Decline
 							</Button>
 						</div>

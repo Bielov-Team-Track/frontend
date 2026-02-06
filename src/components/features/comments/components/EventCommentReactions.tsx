@@ -44,7 +44,7 @@ export default function EventCommentReactions({
 						"flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs transition-colors",
 						reaction.hasReacted
 							? "bg-primary/20 text-primary border border-primary/30"
-							: "bg-white/5 text-muted-foreground hover:bg-white/10"
+							: "bg-surface text-muted-foreground hover:bg-hover"
 					)}>
 					<span>{reaction.emoji}</span>
 					<span>{reaction.count}</span>
@@ -55,7 +55,7 @@ export default function EventCommentReactions({
 			<div className="relative">
 				<button
 					onClick={() => setShowPicker(!showPicker)}
-					className="p-1 rounded-full text-muted-foreground hover:text-white hover:bg-white/10 transition-colors">
+					className="p-1 rounded-full text-muted-foreground hover:text-white hover:bg-hover transition-colors">
 					<Smile size={14} />
 				</button>
 
@@ -63,12 +63,12 @@ export default function EventCommentReactions({
 				{showPicker && (
 					<>
 						<div className="fixed inset-0 z-10" onClick={() => setShowPicker(false)} />
-						<div className="absolute bottom-full left-0 mb-2 z-20 bg-raised/95 backdrop-blur-lg border border-white/10 rounded-lg shadow-xl p-2 flex gap-1">
+						<div className="absolute bottom-full left-0 mb-2 z-20 bg-raised/95 backdrop-blur-lg border border-border rounded-lg shadow-xl p-2 flex gap-1">
 							{REACTION_EMOJIS.map((emoji) => (
 								<button
 									key={emoji}
 									onClick={() => handleToggleReaction(emoji)}
-									className="p-1.5 rounded hover:bg-white/10 transition-colors text-lg">
+									className="p-1.5 rounded hover:bg-hover transition-colors text-lg">
 									{emoji}
 								</button>
 							))}

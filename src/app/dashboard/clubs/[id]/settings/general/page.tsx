@@ -1,13 +1,13 @@
 "use client";
 
 import SocialLinksEditor from "@/components/features/clubs/settings/SocialLinksEditor";
-import { VenueForm, VenueFormData } from "@/components/features/venues";
+import { VenueForm, VenueFormData, VenueList } from "@/components/features/venues";
 import { SettingsAlert, SettingsCard, SettingsHeader } from "@/components/layout/settings-layout";
 import { Button, EmptyState, ImageCropper, Input, Loader, Modal, TextArea } from "@/components/ui";
 import { createVenue, deleteVenue, getClub, updateClub, updateClubSocialLinks, uploadClubImage } from "@/lib/api/clubs";
-import { SocialPlatform, Venue } from "@/lib/models/Club";
+import { SocialPlatform } from "@/lib/models/Club";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Building, Camera, ImageIcon, MapPin, Plus, Shield, Trash2 } from "lucide-react";
+import { Building, Camera, ImageIcon, Plus, Shield } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -194,21 +194,21 @@ export default function ClubGeneralSettingsPage() {
 
 			{/* Branding Section */}
 			<SettingsCard title="Club Branding">
-				<div className="rounded-xl overflow-hidden border border-white/10">
+				<div className="rounded-xl overflow-hidden border border-border">
 					{/* Banner */}
 					<div className="relative h-32 bg-linear-to-r from-accent/20 to-primary/20 group">
 						{currentBannerPreview ? (
 							<img src={currentBannerPreview} alt="Club banner" className="w-full h-full object-cover" />
 						) : (
 							<div className="w-full h-full flex items-center justify-center">
-								<ImageIcon className="text-white/20" size={32} />
+								<ImageIcon className="text-muted" size={32} />
 							</div>
 						)}
-						<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+						<div className="absolute inset-0 bg-overlay-light opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 							<button
 								type="button"
 								onClick={() => bannerInputRef.current?.click()}
-								className="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm flex items-center gap-2">
+								className="px-3 py-1.5 rounded-lg bg-hover hover:bg-surface text-white text-sm flex items-center gap-2">
 								<Camera size={14} />
 								Change Banner
 							</button>
@@ -226,11 +226,11 @@ export default function ClubGeneralSettingsPage() {
 									<Shield className="text-muted" size={24} />
 								</div>
 							)}
-							<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+							<div className="absolute inset-0 bg-overlay-light opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 								<button
 									type="button"
 									onClick={() => logoInputRef.current?.click()}
-									className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white">
+									className="p-2 rounded-full bg-hover hover:bg-surface text-white">
 									<Camera size={12} />
 								</button>
 							</div>
@@ -260,26 +260,7 @@ export default function ClubGeneralSettingsPage() {
 					/>
 				) : (
 					<div className="space-y-4">
-						<ul className="space-y-2">
-							{club.venues.map((venue: Venue) => (
-								<li key={venue.id} className="flex items-start justify-between p-4 rounded-lg bg-white/5 border border-white/10">
-									<div className="flex items-start gap-3">
-										<MapPin size={18} className="text-muted mt-0.5 shrink-0" />
-										<div>
-											<p className="text-sm text-white font-medium">{venue.name}</p>
-											<p className="text-xs text-muted">{[venue.addressLine1, venue.city, venue.country].filter(Boolean).join(", ")}</p>
-										</div>
-									</div>
-									<button
-										type="button"
-										onClick={() => handleRemoveVenue(venue.id)}
-										disabled={deleteVenueMutation.isPending}
-										className="p-2 text-muted hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors disabled:opacity-50">
-										<Trash2 size={16} />
-									</button>
-								</li>
-							))}
-						</ul>
+						<VenueList venues={club.venues} onRemove={handleRemoveVenue} />
 						<Button type="button" variant="outline" onClick={() => setAddVenueModalOpen(true)} leftIcon={<Plus size={16} />} className="w-full">
 							Add Venue
 						</Button>
@@ -299,7 +280,7 @@ export default function ClubGeneralSettingsPage() {
 
 			{/* Visibility */}
 			<SettingsCard title="Visibility & Preferences">
-				<div className="flex items-center gap-3 p-4 rounded-xl bg-white/5">
+				<div className="flex items-center gap-3 p-4 rounded-xl bg-surface">
 					<input type="checkbox" {...register("isPublic")} className="checkbox checkbox-accent" />
 					<div>
 						<p className="text-sm font-medium text-white">Public Club</p>

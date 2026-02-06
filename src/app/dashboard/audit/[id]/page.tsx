@@ -90,7 +90,7 @@ function AuditPage({ params }: AuditPageProps) {
 
 	return (
 		<div className="p-4 flex flex-col gap-4">
-			{(event.eventFormat == EventFormat.Open || !event.eventFormat) && (
+			{(event.eventFormat == EventFormat.List || !event.eventFormat) && (
 				<>
 					<div className="text-2xl font-bold">Participants</div>
 					<AuditParticipantList

@@ -14,10 +14,10 @@ const Header = () => {
 				<h1 className="text-lg font-semibold text-accent">Spike</h1>
 
 				<nav className="hidden md:flex items-center space-x-6">
-					<Link href="/clubs" className="text-white/80 hover:text-accent transition-colors text-sm font-medium">
+					<Link href="/clubs" className="text-foreground/80 hover:text-accent transition-colors text-sm font-medium">
 						Clubs
 					</Link>
-					<Link href="/events" className="text-white/80 hover:text-accent transition-colors text-sm font-medium">
+					<Link href="/events" className="text-foreground/80 hover:text-accent transition-colors text-sm font-medium">
 						Events
 					</Link>
 				</nav>

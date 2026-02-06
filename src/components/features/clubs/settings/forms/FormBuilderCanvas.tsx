@@ -68,8 +68,8 @@ function SortableField({ field, index, isSelected, onSelect, onUpdate, onDelete 
 			ref={setNodeRef}
 			style={style}
 			className={cn(
-				"p-4 rounded-xl bg-white/5 border transition-colors cursor-pointer",
-				isSelected ? "border-accent" : "border-white/10 hover:border-white/20"
+				"p-4 rounded-xl bg-surface border transition-colors cursor-pointer",
+				isSelected ? "border-accent" : "border-border hover:border-border"
 			)}
 			onClick={onSelect}>
 			<div className="flex items-start gap-3">
@@ -129,7 +129,7 @@ export default function FormBuilderCanvas({
 	return (
 		<div className="flex-1 min-w-0 space-y-6">
 			{/* Form Header */}
-			<div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
+			<div className="p-4 rounded-xl bg-surface border border-border space-y-4">
 				<Input
 					label="Form Name"
 					value={formName}
@@ -168,7 +168,7 @@ export default function FormBuilderCanvas({
 					<div
 						className={cn(
 							"p-8 rounded-xl border-2 border-dashed text-center transition-colors",
-							isOver ? "border-accent bg-accent/10" : "border-white/20"
+							isOver ? "border-accent bg-accent/10" : "border-border"
 						)}>
 						<p className="text-muted">Drag fields here to build your form</p>
 					</div>
@@ -178,7 +178,7 @@ export default function FormBuilderCanvas({
 					<div
 						className={cn(
 							"p-4 rounded-xl border-2 border-dashed text-center transition-colors",
-							isOver ? "border-accent bg-accent/10" : "border-white/10"
+							isOver ? "border-accent bg-accent/10" : "border-border"
 						)}>
 						<p className="text-sm text-muted">Drop here to add field</p>
 					</div>

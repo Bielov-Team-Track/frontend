@@ -1,6 +1,7 @@
 "use client";
 
 import { Avatar, Button } from "@/components";
+import { BadgeDisplay } from "@/components/features/feedback/BadgeDisplay";
 import { getClubMembers, getGroupsByClub, getTeamsByClub } from "@/lib/api/clubs";
 import { getFullUserProfile } from "@/lib/api/user";
 import { Group, Team } from "@/lib/models/Club";
@@ -9,6 +10,12 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, Dumbbell, History, Layers, Mail, Medal, Trophy, User, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+
+// Helper to extract role strings from role objects or strings
+function extractRoleStrings(roles: any[] | undefined): string[] {
+	if (!roles) return [];
+	return roles.map((r) => (typeof r === "string" ? r : r?.role)).filter(Boolean);
+}
 
 interface Props {
 	clubId: string;
@@ -77,7 +84,7 @@ export default function ClubMemberDetailClient({ clubId, memberId, clubName }: P
 	return (
 		<div className="space-y-6">
 			{/* Header */}
-			<MemberHeader profile={profile} clubName={clubName} clubId={clubId} role={clubMember?.role} />
+			<MemberHeader profile={profile} clubName={clubName} clubId={clubId} roles={extractRoleStrings(clubMember?.roles)} />
 
 			{/* Banner Card */}
 			<MemberBannerCard
@@ -101,10 +108,10 @@ export default function ClubMemberDetailClient({ clubId, memberId, clubName }: P
 
 // Sub-components
 
-function MemberHeader({ profile, clubName, clubId, role }: { profile: FullProfileDto; clubName: string; clubId: string; role?: string }) {
+function MemberHeader({ profile, clubName, clubId, roles }: { profile: FullProfileDto; clubName: string; clubId: string; roles?: string[] }) {
 	return (
 		<div className="flex items-center gap-4">
-			<Link href={`/dashboard/clubs/${clubId}`} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+			<Link href={`/dashboard/clubs/${clubId}`} className="p-2 rounded-lg bg-surface hover:bg-hover transition-colors">
 				<ArrowLeft size={20} />
 			</Link>
 			<div className="flex-1">
@@ -112,7 +119,13 @@ function MemberHeader({ profile, clubName, clubId, role }: { profile: FullProfil
 					<h1 className="text-2xl font-bold text-white">
 						{profile.userProfile?.name} {profile.userProfile?.surname}
 					</h1>
-					{role && <span className="px-2 py-0.5 rounded text-xs font-medium bg-white/10 text-muted uppercase">{role}</span>}
+					{roles && roles.length > 0 && (
+						<div className="flex gap-1">
+							{roles.map((role) => (
+								<span key={role} className="px-2 py-0.5 rounded text-xs font-medium bg-hover text-muted uppercase">{role}</span>
+							))}
+						</div>
+					)}
 				</div>
 				<div className="flex items-center gap-2 text-sm text-muted">
 					<span>Member</span>
@@ -137,10 +150,10 @@ interface MemberBannerCardProps {
 
 function MemberBannerCard({ profile, clubMember, activeTab, onTabChange, teamsCount, groupsCount }: MemberBannerCardProps) {
 	return (
-		<div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+		<div className="rounded-2xl overflow-hidden border border-border bg-surface">
 			{/* Banner Area */}
 			<div className="h-32 relative bg-linear-to-r from-accent/20 to-primary/20">
-				<div className="absolute inset-0 bg-black/10" />
+				<div className="absolute inset-0 bg-overlay-light" />
 			</div>
 
 			{/* Info Row */}
@@ -184,7 +197,7 @@ function MemberBannerCard({ profile, clubMember, activeTab, onTabChange, teamsCo
 			</div>
 
 			{/* Tabs */}
-			<div className="border-t border-white/10 px-6">
+			<div className="border-t border-border px-6">
 				<div className="flex gap-1 overflow-x-auto no-scrollbar">
 					{TABS.map((tab) => {
 						const count = tab.showCount ? teamsCount + groupsCount : undefined;
@@ -197,7 +210,7 @@ function MemberBannerCard({ profile, clubMember, activeTab, onTabChange, teamsCo
 								}`}>
 								<tab.icon size={16} />
 								{tab.label}
-								{count !== undefined && count > 0 && <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-xs">{count}</span>}
+								{count !== undefined && count > 0 && <span className="px-1.5 py-0.5 rounded-full bg-hover text-xs">{count}</span>}
 								{activeTab === tab.id && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
 							</button>
 						);
@@ -219,7 +232,7 @@ function StatItem({ label, value }: { label: string; value: number | string }) {
 
 function InfoCard({ title, icon: Icon, children, className = "" }: { title: string; icon?: React.ElementType; children: React.ReactNode; className?: string }) {
 	return (
-		<div className={`rounded-xl bg-white/5 border border-white/10 p-6 ${className}`}>
+		<div className={`rounded-xl bg-surface border border-border p-6 ${className}`}>
 			<div className="flex items-center gap-3 mb-6">
 				{Icon && (
 					<div className="p-2 rounded-lg bg-accent/10 text-accent">
@@ -235,7 +248,7 @@ function InfoCard({ title, icon: Icon, children, className = "" }: { title: stri
 
 function StatRowItem({ label, value }: { label: string; value: string | React.ReactNode }) {
 	return (
-		<div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
+		<div className="p-4 rounded-xl bg-surface border border-border hover:border-border transition-colors">
 			<div className="text-xs text-muted mb-1 uppercase tracking-wide">{label}</div>
 			<div className="font-medium text-white text-lg">{value}</div>
 		</div>
@@ -245,61 +258,78 @@ function StatRowItem({ label, value }: { label: string; value: string | React.Re
 function OverviewTab({ profile }: { profile: FullProfileDto }) {
 	const { playerProfile, coachProfile } = profile;
 
+	// Mock badges for now - replace with actual data from API
+	const mockBadges = ["FirstEvent", "TeamPlayer", "Consistent"] as const;
+
 	return (
-		<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-			{playerProfile ? (
-				<InfoCard title="Player Profile" icon={Trophy}>
-					<div className="space-y-4">
-						<div className="grid grid-cols-2 gap-4">
-							<StatRowItem label="Position" value={getVolleyballPositionLabel(playerProfile.preferredPosition) || "Not set"} />
-							<StatRowItem label="Height" value={playerProfile.heightCm ? `${playerProfile.heightCm} cm` : "-"} />
-							<StatRowItem label="Dominant Hand" value={getDominantHandLabel(playerProfile.dominantHand)} />
-							<StatRowItem label="Vertical Jump" value={playerProfile.verticalJumpCm ? `${playerProfile.verticalJumpCm} cm` : "-"} />
-						</div>
-						<div className="mt-4 pt-4 border-t border-white/10">
-							<div className="text-sm text-muted mb-2">Highest Level Played</div>
-							<div className="inline-block px-3 py-1 rounded-full bg-accent/20 text-accent text-sm font-medium">
-								{getSkillLevelLabel(playerProfile.highestLevelPlayed)}
-							</div>
-						</div>
+		<div className="space-y-6">
+			{/* Badges Section */}
+			{mockBadges.length > 0 && (
+				<InfoCard title="Achievements" icon={Medal}>
+					<div className="flex flex-wrap gap-4">
+						{mockBadges.map((badgeType, index) => (
+							<BadgeDisplay key={index} badgeType={badgeType} size="md" />
+						))}
 					</div>
 				</InfoCard>
-			) : (
-				<div className="rounded-xl bg-white/5 border border-white/10 p-10 flex flex-col items-center justify-center text-center text-muted">
-					<Dumbbell size={48} className="mb-4 opacity-20" />
-					<p>No player profile available</p>
-				</div>
 			)}
 
-			{coachProfile ? (
-				<InfoCard title="Coach Profile" icon={Medal}>
-					<div className="space-y-4">
-						<div className="grid grid-cols-2 gap-4">
-							<StatRowItem label="Experience" value={coachProfile.yearsOfExperience ? `${coachProfile.yearsOfExperience} years` : "-"} />
-							<StatRowItem label="Highest Level" value={getSkillLevelLabel(coachProfile.highestLevelCoached)} />
-						</div>
-
-						{coachProfile.qualifications && coachProfile.qualifications.length > 0 && (
-							<div className="mt-4">
-								<div className="text-xs text-muted mb-2 uppercase tracking-wide">Qualifications</div>
-								<div className="space-y-2">
-									{coachProfile.qualifications.map((qual) => (
-										<div key={qual.id} className="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/5">
-											<span className="text-white font-medium">{qual.name}</span>
-											<span className="text-muted text-sm bg-white/10 px-2 py-0.5 rounded">{qual.year}</span>
-										</div>
-									))}
+			{/* Player and Coach Profiles */}
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				{playerProfile ? (
+					<InfoCard title="Player Profile" icon={Trophy}>
+						<div className="space-y-4">
+							<div className="grid grid-cols-2 gap-4">
+								<StatRowItem label="Position" value={getVolleyballPositionLabel(playerProfile.preferredPosition) || "Not set"} />
+								<StatRowItem label="Height" value={playerProfile.heightCm ? `${playerProfile.heightCm} cm` : "-"} />
+								<StatRowItem label="Dominant Hand" value={getDominantHandLabel(playerProfile.dominantHand)} />
+								<StatRowItem label="Vertical Jump" value={playerProfile.verticalJumpCm ? `${playerProfile.verticalJumpCm} cm` : "-"} />
+							</div>
+							<div className="mt-4 pt-4 border-t border-border">
+								<div className="text-sm text-muted mb-2">Highest Level Played</div>
+								<div className="inline-block px-3 py-1 rounded-full bg-accent/20 text-accent text-sm font-medium">
+									{getSkillLevelLabel(playerProfile.highestLevelPlayed)}
 								</div>
 							</div>
-						)}
+						</div>
+					</InfoCard>
+				) : (
+					<div className="rounded-xl bg-surface border border-border p-10 flex flex-col items-center justify-center text-center text-muted">
+						<Dumbbell size={48} className="mb-4 opacity-20" />
+						<p>No player profile available</p>
 					</div>
-				</InfoCard>
-			) : (
-				<div className="rounded-xl bg-white/5 border border-white/10 p-10 flex flex-col items-center justify-center text-center text-muted">
-					<Medal size={48} className="mb-4 opacity-20" />
-					<p>No coach profile available</p>
-				</div>
-			)}
+				)}
+
+				{coachProfile ? (
+					<InfoCard title="Coach Profile" icon={Medal}>
+						<div className="space-y-4">
+							<div className="grid grid-cols-2 gap-4">
+								<StatRowItem label="Experience" value={coachProfile.yearsOfExperience ? `${coachProfile.yearsOfExperience} years` : "-"} />
+								<StatRowItem label="Highest Level" value={getSkillLevelLabel(coachProfile.highestLevelCoached)} />
+							</div>
+
+							{coachProfile.qualifications && coachProfile.qualifications.length > 0 && (
+								<div className="mt-4">
+									<div className="text-xs text-muted mb-2 uppercase tracking-wide">Qualifications</div>
+									<div className="space-y-2">
+										{coachProfile.qualifications.map((qual) => (
+											<div key={qual.id} className="flex justify-between items-center p-3 rounded-lg bg-surface border border-border">
+												<span className="text-white font-medium">{qual.name}</span>
+												<span className="text-muted text-sm bg-hover px-2 py-0.5 rounded">{qual.year}</span>
+											</div>
+										))}
+									</div>
+								</div>
+							)}
+						</div>
+					</InfoCard>
+				) : (
+					<div className="rounded-xl bg-surface border border-border p-10 flex flex-col items-center justify-center text-center text-muted">
+						<Medal size={48} className="mb-4 opacity-20" />
+						<p>No coach profile available</p>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }
@@ -307,7 +337,7 @@ function OverviewTab({ profile }: { profile: FullProfileDto }) {
 function HistoryTab({ history }: { history: any[] }) {
 	if (history.length === 0) {
 		return (
-			<div className="text-center py-20 rounded-xl bg-white/5 border border-white/10">
+			<div className="text-center py-20 rounded-xl bg-surface border border-border">
 				<History className="w-16 h-16 text-muted mx-auto mb-4 opacity-50" />
 				<h3 className="text-lg font-bold text-white mb-2">No History Recorded</h3>
 				<p className="text-sm text-muted">This member hasn&apos;t added any volleyball career history yet.</p>
@@ -318,7 +348,7 @@ function HistoryTab({ history }: { history: any[] }) {
 	const sortedHistory = [...history].sort((a, b) => b.year - a.year);
 
 	return (
-		<div className="rounded-xl bg-white/5 border border-white/10 p-6 md:p-8">
+		<div className="rounded-xl bg-surface border border-border p-6 md:p-8">
 			<h3 className="text-lg font-bold text-white mb-8 flex items-center gap-2">
 				<History size={20} className="text-accent" />
 				Career Timeline
@@ -339,13 +369,13 @@ function HistoryTab({ history }: { history: any[] }) {
 						</div>
 
 						{/* Content Card */}
-						<div className="flex-1 p-5 rounded-xl bg-white/5 border border-white/5 hover:border-accent/30 hover:bg-white/10 transition-all">
+						<div className="flex-1 p-5 rounded-xl bg-surface border border-border hover:border-accent/30 hover:bg-hover transition-all">
 							<div className="flex items-start justify-between gap-4">
 								<div>
 									<h4 className="font-bold text-xl text-white mb-1">{entry.clubName}</h4>
 									{entry.teamName && <p className="text-white/80 font-medium mb-2">{entry.teamName}</p>}
 									<div className="flex flex-wrap gap-2 mt-3">
-										<span className="px-2.5 py-1 rounded-md text-xs font-medium bg-white/10 text-white/90 border border-white/5">
+										<span className="px-2.5 py-1 rounded-md text-xs font-medium bg-hover text-white/90 border border-border">
 											Role: {entry.role}
 										</span>
 										{entry.positions?.map((pos: any) => (
@@ -359,7 +389,7 @@ function HistoryTab({ history }: { history: any[] }) {
 								</div>
 								{entry.clubLogoUrl && (
 									// eslint-disable-next-line @next/next/no-img-element
-									<img src={entry.clubLogoUrl} alt={entry.clubName} className="w-16 h-16 rounded-lg object-contain bg-white/10 p-1" />
+									<img src={entry.clubLogoUrl} alt={entry.clubName} className="w-16 h-16 rounded-lg object-contain bg-hover p-1" />
 								)}
 							</div>
 						</div>
@@ -379,7 +409,7 @@ function TeamsGroupsTab({ teams, groups }: { teams: Team[]; groups: Group[] }) {
 					Teams ({teams.length})
 				</h3>
 				{teams.length === 0 ? (
-					<div className="p-8 rounded-xl bg-white/5 border border-white/10 text-center text-muted">
+					<div className="p-8 rounded-xl bg-surface border border-border text-center text-muted">
 						<p>Not a member of any team in this club.</p>
 					</div>
 				) : (
@@ -388,8 +418,8 @@ function TeamsGroupsTab({ teams, groups }: { teams: Team[]; groups: Group[] }) {
 							<Link
 								key={team.id}
 								href={`/dashboard/teams/${team.id}`}
-								className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:border-accent/50 hover:bg-white/10 transition-all flex items-center gap-4">
-								<div className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform">
+								className="group p-4 rounded-xl bg-surface border border-border hover:border-accent/50 hover:bg-hover transition-all flex items-center gap-4">
+								<div className="w-14 h-14 rounded-xl bg-surface flex items-center justify-center border border-border group-hover:scale-105 transition-transform">
 									{team.logoUrl ? (
 										// eslint-disable-next-line @next/next/no-img-element
 										<img src={team.logoUrl} alt="" className="w-full h-full object-cover rounded-xl" />
@@ -413,7 +443,7 @@ function TeamsGroupsTab({ teams, groups }: { teams: Team[]; groups: Group[] }) {
 					Groups ({groups.length})
 				</h3>
 				{groups.length === 0 ? (
-					<div className="p-8 rounded-xl bg-white/5 border border-white/10 text-center text-muted">
+					<div className="p-8 rounded-xl bg-surface border border-border text-center text-muted">
 						<p>Not a member of any group in this club.</p>
 					</div>
 				) : (
@@ -422,7 +452,7 @@ function TeamsGroupsTab({ teams, groups }: { teams: Team[]; groups: Group[] }) {
 							<Link
 								key={group.id}
 								href={`/dashboard/groups/${group.id}`}
-								className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:border-accent/50 hover:bg-white/10 transition-all flex items-center gap-4">
+								className="group p-4 rounded-xl bg-surface border border-border hover:border-accent/50 hover:bg-hover transition-all flex items-center gap-4">
 								<div
 									className="w-14 h-14 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform"
 									style={{

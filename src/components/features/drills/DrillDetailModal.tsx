@@ -33,7 +33,7 @@ export default function DrillDetailModal({
 			<div className="space-y-6">
 				{/* Badges */}
 				<div className="flex flex-wrap items-center gap-2">
-					<Badge color={CATEGORY_COLORS[drill.category].color} variant="soft">
+					<Badge color={CATEGORY_COLORS[drill.category].color} variant="ghost">
 						{drill.category}
 					</Badge>
 					<Badge color={INTENSITY_COLORS[drill.intensity].color} variant="outline">
@@ -72,7 +72,7 @@ export default function DrillDetailModal({
 				<Section title="Skills Developed">
 					<div className="flex flex-wrap gap-2">
 						{drill.skills.map((skill) => (
-							<Badge key={skill} color="neutral" variant="soft">
+							<Badge key={skill} color="neutral" variant="ghost">
 								{skill}
 							</Badge>
 						))}
@@ -120,7 +120,7 @@ export default function DrillDetailModal({
 						<div className="flex flex-wrap gap-2">
 							{drill.equipment.map((item, i) => (
 								<Badge key={i} color="neutral" variant="ghost" icon={<Dumbbell size={12} />}>
-									{item}
+									{item.name}
 								</Badge>
 							))}
 						</div>
@@ -128,7 +128,7 @@ export default function DrillDetailModal({
 				) : null}
 
 				{/* Actions */}
-				<div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+				<div className="flex justify-end gap-3 pt-4 border-t border-border">
 					<Button variant="ghost" color="neutral" onClick={onClose}>
 						Close
 					</Button>

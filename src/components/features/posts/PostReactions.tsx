@@ -48,7 +48,7 @@ export default function PostReactions({ postId, reactions }: PostReactionsProps)
 					className={cn(
 						"text-sm px-2.5 py-1 rounded-full transition-all flex items-center gap-1.5",
 						reaction.hasReacted
-							? "bg-primary/20 border border-primary/40 text-white"
+							? "bg-primary/20 border border-primary/40 text-foreground"
 							: "bg-surface border border-border text-muted-foreground hover:bg-active"
 					)}>
 					<span>{reaction.emoji}</span>
@@ -60,7 +60,7 @@ export default function PostReactions({ postId, reactions }: PostReactionsProps)
 			<button
 				ref={triggerRef}
 				onClick={() => setShowPicker(!showPicker)}
-				className="p-1.5 rounded-full text-muted-foreground hover:text-white hover:bg-active transition-colors"
+				className="p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-active transition-colors"
 				title="Add reaction">
 				<SmilePlus size={18} />
 			</button>

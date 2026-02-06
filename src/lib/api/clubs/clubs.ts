@@ -24,6 +24,7 @@ import {
 	RegistrationFilterRequest,
 	RegistrationStatus,
 	RegistrationStatusCounts,
+	RoleSummaryResponse,
 	Team,
 	TeamMember,
 	UpdateFormTemplateRequest,
@@ -76,12 +77,12 @@ export async function getUserClubs(userId: string): Promise<Club[]> {
 
 export async function joinClub(clubId: string, userId: string): Promise<void> {
 	const endpoint = `/clubs/${clubId}/members`;
-	await client.post(CLUBS_API_V1 + endpoint, { userId, role: "Member" });
+	await client.post(CLUBS_API_V1 + endpoint, { userId, roles: ["Member"] });
 }
 
-export async function inviteMember(clubId: string, userId: string, role: string): Promise<void> {
+export async function inviteMember(clubId: string, userId: string, roles: string[]): Promise<void> {
 	const endpoint = `/clubs/${clubId}/members`;
-	await client.post(CLUBS_API_V1 + endpoint, { userId, role });
+	await client.post(CLUBS_API_V1 + endpoint, { userId, roles });
 }
 
 export async function inviteMembers(clubId: string, userIds: string[]): Promise<void> {
@@ -95,7 +96,7 @@ export async function leaveClub(clubId: string, userId: string): Promise<void> {
 }
 
 export interface UpdateClubMemberRequest {
-	role?: string;
+	roles?: string[];
 	skillLevel?: string;
 	isActive?: boolean;
 }
@@ -197,9 +198,9 @@ export async function deleteGroup(groupId: string): Promise<void> {
 	await client.delete(CLUBS_API_V1 + endpoint);
 }
 
-export async function addGroupMember(groupId: string, userId: string, role?: string): Promise<void> {
+export async function addGroupMember(groupId: string, userId: string, roles?: string[]): Promise<void> {
 	const endpoint = `/groups/${groupId}/members`;
-	await client.post(CLUBS_API_V1 + endpoint, { userId, role });
+	await client.post(CLUBS_API_V1 + endpoint, { userId, roles });
 }
 
 export async function addGroupMembers(groupId: string, userIds: string[]): Promise<void> {
@@ -217,7 +218,7 @@ export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
 }
 
 export interface UpdateGroupMemberRequest {
-	role?: string;
+	roles?: string[];
 }
 
 export async function updateGroupMember(groupId: string, memberId: string, data: UpdateGroupMemberRequest): Promise<GroupMember> {
@@ -433,4 +434,14 @@ export async function getClubFormTemplatesFiltered(clubId: string, params?: GetF
 	const queryString = searchParams.toString();
 	const endpoint = `/clubs/${clubId}/forms${queryString ? `?${queryString}` : ""}`;
 	return (await client.get<FormTemplate[]>(CLUBS_API_V1 + endpoint)).data;
+}
+
+// Role summary
+/**
+ * Get the current user's role summary across all clubs.
+ * Returns aggregated information about club roles, team assignments, and group memberships.
+ */
+export async function getMyRoleSummary(): Promise<RoleSummaryResponse> {
+	const endpoint = "/clubs/me/role-summary";
+	return (await client.get<RoleSummaryResponse>(CLUBS_API_V1 + endpoint)).data;
 }

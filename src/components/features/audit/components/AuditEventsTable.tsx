@@ -262,7 +262,7 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 
 	return (
 		<div>
-			<div className="p-6 border-b border-white/5">
+			<div className="p-6 border-b border-border">
 				<h2 className="text-lg font-semibold text-white">
 					Events with Outstanding Balances
 				</h2>
@@ -272,7 +272,7 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 				<table className="w-full text-left border-collapse">
 					<thead>
 						{table.getHeaderGroups().map((headerGroup) => (
-							<tr key={headerGroup.id} className="bg-white/5 border-b border-white/5">
+							<tr key={headerGroup.id} className="bg-surface border-b border-border">
 								{headerGroup.headers.map((header) => (
 									<th
 										key={header.id}
@@ -298,7 +298,7 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 						{table.getRowModel().rows.map((row) => (
 							<tr
 								key={row.id}
-								className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group"
+								className="border-b border-border hover:bg-hover transition-colors cursor-pointer group"
 								onClick={() => router.push(`/dashboard/audit/${row.original.id}`)}
 							>
 								{row.getVisibleCells().map((cell) => (

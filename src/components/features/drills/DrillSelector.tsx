@@ -84,7 +84,7 @@ export default function DrillSelector({
                     {selectedDrills.map((drill, index) => (
                         <div
                             key={drill.drillId}
-                            className="flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/10"
+                            className="flex items-start gap-3 p-3 rounded-lg bg-surface border border-border"
                         >
                             <span className="text-accent font-medium text-sm mt-1">
                                 {index + 1}.
@@ -96,7 +96,7 @@ export default function DrillSelector({
                                     </span>
                                     <Badge
                                         color={CATEGORY_COLORS[drill.drillCategory as keyof typeof CATEGORY_COLORS]?.color || "neutral"}
-                                        variant="soft"
+                                        variant="ghost"
                                         size="sm"
                                     >
                                         {drill.drillCategory}
@@ -114,13 +114,13 @@ export default function DrillSelector({
                                     value={drill.note || ""}
                                     onChange={(e) => handleNoteChange(drill.drillId, e.target.value)}
                                     placeholder="Add a note (optional)"
-                                    className="mt-2 w-full px-2 py-1 rounded bg-white/5 border border-white/10 text-muted text-xs placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
+                                    className="mt-2 w-full px-2 py-1 rounded bg-surface border border-border text-muted text-xs placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
                                 />
                             </div>
                             <button
                                 type="button"
                                 onClick={() => handleRemove(drill.drillId)}
-                                className="p-1 rounded hover:bg-white/10 text-muted hover:text-error transition-colors"
+                                className="p-1 rounded hover:bg-hover text-muted hover:text-error transition-colors"
                             >
                                 <X size={14} />
                             </button>
@@ -145,13 +145,13 @@ export default function DrillSelector({
                         }}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="w-full pl-10 pr-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent text-sm"
+                        className="w-full pl-10 pr-4 py-2 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent text-sm"
                     />
                 </div>
 
                 {/* Dropdown */}
                 {isOpen && (
-                    <div className="absolute z-50 w-full mt-1 max-h-60 overflow-y-auto rounded-xl bg-card border border-white/10 shadow-xl">
+                    <div className="absolute z-50 w-full mt-1 max-h-60 overflow-y-auto rounded-xl bg-card border border-border shadow-xl">
                         {availableDrills.length === 0 ? (
                             <div className="p-3 text-center text-muted text-sm">
                                 {search ? "No drills found" : "No more drills available"}
@@ -162,7 +162,7 @@ export default function DrillSelector({
                                     key={drill.id}
                                     type="button"
                                     onClick={() => handleSelect(drill)}
-                                    className="w-full px-3 py-2 text-left hover:bg-white/5 transition-colors flex items-center gap-2"
+                                    className="w-full px-3 py-2 text-left hover:bg-surface transition-colors flex items-center gap-2"
                                 >
                                     <div className="flex-1 min-w-0">
                                         <div className="text-white text-sm font-medium truncate">

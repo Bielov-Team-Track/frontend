@@ -69,7 +69,7 @@ function ConfirmEmailContent() {
 	) : isEmailVerified ? (
 		<div className="flex flex-col items-center gap-4">
 			<h1>Email is verified</h1>
-			<Link href="/login" className="btn btn-success text-white">
+			<Link href="/login" className="btn btn-success text-success-foreground">
 				Login
 			</Link>
 		</div>

@@ -149,7 +149,7 @@ export default function RegistrationDetailClient() {
 					{/* User Info */}
 					<Section title="User Information" icon={User}>
 						<div className="flex items-start gap-4">
-							<div className="w-20 h-20 rounded-full bg-white/10 overflow-hidden shrink-0">
+							<div className="w-20 h-20 rounded-full bg-hover overflow-hidden shrink-0">
 								{user?.imageUrl ? (
 									// eslint-disable-next-line @next/next/no-img-element
 									<img src={user.imageUrl} alt={user.name} className="w-full h-full object-cover" />
@@ -225,8 +225,8 @@ export default function RegistrationDetailClient() {
 
 					{/* No profiles message */}
 					{!player && !coach && (
-						<div className="bg-white/5 border border-white/10 rounded-xl p-8 text-center">
-							<div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-muted mx-auto mb-3">
+						<div className="bg-surface border border-border rounded-xl p-8 text-center">
+							<div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center text-muted mx-auto mb-3">
 								<User size={24} />
 							</div>
 							<p className="text-muted text-sm">No player or coach profile has been created yet.</p>
@@ -246,7 +246,7 @@ export default function RegistrationDetailClient() {
 										return (
 											<div key={answer.id} className="space-y-1">
 												<p className="text-xs text-muted font-medium">{field?.label || "Question"}</p>
-												<p className="text-sm text-white bg-white/5 p-2 rounded-lg border border-white/10">{answer.value}</p>
+												<p className="text-sm text-white bg-surface p-2 rounded-lg border border-border">{answer.value}</p>
 											</div>
 										);
 									})}
@@ -268,7 +268,7 @@ export default function RegistrationDetailClient() {
 									value={privateNote}
 									onChange={(e) => setPrivateNote(e.target.value)}
 									placeholder="Add internal notes about this applicant..."
-									className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-hidden focus:border-accent min-h-[100px]"
+									className="w-full bg-input border border-border rounded-lg p-3 text-sm text-foreground focus:outline-hidden focus:border-accent min-h-[100px]"
 								/>
 							</div>
 							<div>
@@ -279,7 +279,7 @@ export default function RegistrationDetailClient() {
 									value={publicNote}
 									onChange={(e) => setPublicNote(e.target.value)}
 									placeholder="Message to the applicant..."
-									className="w-full bg-black/20 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-hidden focus:border-accent min-h-[100px]"
+									className="w-full bg-input border border-border rounded-lg p-3 text-sm text-foreground focus:outline-hidden focus:border-accent min-h-[100px]"
 								/>
 							</div>
 							<div className="flex justify-end">
@@ -308,8 +308,8 @@ export default function RegistrationDetailClient() {
 
 function Section({ title, icon: Icon, children }: { title: string; icon: any; children: React.ReactNode }) {
 	return (
-		<div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-			<div className="px-6 py-4 border-b border-white/10 flex items-center gap-3">
+		<div className="bg-surface border border-border rounded-xl overflow-hidden">
+			<div className="px-6 py-4 border-b border-border flex items-center gap-3">
 				<Icon className="text-accent" size={20} />
 				<h3 className="font-bold text-white">{title}</h3>
 			</div>

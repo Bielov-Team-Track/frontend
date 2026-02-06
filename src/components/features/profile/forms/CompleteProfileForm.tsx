@@ -173,7 +173,7 @@ const CompleteProfileForm = ({ onProfileComplete }: CompleteProfileFormProps) =>
 
 			{/* Navigation Buttons */}
 
-			<div className="flex justify-between pt-4 items-center mt-2 border-t border-white/5">
+			<div className="flex justify-between pt-4 items-center mt-2 border-t border-border">
 				<div>
 					{!isFirstStep && (
 						<Button variant="ghost" onClick={handleBack} type="button" className="gap-2" disabled={isLoading} leftIcon={<ArrowLeft size={20} />}>

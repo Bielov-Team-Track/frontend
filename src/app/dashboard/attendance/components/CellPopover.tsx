@@ -48,7 +48,7 @@ export default function CellPopover({ record, event, member, onClose, onUpdate, 
 		<Modal isOpen={true} onClose={onClose} title="Update Attendance" isLoading={isLoading}>
 			<div className="space-y-5">
 				{/* Member info */}
-				<div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+				<div className="flex items-center gap-3 p-3 rounded-lg bg-surface border border-border">
 					<div
 						className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold text-background-dark shrink-0"
 						style={{ backgroundColor: bgColor }}>
@@ -81,7 +81,7 @@ export default function CellPopover({ record, event, member, onClose, onUpdate, 
 				</div>
 
 				{/* Status select */}
-				<Select label="Status" options={STATUS_OPTIONS} value={status} onChange={(val) => setStatus(val as AttendanceStatus)} selectSize="md" />
+				<Select label="Status" options={STATUS_OPTIONS} value={status} onChange={(val) => setStatus(val as AttendanceStatus)} />
 
 				{/* Existing Decline Reason (read-only display) */}
 				{record?.status === AttendanceStatus.Declined && record?.declineNote && status !== AttendanceStatus.Declined && (
@@ -108,7 +108,7 @@ export default function CellPopover({ record, event, member, onClose, onUpdate, 
 							value={declineNote}
 							onChange={(e) => setDeclineNote(e.target.value)}
 							placeholder="Why are they declining?"
-							className="w-full px-3 py-2 rounded-lg bg-[#141414] border border-white/10 text-white text-sm placeholder:text-muted focus:outline-hidden focus:border-primary/50 transition-colors resize-none"
+							className="w-full px-3 py-2 rounded-lg bg-surface border border-border text-foreground text-sm placeholder:text-muted focus:outline-hidden focus:border-primary/50 transition-colors resize-none"
 							rows={2}
 						/>
 						{requireDeclineReason && !declineNote.trim() && <p className="text-xs text-error mt-1">Reason is required</p>}
@@ -124,18 +124,14 @@ export default function CellPopover({ record, event, member, onClose, onUpdate, 
 						</label>
 						<div className="flex gap-2">
 							<Button
-								variant={paymentStatus === PaymentStatus.Unpaid ? "solid" : "ghost"}
-								color={paymentStatus === PaymentStatus.Unpaid ? "error" : "neutral"}
+								variant={paymentStatus === PaymentStatus.Unpaid ? "destructive" : "ghost"}
 								size="sm"
-								fullWidth
 								onClick={() => setPaymentStatus(PaymentStatus.Unpaid)}>
 								Unpaid
 							</Button>
 							<Button
-								variant={paymentStatus === PaymentStatus.Paid ? "solid" : "ghost"}
-								color={paymentStatus === PaymentStatus.Paid ? "success" : "neutral"}
+								variant={paymentStatus === PaymentStatus.Paid ? "default" : "ghost"}
 								size="sm"
-								fullWidth
 								onClick={() => setPaymentStatus(PaymentStatus.Paid)}>
 								Paid
 							</Button>

@@ -7,6 +7,8 @@ export enum EventType {
 	CasualPlay = "CasualPlay",
 	Social = "Social",
 	TrainingSession = "TrainingSession",
+	Evaluation = "Evaluation",
+	Trial = "Trial",
 }
 
 export const EventTypeOptions = [
@@ -17,7 +19,7 @@ export const EventTypeOptions = [
 ];
 
 export enum EventFormat {
-	Open = "Open", // No teams, everyone joins individually (masterclass, social events)
+	List = "List", // No teams, everyone joins individually (masterclass, social events)
 	OpenTeams = "OpenTeams", // Teams with generic "Player" positions
 	TeamsWithPositions = "TeamsWithPositions", // Teams with specific volleyball positions
 }
@@ -37,9 +39,12 @@ export const SurfaceOptions = [
 export interface Event {
 	id: string;
 	image?: string | undefined; // Optional for some UIs
+	imageUrl?: string | undefined; // Alias for image
 	name: string;
 	startTime: Date;
 	endTime: Date;
+	createdAt?: Date;
+	updatedAt?: Date;
 	locationId?: Location;
 	location?: Location;
 	description?: string;

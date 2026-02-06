@@ -97,7 +97,7 @@ function ScheduleEventCard({ event }: { event: ScheduleEvent }) {
 	const time = startDate.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 
 	const paymentStatus = event.participant?.payment?.status;
-	const amountDue = event.budget?.amount || event.costToEnter || 0;
+	const amountDue = event.budget?.cost || event.costToEnter || 0;
 	const isUnpaid = amountDue > 0 && paymentStatus !== "completed";
 	const isPaid = amountDue > 0 && paymentStatus === "completed";
 	const isFree = amountDue === 0;
@@ -107,9 +107,9 @@ function ScheduleEventCard({ event }: { event: ScheduleEvent }) {
 			href={`/dashboard/events/${event.id}`}
 			className="block flex-shrink-0 group"
 		>
-			<div className="w-[170px] rounded-2xl bg-white/5 border border-white/10 overflow-hidden transition-all duration-200 hover:bg-white/[0.07] hover:border-accent/50">
+			<div className="w-[170px] rounded-2xl bg-surface border border-border overflow-hidden transition-all duration-200 hover:bg-hover hover:border-accent/50">
 				{/* Date Header */}
-				<div className="p-4 pb-3 text-center border-b border-white/10 bg-white/[0.02]">
+				<div className="p-4 pb-3 text-center border-b border-border bg-surface-elevated">
 					<div className="text-[10px] font-bold text-muted tracking-wider mb-1">
 						{dayName} • {monthName}
 					</div>
@@ -134,7 +134,8 @@ function ScheduleEventCard({ event }: { event: ScheduleEvent }) {
 					<div className="flex flex-wrap items-center gap-1.5">
 						{isUnpaid && (
 							<Badge
-								variant="destructive"
+								variant="solid"
+								color="error"
 								className="text-[10px] gap-1 h-5 font-semibold"
 							>
 								<CreditCard className="size-3" />
@@ -143,8 +144,9 @@ function ScheduleEventCard({ event }: { event: ScheduleEvent }) {
 						)}
 						{isPaid && (
 							<Badge
-								variant="secondary"
-								className="text-[10px] gap-1 h-5 font-semibold bg-success/20 text-success border-success/30"
+								variant="soft"
+								color="success"
+								className="text-[10px] gap-1 h-5 font-semibold"
 							>
 								<Check className="size-3" />
 								Paid
@@ -153,15 +155,16 @@ function ScheduleEventCard({ event }: { event: ScheduleEvent }) {
 						{isFree && (
 							<Badge
 								variant="outline"
-								className="text-[10px] h-5 font-semibold border-white/20 text-muted"
+								className="text-[10px] h-5 font-semibold border-border text-muted"
 							>
 								Free
 							</Badge>
 						)}
 						{event.isHosting && (
 							<Badge
-								variant="default"
-								className="text-[10px] h-5 font-semibold bg-accent/20 text-accent border-accent/30"
+								variant="solid"
+								color="accent"
+								className="text-[10px] h-5 font-semibold"
 							>
 								Host
 							</Badge>

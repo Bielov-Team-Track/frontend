@@ -703,7 +703,7 @@ const EquipmentToolbox = ({
 					className={`flex items-center gap-2 p-2 rounded-md border border-border transition-all ${
 						isPlaying
 							? "opacity-50 cursor-not-allowed"
-							: "hover:bg-white/5 cursor-pointer"
+							: "hover:bg-hover cursor-pointer"
 					}`}
 				>
 					<span
@@ -724,7 +724,7 @@ const EquipmentToolbox = ({
 						className={`flex items-center gap-2 p-2 rounded-md border border-border transition-all ${
 							isPlaying
 								? "opacity-50 cursor-not-allowed"
-								: "hover:bg-white/5 cursor-pointer"
+								: "hover:bg-hover cursor-pointer"
 						}`}
 					>
 						<span
@@ -774,7 +774,7 @@ const ElementsPanel = ({
 					{players.map((player) => (
 						<div
 							key={player.id}
-							className="flex items-center justify-between p-2 rounded-md border border-transparent hover:bg-white/5 transition-colors group"
+							className="flex items-center justify-between p-2 rounded-md border border-transparent hover:bg-hover transition-colors group"
 						>
 							<div className="flex items-center gap-2">
 								<span
@@ -808,7 +808,7 @@ const ElementsPanel = ({
 							return (
 								<div
 									key={item.id}
-									className="flex items-center justify-between p-2 rounded-md border border-transparent hover:bg-white/5 transition-colors group"
+									className="flex items-center justify-between p-2 rounded-md border border-transparent hover:bg-hover transition-colors group"
 								>
 									<div className="flex items-center gap-2">
 										<span
@@ -864,14 +864,14 @@ const ElementContextMenu = ({
 			onClick={(e) => e.stopPropagation()}
 		>
 			<button
-				className="w-full gap-1.5 rounded-md px-1.5 py-1 text-sm flex items-center hover:bg-white/5 outline-none cursor-default"
+				className="w-full gap-1.5 rounded-md px-1.5 py-1 text-sm flex items-center hover:bg-hover outline-none cursor-default"
 				onClick={() => onChangeLabel()}
 			>
 				<Tag className="h-4 w-4" />
 				Change Label
 			</button>
 			<button
-				className="w-full gap-1.5 rounded-md px-1.5 py-1 text-sm flex items-center hover:bg-white/5 outline-none cursor-default"
+				className="w-full gap-1.5 rounded-md px-1.5 py-1 text-sm flex items-center hover:bg-hover outline-none cursor-default"
 				onClick={() => onAddNote()}
 			>
 				<MessageSquare className="h-4 w-4" />
@@ -1801,11 +1801,10 @@ export function AnimationEditor({ initialAnimation, onSave, onCancel, isSaving =
 					<span className="text-xs text-muted-foreground">Speed:</span>
 					<Slider
 						value={2000 - animationSpeed}
-						onValueChange={(value) => value !== null && setAnimationSpeed(2000 - value)}
+						onValueChange={(value) => { if (typeof value === 'number') setAnimationSpeed(2000 - value); }}
 						min={0}
 						max={1500}
 						step={100}
-						showValue={false}
 						className="w-24"
 					/>
 					<span className="text-xs text-muted-foreground w-8">{(animationSpeed / 1000).toFixed(1)}s</span>

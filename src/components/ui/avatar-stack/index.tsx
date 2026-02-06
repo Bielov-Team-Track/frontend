@@ -51,13 +51,13 @@ export default function AvatarStack({
 
 	if (items.length === 0) {
 		return (
-			<div className={cn("flex items-center gap-2 text-muted text-sm", className)}>
+			<div className={cn("flex items-center gap-2 text-muted-foreground text-sm", className)}>
 				<div
 					className={cn(
-						"rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center",
+						"rounded-full bg-surface border-2 border-border flex items-center justify-center",
 						classes.avatar
 					)}>
-					<UserPlus size={size === "xs" ? 12 : size === "sm" ? 14 : 16} className="text-muted" />
+					<UserPlus size={size === "xs" ? 12 : size === "sm" ? 14 : 16} className="text-muted-foreground" />
 				</div>
 				<span>{emptyText}</span>
 			</div>
@@ -80,7 +80,7 @@ export default function AvatarStack({
 				{remaining > 0 && (
 					<div
 						className={cn(
-							"rounded-full bg-white/20 flex items-center justify-center font-medium text-white ring-2 ring-neutral-900",
+							"rounded-full bg-surface flex items-center justify-center font-medium text-white ring-2 ring-neutral-900",
 							classes.count
 						)}>
 						+{remaining}
@@ -88,7 +88,7 @@ export default function AvatarStack({
 				)}
 			</div>
 			{showCount && (
-				<span className="text-sm text-muted">
+				<span className="text-sm text-muted-foreground">
 					{items.length} selected
 				</span>
 			)}

@@ -49,7 +49,7 @@ const PaidParticipantListItem = ({
 		<div className="flex justify-between items-center /60 rounded-lg p-4">
 			<div className="flex gap-2 items-center">
 				<Check size={16} className="text-green-500" />
-				<Avatar profile={participant.userProfile} />
+				<Avatar src={participant.userProfile?.imageUrl} name={`${participant.userProfile?.name} ${participant.userProfile?.surname}`} />
 				<div>
 					{participant.userProfile.name} {participant.userProfile.surname}
 				</div>
@@ -72,7 +72,7 @@ const UnpaidParticipantListItem = ({
 		<div className="flex justify-between items-center bg-warning/10 rounded-lg p-4 border border-warning/20">
 			<div className="flex gap-2 items-center">
 				<AlertTriangle size={16} className="text-warning" />
-				<Avatar profile={participant.userProfile} />
+				<Avatar src={participant.userProfile?.imageUrl} name={`${participant.userProfile?.name} ${participant.userProfile?.surname}`} />
 				<div>
 					<div className="font-medium">
 						{participant.userProfile.name} {participant.userProfile.surname}

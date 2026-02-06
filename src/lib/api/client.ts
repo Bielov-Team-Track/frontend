@@ -22,15 +22,17 @@ const getCookie = (name: string): string | null => {
 const setCookie = (name: string, value: string, maxAge: number): void => {
 	if (typeof window === "undefined") return;
 	// Encode the value to handle special characters in Base64 tokens (+, /, =)
-	// Use Secure flag in production (HTTPS), SameSite=Strict for CSRF protection
+	// Use Secure flag in production (HTTPS), SameSite=Lax for cross-origin redirects
 	const isSecure = window.location.protocol === "https:";
 	const secureFlag = isSecure ? "; Secure" : "";
-	document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Strict${secureFlag}`;
+	document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
 };
 
 const deleteCookie = (name: string): void => {
 	if (typeof window === "undefined") return;
-	document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+	const isSecure = window.location.protocol === "https:";
+	const secureFlag = isSecure ? "; Secure" : "";
+	document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax${secureFlag}`;
 };
 
 // Token management utilities (cookies only)

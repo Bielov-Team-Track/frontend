@@ -26,7 +26,7 @@ export interface UploadedAttachment {
 
 export interface AttachmentsUploaderProps {
 	attachments: UploadedAttachment[];
-	onAttachmentsChange: (attachments: UploadedAttachment[]) => void;
+	onAttachmentsChange: (attachments: UploadedAttachment[] | ((prev: UploadedAttachment[]) => UploadedAttachment[])) => void;
 	onUpload: (file: File) => Promise<string>;
 	maxFiles?: number;
 	acceptedTypes?: string[];
@@ -108,7 +108,7 @@ function SortableAttachment({ attachment, onRemove, onPreview, onRetry, variant,
 			style={style}
 			onClick={handleClick}
 			className={cn(
-				"relative group rounded-lg overflow-hidden bg-white/5 border border-white/10",
+				"relative group rounded-lg overflow-hidden bg-surface border border-border",
 				variantStyles[variant],
 				isDragging && "opacity-50",
 				attachment.status === "done" && "cursor-pointer",
@@ -117,7 +117,7 @@ function SortableAttachment({ attachment, onRemove, onPreview, onRetry, variant,
 			{attachment.type === "image" ? (
 				<img src={attachment.preview} alt={attachment.name} className="w-full h-full object-cover" draggable={false} />
 			) : (
-				<div className="w-full h-full flex flex-col items-center justify-center p-1.5 bg-white/3">
+				<div className="w-full h-full flex flex-col items-center justify-center p-1.5 bg-surface">
 					<FileText size={variant === "compact" ? 16 : 20} className="text-muted-foreground mb-0.5" />
 					<span className="text-[8px] text-muted-foreground text-center truncate w-full px-0.5 leading-tight">
 						{attachment.name.length > 8 ? `${attachment.name.slice(0, 6)}...` : attachment.name}
@@ -189,10 +189,10 @@ function SortableAttachment({ attachment, onRemove, onPreview, onRetry, variant,
 				}}
 				className={cn(
 					"absolute top-0.5 right-0.5 rounded-full bg-black/60 text-white",
-					"opacity-0 group-hover:opacity-100 transition-opacity",
-					"hover:bg-black/80 p-0.5 z-10",
+					"opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity",
+					"hover:bg-black/80 p-1 sm:p-0.5 z-10",
 				)}>
-				<X size={10} />
+				<X size={12} className="sm:w-2.5 sm:h-2.5" />
 			</button>
 		</div>
 	);
@@ -222,7 +222,7 @@ function AddMorePlaceholder({ variant, onClick, isDragActive }: AddMorePlacehold
 			className={cn(
 				"rounded-lg border-2 border-dashed flex items-center justify-center transition-all",
 				variantStyles[variant],
-				isDragActive ? "border-primary bg-primary/10 scale-105" : "border-white/15 hover:border-white/30 hover:bg-white/5 bg-white/2",
+				isDragActive ? "border-primary bg-primary/10 scale-105" : "border-border hover:border-border/80 hover:bg-hover bg-surface",
 			)}>
 			<Plus size={variant === "compact" ? 16 : 20} className={cn("transition-colors", isDragActive ? "text-primary" : "text-muted-foreground")} />
 		</button>
@@ -241,11 +241,11 @@ function DragOverlayItem({ attachment, variant }: { attachment: UploadedAttachme
 	};
 
 	return (
-		<div className={cn("rounded-lg overflow-hidden bg-white/10 border-2 border-primary shadow-xl", variantStyles[variant])}>
+		<div className={cn("rounded-lg overflow-hidden bg-surface border-2 border-primary shadow-xl", variantStyles[variant])}>
 			{attachment.type === "image" ? (
 				<img src={attachment.preview} alt={attachment.name} className="w-full h-full object-cover" />
 			) : (
-				<div className="w-full h-full flex flex-col items-center justify-center p-2 bg-white/5">
+				<div className="w-full h-full flex flex-col items-center justify-center p-2 bg-surface">
 					<FileText size={variant === "compact" ? 16 : 20} className="text-muted-foreground" />
 				</div>
 			)}
@@ -522,7 +522,7 @@ export default function AttachmentsUploader({
 					className={cn(
 						"border border-dashed rounded-xl text-center cursor-pointer transition-all duration-200",
 						dropzoneHeights[dropzoneHeight],
-						isDragActive ? "border-primary bg-primary/10 scale-[1.01]" : "border-white/10 hover:border-white/20 hover:bg-white/2",
+						isDragActive ? "border-primary bg-primary/10 scale-[1.01]" : "border-border hover:border-border/80 hover:bg-hover",
 					)}>
 					<div className="flex flex-col items-center gap-1">
 						<Paperclip size={20} className={cn("text-muted-foreground", isDragActive && "text-primary")} />

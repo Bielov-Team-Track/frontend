@@ -31,7 +31,7 @@ export default function CommentItem({ comment, onReply, onEdit, onDelete, onRetr
 				<Avatar name={`${comment.author.name} ${comment.author.surname}`} src={comment.author.imageUrl} variant="user" className="w-8 h-8 shrink-0" />
 				<div className="flex-1">
 					<div className="bg-surface rounded-xl px-3 py-2">
-						<p className="text-sm text-white">{comment.content}</p>
+						<p className="text-sm text-foreground">{comment.content}</p>
 					</div>
 					<p className="text-xs text-muted-foreground mt-1">Sending...</p>
 				</div>
@@ -46,7 +46,7 @@ export default function CommentItem({ comment, onReply, onEdit, onDelete, onRetr
 				<Avatar name={`${comment.author.name} ${comment.author.surname}`} src={comment.author.imageUrl} variant="user" className="w-8 h-8 shrink-0" />
 				<div className="flex-1">
 					<div className="bg-destructive/10 border border-destructive/30 rounded-xl px-3 py-2">
-						<p className="text-sm text-white">{comment.content}</p>
+						<p className="text-sm text-foreground">{comment.content}</p>
 					</div>
 					<div className="flex items-center gap-2 mt-1">
 						<AlertCircle size={12} className="text-destructive" />
@@ -71,12 +71,12 @@ export default function CommentItem({ comment, onReply, onEdit, onDelete, onRetr
 			<div className="flex-1">
 				<div className="bg-surface rounded-xl px-3 py-2 group relative">
 					<div className="flex items-center gap-2 mb-1">
-						<span className="text-sm font-medium text-white">
+						<span className="text-sm font-medium text-foreground">
 							{comment.author.name} {comment.author.surname}
 						</span>
 						<span className="text-xs text-muted-foreground">{timeAgo}</span>
 					</div>
-					<p className="text-sm text-white whitespace-pre-wrap">{comment.content}</p>
+					<p className="text-sm text-foreground whitespace-pre-wrap">{comment.content}</p>
 
 					{/* Menu */}
 					{isAuthor && (
@@ -93,7 +93,7 @@ export default function CommentItem({ comment, onReply, onEdit, onDelete, onRetr
 												onEdit?.(comment);
 												setShowMenu(false);
 											}}
-											className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-white hover:bg-active">
+											className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-foreground hover:bg-active">
 											<Pencil size={12} />
 											Edit
 										</button>
@@ -119,7 +119,7 @@ export default function CommentItem({ comment, onReply, onEdit, onDelete, onRetr
 					{!isReply && (
 						<button
 							onClick={() => onReply?.(comment)}
-							className="text-xs text-muted-foreground hover:text-white flex items-center gap-1 transition-colors">
+							className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors">
 							<Reply size={12} />
 							Reply
 						</button>

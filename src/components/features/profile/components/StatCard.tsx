@@ -34,7 +34,7 @@ const StatCard = ({
 				<span className="text-sm text-muted-foreground">{label}</span>
 			</div>
 			<div className="flex items-end gap-2">
-				<span className="text-2xl font-bold text-white">{value}</span>
+				<span className="text-2xl font-bold text-foreground">{value}</span>
 				{subValue && (
 					<span className="text-sm text-muted-foreground mb-0.5">{subValue}</span>
 				)}

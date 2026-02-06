@@ -53,7 +53,7 @@ const EventBudgetStep = () => {
 				<p className="text-muted text-sm">Configure payment settings. Without budget you cannot collect payments or audit the event.</p>
 			</div>
 
-			<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+			<div className="p-4 rounded-xl bg-surface border border-border">
 				<Controller
 					name="useBudget"
 					control={control}
@@ -126,8 +126,8 @@ const EventBudgetStep = () => {
 				render={({ field }) => (
 					<Input
 						{...field}
+						value={field.value ?? ""}
 						type="number"
-						optional
 						disabled={!useBudget}
 						label="Dropout Deadline (hours)"
 						leftIcon={<Clock size={16} />}
@@ -138,7 +138,7 @@ const EventBudgetStep = () => {
 			/>
 
 			{values.budget?.pricingModel === PricingModel.Individual && (
-				<div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
+				<div className="p-4 rounded-xl bg-surface border border-border space-y-4">
 					<Controller
 						name="budget.payToJoin"
 						control={control}

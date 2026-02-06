@@ -85,7 +85,7 @@ export default function ReportModal({ isOpen, onClose, postId, onSuccess }: Repo
 								onClick={() => setSelectedReason(option.value as ReportReason)}
 								className={cn(
 									"w-full text-left p-3 rounded-xl border transition-all",
-									selectedReason === option.value ? "border-primary bg-primary/10" : "border-border bg-surface hover:border-white/20"
+									selectedReason === option.value ? "border-primary bg-primary/10" : "border-border bg-surface hover:border-border"
 								)}>
 								<div className="flex items-center justify-between">
 									<span className="text-sm font-medium text-white">{option.label}</span>

@@ -137,16 +137,16 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 
 	return (
 		<>
-			<Modal isOpen={isOpen} onClose={onClose} title="Chat Details" className="max-w-md bg-background border border-white/10">
+			<Modal isOpen={isOpen} onClose={onClose} title="Chat Details" className="max-w-md bg-background border border-border">
 				{isAdding ? (
 					<div className="flex flex-col gap-4 h-[400px]">
 						<div className="flex justify-between items-center">
-							<h3 className="font-medium text-white">Add Participants</h3>
+							<h3 className="font-medium text-foreground">Add Participants</h3>
 							<Button variant="ghost" size="sm" onClick={() => setIsAdding(false)}>
 								Cancel
 							</Button>
 						</div>
-						<div className="flex-1 overflow-hidden border border-white/10 rounded-xl">
+						<div className="flex-1 overflow-hidden border border-border rounded-xl">
 							<UserSelector
 								selectedUsers={selectedUsersToAdd}
 								onSelectedUsersChange={setSelectedUsersToAdd}
@@ -167,7 +167,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 						<div className="flex flex-col items-center text-center">
 							<div className="mb-4 relative">
 								{chat.participants.length > 2 ? (
-									<div className="w-24 h-24 rounded-full bg-white/5 p-1 grid grid-cols-2 gap-1 overflow-hidden border-2 border-white/5 shadow-inner">
+									<div className="w-24 h-24 rounded-full bg-surface p-1 grid grid-cols-2 gap-1 overflow-hidden border-2 border-border shadow-inner">
 										{participants.slice(0, 4).map((p) => (
 											<div key={p.id} className="w-full h-full relative overflow-hidden rounded-full">
 												{p.imageUrl ? (
@@ -186,12 +186,12 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 									<ChatAvatar profile={participants[0]} size="xl" />
 								)}
 							</div>
-							<h2 className="text-xl font-bold text-white tracking-tight">{chat.title}</h2>
+							<h2 className="text-xl font-bold text-foreground tracking-tight">{chat.title}</h2>
 							<p className="text-sm text-muted">{chat.participants.length > 2 ? `${participants.length} participants` : "Direct Message"}</p>
 						</div>
 
 						{/* Actions Grid */}
-						<div className="grid grid-cols-3 gap-3 border-y border-white/5 py-4">
+						<div className="grid grid-cols-3 gap-3 border-y border-border py-4">
 							<ActionButton icon={Bell} label="Mute" />
 							<ActionButton icon={Search} label="Find" />
 							<ActionButton icon={LogOut} label="Leave" danger />
@@ -206,7 +206,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 											initial={{ opacity: 0, x: -10 }}
 											animate={{ opacity: 1, x: 0 }}
 											exit={{ opacity: 0, x: -10 }}
-											className="font-semibold text-white text-sm">
+											className="font-semibold text-foreground text-sm">
 											Participants
 										</motion.h3>
 									) : (
@@ -222,14 +222,14 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 													value={participantSearchQuery}
 													onChange={(e) => setParticipantSearchQuery(e.target.value)}
 													placeholder="Search list..."
-													className="w-full bg-white/5 border border-white/10 rounded-lg py-1.5 pl-3 pr-8 text-xs text-white placeholder:text-muted focus:outline-hidden focus:border-accent/50"
+													className="w-full bg-surface border border-border rounded-lg py-1.5 pl-3 pr-8 text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:border-accent/50"
 												/>
 												<button
 													onClick={() => {
 														setIsSearching(false);
 														setParticipantSearchQuery("");
 													}}
-													className="absolute right-2 text-muted hover:text-white transition-colors">
+													className="absolute right-2 text-muted hover:text-foreground transition-colors">
 													<X size={14} />
 												</button>
 											</div>
@@ -243,7 +243,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 								</div>
 							</div>
 
-							<div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
+							<div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-foreground/10">
 								{isLoading ? (
 									<div className="text-center py-4 text-muted text-sm">Loading...</div>
 								) : filteredParticipants.length === 0 ? (
@@ -254,12 +254,12 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 									filteredParticipants.map((user) => (
 										<div
 											key={user.id}
-											className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors group cursor-pointer"
+											className="flex items-center justify-between p-2 rounded-lg hover:bg-surface transition-colors group cursor-pointer"
 											onClick={() => handleParticipantClick(user)}>
 											<div className="flex items-center gap-3">
 												<ChatAvatar profile={user} size="md" />
 												<div className="flex flex-col">
-													<span className="text-sm font-medium text-white group-hover:text-accent transition-colors">
+													<span className="text-sm font-medium text-foreground group-hover:text-accent transition-colors">
 														{user.name} {user.surname}
 													</span>
 													{user.id === currentUser?.id && (
@@ -298,7 +298,7 @@ function ActionButton({ icon: Icon, label, danger, onClick }: { icon: any; label
 		<button
 			onClick={onClick}
 			className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl transition-all ${
-				danger ? "bg-error/10 text-error hover:bg-error/20" : "bg-white/5 text-muted hover:bg-white/10 hover:text-white"
+				danger ? "bg-error/10 text-error hover:bg-error/20" : "bg-surface text-muted hover:bg-hover hover:text-foreground"
 			}`}>
 			<Icon size={20} />
 			<span className="text-xs font-medium">{label}</span>
@@ -308,7 +308,7 @@ function ActionButton({ icon: Icon, label, danger, onClick }: { icon: any; label
 
 function IconButton({ icon: Icon, tooltip, onClick }: { icon: any; tooltip: string; onClick: () => void }) {
 	return (
-		<button onClick={onClick} title={tooltip} className="p-2 text-muted hover:text-white hover:bg-white/5 rounded-full transition-all group relative">
+		<button onClick={onClick} title={tooltip} className="p-2 text-muted hover:text-foreground hover:bg-surface rounded-full transition-all group relative">
 			<Icon size={18} />
 			{/* Simple CSS-only tooltip if needed, or rely on browser title */}
 		</button>

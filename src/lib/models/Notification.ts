@@ -13,6 +13,8 @@ export interface Notification {
 	isRead: boolean;
 	createdAt: string;
 	readAt: string | null;
+	aggregatedCount: number;
+	aggregatedActors?: string[];
 }
 
 export function getNotificationLink(notification: Notification): string | null {

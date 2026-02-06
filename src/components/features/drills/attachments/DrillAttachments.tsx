@@ -213,7 +213,7 @@ export default function DrillAttachments({ attachments, animation, className }: 
 								key={video.id}
 								type="button"
 								onClick={() => openLightbox(video.id)}
-								className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-left group"
+								className="flex items-center gap-3 p-3 rounded-xl bg-surface hover:bg-hover transition-colors text-left group"
 							>
 								<div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center shrink-0">
 									<Play size={18} className="text-accent" />
@@ -246,7 +246,7 @@ export default function DrillAttachments({ attachments, animation, className }: 
 								href={doc.fileUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
+								className="flex items-center gap-3 p-3 rounded-xl bg-surface hover:bg-hover transition-colors group"
 							>
 								<div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center shrink-0">
 									<FileText size={18} className="text-blue-400" />

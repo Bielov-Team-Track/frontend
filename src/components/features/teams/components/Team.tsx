@@ -90,13 +90,13 @@ function Team({ team: defaultTeam, open = false, editable = false, audit = false
 	const isTeamFull = !positions?.find((p) => !p.eventParticipant?.userProfile);
 
 	return (
-		<div className="bg-[#1E1E1E] border border-white/5 relative max-w-sm flex flex-col rounded-2xl w-full sm:w-80 shadow-lg hover:border-white/10 transition-all overflow-hidden group">
+		<div className="bg-surface-elevated border border-border relative max-w-sm flex flex-col rounded-2xl w-full sm:w-80 shadow-lg hover:border-border transition-all overflow-hidden group">
 			{/* Team Header */}
-			<div className="p-4 border-b border-white/5 bg-white/2">
+			<div className="p-4 border-b border-border bg-surface">
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-between w-full">
 						<div className="flex gap-2 justify-between w-full items-center">
-							<span className="text-lg font-bold text-white truncate max-w-[150px]" title={team.name}>
+							<span className="text-lg font-bold text-foreground truncate max-w-[150px]" title={team.name}>
 								{team.name}
 							</span>
 
@@ -123,7 +123,7 @@ function Team({ team: defaultTeam, open = false, editable = false, audit = false
 											Full
 										</span>
 									) : (
-										<span className="px-2 py-0.5 rounded-full bg-white/5 text-muted border border-white/10 text-[10px] font-bold uppercase whitespace-nowrap">
+										<span className="px-2 py-0.5 rounded-full bg-surface text-muted border border-border text-[10px] font-bold uppercase whitespace-nowrap">
 											Open
 										</span>
 									))}
@@ -206,13 +206,13 @@ const AddNewPosition = ({ teamId, onPositionAdded }: AddNewPositionProps) => {
 	};
 
 	return addingNewPosition ? (
-		<div className="flex flex-col relative mt-2 bg-background p-2 rounded-xl border border-white/10 animate-in fade-in slide-in-from-top-2">
-			{isLoading && <Loader className="inset-0 absolute bg-black/40 rounded-xl" />}
+		<div className="flex flex-col relative mt-2 bg-background p-2 rounded-xl border border-border animate-in fade-in slide-in-from-top-2">
+			{isLoading && <Loader className="inset-0 absolute bg-overlay rounded-xl" />}
 			<div className="flex items-center gap-2 w-full">
 				<input
 					type="text"
 					placeholder="Position name (e.g. Setter)"
-					className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-hidden focus:border-accent/50 transition-colors"
+					className="flex-1 bg-surface border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-hidden focus:border-accent/50 transition-colors"
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
 							handleAddNewPosition();
@@ -223,13 +223,13 @@ const AddNewPosition = ({ teamId, onPositionAdded }: AddNewPositionProps) => {
 					autoFocus
 				/>
 				<button
-					className="p-2 bg-accent/10 text-accent hover:bg-accent hover:text-white rounded-lg transition-colors border border-accent/20"
+					className="p-2 bg-accent/10 text-accent hover:bg-accent hover:text-foreground rounded-lg transition-colors border border-accent/20"
 					onClick={() => handleAddNewPosition()}
 					title="Add">
 					<Check size={16} />
 				</button>
 				<button
-					className="p-2 bg-white/5 text-muted hover:bg-red-500/10 hover:text-error rounded-lg transition-colors border border-white/10"
+					className="p-2 bg-surface text-muted hover:bg-red-500/10 hover:text-error rounded-lg transition-colors border border-border"
 					onClick={() => {
 						setAddingNewPosition(false);
 						setNewPositionName("");
@@ -243,7 +243,7 @@ const AddNewPosition = ({ teamId, onPositionAdded }: AddNewPositionProps) => {
 		</div>
 	) : (
 		<button
-			className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-dashed border-white/10 text-xs font-medium text-muted hover:text-white hover:border-white/20 hover:bg-white/5 transition-all"
+			className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-dashed border-border text-xs font-medium text-muted hover:text-foreground hover:border-border hover:bg-hover transition-all"
 			onClick={() => setAddingNewPosition(true)}>
 			<Plus size={14} /> Add Position
 		</button>

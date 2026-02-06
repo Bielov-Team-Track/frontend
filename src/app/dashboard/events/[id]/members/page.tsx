@@ -58,7 +58,7 @@ const getStatusColor = (status: string): string => {
 		case "NoShow":
 			return "bg-error/20 text-error border-error/30";
 		default:
-			return "bg-white/10 text-muted border-white/20";
+			return "bg-hover text-muted border-border";
 	}
 };
 
@@ -158,13 +158,13 @@ export default function EventMembersPage() {
 
 			{/* Participants List */}
 			{filteredParticipants.length > 0 ? (
-				<div className="rounded-2xl bg-white/5 border border-white/10 divide-y divide-white/10">
+				<div className="rounded-2xl bg-surface border border-border divide-y divide-border">
 					{filteredParticipants.map((participant) => {
 						const { userProfile } = participant;
 						const statusStr = participant.status as unknown as string;
 
 						return (
-							<div key={participant.id} className="flex items-center justify-between p-4 hover:bg-white/5 transition-colors">
+							<div key={participant.id} className="flex items-center justify-between p-4 hover:bg-hover transition-colors">
 								<div className="flex items-center gap-3">
 									<Avatar name={`${userProfile.name} ${userProfile.surname}`} src={userProfile.imageUrl} />
 									<div>

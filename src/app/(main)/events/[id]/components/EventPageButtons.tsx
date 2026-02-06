@@ -108,8 +108,7 @@ const EventPageButtons = ({ event, participantIds = [] }: EventPageButtonsProps)
 							Cancel Event
 						</Button>
 						<Button
-							variant="solid"
-							color="primary"
+							variant="default"
 							fullWidth
 							onClick={() => setShowCancelModal(false)}
 							disabled={isCancelling}>

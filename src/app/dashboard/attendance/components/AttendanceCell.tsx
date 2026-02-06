@@ -21,7 +21,7 @@ const STATUS_CONFIG: Record<
     { bg: string; textColor: string; icon: React.ReactNode }
 > = {
     [AttendanceStatus.Invited]: {
-        bg: "bg-white/10",
+        bg: "bg-hover",
         textColor: "text-muted",
         icon: <HelpCircle size={14} />,
     },
@@ -53,7 +53,7 @@ const STATUS_CONFIG: Record<
 };
 
 const DEFAULT_CONFIG = {
-    bg: "bg-white/10",
+    bg: "bg-hover",
     textColor: "text-muted",
     icon: <HelpCircle size={14} />,
 };
@@ -117,7 +117,7 @@ export default function AttendanceCell({
                         text-white text-[10px] font-bold
                         border-2 border-background
                         transition-colors duration-100
-                        ${isSelected ? "bg-primary" : "bg-white/20"}
+                        ${isSelected ? "bg-primary" : "bg-hover"}
                     `}
                 >
                     {isSelected && <Check size={10} strokeWidth={3} />}

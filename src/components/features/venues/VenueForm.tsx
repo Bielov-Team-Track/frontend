@@ -7,12 +7,15 @@ import { MapPin, Plus } from "lucide-react";
 import { useCallback, useState } from "react";
 
 export interface VenueFormData {
-	tempId: string;
+	tempId?: string;
+	clubId?: string;
 	name: string;
 	addressLine1?: string;
+	addressLine2?: string;
 	city?: string;
-	postalCode?: string;
 	country?: string;
+	region?: string;
+	postalCode?: string;
 	latitude?: number;
 	longitude?: number;
 	howToGetThereInstructions?: string;
@@ -23,9 +26,10 @@ interface VenueFormProps {
 	title?: string;
 	description?: string;
 	className?: string;
+	buttonVariant?: "default" | "outline";
 }
 
-export default function VenueForm({ onAddVenue, title = "Add a venue", description, className = "" }: VenueFormProps) {
+export default function VenueForm({ onAddVenue, title = "Add a venue", description, className = "", buttonVariant = "default" }: VenueFormProps) {
 	const [newVenue, setNewVenue] = useState<Partial<VenueFormData>>({
 		name: "",
 		addressLine1: "",
@@ -62,27 +66,44 @@ export default function VenueForm({ onAddVenue, title = "Add a venue", descripti
 			tempId: crypto.randomUUID(),
 			name: newVenue.name,
 			addressLine1: newVenue.addressLine1,
+			addressLine2: newVenue.addressLine2,
 			city: newVenue.city,
 			country: newVenue.country,
+			region: newVenue.region,
 			latitude: newVenue.latitude,
 			longitude: newVenue.longitude,
 			postalCode: newVenue.postalCode,
-			howToGetThereInstructions: newVenue.howToGetThereInstructions,
+			howToGetThereInstructions: instructions || undefined,
 		};
 
 		onAddVenue(venueToAdd);
+
+		// Clear form after adding venue
+		setNewVenue({
+			name: "",
+			addressLine1: "",
+		});
+		setAddressInput("");
+		setInstructions("");
 	};
 
 	return (
 		<div className={className}>
 			{(title || description) && (
 				<div className="mb-4">
-					{title && <div className="text-sm font-medium text-white">{title}</div>}
-					{description && <p className="text-muted text-sm">{description}</p>}
+					{title && <div className="text-sm font-medium text-foreground">{title}</div>}
+					{description && <p className="text-muted-foreground text-sm">{description}</p>}
 				</div>
 			)}
 
 			<div className="space-y-4">
+				<Input
+					label="Venue Name"
+					placeholder="e.g., Main Training Hall"
+					value={newVenue.name || ""}
+					onChange={(e) => setNewVenue((prev) => ({ ...prev, name: e.target.value }))}
+				/>
+
 				<APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
 					<AddressAutocomplete
 						value={addressInput || ""}
@@ -93,11 +114,11 @@ export default function VenueForm({ onAddVenue, title = "Add a venue", descripti
 				</APIProvider>
 
 				<div className="space-y-2">
-					<div className="flex items-center gap-2 text-sm text-muted">
+					<div className="flex items-center gap-2 text-sm text-muted-foreground">
 						<MapPin size={14} />
 						<span>Click on the map to fine-tune location</span>
 					</div>
-					<div className="rounded-xl overflow-hidden border border-white/10 h-48">
+					<div className="rounded-xl overflow-hidden border border-border h-48">
 						<Map
 							readonly={false}
 							defaultAddress={newVenue.addressLine1}
@@ -107,16 +128,8 @@ export default function VenueForm({ onAddVenue, title = "Add a venue", descripti
 					</div>
 				</div>
 
-				<Input
-					label="Venue Name"
-					placeholder="e.g., Main Training Hall"
-					value={newVenue.name || ""}
-					onChange={(e) => setNewVenue((prev) => ({ ...prev, name: e.target.value }))}
-					className="bg-black/20"
-				/>
-
 				<TextArea label="How to get there" optional={true} value={instructions} onChange={(e) => setInstructions(e.target.value)} />
-				<Button type="button" onClick={handleAddVenue} disabled={!newVenue.name || !addressInput} leftIcon={<Plus size={16} />} className="w-full">
+				<Button type="button" variant={buttonVariant} onClick={handleAddVenue} disabled={!newVenue.name || !addressInput} leftIcon={<Plus size={16} />} className="w-full">
 					Add Venue
 				</Button>
 			</div>

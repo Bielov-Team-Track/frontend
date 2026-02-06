@@ -51,6 +51,17 @@ export class ApiError extends Error {
       }
       return this.detail || 'Please fix the validation errors';
     }
+
+    // Don't show technical details for internal server errors
+    if (this.status >= 500) {
+      return 'Something went wrong. Please try again later.';
+    }
+
+    // For 502/503/504 gateway errors, show a service unavailable message
+    if (this.code === 'NETWORK_ERROR' || this.status === 0) {
+      return 'Unable to connect to the server. Please check your connection.';
+    }
+
     return this.detail || this.title || 'An error occurred';
   }
 

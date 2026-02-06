@@ -39,11 +39,11 @@ export function NextEventHero({ event, isHosting, participant, participantCount 
 	const startDate = new Date(event.startTime);
 	const timeUntil = getTimeUntilEvent(startDate);
 	const paymentStatus = participant?.payment?.status;
-	const amountDue = event.budget?.amount || event.costToEnter || 0;
+	const amountDue = event.budget?.cost || event.costToEnter || 0;
 	const isUnpaid = amountDue > 0 && paymentStatus !== "completed";
 
 	return (
-		<div className="relative rounded-2xl bg-white/5 border border-white/10 overflow-hidden group hover:border-white/20 transition-all duration-300">
+		<div className="relative rounded-2xl bg-surface border border-border overflow-hidden group hover:border-border transition-all duration-300">
 			{/* Accent Glow */}
 			<div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-50 group-hover:opacity-70 transition-opacity duration-300" />
 			<div className="absolute top-0 right-0 w-1/3 h-1/2 bg-accent/5 blur-3xl rounded-full" />
@@ -71,12 +71,12 @@ export function NextEventHero({ event, isHosting, participant, participantCount 
 						{/* Badges Row */}
 						<div className="flex items-center gap-2 mb-3">
 							{isHosting && (
-								<Badge variant="default" className="text-xs font-semibold bg-accent/20 text-accent border-accent/30">
+								<Badge variant="solid" color="accent" className="text-xs font-semibold bg-accent/20 text-accent border-accent/30">
 									HOSTING
 								</Badge>
 							)}
 							{isUnpaid && (
-								<Badge variant="destructive" className="gap-1 text-xs font-semibold">
+								<Badge variant="solid" color="error" className="gap-1 text-xs font-semibold">
 									<CreditCard className="size-3" />
 									${amountDue} UNPAID
 								</Badge>
@@ -89,7 +89,7 @@ export function NextEventHero({ event, isHosting, participant, participantCount 
 						{/* Event Metadata Grid */}
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
 							<div className="flex items-center gap-2.5 text-sm text-white/80">
-								<div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+								<div className="flex-shrink-0 w-8 h-8 rounded-lg bg-hover flex items-center justify-center">
 									<Clock className="size-4 text-accent" />
 								</div>
 								<span>
@@ -102,7 +102,7 @@ export function NextEventHero({ event, isHosting, participant, participantCount 
 
 							{event.location && (
 								<div className="flex items-center gap-2.5 text-sm text-white/80">
-									<div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+									<div className="flex-shrink-0 w-8 h-8 rounded-lg bg-hover flex items-center justify-center">
 										<MapPin className="size-4 text-accent" />
 									</div>
 									<span className="truncate">{event.location.name}</span>
@@ -111,7 +111,7 @@ export function NextEventHero({ event, isHosting, participant, participantCount 
 
 							{maxParticipants && (
 								<div className="flex items-center gap-2.5 text-sm text-white/80">
-									<div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+									<div className="flex-shrink-0 w-8 h-8 rounded-lg bg-hover flex items-center justify-center">
 										<Users className="size-4 text-accent" />
 									</div>
 									<span>
@@ -141,9 +141,9 @@ export function NextEventHero({ event, isHosting, participant, participantCount 
 
 function EmptyState() {
 	return (
-		<div className="rounded-2xl bg-white/5 border border-white/10 border-dashed">
+		<div className="rounded-2xl bg-surface border border-border border-dashed">
 			<div className="py-16 px-6 text-center">
-				<div className="w-20 h-20 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center">
+				<div className="w-20 h-20 mx-auto mb-6 rounded-full bg-surface flex items-center justify-center">
 					<Calendar className="size-10 text-muted" />
 				</div>
 				<h3 className="text-xl font-bold text-white mb-3">No upcoming events</h3>

@@ -17,7 +17,7 @@ interface PublicProfileCardProps {
 }
 
 const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
-	const fullName = [profile.name, profile.surname].filter(Boolean).join(" ") || "Unknown User";
+	const fullName = [profile.userProfile?.name, profile.userProfile?.surname].filter(Boolean).join(" ") || "Unknown User";
 
 	return (
 		<div className="bg-background rounded-2xl overflow-hidden">
@@ -25,9 +25,9 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 			<div className="bg-linear-to-r from-accent/20 to-purple-500/20 p-6 md:p-8">
 				<div className="flex flex-col md:flex-row items-center gap-6">
 					<div className="relative">
-						{profile.imageUrl ? (
+						{profile.userProfile?.imageUrl ? (
 							<Image
-								src={profile.imageUrl}
+								src={profile.userProfile.imageUrl}
 								alt={fullName}
 								width={120}
 								height={120}
@@ -35,15 +35,13 @@ const PublicProfileCard = ({ profile }: PublicProfileCardProps) => {
 							/>
 						) : (
 							<div className="w-[120px] h-[120px] rounded-full border-4 border-card bg-surface flex items-center justify-center text-4xl font-bold text-white/50">
-								{(profile.name?.[0] || "?").toUpperCase()}
+								{(profile.userProfile?.name?.[0] || "?").toUpperCase()}
 							</div>
 						)}
 					</div>
 					<div className="text-center md:text-left">
 						<h1 className="text-2xl md:text-3xl font-bold text-white">{fullName}</h1>
-						{profile.bio && (
-							<p className="text-white/70 mt-2 max-w-xl">{profile.bio}</p>
-						)}
+						{/* Bio not yet implemented in UserProfile model */}
 					</div>
 				</div>
 			</div>
@@ -231,7 +229,7 @@ export const generateMetadata = async ({
 		};
 	}
 
-	const fullName = [profile.name, profile.surname].filter(Boolean).join(" ") || "User";
+	const fullName = [profile.userProfile?.name, profile.userProfile?.surname].filter(Boolean).join(" ") || "User";
 
 	return {
 		title: `${fullName} - Profile`,

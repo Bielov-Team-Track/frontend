@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { RadioCards } from "@/components/ui";
-import { Unit } from "@/lib/models/EventBudget";
+import { Unit } from "@/lib/models/EventPaymentConfig";
 import { User, Users } from "lucide-react";
 import { CasualPlayFormatSelector } from "./CasualPlayFormatSelector";
 import { RegistrationTypeSelector } from "./RegistrationTypeSelector";
@@ -43,7 +43,7 @@ export function CasualPlayRegistration() {
 	// If list format, use ListRegistration
 	if (casualPlayFormat === "list") {
 		return (
-			<div className="space-y-6">
+			<div className="space-y-4 sm:space-y-6">
 				<CasualPlayFormatSelector />
 				<ListRegistration />
 			</div>
@@ -53,7 +53,7 @@ export function CasualPlayRegistration() {
 	// If teams format
 	if (casualPlayFormat === "openTeams" || casualPlayFormat === "teamsWithPositions") {
 		return (
-			<div className="space-y-6">
+			<div className="space-y-4 sm:space-y-6">
 				<CasualPlayFormatSelector />
 				<RegistrationTypeSelector />
 
@@ -76,7 +76,7 @@ export function CasualPlayRegistration() {
 						/>
 
 						{/* Team Slots */}
-						<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+						<div className="p-3 sm:p-4 rounded-xl bg-surface border border-border">
 							<CasualPlayTeamSlots
 								slots={teamSlots}
 								onChange={setTeamSlots}
@@ -86,18 +86,18 @@ export function CasualPlayRegistration() {
 				)}
 
 				{registrationType === "closed" && (
-					<div className="p-4 rounded-xl bg-white/5 border border-white/10">
-						<h3 className="text-sm font-medium text-white mb-2">Teams</h3>
-						<p className="text-muted text-sm mb-4">
+					<div className="p-3 sm:p-4 rounded-xl bg-surface border border-border">
+						<h3 className="text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">Teams</h3>
+						<p className="text-muted text-[10px] sm:text-sm mb-3 sm:mb-4">
 							Invite existing teams or create teams with captains who will manage rosters.
 						</p>
-						<div className="p-8 border-2 border-dashed border-white/20 rounded-xl text-center text-muted text-sm">
+						<div className="p-4 sm:p-8 border-2 border-dashed border-border rounded-xl text-center text-muted text-xs sm:text-sm">
 							Closed registration team management coming in Phase 5...
 						</div>
 					</div>
 				)}
 
-				<div className="p-4 rounded-xl bg-white/5 border border-white/10">
+				<div className="p-3 sm:p-4 rounded-xl bg-surface border border-border">
 					<RegistrationTimingFields />
 				</div>
 			</div>
@@ -106,11 +106,11 @@ export function CasualPlayRegistration() {
 
 	// No format selected yet - just show format selector
 	return (
-		<div className="space-y-6">
+		<div className="space-y-4 sm:space-y-6">
 			<CasualPlayFormatSelector />
 
-			<div className="p-8 rounded-xl bg-white/5 border border-white/10 text-center">
-				<p className="text-muted text-sm">
+			<div className="p-4 sm:p-8 rounded-xl bg-surface border border-border text-center">
+				<p className="text-muted text-xs sm:text-sm">
 					Select a format above to configure registration settings.
 				</p>
 			</div>

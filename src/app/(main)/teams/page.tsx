@@ -121,11 +121,11 @@ export default function TeamPage() {
 	return (
 		<div className="min-h-screen bg-base-100 text-foreground font-sans pb-20">
 			{/* --- HEADER SECTION --- */}
-			<div className="bg-[#1A1A1A] border-b border-white/5 pt-8 pb-6 px-4 md:px-8">
+			<div className="bg-surface border-b border-border pt-8 pb-6 px-4 md:px-8">
 				<div className="max-w-desktop mx-auto">
 					{/* Breadcrumb */}
 					<div className="flex items-center gap-2 text-xs text-muted-foreground mb-4 uppercase tracking-wider font-bold">
-						<span className="hover:text-white cursor-pointer">
+						<span className="hover:text-foreground cursor-pointer">
 							{TEAM.clubName}
 						</span>
 						<ChevronRight size={12} />
@@ -135,7 +135,7 @@ export default function TeamPage() {
 					<div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
 						<div className="flex items-center gap-5">
 							{/* Team Identity */}
-							<div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-linear-to-br from-gray-800 to-black border border-white/10 p-2 flex items-center justify-center shadow-2xl">
+							<div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-linear-to-br from-gray-800 to-black border border-border p-2 flex items-center justify-center shadow-2xl">
 								<span className="text-3xl font-bold text-muted-foreground">
 									FA
 								</span>
@@ -143,14 +143,14 @@ export default function TeamPage() {
 							</div>
 
 							<div>
-								<h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+								<h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
 									{TEAM.name}
 								</h1>
 								<div className="flex items-center gap-3 text-sm">
 									<span className="px-2 py-0.5 rounded bg-primary/20 text-primary border border-primary/20 font-bold">
 										{TEAM.division}
 									</span>
-									<span className="text-muted-foreground border-l border-white/10 pl-3">
+									<span className="text-muted-foreground border-l border-border pl-3">
 										{TEAM.season} Season
 									</span>
 								</div>
@@ -159,15 +159,15 @@ export default function TeamPage() {
 
 						{/* Quick Stats Header */}
 						<div className="flex gap-4">
-							<div className="text-center px-4 py-2 bg-white/5 rounded-xl border border-white/5">
-								<div className="text-2xl font-bold text-white">
+							<div className="text-center px-4 py-2 bg-surface rounded-xl border border-border">
+								<div className="text-2xl font-bold text-foreground">
 									{TEAM.record}
 								</div>
 								<div className="text-[10px] text-muted-foreground uppercase">
 									Record
 								</div>
 							</div>
-							<button className="btn bg-white/5 border border-white/10 text-white hover:bg-white/10">
+							<button className="btn bg-surface border border-border text-foreground hover:bg-hover">
 								<MoreHorizontal />
 							</button>
 						</div>
@@ -181,7 +181,7 @@ export default function TeamPage() {
 				<div className="lg:col-span-7 space-y-8">
 					{/* Roster Header */}
 					<div className="flex justify-between items-end">
-						<h2 className="text-xl font-bold text-white flex items-center gap-2">
+						<h2 className="text-xl font-bold text-foreground flex items-center gap-2">
 							<Users className="text-accent" size={20} /> The
 							Squad
 						</h2>
@@ -195,9 +195,9 @@ export default function TeamPage() {
 						{ROSTER.map((player) => (
 							<div
 								key={player.id}
-								className="group flex items-center gap-4 p-3 rounded-xl bg-[#1E1E1E] border border-white/5 hover:border-accent/30 hover:bg-white/[0.07] transition-all cursor-pointer">
+								className="group flex items-center gap-4 p-3 rounded-xl bg-surface-elevated border border-border hover:border-accent/30 hover:bg-hover transition-all cursor-pointer">
 								{/* Jersey Number */}
-								<div className="w-10 h-12 flex items-center justify-center bg-white/5 rounded-lg border border-white/5 group-hover:bg-accent group-hover:text-white transition-colors">
+								<div className="w-10 h-12 flex items-center justify-center bg-surface rounded-lg border border-border group-hover:bg-accent group-hover:text-white transition-colors">
 									<span className="font-mono text-xl font-bold text-muted-foreground group-hover:text-white">
 										{player.number}
 									</span>
@@ -212,7 +212,7 @@ export default function TeamPage() {
 									/>
 									{player.isCaptain && (
 										<div
-											className="absolute -top-1 -right-1 bg-yellow-500 text-black p-0.5 rounded-full border-2 border-[#1E1E1E]"
+											className="absolute -top-1 -right-1 bg-yellow-500 text-black p-0.5 rounded-full border-2 border-border"
 											title="Captain">
 											<Crown size={10} fill="black" />
 										</div>
@@ -222,7 +222,7 @@ export default function TeamPage() {
 								{/* Info */}
 								<div className="flex-1">
 									<div className="flex items-center gap-2">
-										<h3 className="font-bold text-foreground group-hover:text-white">
+										<h3 className="font-bold text-foreground group-hover:text-foreground">
 											{player.name}
 										</h3>
 										{player.position === "Libero" && (
@@ -245,7 +245,7 @@ export default function TeamPage() {
 					</div>
 
 					{/* Recruit Card */}
-					<div className="border border-dashed border-white/10 rounded-xl p-4 flex items-center justify-center gap-3 text-muted-foreground hover:text-white hover:border-white/20 hover:bg-white/5 cursor-pointer transition-all">
+					<div className="border border-dashed border-border rounded-xl p-4 flex items-center justify-center gap-3 text-muted-foreground hover:text-foreground hover:border-border hover:bg-hover cursor-pointer transition-all">
 						<ArrowUpRight size={18} />
 						<span className="text-sm font-medium">
 							Manage Roster / Invite Players
@@ -256,7 +256,7 @@ export default function TeamPage() {
 				{/* --- RIGHT COLUMN: INFO & FIXTURES (5 cols) --- */}
 				<div className="lg:col-span-5 space-y-8">
 					{/* NEXT MATCH CARD (Hero of the sidebar) */}
-					<div className="relative overflow-hidden rounded-2xl bg-linear-to-b from-[#2A2A2A] to-[#1E1E1E] border border-white/10 shadow-2xl">
+					<div className="relative overflow-hidden rounded-2xl bg-linear-to-b from-[#2A2A2A] to-[#1E1E1E] border border-border shadow-2xl">
 						<div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-accent to-transparent"></div>
 
 						<div className="p-6 text-center">
@@ -267,7 +267,7 @@ export default function TeamPage() {
 							<div className="flex justify-between items-center mb-6">
 								{/* Home */}
 								<div className="flex flex-col items-center gap-2 w-1/3">
-									<div className="w-16 h-16 rounded-full bg-surface-elevated border-2 border-white/10 p-2">
+									<div className="w-16 h-16 rounded-full bg-surface-elevated border-2 border-border p-2">
 										{/* Img */}
 										<div className="w-full h-full rounded-full bg-muted/50"></div>
 									</div>
@@ -283,7 +283,7 @@ export default function TeamPage() {
 
 								{/* Away */}
 								<div className="flex flex-col items-center gap-2 w-1/3">
-									<div className="w-16 h-16 rounded-full bg-surface-elevated border-2 border-white/10 p-2">
+									<div className="w-16 h-16 rounded-full bg-surface-elevated border-2 border-border p-2">
 										{/* Img */}
 										<div className="w-full h-full rounded-full bg-muted/50"></div>
 									</div>
@@ -294,7 +294,7 @@ export default function TeamPage() {
 							</div>
 
 							<div className="bg-overlay-light rounded-xl p-3 inline-flex flex-col gap-1 w-full">
-								<div className="flex items-center justify-center gap-2 text-white font-medium">
+								<div className="flex items-center justify-center gap-2 text-foreground font-medium">
 									<Calendar
 										size={14}
 										className="text-muted-foreground"
@@ -306,16 +306,16 @@ export default function TeamPage() {
 								</div>
 							</div>
 
-							<button className="mt-4 w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm font-bold transition-colors">
+							<button className="mt-4 w-full py-2 rounded-lg bg-surface hover:bg-hover text-foreground text-sm font-bold transition-colors">
 								Match Details
 							</button>
 						</div>
 					</div>
 
 					{/* LEAGUE TABLE WIDGET */}
-					<div className="bg-[#1E1E1E] border border-white/5 rounded-2xl p-5">
+					<div className="bg-surface-elevated border border-border rounded-2xl p-5">
 						<div className="flex justify-between items-center mb-4">
-							<h3 className="font-bold text-white flex items-center gap-2">
+							<h3 className="font-bold text-foreground flex items-center gap-2">
 								<Shield size={16} className="text-muted-foreground" />{" "}
 								Standings
 							</h3>
@@ -335,7 +335,7 @@ export default function TeamPage() {
 									key={row.rank}
 									className={`grid grid-cols-12 text-sm px-2 py-2 rounded-lg ${
 										row.isCurrent
-											? "bg-white/10 font-bold text-white border border-white/5"
+											? "bg-surface font-bold text-foreground border border-border"
 											: "text-muted-foreground"
 									}`}>
 									<div className="col-span-1">{row.rank}</div>
@@ -351,8 +351,8 @@ export default function TeamPage() {
 					</div>
 
 					{/* RECENT FORM */}
-					<div className="bg-[#1E1E1E] border border-white/5 rounded-2xl p-5">
-						<h3 className="font-bold text-white mb-4 flex items-center gap-2">
+					<div className="bg-surface-elevated border border-border rounded-2xl p-5">
+						<h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
 							<Trophy size={16} className="text-muted-foreground" />{" "}
 							Recent Form
 						</h3>

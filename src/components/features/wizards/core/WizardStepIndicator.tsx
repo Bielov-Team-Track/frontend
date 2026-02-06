@@ -4,7 +4,7 @@ import { Steps } from "@/components/ui";
 import { WizardStep } from "./types";
 
 interface WizardStepIndicatorProps {
-	steps: WizardStep[];
+	steps: WizardStep<any>[];
 	currentStep: number;
 	className?: string;
 }

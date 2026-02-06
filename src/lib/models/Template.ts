@@ -3,6 +3,15 @@
 import { Drill, DrillSkill } from "./Drill";
 
 export type TemplateVisibility = "Private" | "Public";
+export type DifficultyLevel = "Beginner" | "Intermediate" | "Advanced";
+
+export const DIFFICULTY_LEVELS: DifficultyLevel[] = ["Beginner", "Intermediate", "Advanced"];
+
+export const DIFFICULTY_LEVEL_COLORS: Record<DifficultyLevel, { bg: string; text: string; border: string }> = {
+  Beginner: { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/40" },
+  Intermediate: { bg: "bg-amber-500/10", text: "text-amber-400", border: "border-amber-500/40" },
+  Advanced: { bg: "bg-rose-500/10", text: "text-rose-400", border: "border-rose-500/40" },
+};
 
 export interface TemplateAuthor {
   id: string;
@@ -21,6 +30,7 @@ export interface TrainingPlanTemplate {
   clubLogoUrl?: string;
   author?: TemplateAuthor;
   visibility: TemplateVisibility;
+  level: DifficultyLevel;
   totalDuration: number;
   likeCount: number;
   usageCount: number;
@@ -61,6 +71,7 @@ export interface CreateTemplateRequest {
   description?: string;
   clubId?: string;
   visibility?: TemplateVisibility;
+  level?: DifficultyLevel;
   sections?: CreateTemplateSectionRequest[];
   items?: CreateTemplateItemRequest[];
 }
@@ -70,6 +81,7 @@ export interface UpdateTemplateRequest {
   description?: string;
   clubId?: string;
   visibility?: TemplateVisibility;
+  level?: DifficultyLevel;
 }
 
 export interface CreateTemplateSectionRequest {
@@ -101,6 +113,7 @@ export interface SaveAsTemplateRequest {
   description?: string;
   clubId?: string;
   visibility?: TemplateVisibility;
+  level?: DifficultyLevel;
 }
 
 // Filter/List types
@@ -109,6 +122,7 @@ export interface TemplateFilterRequest {
   minDuration?: number;
   maxDuration?: number;
   skills?: string[];
+  level?: DifficultyLevel;
   sortBy?: "newest" | "mostUsed" | "mostLiked" | "shortest" | "longest";
   page?: number;
   pageSize?: number;

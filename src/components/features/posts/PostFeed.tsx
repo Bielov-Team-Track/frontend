@@ -62,7 +62,6 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 			const searchLower = search.toLowerCase();
 			regular = regular.filter(
 				(post) =>
-					post.title?.toLowerCase().includes(searchLower) ||
 					post.content?.toLowerCase().includes(searchLower) ||
 					`${post.author?.name || ""} ${post.author?.surname || ""}`.toLowerCase().includes(searchLower)
 			);

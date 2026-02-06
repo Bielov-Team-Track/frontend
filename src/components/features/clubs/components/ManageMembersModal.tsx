@@ -6,6 +6,12 @@ import { ClubMember } from "@/lib/models/Club";
 import { Search, UserMinus, UserPlus, Users } from "lucide-react";
 import { useState } from "react";
 
+// Helper to extract role strings from role objects or strings
+function extractRoleStrings(roles: any[] | undefined): string[] {
+	if (!roles) return [];
+	return roles.map((r) => (typeof r === "string" ? r : r?.role)).filter(Boolean);
+}
+
 interface ManageMembersModalProps {
 	isOpen: boolean;
 	title: string;
@@ -69,7 +75,7 @@ export default function ManageMembersModal({
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 						placeholder="Search members..."
-						className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
+						className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
 					/>
 				</div>
 
@@ -87,7 +93,7 @@ export default function ManageMembersModal({
 								<div
 									key={member.id}
 									className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${
-										isIncluded ? "bg-accent/10 border-accent/30" : "bg-white/5 border-white/10 hover:border-white/20"
+										isIncluded ? "bg-accent/10 border-accent/30" : "bg-surface border-border hover:border-border"
 									}`}>
 									<div className="flex items-center gap-3">
 										<div className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-sm font-bold text-muted">
@@ -97,7 +103,7 @@ export default function ManageMembersModal({
 											<div className="text-sm font-medium text-white">
 												{member.userProfile?.name} {member.userProfile?.surname}
 											</div>
-											<div className="text-xs text-muted">{member.role}</div>
+											<div className="text-xs text-muted">{extractRoleStrings(member.roles).join(", ") || "Member"}</div>
 										</div>
 									</div>
 									<button
@@ -115,7 +121,7 @@ export default function ManageMembersModal({
 				</div>
 
 				{/* Footer */}
-				<div className="flex items-center justify-between text-sm pt-2 border-t border-white/10">
+				<div className="flex items-center justify-between text-sm pt-2 border-t border-border">
 					<div className="flex items-center gap-2">
 						{accentColor && <div className="w-3 h-3 rounded-full" style={{ backgroundColor: accentColor }} />}
 						<span className="text-muted">{memberCount} members selected</span>

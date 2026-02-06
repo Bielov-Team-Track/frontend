@@ -38,7 +38,7 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 		handleSubmit,
 		formState: { errors },
 	} = useForm<BasicInfoData>({
-		resolver: yupResolver(schema),
+		resolver: yupResolver(schema) as any,
 		defaultValues: {
 			name: defaultValues?.name || "",
 			surname: defaultValues?.surname || "",
@@ -93,7 +93,7 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 					<h2 className="text-2xl font-bold">Crop Your Profile Picture</h2>
 				</div>
 
-				<div className="bg-[#141414] rounded-2xl overflow-hidden border border-white/10">
+				<div className="bg-surface rounded-2xl overflow-hidden border border-border">
 					<ImageCropper imageFile={imageFile} onImageSave={handleImageSave} onCancel={skipImageUpload} className="border-0" />
 				</div>
 
@@ -105,7 +105,7 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 	return (
 		<form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 			<div className="flex flex-col gap-2">
-				<h2 className="text-xl font-semibold text-white">Basic Information</h2>
+				<h2 className="text-xl font-semibold text-foreground">Basic Information</h2>
 				<p className="text-sm text-muted">Let's start with your name and photo.</p>
 			</div>
 
@@ -146,13 +146,13 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 			</div>
 
 			<div className="flex flex-col gap-2">
-				<label className="block text-sm font-medium text-white mb-2">
+				<label className="block text-sm font-medium text-foreground mb-2">
 					Profile Picture <span className="text-muted ml-1.5 font-normal text-xs">(optional)</span>
 				</label>
 
 				{uploadedImageUrl ? (
-					<div className="flex flex-col gap-4 items-center p-6 border border-white/10 rounded-xl bg-white/5">
-						<div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white/10 shadow-xl">
+					<div className="flex flex-col gap-4 items-center p-6 border border-border rounded-xl bg-surface">
+						<div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-border shadow-xl">
 							<Image src={uploadedImageUrl} alt="Profile" fill className="object-cover" />
 						</div>
 						<Button
@@ -165,13 +165,13 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 					</div>
 				) : (
 					<div
-						className="border-2 border-dashed border-white/10 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 hover:border-white/20 transition-all gap-3 group"
+						className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-hover hover:border-border transition-all gap-3 group"
 						onClick={() => fileInputRef.current?.click()}>
-						<div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-white/50 group-hover:text-white group-hover:bg-white/10 transition-all">
+						<div className="w-16 h-16 rounded-full bg-surface flex items-center justify-center text-foreground/50 group-hover:text-foreground group-hover:bg-hover transition-all">
 							<Camera size={24} />
 						</div>
 						<div className="text-center">
-							<span className="text-sm font-medium text-white block group-hover:text-accent transition-colors">Upload Profile Picture</span>
+							<span className="text-sm font-medium text-foreground block group-hover:text-accent transition-colors">Upload Profile Picture</span>
 							<span className="text-xs text-muted block mt-1">Click to select image</span>
 						</div>
 						<input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />

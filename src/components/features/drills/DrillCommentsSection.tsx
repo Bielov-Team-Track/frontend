@@ -142,10 +142,10 @@ export default function DrillCommentsSection({ drillId, className }: DrillCommen
 	}
 
 	return (
-		<div className={cn("bg-[#1A1A1A] border border-white/5 rounded-2xl overflow-hidden", className)}>
+		<div className={cn("bg-surface border border-border rounded-2xl overflow-hidden", className)}>
 			{/* Header */}
-			<div className="p-4 border-b border-white/5 bg-white/2 flex items-center justify-between">
-				<h3 className="text-sm font-bold text-white flex items-center gap-2">
+			<div className="p-4 border-b border-border bg-surface flex items-center justify-between">
+				<h3 className="text-sm font-bold text-foreground flex items-center gap-2">
 					<MessageCircle size={16} className="text-accent" />
 					Comments {totalCount > 0 && `(${totalCount})`}
 				</h3>

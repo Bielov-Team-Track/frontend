@@ -37,6 +37,8 @@ interface EventContext {
 	clubId?: string;
 	teamId?: string;
 	groupId?: string;
+	// Pre-built context selection for immediate use
+	contextSelection?: ContextSelection;
 }
 
 interface CreateModalsContextType {
@@ -76,10 +78,14 @@ export function CreateModalsProvider({ children }: { children: React.ReactNode }
 		setIsCreateEventOpen(false);
 	}, []);
 
-	// Handler for successful event creation - close modal first, then navigate
+	// Handler for successful event creation - close modal first, then refresh
 	const handleEventSuccess = useCallback(() => {
 		setIsCreateEventOpen(false);
+		// Navigate to events page if not already there
 		router.push("/dashboard/events");
+		// Refresh to get updated data from server components
+		// This ensures the event list is updated even if we're already on the events page
+		router.refresh();
 	}, [router]);
 
 	// Club modal handlers
@@ -100,14 +106,8 @@ export function CreateModalsProvider({ children }: { children: React.ReactNode }
 		isCreateClubOpen,
 	};
 
-	// Build context selection from eventContext
-	const contextSelection: ContextSelection | undefined = eventContext.clubId
-		? {
-				clubId: eventContext.clubId,
-				teamId: eventContext.teamId,
-				groupId: eventContext.groupId,
-		  }
-		: undefined;
+	// Use pre-built context selection if provided
+	const contextSelection = eventContext.contextSelection;
 
 	return (
 		<CreateModalsContext.Provider value={value}>

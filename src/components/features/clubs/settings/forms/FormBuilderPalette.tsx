@@ -40,7 +40,7 @@ function DraggableFieldType({ type, label, icon: Icon }: { type: FieldType; labe
 			style={style}
 			{...listeners}
 			{...attributes}
-			className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-colors cursor-grab active:cursor-grabbing">
+			className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-surface border border-border text-white text-sm hover:bg-hover transition-colors cursor-grab active:cursor-grabbing">
 			<Icon size={14} />
 			{label}
 		</button>
@@ -70,7 +70,7 @@ export default function FormBuilderPalette({ selectedField, onUpdateField }: For
 	};
 
 	return (
-		<div className="w-64 shrink-0 border-l border-white/10 pl-4 space-y-6">
+		<div className="w-64 shrink-0 border-l border-border pl-4 space-y-6">
 			{/* Field Palette */}
 			<div>
 				<h3 className="text-sm font-medium text-muted uppercase tracking-wide mb-3">Add Field</h3>
@@ -83,7 +83,7 @@ export default function FormBuilderPalette({ selectedField, onUpdateField }: For
 
 			{/* Field Settings */}
 			{selectedField && (
-				<div className="border-t border-white/10 pt-6">
+				<div className="border-t border-border pt-6">
 					<h3 className="text-sm font-medium text-muted uppercase tracking-wide mb-3">Field Settings</h3>
 					<div className="space-y-4">
 						<Input
@@ -113,7 +113,7 @@ export default function FormBuilderPalette({ selectedField, onUpdateField }: For
 								<label className="text-sm font-medium text-white">Options</label>
 								{selectedField.options?.map((option, index) => (
 									<div key={index} className="flex items-center gap-2">
-										<Input value={option} onChange={(e) => updateOption(index, e.target.value)} size="sm" />
+										<Input value={option} onChange={(e) => updateOption(index, e.target.value)} />
 										<button type="button" onClick={() => removeOption(index)} className="p-1 text-muted hover:text-red-400">
 											×
 										</button>

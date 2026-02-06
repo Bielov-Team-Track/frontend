@@ -9,6 +9,8 @@
  * - All sizes include optimized line heights for readability
  */
 
+import { cn } from "@/lib/utils";
+
 export const breakpoints = {
 	mobile: {
 		small: 320,
@@ -104,8 +106,9 @@ export const responsiveClasses = {
 
 /**
  * Utility function to conditionally apply responsive classes
+ * Note: Renamed to avoid conflict with the main cn utility from clsx/tailwind-merge
  */
-export function cn(...classes: (string | undefined | false)[]): string {
+export function classNames(...classes: (string | undefined | false)[]): string {
 	return classes.filter(Boolean).join(" ");
 }
 

@@ -78,16 +78,16 @@ const ContextSelector = ({ onSelect, clubs }: ContextSelectorProps) => {
 
 	return (
 		<div className="flex flex-1 flex-col justify-between h-full animate-in fade-in slide-in-from-right-4 duration-300">
-			<div className="space-y-6">
-				<div className="border-b-2 pb-4">
-					<h2 className="text-xl font-bold text-white mb-1">Select club, group, or team</h2>
-					<p className="text-muted text-sm">We see that you are part of the club, you can select it, so event is linked to it. This is optional.</p>
+			<div className="space-y-4 sm:space-y-6">
+				<div className="border-b-2 pb-3 sm:pb-4">
+					<h2 className="text-lg sm:text-xl font-bold text-foreground mb-1">Select club, group, or team</h2>
+					<p className="text-muted text-xs sm:text-sm">We see that you are part of the club, you can select it, so event is linked to it. This is optional.</p>
 				</div>
 
 				<motion.div
 					layout
 					transition={{ layout: { duration: 0.2, ease: "easeOut" } }}
-					className="flex flex-col gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
+					className="flex flex-col gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-surface border border-border">
 					<Select
 						clearable={true}
 						options={clubOptions}
@@ -158,11 +158,11 @@ const ContextSelector = ({ onSelect, clubs }: ContextSelectorProps) => {
 					)}
 				</AnimatePresence>
 			</div>
-			<div className="flex gap-4 justify-end">
-				<Button variant={"ghost"} onClick={() => onSelect(null)}>
+			<div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 justify-end mt-6">
+				<Button variant={"ghost"} className="w-full sm:w-auto" onClick={() => onSelect(null)}>
 					Skip
 				</Button>
-				<Button disabled={!selectedClubId} onClick={() => onSelect(getSelectedContext())}>
+				<Button disabled={!selectedClubId} className="w-full sm:w-auto" onClick={() => onSelect(getSelectedContext())}>
 					Continue
 				</Button>
 			</div>

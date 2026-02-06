@@ -23,7 +23,7 @@ function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 					{onMenuClick && (
 						<button
 							onClick={onMenuClick}
-							className="md:hidden p-2 -ml-2 text-muted hover:text-white transition-colors rounded-lg hover:bg-hover"
+							className="md:hidden p-2 -ml-2 text-muted hover:text-foreground transition-colors rounded-lg hover:bg-hover"
 							aria-label="Open menu">
 							<Menu size={24} />
 						</button>
@@ -34,7 +34,7 @@ function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 						<div className="w-9 h-9 bg-linear-to-tr from-secondary to-primary rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 text-white">
 							<Volleyball size={18} />
 						</div>
-						<span className="text-xl font-bold text-white tracking-tight">Spike</span>
+						<span className="text-xl font-bold text-foreground tracking-tight">Spike</span>
 					</Link>
 				</div>
 

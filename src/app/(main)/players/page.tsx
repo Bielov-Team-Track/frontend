@@ -112,7 +112,7 @@ export default function PlayerPage() {
 	const [avatarError, setAvatarError] = useState(false);
 
 	return (
-		<div className="min-h-screen bg-background text-white font-sans pb-20">
+		<div className="min-h-screen bg-background text-foreground font-sans pb-20">
 			{/* --- HERO SECTION --- */}
 			<div className="relative mb-6">
 				{/* Banner & Gradient */}
@@ -132,7 +132,7 @@ export default function PlayerPage() {
 				<div className="max-w-desktop mx-auto px-4 sm:px-6 relative -mt-20 md:-mt-32 flex flex-col md:flex-row items-end gap-6">
 					{/* Avatar */}
 					<div className="relative">
-						<div className="w-28 h-28 md:w-48 md:h-48 rounded-full border-4 border-background bg-surface-elevated overflow-hidden shadow-2xl shadow-black/50 flex items-center justify-center">
+						<div className="w-28 h-28 md:w-48 md:h-48 rounded-full border-4 border-background bg-surface-elevated overflow-hidden shadow-2xl flex items-center justify-center">
 							{!avatarError ? (
 								/* eslint-disable-next-line @next/next/no-img-element */
 								<img src={PLAYER.avatar} alt={PLAYER.name} className="w-full h-full object-cover" onError={() => setAvatarError(true)} />
@@ -142,7 +142,7 @@ export default function PlayerPage() {
 						</div>
 						{PLAYER.isVerified && (
 							<div
-								className="absolute bottom-2 right-2 bg-primary text-white p-1 rounded-full border-4 border-background"
+								className="absolute bottom-2 right-2 bg-primary text-primary-foreground p-1 rounded-full border-4 border-background"
 								title="Verified Player">
 								<Check size={18} strokeWidth={3} />
 							</div>
@@ -153,7 +153,7 @@ export default function PlayerPage() {
 					<div className="flex-1 mb-2 w-full">
 						<div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
 							<div>
-								<h1 className="text-2xl md:text-4xl font-bold text-white flex items-center gap-2">{PLAYER.name}</h1>
+								<h1 className="text-2xl md:text-4xl font-bold text-foreground flex items-center gap-2">{PLAYER.name}</h1>
 								<p className="text-muted text-sm md:text-base flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
 									<span className="text-primary font-medium">{PLAYER.username}</span>
 									<span className="w-1 h-1 bg-muted rounded-full hidden sm:block" />
@@ -169,13 +169,13 @@ export default function PlayerPage() {
 
 							{/* Action Buttons */}
 							<div className="flex gap-2 w-full md:w-auto mt-4 md:mt-0">
-								<button className="flex-1 md:flex-none btn bg-accent hover:bg-accent/90 text-white border-none px-6 shadow-[0_0_20px_rgba(249,115,22,0.2)] flex items-center justify-center gap-2">
+								<button className="flex-1 md:flex-none btn bg-accent hover:bg-accent/90 text-accent-foreground border-none px-6 shadow-[0_0_20px_rgba(249,115,22,0.2)] flex items-center justify-center gap-2">
 									<UserPlus size={18} /> Follow
 								</button>
-								<button className="btn btn-square btn-ghost bg-white/5 hover:bg-white/10 border border-white/10 text-white">
+								<button className="btn btn-square btn-ghost bg-surface hover:bg-hover border border-border text-foreground">
 									<MessageCircle size={18} />
 								</button>
-								<button className="btn btn-square btn-ghost hover:bg-white/5 text-muted hover:text-white">
+								<button className="btn btn-square btn-ghost hover:bg-hover text-muted hover:text-foreground">
 									<Share2 size={18} />
 								</button>
 							</div>
@@ -186,8 +186,8 @@ export default function PlayerPage() {
 							{PLAYER.stats.map((stat, i) => (
 								<div
 									key={i}
-									className="bg-white/5 border border-white/10 rounded-xl p-3 text-center backdrop-blur-xs hover:bg-white/10 transition-colors">
-									<div className="text-xl md:text-3xl font-bold text-white">{stat.value}</div>
+									className="bg-surface border border-border rounded-xl p-3 text-center backdrop-blur-xs hover:bg-hover transition-colors">
+									<div className="text-xl md:text-3xl font-bold text-foreground">{stat.value}</div>
 									<div className="text-[10px] md:text-xs text-muted uppercase tracking-wider font-medium">{stat.label}</div>
 								</div>
 							))}
@@ -201,8 +201,8 @@ export default function PlayerPage() {
 				{/* --- LEFT SIDEBAR (Details & Clubs) --- */}
 				<div className="lg:col-span-4 space-y-6">
 					{/* Key Details Card */}
-					<div className="p-6 rounded-2xl bg-white/5 border border-white/5">
-						<h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+					<div className="p-6 rounded-2xl bg-surface border border-border">
+						<h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
 							<Activity size={18} className="text-primary" /> Player Details
 						</h3>
 						<div className="space-y-4">
@@ -213,13 +213,13 @@ export default function PlayerPage() {
 					</div>
 
 					{/* Clubs History */}
-					<div className="p-6 rounded-2xl bg-white/5 border border-white/5">
-						<h3 className="text-lg font-bold text-white mb-4">Club History</h3>
-						<div className="space-y-4 relative before:absolute before:left-5 before:top-2 before:bottom-2 before:w-0.5 before:bg-white/5 before:z-0">
+					<div className="p-6 rounded-2xl bg-surface border border-border">
+						<h3 className="text-lg font-bold text-foreground mb-4">Club History</h3>
+						<div className="space-y-4 relative before:absolute before:left-5 before:top-2 before:bottom-2 before:w-0.5 before:bg-border before:z-0">
 							{PLAYER.clubs.map((club) => (
 								<div
 									key={club.id}
-									className="relative z-10 flex items-center justify-between group cursor-pointer p-2 rounded-lg hover:bg-white/5 transition-all">
+									className="relative z-10 flex items-center justify-between group cursor-pointer p-2 rounded-lg hover:bg-hover transition-all">
 									<div className="flex items-center gap-3">
 										<div
 											className={`w-10 h-10 rounded-xl p-0.5 flex items-center justify-center overflow-hidden ${
@@ -243,12 +243,12 @@ export default function PlayerPage() {
 											</div>
 										</div>
 										<div>
-											<div className={`text-sm font-bold ${club.current ? "text-white" : "text-muted-foreground"}`}>{club.name}</div>
+											<div className={`text-sm font-bold ${club.current ? "text-foreground" : "text-muted-foreground"}`}>{club.name}</div>
 											<div className="text-xs text-muted">{club.period}</div>
 										</div>
 									</div>
 									<div className="flex flex-col items-end gap-1">
-										<span className="px-2 py-0.5 rounded bg-white/5 text-muted text-[10px] font-medium border border-white/10">
+										<span className="px-2 py-0.5 rounded bg-surface text-muted text-[10px] font-medium border border-border">
 											{club.division}
 										</span>
 										{club.current && <span className="text-[10px] text-accent font-bold">Current</span>}
@@ -262,14 +262,14 @@ export default function PlayerPage() {
 				{/* --- RIGHT MAIN CONTENT (Tabs) --- */}
 				<div className="lg:col-span-8">
 					{/* Tabs Navigation */}
-					<div className="flex items-center border-b border-white/10 mb-6 overflow-x-auto no-scrollbar">
+					<div className="flex items-center border-b border-border mb-6 overflow-x-auto no-scrollbar">
 						{(["overview", "tournaments", "achievements"] as TabType[]).map((tab) => (
 							<button
 								key={tab}
 								onClick={() => setActiveTab(tab)}
 								className={`
                   flex-1 md:flex-none md:px-6 pb-4 text-sm font-bold capitalize relative transition-colors whitespace-nowrap
-                  ${activeTab === tab ? "text-accent" : "text-muted hover:text-white"}
+                  ${activeTab === tab ? "text-accent" : "text-muted hover:text-foreground"}
                 `}>
 								{tab}
 								{activeTab === tab && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-accent rounded-t-full z-10" />}
@@ -285,11 +285,11 @@ export default function PlayerPage() {
 								{PLAYER.achievements.map((ach) => (
 									<div
 										key={ach.id}
-										className="group p-6 rounded-2xl bg-background border border-white/5 flex flex-col items-center text-center hover:border-accent/30 transition-all hover:-translate-y-1">
+										className="group p-6 rounded-2xl bg-background border border-border flex flex-col items-center text-center hover:border-accent/30 transition-all hover:-translate-y-1">
 										<div className={`mb-4 p-3 rounded-full bg-linear-to-br ${ach.color} bg-opacity-10`}>
-											<ach.icon size={32} className="text-white drop-shadow-lg" />
+											<ach.icon size={32} className="text-foreground drop-shadow-lg" />
 										</div>
-										<div className="text-2xl font-bold text-white mb-1">{ach.count}x</div>
+										<div className="text-2xl font-bold text-foreground mb-1">{ach.count}x</div>
 										<div className="text-sm text-muted font-medium uppercase tracking-wider">{ach.title}</div>
 									</div>
 								))}
@@ -306,14 +306,14 @@ export default function PlayerPage() {
 											<span className="text-sm font-bold text-muted-foreground">{tour.date.split(" ")[0]}</span>
 											<span className="text-xs text-muted">{tour.date.split(" ")[1]}</span>
 											{/* Timeline Connector */}
-											<div className="absolute right-[-5px] top-[22px] w-2.5 h-2.5 rounded-full bg-background border-2 border-white/20 group-hover:border-accent z-10"></div>
-											<div className="absolute right-0 top-[22px] bottom-[-16px] w-0.5 bg-white/10 z-0"></div>
+											<div className="absolute right-[-5px] top-[22px] w-2.5 h-2.5 rounded-full bg-background border-2 border-border group-hover:border-accent z-10"></div>
+											<div className="absolute right-0 top-[22px] bottom-[-16px] w-0.5 bg-border z-0"></div>
 										</div>
 
 										{/* Content Card */}
-										<div className="flex-1 p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/[0.07] transition-all flex justify-between items-center">
+										<div className="flex-1 p-4 rounded-xl bg-surface border border-border hover:bg-hover transition-all flex justify-between items-center">
 											<div>
-												<h4 className="font-bold text-white text-lg group-hover:text-accent transition-colors">{tour.name}</h4>
+												<h4 className="font-bold text-foreground text-lg group-hover:text-accent transition-colors">{tour.name}</h4>
 												<div className="flex items-center gap-2 text-sm text-muted mt-1">
 													<Users size={14} /> Represents: {tour.team}
 												</div>
@@ -327,9 +327,9 @@ export default function PlayerPage() {
 
 						{/* 3. OVERVIEW TAB (Placeholder for now) */}
 						{activeTab === "overview" && (
-							<div className="text-center py-12 text-muted bg-white/5 rounded-2xl border border-white/5 border-dashed">
+							<div className="text-center py-12 text-muted bg-surface rounded-2xl border border-border border-dashed">
 								<Activity size={48} className="mx-auto mb-4 opacity-50" />
-								<h3 className="text-lg font-bold text-white">Season Overview</h3>
+								<h3 className="text-lg font-bold text-foreground">Season Overview</h3>
 								<p className="text-sm">Recent matches and highlights will appear here.</p>
 							</div>
 						)}
@@ -345,7 +345,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 	return (
 		<div className="flex justify-between text-sm">
 			<span className="text-muted">{label}</span>
-			<span className="font-medium text-white">{value}</span>
+			<span className="font-medium text-foreground">{value}</span>
 		</div>
 	);
 }
@@ -355,7 +355,7 @@ function ResultBadge({ type, children }: { type: string; children: React.ReactNo
 		gold: "bg-yellow-500/20 text-yellow-500 border-yellow-500/30",
 		silver: "bg-muted/20 text-muted-foreground border-border",
 		bronze: "bg-orange-700/20 text-orange-700 border-orange-700/30",
-		neutral: "bg-white/10 text-muted border-white/10",
+		neutral: "bg-surface text-muted border-border",
 	};
 	const colorClass = colors[type as keyof typeof colors] || colors.neutral;
 

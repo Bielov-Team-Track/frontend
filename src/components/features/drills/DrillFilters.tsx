@@ -565,7 +565,7 @@ function DrawerFilters(props: DrillFiltersProps) {
 								<button
 									type="button"
 									onClick={() => props.onSelectedIntensitiesChange(props.selectedIntensities.filter((i) => i !== int))}
-									className="hover:bg-white/10 rounded-full p-0.5">
+									className="hover:bg-hover rounded-full p-0.5">
 									<X size={10} />
 								</button>
 							</span>
@@ -616,7 +616,7 @@ function DrawerFilters(props: DrillFiltersProps) {
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							onClick={() => setIsOpen(false)}
-							className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+							className="fixed inset-0 bg-overlay backdrop-blur-sm z-50"
 						/>
 
 						{/* Drawer */}
@@ -624,6 +624,14 @@ function DrawerFilters(props: DrillFiltersProps) {
 							initial={{ y: "100%" }}
 							animate={{ y: 0 }}
 							exit={{ y: "100%" }}
+							drag="y"
+							dragConstraints={{ top: 0 }}
+							dragElastic={{ top: 0, bottom: 0.5 }}
+							onDragEnd={(_, info) => {
+								if (info.offset.y > 100 || info.velocity.y > 500) {
+									setIsOpen(false);
+								}
+							}}
 							transition={{ type: "spring", damping: 30, stiffness: 300 }}
 							className="fixed bottom-0 left-0 right-0 bg-card border-t border-border rounded-t-3xl z-50 max-h-[85vh] overflow-hidden flex flex-col">
 							{/* Handle */}

@@ -352,7 +352,7 @@ export default function ClaudeRosterTabV2({ team, clubMembers, teamId }: ClaudeR
 
 				.claude-roster-v2 .stat-card {
 					background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-					border: 1px solid rgba(255, 255, 255, 0.08);
+					border: 1px solid var(--color-border);
 					position: relative;
 					overflow: hidden;
 				}
@@ -414,7 +414,7 @@ export default function ClaudeRosterTabV2({ team, clubMembers, teamId }: ClaudeR
 
 			<div className="claude-roster-v2 space-y-6">
 				{/* Broadcast-style Header Bar */}
-				<div className="broadcast-gradient rounded-2xl border border-white/10 overflow-hidden">
+				<div className="broadcast-gradient rounded-2xl border border-border overflow-hidden">
 					{/* Top accent stripe */}
 					<div className="h-1 accent-stripe" />
 
@@ -466,7 +466,7 @@ export default function ClaudeRosterTabV2({ team, clubMembers, teamId }: ClaudeR
 							{/* Actions */}
 							<div className="flex items-center gap-3">
 								{/* Mobile View Toggle */}
-								<div className="lg:hidden flex bg-white/5 rounded-xl p-1 border border-white/10">
+								<div className="lg:hidden flex bg-surface rounded-xl p-1 border border-border">
 									<button
 										onClick={() => setActiveView("court")}
 										className={`px-4 py-2 rounded-lg font-condensed text-sm font-semibold uppercase tracking-wider transition-all ${
@@ -484,7 +484,7 @@ export default function ClaudeRosterTabV2({ team, clubMembers, teamId }: ClaudeR
 								</div>
 
 								<Button
-									variant="solid"
+									variant="default"
 									color="accent"
 									onClick={() => setShowAddModal(true)}
 									leftIcon={<UserPlus size={18} />}
@@ -501,8 +501,8 @@ export default function ClaudeRosterTabV2({ team, clubMembers, teamId }: ClaudeR
 				<div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 					{/* Court Visualization */}
 					<div className={`lg:col-span-8 ${activeView === "roster" ? "hidden lg:block" : ""}`}>
-						<div className="broadcast-gradient rounded-2xl border border-white/10 overflow-hidden">
-							<div className="px-5 py-4 border-b border-white/10 flex items-center justify-between diagonal-lines">
+						<div className="broadcast-gradient rounded-2xl border border-border overflow-hidden">
+							<div className="px-5 py-4 border-b border-border flex items-center justify-between diagonal-lines">
 								<div className="flex items-center gap-3">
 									<div className="w-1 h-8 bg-accent rounded-full" />
 									<div>
@@ -510,7 +510,7 @@ export default function ClaudeRosterTabV2({ team, clubMembers, teamId }: ClaudeR
 										<p className="font-condensed text-xs text-muted">Drag players to assign positions</p>
 									</div>
 								</div>
-								<div className="font-condensed text-xs text-muted bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
+								<div className="font-condensed text-xs text-muted bg-surface px-3 py-1.5 rounded-lg border border-border">
 									{startersCount}/6 Positions Filled
 								</div>
 							</div>

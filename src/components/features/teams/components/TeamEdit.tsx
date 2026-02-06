@@ -73,7 +73,7 @@ function TeamEdit({
 				</div>
 			</div>
 			{isLoading && (
-				<Loader className="absolute inset-0 flex justify-center items-center bg-black/55 rounded-lg" />
+				<Loader className="absolute inset-0 flex justify-center items-center bg-overlay rounded-lg" />
 			)}
 
 			{positions && positions.length != 0 ? (
@@ -90,7 +90,7 @@ function TeamEdit({
 										<span className="text-black">
 											{p.eventParticipant?.userProfile.name}
 										</span>
-										<Avatar profile={p.eventParticipant?.userProfile} />
+										<Avatar src={p.eventParticipant?.userProfile?.imageUrl} name={`${p.eventParticipant?.userProfile?.name} ${p.eventParticipant?.userProfile?.surname}`} />
 									</div>
 								)}
 								<button

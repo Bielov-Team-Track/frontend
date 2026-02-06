@@ -6,5 +6,5 @@ import { useGroupContext } from "../../layout";
 export default function PostsTab() {
 	const { group, groupId } = useGroupContext();
 
-	return <PostFeed contextType="group" contextId={groupId} contextName={group?.name} />;
+	return <PostFeed contextType="group" contextId={groupId} contextName={group?.name || ""} />;
 }

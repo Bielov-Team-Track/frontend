@@ -178,7 +178,7 @@ export function ListToolbar({
 				<div className="flex items-center gap-2">
 					{/* Sort Dropdown */}
 					{sortOptions && sortOptions.length > 0 && onSortChange && (
-						<Select value={sortBy} onValueChange={onSortChange}>
+						<Select value={sortBy} onValueChange={(value) => value && onSortChange(value)}>
 							<SelectTrigger variant="ghost">
 								{currentSort?.icon || <ArrowDownAZ size={14} />}
 								<SelectValue>{currentSort?.label}</SelectValue>
@@ -279,7 +279,7 @@ export function ListToolbar({
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							transition={{ duration: 0.2 }}
-							className="sm:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+							className="sm:hidden fixed inset-0 bg-overlay backdrop-blur-sm z-40"
 							onClick={() => setShowFilters(false)}
 						/>
 						{/* Bottom Sheet */}
@@ -287,6 +287,14 @@ export function ListToolbar({
 							initial={{ y: "100%" }}
 							animate={{ y: 0 }}
 							exit={{ y: "100%" }}
+							drag="y"
+							dragConstraints={{ top: 0 }}
+							dragElastic={{ top: 0, bottom: 0.5 }}
+							onDragEnd={(_, info) => {
+								if (info.offset.y > 100 || info.velocity.y > 500) {
+									setShowFilters(false);
+								}
+							}}
 							transition={{ type: "spring", damping: 25, stiffness: 300 }}
 							className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-2xl border-t border-border shadow-2xl max-h-[80vh] overflow-hidden">
 							{/* Handle */}
@@ -350,7 +358,7 @@ interface StatusTabsProps {
 
 export function StatusTabs({ tabs, activeTab, onTabChange }: StatusTabsProps) {
 	return (
-		<div className="flex gap-1 p-1 bg-white/5 rounded-xl border border-white/10 overflow-x-auto scrollbar-none">
+		<div className="flex gap-1 p-1 bg-surface rounded-xl border border-border overflow-x-auto scrollbar-none">
 			{tabs.map((tab) => (
 				<button
 					key={tab.id}
@@ -367,7 +375,7 @@ export function StatusTabs({ tabs, activeTab, onTabChange }: StatusTabsProps) {
 						<span
 							className={cn(
 								"min-w-5 h-5 flex items-center justify-center text-xs rounded-full px-1.5",
-								activeTab === tab.id ? "bg-foreground/10" : "bg-white/10"
+								activeTab === tab.id ? "bg-foreground/10" : "bg-surface"
 							)}>
 							{tab.count}
 						</span>

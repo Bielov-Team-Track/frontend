@@ -26,8 +26,8 @@ export default function InviteMemberModal({ isOpen, onClose, onInvite, isLoading
 		if (!searchQuery.trim()) return;
 		setIsSearching(true);
 		try {
-			const results = await searchUsers(searchQuery);
-			setSearchResults(results || []);
+			const results = await searchUsers({ query: searchQuery });
+			setSearchResults(results.items || []);
 		} catch (error) {
 			console.error("Search failed:", error);
 		} finally {
@@ -63,7 +63,7 @@ export default function InviteMemberModal({ isOpen, onClose, onInvite, isLoading
 									onChange={(e) => setSearchQuery(e.target.value)}
 									onKeyDown={(e) => e.key === "Enter" && handleSearch()}
 									placeholder="Search by name or email..."
-									className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
+									className="w-full pl-10 pr-4 py-3 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent"
 								/>
 							</div>
 							<Button variant="ghost" color="neutral" onClick={handleSearch} disabled={isSearching || !searchQuery.trim()} loading={isSearching}>
@@ -78,8 +78,8 @@ export default function InviteMemberModal({ isOpen, onClose, onInvite, isLoading
 									<button
 										key={user.id}
 										onClick={() => setSelectedUser(user)}
-										className="w-full flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 hover:border-accent hover:bg-accent/10 transition-colors text-left">
-										<Avatar profile={user} />
+										className="w-full flex items-center gap-3 p-3 rounded-xl bg-surface border border-border hover:border-accent hover:bg-accent/10 transition-colors text-left">
+										<Avatar src={user.imageUrl} name={`${user.name} ${user.surname}`} />
 										<div>
 											<div className="font-medium text-white">
 												{user.name} {user.surname}
@@ -99,7 +99,7 @@ export default function InviteMemberModal({ isOpen, onClose, onInvite, isLoading
 					<div className="space-y-6">
 						{/* Selected User Display */}
 						<div className="flex items-center gap-4 p-4 rounded-xl bg-accent/10 border border-accent/20">
-							<Avatar profile={selectedUser} />
+							<Avatar src={selectedUser.imageUrl} name={`${selectedUser.name} ${selectedUser.surname}`} />
 							<div className="flex-1">
 								<div className="font-bold text-white">
 									{selectedUser.name} {selectedUser.surname}
@@ -119,7 +119,7 @@ export default function InviteMemberModal({ isOpen, onClose, onInvite, isLoading
 									<label
 										key={r}
 										className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors ${
-											role === r ? "bg-accent/20 border-accent" : "bg-white/5 border-white/10 hover:border-white/20"
+											role === r ? "bg-accent/20 border-accent" : "bg-surface border-border hover:border-border"
 										}`}>
 										<div className="flex items-center gap-3">
 											<input

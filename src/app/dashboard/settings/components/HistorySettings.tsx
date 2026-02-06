@@ -12,6 +12,7 @@ import {
 	UpdateHistoryDto,
 	VolleyballPosition,
 } from "@/lib/models/Profile";
+import { showSuccessToast } from "@/lib/errors";
 import { Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -49,7 +50,6 @@ interface HistorySettingsProps {
 export default function HistorySettings({ user }: HistorySettingsProps) {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
-	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
 	// Convert backend HistoryDto to frontend HistoryEntry format
@@ -69,11 +69,6 @@ export default function HistorySettings({ user }: HistorySettingsProps) {
 
 	// Track initial entry IDs for comparison
 	const initialEntryIds = useMemo(() => new Set(initialEntries.map((e) => e.id)), [initialEntries]);
-
-	const showSuccess = (msg: string) => {
-		setSuccessMessage(msg);
-		setTimeout(() => setSuccessMessage(null), 3000);
-	};
 
 	// Convert frontend HistoryEntry to backend CreateHistoryDto
 	const toCreateDto = (entry: HistoryEntry): CreateHistoryDto => ({
@@ -100,7 +95,6 @@ export default function HistorySettings({ user }: HistorySettingsProps) {
 	const handleSave = async (data: { bio: string; entries: HistoryEntry[] }) => {
 		setIsLoading(true);
 		setError(null);
-		setSuccessMessage(null);
 
 		try {
 			const currentEntries = data.entries;
@@ -131,7 +125,7 @@ export default function HistorySettings({ user }: HistorySettingsProps) {
 
 			await Promise.all(operations);
 
-			showSuccess("History updated successfully!");
+			showSuccessToast("History updated successfully!");
 			router.refresh();
 		} catch (err: any) {
 			console.error("History update error:", err);
@@ -143,12 +137,6 @@ export default function HistorySettings({ user }: HistorySettingsProps) {
 
 	return (
 		<div className="flex flex-col gap-6">
-			{/* Messages */}
-			{successMessage && (
-				<div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg text-sm font-medium animate-in fade-in slide-in-from-top-2">
-					{successMessage}
-				</div>
-			)}
 			{error && (
 				<div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm font-medium animate-in fade-in slide-in-from-top-2">
 					{error}
@@ -156,7 +144,7 @@ export default function HistorySettings({ user }: HistorySettingsProps) {
 			)}
 
 			{/* Content */}
-			<div className="bg-[#141414] border border-white/5 rounded-2xl p-6 md:p-8">
+			<div className="bg-surface border border-border rounded-2xl p-6 md:p-8">
 				<div className="flex flex-col gap-8">
 					<HistoryStep
 						onNext={handleSave}
@@ -164,7 +152,7 @@ export default function HistorySettings({ user }: HistorySettingsProps) {
 						initialEntries={initialEntries}
 					/>
 
-					<div className="flex justify-end pt-4 border-t border-white/5">
+					<div className="flex justify-end pt-4 border-t border-border">
 						<Button type="submit" form="history-settings-form" loading={isLoading} className="gap-2" leftIcon={<Save size={20} />}>
 							Save Changes
 						</Button>

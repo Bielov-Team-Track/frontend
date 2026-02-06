@@ -89,7 +89,7 @@ export default function GroupFormModal({ isOpen, group, clubId, onClose, onSubmi
 						onChange={(e) => setDescription(e.target.value)}
 						placeholder="Describe your group"
 						rows={3}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent resize-none"
+						className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent resize-none"
 					/>
 				</div>
 
@@ -116,7 +116,7 @@ export default function GroupFormModal({ isOpen, group, clubId, onClose, onSubmi
 					<select
 						value={skillLevel}
 						onChange={(e) => setSkillLevel(e.target.value)}
-						className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-hidden focus:border-accent">
+						className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-white focus:outline-hidden focus:border-accent">
 						<option value="">Select skill level (optional)</option>
 						{Object.values(SkillLevel).map((level) => (
 							<option key={level} value={level}>
@@ -130,7 +130,7 @@ export default function GroupFormModal({ isOpen, group, clubId, onClose, onSubmi
 					<Button type="button" variant="ghost" color="neutral" fullWidth onClick={onClose}>
 						Cancel
 					</Button>
-					<Button type="submit" variant="solid" color="accent" fullWidth disabled={!name.trim()} loading={isLoading}>
+					<Button type="submit" variant="default" color="accent" fullWidth disabled={!name.trim()} loading={isLoading}>
 						{isEditing ? "Save Changes" : "Create Group"}
 					</Button>
 				</div>
