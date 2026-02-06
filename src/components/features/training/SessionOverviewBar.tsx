@@ -58,6 +58,7 @@ const SKILLS: DrillSkill[] = ["Serving", "Passing", "Setting", "Attacking", "Blo
 const CATEGORIES: DrillCategory[] = ["Warmup", "Technical", "Tactical", "Game", "Conditioning", "Cooldown"];
 const INTENSITIES: DrillIntensity[] = ["Low", "Medium", "High"];
 
+// Segment colors (for timeline bar)
 const CATEGORY_COLORS: Record<DrillCategory, string> = {
 	Warmup: "#29757A",
 	Technical: "#2E5A88",
@@ -71,6 +72,22 @@ const INTENSITY_COLORS: Record<DrillIntensity, string> = {
 	Low: "#4A7A45",
 	Medium: "#D99100",
 	High: "#BE3F23",
+};
+
+// Pill colors (brighter for better readability)
+const CATEGORY_PILL_COLORS: Record<DrillCategory, string> = {
+	Warmup: "#3DBCC4",
+	Technical: "#5B9BD5",
+	Tactical: "#FF9533",
+	Game: "#FFBC33",
+	Conditioning: "#E85A3D",
+	Cooldown: "#6ABF62",
+};
+
+const INTENSITY_PILL_COLORS: Record<DrillIntensity, string> = {
+	Low: "#6ABF62",
+	Medium: "#FFBC33",
+	High: "#E85A3D",
 };
 
 const SNAP_POINTS = [30, 60, 90, 120, 150, 180];
@@ -536,21 +553,21 @@ export const SessionOverviewBar: React.FC<SessionOverviewBarProps> = ({
 									variant={isActive ? "soft" : "ghost"}
 									size="md"
 									className={cn(
-										"text-xs font-medium transition-all flex items-center gap-1.5 px-2.5 py-1",
-										isActive ? `border` : "text-muted/30 border border-border/50",
+										"text-xs font-semibold transition-all flex items-center gap-1.5 px-2.5 py-1",
+										isActive ? `border` : "text-muted/50 border border-border/40",
 									)}
 									style={
 										isActive
 											? {
-													background: `${CATEGORY_COLORS[category]}15`,
-													borderColor: `${CATEGORY_COLORS[category]}40`,
-													color: CATEGORY_COLORS[category],
+													background: `${CATEGORY_PILL_COLORS[category]}25`,
+													borderColor: `${CATEGORY_PILL_COLORS[category]}60`,
+													color: CATEGORY_PILL_COLORS[category],
 												}
 											: undefined
 									}>
 									<span
 										className="w-2 h-2 rounded-full flex-shrink-0"
-										style={{ background: isActive ? CATEGORY_COLORS[category] : "#66666650" }}
+										style={{ background: isActive ? CATEGORY_PILL_COLORS[category] : "#666666" }}
 									/>
 									{category}
 									{isActive ? ` · ${duration}m` : ""}
@@ -570,12 +587,12 @@ export const SessionOverviewBar: React.FC<SessionOverviewBarProps> = ({
 									variant={isActive ? "soft" : "ghost"}
 									color={isActive ? "primary" : "neutral"}
 									size="md"
-									className={cn("text-xs font-medium transition-all px-2.5 py-1", isActive ? "" : "text-muted/30 border border-border/50")}>
+									className={cn("text-xs font-semibold transition-all px-2.5 py-1", isActive ? "" : "text-muted/50 border border-border/40")}>
 									{skill}
 								</Badge>
 							);
 						})}
-						<span className="text-[10px] text-muted/50 ml-2">
+						<span className="text-[10px] text-muted ml-2">
 							{presentSkills.size}/{SKILLS.length} covered
 						</span>
 					</div>
@@ -591,19 +608,19 @@ export const SessionOverviewBar: React.FC<SessionOverviewBarProps> = ({
 									key={intensity}
 									variant={isActive ? "soft" : "ghost"}
 									size="md"
-									className={cn("text-xs font-medium transition-all flex items-center gap-1.5 px-2.5 py-1", isActive ? "border" : "text-muted/30 border border-border/50")}
+									className={cn("text-xs font-semibold transition-all flex items-center gap-1.5 px-2.5 py-1", isActive ? "border" : "text-muted/50 border border-border/40")}
 									style={
 										isActive
 											? {
-													background: `${INTENSITY_COLORS[intensity]}15`,
-													borderColor: `${INTENSITY_COLORS[intensity]}40`,
-													color: INTENSITY_COLORS[intensity],
+													background: `${INTENSITY_PILL_COLORS[intensity]}25`,
+													borderColor: `${INTENSITY_PILL_COLORS[intensity]}60`,
+													color: INTENSITY_PILL_COLORS[intensity],
 												}
 											: undefined
 									}>
 									<span
 										className="w-2 h-2 rounded-full flex-shrink-0"
-										style={{ background: isActive ? INTENSITY_COLORS[intensity] : "#66666650" }}
+										style={{ background: isActive ? INTENSITY_PILL_COLORS[intensity] : "#666666" }}
 									/>
 									{intensity}
 									{isActive ? ` · ${duration}m` : ""}
@@ -687,7 +704,7 @@ export const SessionOverviewBar: React.FC<SessionOverviewBarProps> = ({
 								END
 							</span>
 							<span className={cn(
-								"absolute bottom-[-10px] left-1/2 -translate-x-1/2 text-[8px] font-medium tracking-wider whitespace-nowrap",
+								"absolute bottom-[-10px] left-1/2 -translate-x-1/2 text-[8px] font-medium tracking-wider whitespace-nowrap px-1 bg-surface rounded",
 								isOverLimit ? "text-error" : "text-muted"
 							)}>
 								{sessionDuration}m
