@@ -475,6 +475,7 @@ export default function TrainingPlanWizardPage() {
 						onTimelineChange={setTimeline}
 						onSectionsChange={setSections}
 						onViewDrillDetails={handleViewDetails}
+						sessionDuration={sessionDuration}
 					/>
 				</div>
 			</div>

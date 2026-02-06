@@ -11,8 +11,11 @@ import {
   GripVertical,
   ChevronUp,
   ChevronDown,
+  ChevronRight,
   Download,
   X,
+  LayoutList,
+  StickyNote,
 } from "lucide-react";
 
 // Types
@@ -109,16 +112,19 @@ const DurationEditor: React.FC<DurationEditorProps> = ({
   return (
     <div
       ref={popoverRef}
-      className="fixed z-50 min-w-[220px] rounded-xl border border-border bg-raised/95 p-4 shadow-lg backdrop-blur-lg"
+      className="fixed z-50 min-w-[240px] rounded-xl border border-border/80 bg-raised/95 p-4 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-200"
       style={{ left: position.x, top: position.y }}
     >
-      <label className="mb-2 block text-xs font-medium text-muted">
+      {/* Arrow pointer */}
+      <div className="absolute -top-2 left-6 h-4 w-4 rotate-45 border-l border-t border-border/80 bg-raised/95" />
+
+      <label className="mb-2 block text-xs font-semibold text-foreground">
         Duration (minutes)
       </label>
       <div className="flex items-center gap-2">
         <button
           onClick={() => handleAdjust(-5)}
-          className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-subtle text-foreground hover:bg-hover"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-subtle text-foreground hover:bg-hover hover:border-border-strong transition-all text-sm font-medium"
         >
           -5
         </button>
@@ -126,17 +132,17 @@ const DurationEditor: React.FC<DurationEditorProps> = ({
           type="number"
           value={localDuration}
           onChange={(e) => setLocalDuration(Math.max(1, parseInt(e.target.value) || 1))}
-          className="flex-1 text-center"
+          className="flex-1 text-center font-semibold tabular-nums"
           min={1}
         />
         <button
           onClick={() => handleAdjust(5)}
-          className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-subtle text-foreground hover:bg-hover"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-subtle text-foreground hover:bg-hover hover:border-border-strong transition-all text-sm font-medium"
         >
           +5
         </button>
       </div>
-      <label className="mb-1 mt-3 block text-xs text-muted">Notes</label>
+      <label className="mb-1.5 mt-4 block text-xs font-semibold text-foreground">Notes</label>
       <TextArea
         value={localNotes}
         onChange={(e) => setLocalNotes(e.target.value)}
@@ -144,7 +150,7 @@ const DurationEditor: React.FC<DurationEditorProps> = ({
         rows={2}
         className="resize-none"
       />
-      <div className="mt-3 flex gap-2">
+      <div className="mt-4 flex gap-2">
         <Button
           variant="outline"
           size="sm"
@@ -175,11 +181,15 @@ const DropZonePlaceholder: React.FC<DropZonePlaceholderProps> = ({ onDrop }) => 
     <div
       onDragOver={handleDragOver}
       onDrop={onDrop}
-      className="mb-2 flex items-center justify-center rounded-xl border-2 border-dashed border-accent/50 bg-accent/10 p-3 text-center text-sm text-accent transition-all duration-200"
+      className="mb-3 flex items-center justify-center rounded-xl border-2 border-dashed border-accent/60 bg-accent/5 p-4 text-center text-sm transition-all duration-200 hover:border-accent hover:bg-accent/10 relative overflow-hidden"
     >
-      <span className="flex items-center gap-2">
-        <ChevronDown size={16} />
+      {/* Animated shimmer background */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-accent/10 to-transparent -translate-x-full animate-[shimmer_2s_linear_infinite]" />
+
+      <span className="flex items-center gap-2 font-medium text-accent relative z-10">
+        <ChevronDown size={16} className="animate-bounce" />
         Drop here
+        <ChevronDown size={16} className="animate-bounce [animation-delay:150ms]" />
       </span>
     </div>
   );
@@ -224,79 +234,90 @@ const DrillItemCard: React.FC<DrillItemCardProps> = ({
       tabIndex={0}
       role="listitem"
       aria-label={`${item.drill.name}, ${item.duration} minutes, position ${index + 1} of ${totalItems}`}
-      className={`group relative mb-2 flex cursor-move items-start gap-3 rounded-xl p-3 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${
+      className={`group relative mb-3 flex cursor-move items-start gap-3.5 rounded-xl p-3 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${
         isDragging
-          ? "opacity-60 border-2 border-dashed border-accent bg-accent/20"
-          : "border border-border bg-subtle/30 hover:border-primary/30 hover:bg-hover"
+          ? "opacity-50 scale-[0.98] border-2 border-dashed border-accent bg-accent/10 shadow-lg"
+          : "border border-border/50 bg-surface/80 shadow-sm hover:border-accent/30 hover:bg-surface hover:shadow-md hover:-translate-y-0.5"
       }`}
     >
-      {/* Category color bar */}
+      {/* Hover gradient overlay */}
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+      {/* Category color bar with glow */}
       <div
-        className="h-full w-1 flex-shrink-0 rounded-full"
-        style={{ background: categoryColor }}
+        className="h-full w-1.5 flex-shrink-0 rounded-full"
+        style={{
+          background: categoryColor,
+          boxShadow: `0 0 8px ${categoryColor}40`
+        }}
       />
 
       {/* Drag handle */}
       <div className={`flex-shrink-0 pt-1 transition-colors duration-200 ${
-        isDragging ? "text-accent" : "text-muted/50 group-hover:text-muted"
+        isDragging ? "text-accent" : "text-muted/40 group-hover:text-muted"
       }`}>
         <GripVertical size={16} />
       </div>
 
       {/* Content */}
-      <div className="min-w-0 flex-1">
-        <h4 className="text-sm font-medium text-foreground">
+      <div className="min-w-0 flex-1 py-0.5 relative z-10">
+        <h4 className="text-sm font-semibold text-foreground leading-tight truncate">
           {item.drill.name}
         </h4>
-        <div className="mt-1 flex flex-wrap items-center gap-2">
-          {/* Duration - clickable */}
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          {/* Duration - clickable with better styling */}
           <button
             onClick={onDurationClick}
-            className="flex items-center gap-1 text-xs text-muted hover:text-primary transition-colors"
+            className="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-accent transition-colors rounded-md px-1.5 py-0.5 -ml-1.5 hover:bg-accent/10"
           >
-            <Clock size={12} />
-            {item.duration}m
+            <Clock size={13} strokeWidth={2.5} />
+            <span className="tabular-nums">{item.duration}m</span>
           </button>
 
-          {/* Category badge */}
+          {/* Category badge - no border */}
           <Badge
             variant="custom"
+            className="text-[10px] px-1.5 py-0.5"
             style={{
-              background: `${categoryColor}20`,
+              background: `${categoryColor}15`,
               color: categoryColor,
-              borderColor: `${categoryColor}40`,
             }}
           >
             {item.drill.category}
           </Badge>
 
-          {/* Intensity badge */}
+          {/* Intensity badge - with border */}
           <Badge
             variant="custom"
+            className="text-[10px] px-1.5 py-0.5"
             style={{
-              background: `${intensityColor}20`,
+              background: `${intensityColor}15`,
               color: intensityColor,
-              borderColor: `${intensityColor}40`,
+              borderColor: `${intensityColor}30`,
+              borderWidth: '1px',
             }}
           >
             {item.drill.intensity}
           </Badge>
         </div>
 
-        {/* Notes preview */}
+        {/* Notes preview with icon */}
         {item.notes && (
-          <p className="mt-1.5 text-xs text-muted/70 line-clamp-1">
-            {item.notes}
-          </p>
+          <div className="mt-2 flex items-start gap-1.5 text-xs">
+            <StickyNote size={11} className="text-muted/50 mt-0.5 flex-shrink-0" />
+            <p className="text-muted/70 line-clamp-2 leading-relaxed">
+              {item.notes}
+            </p>
+          </div>
         )}
       </div>
 
-      {/* Hover actions */}
-      <div className="flex flex-shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+      {/* Hover actions with staggered animation */}
+      <div className="flex flex-shrink-0 items-center gap-1 opacity-0 transition-all duration-200 group-hover:opacity-100 focus-within:opacity-100 relative z-10">
         {index > 0 && (
           <button
             onClick={onMoveUp}
-            className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-border-strong hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-border-strong hover:text-foreground hover:scale-110 active:scale-95 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             aria-label="Move drill up"
           >
             <ChevronUp size={14} />
@@ -305,7 +326,7 @@ const DrillItemCard: React.FC<DrillItemCardProps> = ({
         {index < totalItems - 1 && (
           <button
             onClick={onMoveDown}
-            className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-border-strong hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-border-strong hover:text-foreground hover:scale-110 active:scale-95 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             aria-label="Move drill down"
           >
             <ChevronDown size={14} />
@@ -313,14 +334,14 @@ const DrillItemCard: React.FC<DrillItemCardProps> = ({
         )}
         <button
           onClick={onViewDetails}
-          className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-border-strong hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-border-strong hover:text-foreground hover:scale-110 active:scale-95 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           aria-label="View drill details"
         >
           <Eye size={14} />
         </button>
         <button
           onClick={onRemove}
-          className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-error/30 hover:text-error focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-error/30 hover:text-error hover:scale-110 hover:rotate-12 active:scale-95 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           aria-label="Remove drill from timeline"
         >
           <Trash2 size={14} />
@@ -331,12 +352,17 @@ const DrillItemCard: React.FC<DrillItemCardProps> = ({
 };
 
 // Main Component
-export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
+interface TimelineBuilderPanelPropsExtended extends TimelineBuilderPanelProps {
+  sessionDuration?: number;
+}
+
+export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelPropsExtended> = ({
   timeline,
   sections,
   onTimelineChange,
   onSectionsChange,
   onViewDrillDetails,
+  sessionDuration = 90,
 }) => {
   const [editingDuration, setEditingDuration] = useState<{
     instanceId: string;
@@ -345,6 +371,23 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
     position: { x: number; y: number };
   } | null>(null);
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
+
+  // Calculate total timeline duration
+  const totalDuration = timeline.reduce((sum, item) => sum + item.duration, 0);
+  const progressPercent = Math.min((totalDuration / sessionDuration) * 100, 100);
+  const isOvertime = totalDuration > sessionDuration;
+
+  // Toggle section collapse
+  const toggleSectionCollapse = (sectionId: string) => {
+    const newCollapsed = new Set(collapsedSections);
+    if (newCollapsed.has(sectionId)) {
+      newCollapsed.delete(sectionId);
+    } else {
+      newCollapsed.add(sectionId);
+    }
+    setCollapsedSections(newCollapsed);
+  };
 
   // Add section
   const handleAddSection = () => {
@@ -518,6 +561,36 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
         )}
       </div>
 
+      {/* Session Progress Bar */}
+      {timeline.length > 0 && (
+        <div className="relative">
+          <div className="h-2 rounded-full bg-subtle overflow-hidden">
+            <div
+              className={`h-full transition-all duration-500 ease-out relative ${
+                isOvertime
+                  ? "bg-gradient-to-r from-warning/80 to-warning"
+                  : "bg-gradient-to-r from-accent/80 to-accent"
+              }`}
+              style={{ width: `${progressPercent}%` }}
+            >
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_linear_infinite]" />
+            </div>
+          </div>
+          <div className="flex items-center justify-between mt-2 text-xs">
+            <span className="font-medium text-muted">
+              Session Progress
+            </span>
+            <span className={`font-semibold tabular-nums ${
+              isOvertime ? "text-warning" : "text-accent"
+            }`}>
+              {totalDuration}m / {sessionDuration}m
+              {isOvertime && " (overtime)"}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Timeline Area */}
       <div className="min-h-[400px]">
         {timeline.length === 0 && sections.length === 0 ? (
@@ -541,34 +614,61 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
         ) : (
           // Timeline Content
           <div className="relative pl-8" role="list" aria-label="Training drills timeline">
-            {/* Timeline line */}
-            <div className="absolute bottom-2 left-3 top-2 w-0.5 bg-border" />
-            <div className="absolute left-[5px] top-0 z-10 h-[13px] w-[13px] rounded-full border-[3px] border-base bg-accent" />
+            {/* Timeline line with gradient */}
+            <div className="absolute bottom-2 left-3 top-2 w-1 bg-gradient-to-b from-accent via-border to-border/20 rounded-full" />
+
+            {/* Start dot with glow effect */}
+            <div className="absolute left-[3px] top-0 z-10 h-5 w-5 rounded-full border-4 border-base bg-accent shadow-lg">
+              <div className="absolute inset-0 rounded-full bg-accent/30 blur-sm -z-10" />
+            </div>
 
             {/* Ordered sections and items */}
             {orderedTimeline.map((group, groupIndex) => (
               <div key={groupIndex}>
                 {group.type === "section" && group.section && (
                   <div className="relative mb-2 mt-4 first:mt-0">
-                    {/* Section dot */}
+                    {/* Section dot with glow */}
                     <div
                       className="absolute left-[-25px] top-1/2 z-10 h-[13px] w-[13px] -translate-y-1/2 rounded-full border-[3px] border-base"
-                      style={{ background: group.section.color }}
+                      style={{
+                        background: group.section.color,
+                        boxShadow: `0 0 12px ${group.section.color}60`
+                      }}
                     />
 
-                    {/* Section header */}
+                    {/* Section header with enhanced styling */}
                     <div
-                      className="ml-2 flex items-center justify-between rounded-xl px-4 py-2.5"
+                      className="ml-2 flex items-center justify-between rounded-xl px-4 py-3 transition-all hover:scale-[1.005]"
                       style={{
-                        background: `${group.section.color}10`,
-                        border: `1px solid ${group.section.color}30`,
+                        background: `linear-gradient(135deg, ${group.section.color}08 0%, ${group.section.color}15 100%)`,
+                        border: `1.5px solid ${group.section.color}40`,
+                        boxShadow: `0 2px 8px ${group.section.color}10`,
                       }}
                     >
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-3">
+                        {/* Collapse toggle */}
+                        <button
+                          onClick={() => toggleSectionCollapse(group.section!.id)}
+                          className="p-1 rounded hover:bg-white/10 transition-colors"
+                          aria-label={collapsedSections.has(group.section.id) ? "Expand section" : "Collapse section"}
+                        >
+                          {collapsedSections.has(group.section.id) ? (
+                            <ChevronRight size={14} style={{ color: group.section.color }} />
+                          ) : (
+                            <ChevronDown size={14} style={{ color: group.section.color }} />
+                          )}
+                        </button>
+
+                        {/* Section dot indicator */}
                         <div
-                          className="h-2.5 w-2.5 rounded-full"
-                          style={{ background: group.section.color }}
+                          className="h-3 w-3 rounded-full"
+                          style={{
+                            background: group.section.color,
+                            boxShadow: `0 0 8px ${group.section.color}60`
+                          }}
                         />
+
+                        {/* Editable section name */}
                         <input
                           type="text"
                           value={group.section.name}
@@ -578,93 +678,102 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
                               e.target.value
                             )
                           }
-                          className="cursor-text rounded bg-transparent px-1 text-xs font-bold uppercase tracking-wider outline-none transition-all hover:bg-white/5 focus:bg-white/10 focus:ring-1 focus:ring-white/20"
+                          className="cursor-text rounded-md bg-transparent px-2 py-1 text-xs font-bold uppercase tracking-wider outline-none transition-all hover:bg-white/10 focus:bg-white/15 focus:ring-2 focus:ring-white/30"
                           style={{ color: group.section.color }}
                         />
-                        <span className="text-[10px] text-muted">
-                          {group.items.length} drill
-                          {group.items.length !== 1 ? "s" : ""} ·{" "}
-                          {group.items.reduce(
-                            (sum, item) => sum + item.duration,
-                            0
-                          )}
-                          m
-                        </span>
+
+                        {/* Enhanced metrics */}
+                        <div className="flex items-center gap-2 text-[10px] font-medium">
+                          <span className="flex items-center gap-1 text-muted">
+                            <LayoutList size={11} />
+                            {group.items.length}
+                          </span>
+                          <span className="text-muted/50">·</span>
+                          <span
+                            className="flex items-center gap-1 tabular-nums"
+                            style={{ color: group.section.color }}
+                          >
+                            <Clock size={11} />
+                            {group.items.reduce((sum, item) => sum + item.duration, 0)}m
+                          </span>
+                        </div>
                       </div>
                       <button
                         onClick={() => handleDeleteSection(group.section!.id)}
-                        className="rounded-lg p-1 text-muted/50 transition-all hover:bg-hover hover:text-error"
+                        className="rounded-lg p-1.5 text-muted/50 transition-all hover:bg-error/10 hover:text-error hover:scale-110"
                         title="Delete section"
                       >
                         <X size={14} />
                       </button>
                     </div>
 
-                    {/* Section items */}
-                    <div className="ml-2 mt-2">
-                      {/* Drop zone at the start of section */}
-                      {draggedItemId && group.items.length === 0 && (
-                        <DropZonePlaceholder
-                          onDrop={() => {
-                            const firstItemIndex = timeline.findIndex(
-                              (item) => item.sectionId === group.section!.id
-                            );
-                            if (firstItemIndex !== -1) {
-                              handleDrop(firstItemIndex, group.section!.id);
-                            } else {
-                              // Empty section - add at the end
-                              handleDrop(timeline.length, group.section!.id);
-                            }
-                          }}
-                        />
-                      )}
+                    {/* Section items - conditionally rendered based on collapse state */}
+                    {!collapsedSections.has(group.section.id) && (
+                      <div className="ml-2 mt-2">
+                        {/* Drop zone at the start of section */}
+                        {draggedItemId && group.items.length === 0 && (
+                          <DropZonePlaceholder
+                            onDrop={() => {
+                              const firstItemIndex = timeline.findIndex(
+                                (item) => item.sectionId === group.section!.id
+                              );
+                              if (firstItemIndex !== -1) {
+                                handleDrop(firstItemIndex, group.section!.id);
+                              } else {
+                                // Empty section - add at the end
+                                handleDrop(timeline.length, group.section!.id);
+                              }
+                            }}
+                          />
+                        )}
 
-                      {group.items.map((item, itemIndex) => {
-                        const globalIndex = timeline.indexOf(item);
-                        return (
-                          <React.Fragment key={item.instanceId}>
-                            {/* Drop zone before this item */}
-                            {draggedItemId && draggedItemId !== item.instanceId && itemIndex === 0 && (
-                              <DropZonePlaceholder
-                                onDrop={() => handleDrop(globalIndex, group.section!.id)}
+                        {group.items.map((item, itemIndex) => {
+                          const globalIndex = timeline.indexOf(item);
+                          return (
+                            <React.Fragment key={item.instanceId}>
+                              {/* Drop zone before this item */}
+                              {draggedItemId && draggedItemId !== item.instanceId && itemIndex === 0 && (
+                                <DropZonePlaceholder
+                                  onDrop={() => handleDrop(globalIndex, group.section!.id)}
+                                />
+                              )}
+
+                              <DrillItemCard
+                                item={item}
+                                index={globalIndex}
+                                totalItems={timeline.length}
+                                isDragging={draggedItemId === item.instanceId}
+                                onMoveUp={() =>
+                                  handleMoveDrill(item.instanceId, -1)
+                                }
+                                onMoveDown={() =>
+                                  handleMoveDrill(item.instanceId, 1)
+                                }
+                                onRemove={() => handleRemoveDrill(item.instanceId)}
+                                onViewDetails={() => onViewDrillDetails(item.drill)}
+                                onDurationClick={(e) =>
+                                  handleDurationClick(
+                                    item.instanceId,
+                                    item.duration,
+                                    item.notes,
+                                    e
+                                  )
+                                }
+                                onDragStart={() => handleDragStart(item.instanceId)}
+                                onDragEnd={handleDragEnd}
                               />
-                            )}
 
-                            <DrillItemCard
-                              item={item}
-                              index={globalIndex}
-                              totalItems={timeline.length}
-                              isDragging={draggedItemId === item.instanceId}
-                              onMoveUp={() =>
-                                handleMoveDrill(item.instanceId, -1)
-                              }
-                              onMoveDown={() =>
-                                handleMoveDrill(item.instanceId, 1)
-                              }
-                              onRemove={() => handleRemoveDrill(item.instanceId)}
-                              onViewDetails={() => onViewDrillDetails(item.drill)}
-                              onDurationClick={(e) =>
-                                handleDurationClick(
-                                  item.instanceId,
-                                  item.duration,
-                                  item.notes,
-                                  e
-                                )
-                              }
-                              onDragStart={() => handleDragStart(item.instanceId)}
-                              onDragEnd={handleDragEnd}
-                            />
-
-                            {/* Drop zone after this item */}
-                            {draggedItemId && draggedItemId !== item.instanceId && (
-                              <DropZonePlaceholder
-                                onDrop={() => handleDrop(globalIndex + 1, group.section!.id)}
-                              />
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
-                    </div>
+                              {/* Drop zone after this item */}
+                              {draggedItemId && draggedItemId !== item.instanceId && (
+                                <DropZonePlaceholder
+                                  onDrop={() => handleDrop(globalIndex + 1, group.section!.id)}
+                                />
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -744,11 +853,12 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
               </div>
             ) : (
               <div
-                className="mt-4 rounded-xl border-2 border-dashed border-border p-5 text-center transition-all hover:border-primary/30"
+                className="mt-4 rounded-xl border-2 border-dashed border-border/50 p-6 text-center transition-all hover:border-accent/40 hover:bg-accent/5 group"
                 onDragOver={handleDragOver}
                 onDrop={() => handleDrop(timeline.length, undefined)}
               >
-                <p className="text-sm text-muted">
+                <Plus size={20} className="mx-auto mb-2 text-muted/50 group-hover:text-accent transition-colors" />
+                <p className="text-sm text-muted group-hover:text-foreground transition-colors">
                   Drop drills here or browse library
                 </p>
               </div>
