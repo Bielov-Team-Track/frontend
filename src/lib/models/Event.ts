@@ -105,7 +105,8 @@ export interface CreateEvent {
 	surface: PlayingSurface;
 	eventFormat: EventFormat;
 	registrationConfig?: RegistrationConfig;
-	paymentsConfig?: EventPaymentsConfig;
+	paymentConfig?: EventPaymentsConfig;
+	invitedUsers?: string[];
 
 	contextType?: ContextType;
 	contextId?: string;
@@ -182,7 +183,8 @@ export interface CreateEventSeries {
 	eventFormat: EventFormat;
 	isPublic: boolean;
 	location?: Location;
-	paymentsConfig?: EventPaymentsConfig;
+	paymentConfig?: EventPaymentsConfig;
+	invitedUsers?: string[];
 	registrationOpenOffset?: TimeOffset;
 	registrationDeadlineOffset?: TimeOffset;
 	contextType?: ContextType;

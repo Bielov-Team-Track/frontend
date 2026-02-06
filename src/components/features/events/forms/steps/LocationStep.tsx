@@ -26,12 +26,12 @@ export default function LocationStep() {
 		lng: number;
 	} | null>(null);
 	const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
+	const [selectedRecentLocation, setSelectedRecentLocation] = useState<string | null>(null);
 	const [googleMapsError, setGoogleMapsError] = useState<string | null>(null);
 	const [isManualEntry, setIsManualEntry] = useState(false);
 
 	const venues: Venue[] = (context as any)?.venues || (context as any)?.club?.venues || [];
 	const { data: recentLocations } = useRecentLocations();
-	const locationName = watch("location.name");
 
 	// Listen for Google Maps API errors
 	useEffect(() => {
@@ -51,9 +51,30 @@ export default function LocationStep() {
 		return () => window.removeEventListener("error", handleError);
 	}, []);
 
+	const clearLocation = useCallback(() => {
+		setSelectedVenueId(null);
+		setSelectedRecentLocation(null);
+		setCoordinates(null);
+		setValue("location.name", "");
+		setValue("location.address", "");
+		setValue("location.city", "");
+		setValue("location.country", "");
+		setValue("location.postalCode", "");
+		setValue("location.latitude", undefined);
+		setValue("location.longitude", undefined);
+		setValue("location.instructions", "");
+	}, [setValue]);
+
 	const handleVenueSelect = useCallback(
 		(venue: Venue) => {
+			// Toggle: deselect if already selected
+			if (selectedVenueId === venue.id) {
+				clearLocation();
+				return;
+			}
+
 			setSelectedVenueId(venue.id);
+			setSelectedRecentLocation(null);
 
 			const address = [venue.name, venue.addressLine1, venue.city, venue.country].filter(Boolean).join(", ");
 
@@ -69,12 +90,13 @@ export default function LocationStep() {
 				setValue("location.longitude", venue.longitude);
 			}
 		},
-		[setValue]
+		[setValue, selectedVenueId, clearLocation]
 	);
 
 	const handleAddressSelected = useCallback(
 		(address: ParsedAddress) => {
 			setSelectedVenueId(null);
+			setSelectedRecentLocation(null);
 			setValue("location.name", address.addressName || "");
 			setValue("location.address", [address.addressName, address.formattedAddress].filter(Boolean).join(", "));
 			setValue("location.city", address.city || "");
@@ -144,7 +166,14 @@ export default function LocationStep() {
 									key={loc.name}
 									type="button"
 									onClick={() => {
+										// Toggle: deselect if already selected
+										if (selectedRecentLocation === loc.name) {
+											clearLocation();
+											return;
+										}
+
 										setSelectedVenueId(null);
+										setSelectedRecentLocation(loc.name);
 										setValue("location.name", loc.name || "");
 										setValue("location.address", loc.address || "");
 										setValue("location.city", loc.city || "");
@@ -158,7 +187,7 @@ export default function LocationStep() {
 									}}
 									className={cn(
 										"flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg border text-left transition-all",
-										locationName === loc.name
+										selectedRecentLocation === loc.name
 											? "border-accent bg-accent/10"
 											: "border-border bg-surface hover:border-border/80"
 									)}

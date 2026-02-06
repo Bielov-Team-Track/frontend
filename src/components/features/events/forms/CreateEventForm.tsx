@@ -27,7 +27,6 @@ function CreateEventFormContent({ onClearContext, onChageContext }: CreateEventF
 			<div className="relative z-10 flex-1">
 				<StepRenderer />
 			</div>
-			<ContextIndicator context={context} onChange={onChageContext} onClear={onClearContext} />
 
 			{isError && (
 				<div className="bg-error/10 border border-error/20 text-error p-4 rounded-lg mt-4">
@@ -37,6 +36,7 @@ function CreateEventFormContent({ onClearContext, onChageContext }: CreateEventF
 			)}
 
 			<NavigationButtons />
+			<ContextIndicator context={context} onChange={onChageContext} onClear={onClearContext} />
 		</>
 	);
 }

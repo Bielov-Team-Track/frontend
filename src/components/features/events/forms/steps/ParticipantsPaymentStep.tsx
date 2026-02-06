@@ -1,6 +1,6 @@
 "use client";
 
-import { Checkbox, CollapsibleSection, Input, RadioCards, Select } from "@/components/ui";
+import { Checkbox, CollapsibleSection, RadioCards, Select, Slider } from "@/components/ui";
 import { UserSelectorModal } from "@/components/features/users";
 import { EventFormat } from "@/lib/models/Event";
 import { Unit } from "@/lib/models/EventPaymentConfig";
@@ -19,7 +19,7 @@ const eventFormatCards = [
 		icon: List,
 	},
 	{
-		value: EventFormat.ListTeams,
+		value: EventFormat.OpenTeams,
 		label: "Open Teams",
 		description: "Teams with generic player slots",
 		icon: Users,
@@ -123,31 +123,27 @@ export default function ParticipantsPaymentStep() {
 				<Controller
 					name="capacity"
 					control={control}
-					render={({ field: { value, ...field } }) => (
-						<Input
-							{...field}
-							value={value ?? ""}
-							type="number"
+					render={({ field }) => (
+						<Slider
+							value={field.value ?? null}
+							onChange={(e) => field.onChange(e.target.value)}
+							min={1}
+							max={100}
+							step={1}
+							editable
+							clearable
+							placeholder="Unlimited"
 							label="Maximum Participants"
-							leftIcon={<Users size={16} />}
-							error={errors.capacity?.message as string | undefined}
-							min="1"
-							helperText="Leave empty for unlimited participants"
 							optional
-							data-testid="capacity-input"
+							helperText="Leave empty for unlimited participants"
+							error={errors.capacity?.message as string | undefined}
+							color="accent"
 						/>
 					)}
 				/>
 			)}
 
-			{/* Invitees Section */}
-			<div className="border-b-2 pb-3 sm:pb-4 mt-6 sm:mt-8">
-				<h3 className="text-base sm:text-lg font-semibold text-foreground mb-1">Invitees</h3>
-				<p className="text-muted-foreground text-xs sm:text-sm">
-					{isPublic ? "Optionally invite specific people (they'll be notified)" : "Add people who can participate in this event"}
-				</p>
-			</div>
-
+			{/* Invitees */}
 			<InviteesSummaryCard selectedUsers={selectedUsersCache} onEdit={() => setIsInviteesModalOpen(true)} />
 
 			<UserSelectorModal

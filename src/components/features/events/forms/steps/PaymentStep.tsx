@@ -1,8 +1,8 @@
 "use client";
 
-import { Checkbox, Input, RadioCards, Select } from "@/components/ui";
+import { Checkbox, RadioCards, Select, Slider } from "@/components/ui";
 import { PricingModel } from "@/lib/models/EventPaymentConfig";
-import { Bell, Calculator, Clock, Coins, User, Users } from "lucide-react";
+import { Bell, Calculator, User, Users } from "lucide-react";
 import { Controller } from "react-hook-form";
 import PaymentMethodsSelector from "../components/PaymentMethodsSelector";
 import { useEventFormContext } from "../context/EventFormContext";
@@ -110,13 +110,16 @@ export default function PaymentStep() {
 						name="paymentConfig.cost"
 						control={control}
 						render={({ field }) => (
-							<Input
-								{...field}
+							<Slider
+								value={field.value ?? 0}
+								onChange={(e) => field.onChange(e.target.value)}
 								required
-								type="number"
-								min={1}
-								label={pricingModel === PricingModel.Event ? "Total Cost" : "Cost per Unit"}
-								leftIcon={<Coins size={16} />}
+								min={0}
+								max={pricingModel === PricingModel.Event ? 1000 : 200}
+								step={pricingModel === PricingModel.Event ? 10 : 1}
+								editable
+								label={pricingModel === PricingModel.Event ? "Total Cost" : pricingModel === PricingModel.Team ? "Cost per Team" : "Cost per Person"}
+								formatValue={(v) => `${v} £`}
 								helperText={
 									pricingModel === PricingModel.Event
 										? "Total event cost to be split between all participants"
@@ -125,6 +128,7 @@ export default function PaymentStep() {
 										: "Fixed price each person will pay"
 								}
 								error={errors.paymentConfig?.cost?.message as string | undefined}
+								color="accent"
 							/>
 						)}
 					/>
@@ -172,14 +176,20 @@ export default function PaymentStep() {
 						name="paymentConfig.dropoutDeadlineHours"
 						control={control}
 						render={({ field }) => (
-							<Input
-								{...field}
-								value={field.value ?? ""}
-								type="number"
-								label="Dropout Deadline (hours)"
-								leftIcon={<Clock size={16} />}
+							<Slider
+								value={field.value ?? null}
+								onChange={(e) => field.onChange(e.target.value)}
+								min={0}
+								max={72}
+								step={1}
+								editable
+								clearable
+								placeholder="Not set"
+								label="Dropout Deadline"
+								formatValue={(v) => `${v}h`}
 								helperText="Hours before event start when participants can no longer drop out without penalty"
 								error={errors.paymentConfig?.dropoutDeadlineHours?.message as string | undefined}
+								color="accent"
 							/>
 						)}
 					/>

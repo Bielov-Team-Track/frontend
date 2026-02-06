@@ -35,7 +35,7 @@ function EventSettingsFormContent({ event, children }: EventSettingsFormProps) {
 				startTime: formData.startTime.toISOString(),
 				endTime: formData.endTime.toISOString(),
 				location: formData.location,
-				paymentsConfig: formData.usePaymentConfig && formData.paymentConfig
+				paymentConfig: formData.usePaymentConfig && formData.paymentConfig
 					? {
 							pricingModel: formData.paymentConfig.pricingModel,
 							cost: formData.paymentConfig.cost || 0,

@@ -35,7 +35,7 @@ export function transformFormDataToCreateEvent(data: EventFormData, contextSelec
 			latitude: data.location.latitude,
 			longitude: data.location.longitude,
 		},
-		paymentsConfig: data.usePaymentConfig
+		paymentConfig: data.usePaymentConfig
 			? {
 					paymentMethods: data.paymentConfig?.paymentMethods,
 					cost: Number(data.paymentConfig?.cost) || 0,
@@ -46,7 +46,9 @@ export function transformFormDataToCreateEvent(data: EventFormData, contextSelec
 					paymentReminderDaysBefore: data.paymentConfig?.paymentReminderDaysBefore ? Number(data.paymentConfig.paymentReminderDaysBefore) : undefined,
 				}
 			: undefined,
+		invitedUsers: data.invitees,
 		name: data.name,
+		description: data.description || undefined,
 		eventFormat: data.eventFormat,
 		type: data.type,
 		surface: data.surface,
@@ -80,7 +82,7 @@ export function transformFormDataToCreateEventSeries(data: EventFormData, contex
 					longitude: data.location.longitude,
 				}
 			: undefined,
-		paymentsConfig: data.usePaymentConfig
+		paymentConfig: data.usePaymentConfig
 			? {
 					paymentMethods: data.paymentConfig?.paymentMethods,
 					cost: Number(data.paymentConfig?.cost) || 0,
@@ -91,6 +93,7 @@ export function transformFormDataToCreateEventSeries(data: EventFormData, contex
 					paymentReminderDaysBefore: data.paymentConfig?.paymentReminderDaysBefore ? Number(data.paymentConfig.paymentReminderDaysBefore) : undefined,
 				}
 			: undefined,
+		invitedUsers: data.invitees,
 		registrationOpenOffset: data.registrationOpenOffset,
 		registrationDeadlineOffset: data.registrationDeadlineOffset,
 		contextType: contextSelection?.contextType,

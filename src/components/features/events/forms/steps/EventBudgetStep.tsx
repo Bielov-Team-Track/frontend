@@ -106,7 +106,7 @@ const EventBudgetStep = () => {
 						type="number"
 						min={1}
 						disabled={!useBudget}
-						label={values.budget?.pricingModel === PricingModel.Event ? "Total Budget" : "Cost per Unit"}
+						label={values.budget?.pricingModel === PricingModel.Event ? "Total Budget" : values.budget?.pricingModel === PricingModel.Team ? "Cost per Team" : "Cost per Person"}
 						leftIcon={<Coins size={16} />}
 						helperText={
 							values.budget?.pricingModel === PricingModel.Event
