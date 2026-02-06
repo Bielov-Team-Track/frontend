@@ -1,6 +1,25 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragStartEvent,
+  type DragEndEvent,
+  type DragOverEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Drill, DrillCategory, DrillIntensity } from "@/lib/models/Drill";
 import { Button, Badge, Input, TextArea, Card } from "@/components";
 import {
@@ -14,8 +33,8 @@ import {
   ChevronRight,
   Download,
   X,
-  LayoutList,
   StickyNote,
+  AlertTriangle,
 } from "lucide-react";
 
 // Types
@@ -39,6 +58,8 @@ interface TimelineBuilderPanelProps {
   onTimelineChange: (timeline: TimelineItem[]) => void;
   onSectionsChange: (sections: Section[]) => void;
   onViewDrillDetails: (drill: Drill) => void;
+  onAddDrill?: (drill: Drill) => void;
+  sessionDuration?: number;
 }
 
 // Constants
@@ -68,7 +89,6 @@ const INTENSITY_COLORS: Record<DrillIntensity, string> = {
 
 // Duration Editor Popover Component
 interface DurationEditorProps {
-  instanceId: string;
   duration: number;
   notes: string;
   position: { x: number; y: number };
@@ -89,42 +109,26 @@ const DurationEditor: React.FC<DurationEditorProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        popoverRef.current &&
-        !popoverRef.current.contains(event.target as Node)
-      ) {
+      if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
         onCancel();
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onCancel]);
 
-  const handleAdjust = (delta: number) => {
-    setLocalDuration((prev) => Math.max(1, prev + delta));
-  };
-
-  const handleSave = () => {
-    onSave(localDuration, localNotes);
-  };
-
   return (
     <div
       ref={popoverRef}
-      className="fixed z-50 min-w-[240px] rounded-xl border border-border/80 bg-raised/95 p-4 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-200"
+      className="fixed z-50 min-w-[240px] rounded-xl border border-border/80 bg-raised/95 p-4 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95 duration-200"
       style={{ left: position.x, top: position.y }}
     >
-      {/* Arrow pointer */}
       <div className="absolute -top-2 left-6 h-4 w-4 rotate-45 border-l border-t border-border/80 bg-raised/95" />
-
-      <label className="mb-2 block text-xs font-semibold text-foreground">
-        Duration (minutes)
-      </label>
+      <label className="mb-2 block text-xs font-semibold text-foreground">Duration (minutes)</label>
       <div className="flex items-center gap-2">
         <button
-          onClick={() => handleAdjust(-5)}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-subtle text-foreground hover:bg-hover hover:border-border-strong transition-all text-sm font-medium"
+          onClick={() => setLocalDuration((prev) => Math.max(1, prev - 5))}
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-subtle text-foreground hover:bg-hover text-sm font-medium"
         >
           -5
         </button>
@@ -136,8 +140,8 @@ const DurationEditor: React.FC<DurationEditorProps> = ({
           min={1}
         />
         <button
-          onClick={() => handleAdjust(5)}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-subtle text-foreground hover:bg-hover hover:border-border-strong transition-all text-sm font-medium"
+          onClick={() => setLocalDuration((prev) => prev + 5)}
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-subtle text-foreground hover:bg-hover text-sm font-medium"
         >
           +5
         </button>
@@ -151,15 +155,10 @@ const DurationEditor: React.FC<DurationEditorProps> = ({
         className="resize-none"
       />
       <div className="mt-4 flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onCancel}
-          className="flex-1"
-        >
+        <Button variant="outline" size="sm" onClick={onCancel} className="flex-1">
           Cancel
         </Button>
-        <Button size="sm" onClick={handleSave} className="flex-1">
+        <Button size="sm" onClick={() => onSave(localDuration, localNotes)} className="flex-1">
           Save
         </Button>
       </div>
@@ -167,201 +166,222 @@ const DurationEditor: React.FC<DurationEditorProps> = ({
   );
 };
 
-// Drop Zone Placeholder Component
-interface DropZonePlaceholderProps {
-  onDrop: () => void;
-}
-
-const DropZonePlaceholder: React.FC<DropZonePlaceholderProps> = ({ onDrop }) => {
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
-  };
-
-  return (
-    <div
-      onDragOver={handleDragOver}
-      onDrop={onDrop}
-      className="mb-3 flex items-center justify-center rounded-xl border-2 border-dashed border-accent/60 bg-accent/5 p-4 text-center text-sm transition-all duration-200 hover:border-accent hover:bg-accent/10 relative overflow-hidden"
-    >
-      {/* Animated shimmer background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-accent/10 to-transparent -translate-x-full animate-[shimmer_2s_linear_infinite]" />
-
-      <span className="flex items-center gap-2 font-medium text-accent relative z-10">
-        <ChevronDown size={16} className="animate-bounce" />
-        Drop here
-        <ChevronDown size={16} className="animate-bounce [animation-delay:150ms]" />
-      </span>
-    </div>
-  );
-};
-
-// Drill Item Card Component
-interface DrillItemCardProps {
+// Sortable Drill Card
+interface SortableDrillCardProps {
   item: TimelineItem;
-  index: number;
-  totalItems: number;
-  isDragging: boolean;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
+  cumulativeTime: number;
   onRemove: () => void;
   onViewDetails: () => void;
   onDurationClick: (event: React.MouseEvent) => void;
-  onDragStart: (event: React.DragEvent) => void;
-  onDragEnd: (event: React.DragEvent) => void;
+  isOverlay?: boolean;
 }
 
-const DrillItemCard: React.FC<DrillItemCardProps> = ({
+const SortableDrillCard: React.FC<SortableDrillCardProps> = ({
   item,
-  index,
-  totalItems,
-  isDragging,
-  onMoveUp,
-  onMoveDown,
+  cumulativeTime,
   onRemove,
   onViewDetails,
   onDurationClick,
-  onDragStart,
-  onDragEnd,
+  isOverlay = false,
 }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.instanceId });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
   const categoryColor = CATEGORY_COLORS[item.drill.category];
   const intensityColor = INTENSITY_COLORS[item.drill.intensity];
 
   return (
     <div
-      draggable
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      tabIndex={0}
-      role="listitem"
-      aria-label={`${item.drill.name}, ${item.duration} minutes, position ${index + 1} of ${totalItems}`}
-      className={`group relative mb-3 flex cursor-move items-start gap-3.5 rounded-xl p-3 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface ${
-        isDragging
-          ? "opacity-50 scale-[0.98] border-2 border-dashed border-accent bg-accent/10 shadow-lg"
-          : "border border-border/50 bg-surface/80 shadow-sm hover:border-accent/30 hover:bg-surface hover:shadow-md hover:-translate-y-0.5"
-      }`}
+      ref={setNodeRef}
+      style={isOverlay ? undefined : style}
+      className={`group flex items-start gap-2 mb-2 ${isDragging && !isOverlay ? 'z-50' : ''}`}
     >
-      {/* Hover gradient overlay */}
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-
-      {/* Category color bar with glow */}
-      <div
-        className="h-full w-1.5 flex-shrink-0 rounded-full"
-        style={{
-          background: categoryColor,
-          boxShadow: `0 0 8px ${categoryColor}40`
-        }}
-      />
-
-      {/* Drag handle */}
-      <div className={`flex-shrink-0 pt-1 transition-colors duration-200 ${
-        isDragging ? "text-accent" : "text-muted/40 group-hover:text-muted"
-      }`}>
-        <GripVertical size={16} />
+      {/* Time marker */}
+      <div className="flex-shrink-0 w-10 pt-3 text-right">
+        <span className="text-[11px] font-medium tabular-nums text-muted">
+          {cumulativeTime}m
+        </span>
       </div>
 
-      {/* Content */}
-      <div className="min-w-0 flex-1 py-0.5 relative z-10">
-        <h4 className="text-sm font-semibold text-foreground leading-tight truncate">
-          {item.drill.name}
-        </h4>
-        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          {/* Duration - clickable with better styling */}
-          <button
-            onClick={onDurationClick}
-            className="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-accent transition-colors rounded-md px-1.5 py-0.5 -ml-1.5 hover:bg-accent/10"
-          >
-            <Clock size={13} strokeWidth={2.5} />
-            <span className="tabular-nums">{item.duration}m</span>
-          </button>
+      {/* Drill card */}
+      <div
+        className={`flex-1 flex items-center gap-3 rounded-xl p-3 border transition-all ${
+          isDragging || isOverlay
+            ? "border-accent bg-accent/10 shadow-lg"
+            : "border-border/50 bg-surface/80 shadow-sm hover:border-accent/30 hover:bg-surface"
+        }`}
+      >
+        {/* Drag handle */}
+        <button
+          {...attributes}
+          {...listeners}
+          className="flex-shrink-0 cursor-grab active:cursor-grabbing text-muted/30 hover:text-muted touch-none"
+        >
+          <GripVertical size={16} />
+        </button>
 
-          {/* Category badge - no border */}
-          <Badge
-            variant="custom"
-            className="text-[10px] px-1.5 py-0.5"
-            style={{
-              background: `${categoryColor}15`,
-              color: categoryColor,
-            }}
-          >
-            {item.drill.category}
-          </Badge>
+        {/* Category color indicator */}
+        <div className="w-1 h-8 flex-shrink-0 rounded-full" style={{ background: categoryColor }} />
 
-          {/* Intensity badge - with border */}
-          <Badge
-            variant="custom"
-            className="text-[10px] px-1.5 py-0.5"
-            style={{
-              background: `${intensityColor}15`,
-              color: intensityColor,
-              borderColor: `${intensityColor}30`,
-              borderWidth: '1px',
-            }}
-          >
-            {item.drill.intensity}
-          </Badge>
+        {/* Content */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <h4 className="text-sm font-semibold text-foreground truncate">{item.drill.name}</h4>
+            <button
+              onClick={onDurationClick}
+              className="flex items-center gap-1 text-xs font-medium text-muted hover:text-accent rounded px-1.5 py-0.5 hover:bg-accent/10"
+            >
+              <Clock size={12} />
+              <span className="tabular-nums">{item.duration}m</span>
+            </button>
+          </div>
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <Badge variant="custom" className="text-[10px] px-1.5 py-0.5" style={{ background: `${categoryColor}15`, color: categoryColor }}>
+              {item.drill.category}
+            </Badge>
+            <Badge variant="custom" className="text-[10px] px-1.5 py-0.5" style={{ background: `${intensityColor}15`, color: intensityColor, borderColor: `${intensityColor}30`, borderWidth: '1px' }}>
+              {item.drill.intensity}
+            </Badge>
+            {item.notes && <span className="flex items-center gap-1 text-[10px] text-muted/60"><StickyNote size={10} />Note</span>}
+          </div>
         </div>
 
-        {/* Notes preview with icon */}
-        {item.notes && (
-          <div className="mt-2 flex items-start gap-1.5 text-xs">
-            <StickyNote size={11} className="text-muted/50 mt-0.5 flex-shrink-0" />
-            <p className="text-muted/70 line-clamp-2 leading-relaxed">
-              {item.notes}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Hover actions with staggered animation */}
-      <div className="flex flex-shrink-0 items-center gap-1 opacity-0 transition-all duration-200 group-hover:opacity-100 focus-within:opacity-100 relative z-10">
-        {index > 0 && (
-          <button
-            onClick={onMoveUp}
-            className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-border-strong hover:text-foreground hover:scale-110 active:scale-95 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-            aria-label="Move drill up"
-          >
-            <ChevronUp size={14} />
+        {/* Actions */}
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button onClick={onViewDetails} className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:text-foreground">
+            <Eye size={14} />
           </button>
-        )}
-        {index < totalItems - 1 && (
-          <button
-            onClick={onMoveDown}
-            className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-border-strong hover:text-foreground hover:scale-110 active:scale-95 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-            aria-label="Move drill down"
-          >
-            <ChevronDown size={14} />
+          <button onClick={onRemove} className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:text-error">
+            <Trash2 size={14} />
           </button>
-        )}
-        <button
-          onClick={onViewDetails}
-          className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-border-strong hover:text-foreground hover:scale-110 active:scale-95 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-          aria-label="View drill details"
-        >
-          <Eye size={14} />
-        </button>
-        <button
-          onClick={onRemove}
-          className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:border-error/30 hover:text-error hover:scale-110 hover:rotate-12 active:scale-95 transition-all duration-150 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
-          aria-label="Remove drill from timeline"
-        >
-          <Trash2 size={14} />
-        </button>
+        </div>
       </div>
     </div>
   );
 };
 
-// Main Component
-interface TimelineBuilderPanelPropsExtended extends TimelineBuilderPanelProps {
-  sessionDuration?: number;
+// Sortable Section Header
+interface SortableSectionProps {
+  section: Section;
+  itemCount: number;
+  totalDuration: number;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+  onDelete: () => void;
+  onNameChange: (name: string) => void;
+  children: React.ReactNode;
 }
 
-export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelPropsExtended> = ({
+const SortableSection: React.FC<SortableSectionProps> = ({
+  section,
+  itemCount,
+  totalDuration,
+  isCollapsed,
+  onToggleCollapse,
+  onDelete,
+  onNameChange,
+  children,
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: `section-${section.id}` });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="mb-4">
+      {/* Section header */}
+      <div className="flex items-center gap-2 mb-2">
+        <div
+          {...attributes}
+          {...listeners}
+          className={`flex-1 flex items-center justify-between rounded-xl px-4 py-2.5 cursor-grab active:cursor-grabbing transition-all ${
+            isDragging ? 'shadow-lg' : 'hover:shadow-md'
+          }`}
+          style={{
+            background: `linear-gradient(135deg, ${section.color}08 0%, ${section.color}15 100%)`,
+            border: `1.5px solid ${section.color}40`,
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <GripVertical size={14} className="text-muted/30" />
+
+            <button onClick={onToggleCollapse} className="p-1 rounded hover:bg-white/10">
+              {isCollapsed ? (
+                <ChevronRight size={14} style={{ color: section.color }} />
+              ) : (
+                <ChevronDown size={14} style={{ color: section.color }} />
+              )}
+            </button>
+
+            <div className="h-2.5 w-2.5 rounded-full" style={{ background: section.color }} />
+
+            <input
+              type="text"
+              value={section.name}
+              onChange={(e) => onNameChange(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+              className="bg-transparent px-1 text-xs font-bold uppercase tracking-wider outline-none hover:bg-white/10 focus:bg-white/15 rounded"
+              style={{ color: section.color }}
+            />
+
+            <div className="flex items-center gap-2 text-[10px] font-medium text-muted">
+              <span>{itemCount} drills</span>
+              <span>·</span>
+              <span style={{ color: section.color }}>{totalDuration}m</span>
+            </div>
+          </div>
+
+          <button
+            onClick={onDelete}
+            onMouseDown={(e) => e.stopPropagation()}
+            className="rounded-lg p-1.5 text-muted/50 hover:bg-error/10 hover:text-error transition-all"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      </div>
+
+      {/* Section content */}
+      {!isCollapsed && (
+        <div className="ml-6 min-h-[40px]">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Main Component
+export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
   timeline,
   sections,
   onTimelineChange,
   onSectionsChange,
   onViewDrillDetails,
+  onAddDrill,
   sessionDuration = 90,
 }) => {
   const [editingDuration, setEditingDuration] = useState<{
@@ -370,15 +390,113 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelPropsExtended> =
     notes: string;
     position: { x: number; y: number };
   } | null>(null);
-  const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
+  const [deletingSectionId, setDeletingSectionId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
-  // Calculate total timeline duration
+  // Handle external drop (from drill library)
+  const handleExternalDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+    setIsDragOver(true);
+  };
+
+  const handleExternalDragLeave = (e: React.DragEvent) => {
+    // Only set to false if leaving the container entirely
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsDragOver(false);
+    }
+  };
+
+  const handleExternalDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    try {
+      const data = e.dataTransfer.getData("application/json");
+      if (data && onAddDrill) {
+        const drill = JSON.parse(data) as Drill;
+        onAddDrill(drill);
+      }
+    } catch (err) {
+      console.error("Failed to parse dropped drill:", err);
+    }
+  };
+
+  // Sensors for drag detection
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  // Calculate totals
   const totalDuration = timeline.reduce((sum, item) => sum + item.duration, 0);
   const progressPercent = Math.min((totalDuration / sessionDuration) * 100, 100);
   const isOvertime = totalDuration > sessionDuration;
 
-  // Toggle section collapse
+  // Group items by section (memoized)
+  const groupedItems = useMemo(() => {
+    const map = new Map<string, TimelineItem[]>();
+    map.set('__ungrouped__', []);
+    sections.forEach(s => map.set(s.id, []));
+
+    timeline.forEach(item => {
+      const key = item.sectionId && sections.find(s => s.id === item.sectionId)
+        ? item.sectionId
+        : '__ungrouped__';
+      map.get(key)!.push(item);
+    });
+
+    return map;
+  }, [timeline, sections]);
+
+  // Get cumulative time for an item
+  const getCumulativeTime = (instanceId: string) => {
+    let time = 0;
+    for (const item of timeline) {
+      if (item.instanceId === instanceId) return time;
+      time += item.duration;
+    }
+    return time;
+  };
+
+  // Section handlers
+  const handleAddSection = () => {
+    const newSection: Section = {
+      id: `sec-${Date.now()}`,
+      name: `Section ${sections.length + 1}`,
+      color: SECTION_COLORS[sections.length % SECTION_COLORS.length],
+    };
+    onSectionsChange([...sections, newSection]);
+  };
+
+  const handleDeleteSection = (sectionId: string) => {
+    setDeletingSectionId(sectionId);
+  };
+
+  const handleConfirmDeleteKeepDrills = () => {
+    if (!deletingSectionId) return;
+    const updatedTimeline = timeline.map((item) =>
+      item.sectionId === deletingSectionId ? { ...item, sectionId: undefined } : item
+    );
+    onTimelineChange(updatedTimeline);
+    onSectionsChange(sections.filter((s) => s.id !== deletingSectionId));
+    setDeletingSectionId(null);
+  };
+
+  const handleConfirmDeleteWithDrills = () => {
+    if (!deletingSectionId) return;
+    const updatedTimeline = timeline.filter((item) => item.sectionId !== deletingSectionId);
+    onTimelineChange(updatedTimeline);
+    onSectionsChange(sections.filter((s) => s.id !== deletingSectionId));
+    setDeletingSectionId(null);
+  };
+
+  const handleSectionNameChange = (sectionId: string, newName: string) => {
+    onSectionsChange(sections.map((s) => (s.id === sectionId ? { ...s, name: newName } : s)));
+  };
+
   const toggleSectionCollapse = (sectionId: string) => {
     const newCollapsed = new Set(collapsedSections);
     if (newCollapsed.has(sectionId)) {
@@ -389,152 +507,134 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelPropsExtended> =
     setCollapsedSections(newCollapsed);
   };
 
-  // Add section
-  const handleAddSection = () => {
-    const colorIdx = sections.length % SECTION_COLORS.length;
-    const newSection: Section = {
-      id: `sec-${Date.now()}`,
-      name: `Section ${sections.length + 1}`,
-      color: SECTION_COLORS[colorIdx],
-    };
-    onSectionsChange([...sections, newSection]);
-  };
-
-  // Delete section
-  const handleDeleteSection = (sectionId: string) => {
-    // Move items to ungrouped
-    const updatedTimeline = timeline.map((item) =>
-      item.sectionId === sectionId ? { ...item, sectionId: undefined } : item
-    );
-    onTimelineChange(updatedTimeline);
-    onSectionsChange(sections.filter((s) => s.id !== sectionId));
-  };
-
-  // Edit section name
-  const handleSectionNameChange = (sectionId: string, newName: string) => {
-    onSectionsChange(
-      sections.map((s) => (s.id === sectionId ? { ...s, name: newName } : s))
-    );
-  };
-
-  // Clear all
   const handleClearAll = () => {
     onTimelineChange([]);
     onSectionsChange([]);
   };
 
-  // Remove drill
+  // Item handlers
   const handleRemoveDrill = (instanceId: string) => {
     onTimelineChange(timeline.filter((item) => item.instanceId !== instanceId));
   };
 
-  // Move drill
-  const handleMoveDrill = (instanceId: string, direction: number) => {
-    const index = timeline.findIndex((item) => item.instanceId === instanceId);
-    if (index === -1) return;
-
-    const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= timeline.length) return;
-
-    const newTimeline = [...timeline];
-    const [movedItem] = newTimeline.splice(index, 1);
-    newTimeline.splice(newIndex, 0, movedItem);
-
-    // Adopt section of neighbor
-    const neighbor = newTimeline[newIndex + (direction > 0 ? -1 : 1)];
-    if (neighbor && neighbor.sectionId !== movedItem.sectionId) {
-      movedItem.sectionId = neighbor.sectionId;
-    }
-
-    onTimelineChange(newTimeline);
-  };
-
-  // Duration editor
-  const handleDurationClick = (
-    instanceId: string,
-    duration: number,
-    notes: string,
-    event: React.MouseEvent
-  ) => {
+  const handleDurationClick = (instanceId: string, duration: number, notes: string, event: React.MouseEvent) => {
     const rect = (event.target as HTMLElement).getBoundingClientRect();
-    setEditingDuration({
-      instanceId,
-      duration,
-      notes,
-      position: { x: rect.left, y: rect.bottom + 8 },
-    });
+    setEditingDuration({ instanceId, duration, notes, position: { x: rect.left, y: rect.bottom + 8 } });
   };
 
   const handleSaveDuration = (duration: number, notes: string) => {
     if (!editingDuration) return;
-
     onTimelineChange(
       timeline.map((item) =>
-        item.instanceId === editingDuration.instanceId
-          ? { ...item, duration, notes }
-          : item
+        item.instanceId === editingDuration.instanceId ? { ...item, duration, notes } : item
       )
     );
     setEditingDuration(null);
   };
 
-  // Drag and drop
-  const handleDragStart = (instanceId: string) => {
-    setDraggedItemId(instanceId);
+  // Drag handlers
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
   };
 
-  const handleDragEnd = () => {
-    setDraggedItemId(null);
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    // Check if we're dragging an item over a section
+    if (!activeId.startsWith('section-') && overId.startsWith('section-')) {
+      const sectionId = overId.replace('section-', '');
+      const activeItem = timeline.find(item => item.instanceId === activeId);
+
+      if (activeItem && activeItem.sectionId !== sectionId) {
+        // Move item to this section
+        onTimelineChange(
+          timeline.map(item =>
+            item.instanceId === activeId ? { ...item, sectionId } : item
+          )
+        );
+      }
+    }
   };
 
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
-  };
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
 
-  const handleDrop = (targetIndex: number, sectionId?: string) => {
-    if (!draggedItemId) return;
+    if (!over || active.id === over.id) return;
 
-    const draggedIndex = timeline.findIndex(
-      (item) => item.instanceId === draggedItemId
-    );
-    if (draggedIndex === -1) return;
+    const activeId = active.id as string;
+    const overId = over.id as string;
 
-    const newTimeline = [...timeline];
-    const [draggedItem] = newTimeline.splice(draggedIndex, 1);
-    draggedItem.sectionId = sectionId;
-    newTimeline.splice(targetIndex, 0, draggedItem);
+    // Section reordering
+    if (activeId.startsWith('section-') && overId.startsWith('section-')) {
+      const activeSectionId = activeId.replace('section-', '');
+      const overSectionId = overId.replace('section-', '');
 
-    onTimelineChange(newTimeline);
-    setDraggedItemId(null);
-  };
+      const oldIndex = sections.findIndex(s => s.id === activeSectionId);
+      const newIndex = sections.findIndex(s => s.id === overSectionId);
 
-  // Build ordered timeline structure
-  const buildOrderedTimeline = () => {
-    const result: Array<{
-      type: "section" | "ungrouped";
-      section?: Section;
-      items: TimelineItem[];
-    }> = [];
+      if (oldIndex !== -1 && newIndex !== -1) {
+        // Reorder sections array
+        const newSections = [...sections];
+        const [removed] = newSections.splice(oldIndex, 1);
+        newSections.splice(newIndex, 0, removed);
 
-    // Sections with their items
-    sections.forEach((section) => {
-      const items = timeline.filter((item) => item.sectionId === section.id);
-      result.push({ type: "section", section, items });
-    });
+        // Reorder timeline items to match new section order
+        // Group items by section, then rebuild timeline in new section order
+        const ungrouped = timeline.filter(item => !item.sectionId || !sections.find(s => s.id === item.sectionId));
+        const itemsBySection = new Map<string, TimelineItem[]>();
+        sections.forEach(s => itemsBySection.set(s.id, []));
+        timeline.forEach(item => {
+          if (item.sectionId && itemsBySection.has(item.sectionId)) {
+            itemsBySection.get(item.sectionId)!.push(item);
+          }
+        });
 
-    // Ungrouped items
-    const ungrouped = timeline.filter(
-      (item) =>
-        !item.sectionId || !sections.find((s) => s.id === item.sectionId)
-    );
-    if (ungrouped.length > 0) {
-      result.push({ type: "ungrouped", items: ungrouped });
+        // Rebuild timeline: sections in new order, then ungrouped items
+        const newTimeline: TimelineItem[] = [];
+        newSections.forEach(section => {
+          const sectionItems = itemsBySection.get(section.id) || [];
+          newTimeline.push(...sectionItems);
+        });
+        newTimeline.push(...ungrouped);
+
+        onSectionsChange(newSections);
+        onTimelineChange(newTimeline);
+      }
+      return;
     }
 
-    return result;
+    // Item reordering
+    if (!activeId.startsWith('section-') && !overId.startsWith('section-')) {
+      const oldIndex = timeline.findIndex(item => item.instanceId === activeId);
+      const newIndex = timeline.findIndex(item => item.instanceId === overId);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newTimeline = [...timeline];
+        const [removed] = newTimeline.splice(oldIndex, 1);
+
+        // Adopt the section of the target position
+        const targetItem = timeline[newIndex];
+        removed.sectionId = targetItem.sectionId;
+
+        newTimeline.splice(newIndex, 0, removed);
+        onTimelineChange(newTimeline);
+      }
+    }
   };
 
-  const orderedTimeline = buildOrderedTimeline();
+  // Get the active item for drag overlay
+  const activeItem = activeId && !activeId.startsWith('section-')
+    ? timeline.find(item => item.instanceId === activeId)
+    : null;
+
+  // Build section and item IDs for sortable contexts
+  const sectionIds = sections.map(s => `section-${s.id}`);
+  const allItemIds = timeline.map(item => item.instanceId);
 
   return (
     <div className="space-y-4">
@@ -566,24 +666,17 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelPropsExtended> =
         <div className="relative">
           <div className="h-2 rounded-full bg-subtle overflow-hidden">
             <div
-              className={`h-full transition-all duration-500 ease-out relative ${
+              className={`h-full transition-all duration-500 ease-out ${
                 isOvertime
                   ? "bg-gradient-to-r from-warning/80 to-warning"
                   : "bg-gradient-to-r from-accent/80 to-accent"
               }`}
               style={{ width: `${progressPercent}%` }}
-            >
-              {/* Shimmer effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_linear_infinite]" />
-            </div>
+            />
           </div>
           <div className="flex items-center justify-between mt-2 text-xs">
-            <span className="font-medium text-muted">
-              Session Progress
-            </span>
-            <span className={`font-semibold tabular-nums ${
-              isOvertime ? "text-warning" : "text-accent"
-            }`}>
+            <span className="font-medium text-muted">Session Progress</span>
+            <span className={`font-semibold tabular-nums ${isOvertime ? "text-warning" : "text-accent"}`}>
               {totalDuration}m / {sessionDuration}m
               {isOvertime && " (overtime)"}
             </span>
@@ -592,19 +685,20 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelPropsExtended> =
       )}
 
       {/* Timeline Area */}
-      <div className="min-h-[400px]">
+      <div
+        className={`min-h-[400px] rounded-xl transition-colors ${isDragOver ? 'bg-accent/5 ring-2 ring-accent/30 ring-dashed' : ''}`}
+        onDragOver={handleExternalDragOver}
+        onDragLeave={handleExternalDragLeave}
+        onDrop={handleExternalDrop}
+      >
         {timeline.length === 0 && sections.length === 0 ? (
-          // Empty State
           <Card className="p-12 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-subtle">
               <Clock size={28} className="text-muted" strokeWidth={1.5} />
             </div>
-            <h3 className="mb-1 text-lg font-bold text-foreground">
-              Build your training timeline
-            </h3>
+            <h3 className="mb-1 text-lg font-bold text-foreground">Build your training timeline</h3>
             <p className="mx-auto mb-6 max-w-sm text-sm text-muted">
-              Drag drills from the library or click + to add them to your
-              session
+              Drag drills from the library or click + to add them to your session
             </p>
             <Button variant="outline" className="mx-auto">
               <Download size={16} />
@@ -612,265 +706,107 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelPropsExtended> =
             </Button>
           </Card>
         ) : (
-          // Timeline Content
-          <div className="relative pl-8" role="list" aria-label="Training drills timeline">
-            {/* Timeline line with gradient */}
-            <div className="absolute bottom-2 left-3 top-2 w-1 bg-gradient-to-b from-accent via-border to-border/20 rounded-full" />
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+          >
+            {/* Sections */}
+            <SortableContext items={sectionIds} strategy={verticalListSortingStrategy}>
+              {sections.map((section) => {
+                const sectionItems = groupedItems.get(section.id) || [];
+                const sectionDuration = sectionItems.reduce((sum, item) => sum + item.duration, 0);
 
-            {/* Start dot with glow effect */}
-            <div className="absolute left-[3px] top-0 z-10 h-5 w-5 rounded-full border-4 border-base bg-accent shadow-lg">
-              <div className="absolute inset-0 rounded-full bg-accent/30 blur-sm -z-10" />
-            </div>
-
-            {/* Ordered sections and items */}
-            {orderedTimeline.map((group, groupIndex) => (
-              <div key={groupIndex}>
-                {group.type === "section" && group.section && (
-                  <div className="relative mb-2 mt-4 first:mt-0">
-                    {/* Section dot with glow */}
-                    <div
-                      className="absolute left-[-25px] top-1/2 z-10 h-[13px] w-[13px] -translate-y-1/2 rounded-full border-[3px] border-base"
-                      style={{
-                        background: group.section.color,
-                        boxShadow: `0 0 12px ${group.section.color}60`
-                      }}
-                    />
-
-                    {/* Section header with enhanced styling */}
-                    <div
-                      className="ml-2 flex items-center justify-between rounded-xl px-4 py-3 transition-all hover:scale-[1.005]"
-                      style={{
-                        background: `linear-gradient(135deg, ${group.section.color}08 0%, ${group.section.color}15 100%)`,
-                        border: `1.5px solid ${group.section.color}40`,
-                        boxShadow: `0 2px 8px ${group.section.color}10`,
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        {/* Collapse toggle */}
-                        <button
-                          onClick={() => toggleSectionCollapse(group.section!.id)}
-                          className="p-1 rounded hover:bg-white/10 transition-colors"
-                          aria-label={collapsedSections.has(group.section.id) ? "Expand section" : "Collapse section"}
-                        >
-                          {collapsedSections.has(group.section.id) ? (
-                            <ChevronRight size={14} style={{ color: group.section.color }} />
-                          ) : (
-                            <ChevronDown size={14} style={{ color: group.section.color }} />
-                          )}
-                        </button>
-
-                        {/* Section dot indicator */}
-                        <div
-                          className="h-3 w-3 rounded-full"
-                          style={{
-                            background: group.section.color,
-                            boxShadow: `0 0 8px ${group.section.color}60`
-                          }}
-                        />
-
-                        {/* Editable section name */}
-                        <input
-                          type="text"
-                          value={group.section.name}
-                          onChange={(e) =>
-                            handleSectionNameChange(
-                              group.section!.id,
-                              e.target.value
-                            )
-                          }
-                          className="cursor-text rounded-md bg-transparent px-2 py-1 text-xs font-bold uppercase tracking-wider outline-none transition-all hover:bg-white/10 focus:bg-white/15 focus:ring-2 focus:ring-white/30"
-                          style={{ color: group.section.color }}
-                        />
-
-                        {/* Enhanced metrics */}
-                        <div className="flex items-center gap-2 text-[10px] font-medium">
-                          <span className="flex items-center gap-1 text-muted">
-                            <LayoutList size={11} />
-                            {group.items.length}
-                          </span>
-                          <span className="text-muted/50">·</span>
-                          <span
-                            className="flex items-center gap-1 tabular-nums"
-                            style={{ color: group.section.color }}
-                          >
-                            <Clock size={11} />
-                            {group.items.reduce((sum, item) => sum + item.duration, 0)}m
-                          </span>
-                        </div>
+                return (
+                  <SortableSection
+                    key={section.id}
+                    section={section}
+                    itemCount={sectionItems.length}
+                    totalDuration={sectionDuration}
+                    isCollapsed={collapsedSections.has(section.id)}
+                    onToggleCollapse={() => toggleSectionCollapse(section.id)}
+                    onDelete={() => handleDeleteSection(section.id)}
+                    onNameChange={(name) => handleSectionNameChange(section.id, name)}
+                  >
+                    {sectionItems.length === 0 ? (
+                      <div className="py-4 text-center text-sm rounded-lg border-2 border-dashed border-border/30 text-muted/50">
+                        Drag drills here
                       </div>
-                      <button
-                        onClick={() => handleDeleteSection(group.section!.id)}
-                        className="rounded-lg p-1.5 text-muted/50 transition-all hover:bg-error/10 hover:text-error hover:scale-110"
-                        title="Delete section"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-
-                    {/* Section items - conditionally rendered based on collapse state */}
-                    {!collapsedSections.has(group.section.id) && (
-                      <div className="ml-2 mt-2">
-                        {/* Drop zone at the start of section */}
-                        {draggedItemId && group.items.length === 0 && (
-                          <DropZonePlaceholder
-                            onDrop={() => {
-                              const firstItemIndex = timeline.findIndex(
-                                (item) => item.sectionId === group.section!.id
-                              );
-                              if (firstItemIndex !== -1) {
-                                handleDrop(firstItemIndex, group.section!.id);
-                              } else {
-                                // Empty section - add at the end
-                                handleDrop(timeline.length, group.section!.id);
-                              }
-                            }}
-                          />
-                        )}
-
-                        {group.items.map((item, itemIndex) => {
-                          const globalIndex = timeline.indexOf(item);
-                          return (
-                            <React.Fragment key={item.instanceId}>
-                              {/* Drop zone before this item */}
-                              {draggedItemId && draggedItemId !== item.instanceId && itemIndex === 0 && (
-                                <DropZonePlaceholder
-                                  onDrop={() => handleDrop(globalIndex, group.section!.id)}
-                                />
-                              )}
-
-                              <DrillItemCard
-                                item={item}
-                                index={globalIndex}
-                                totalItems={timeline.length}
-                                isDragging={draggedItemId === item.instanceId}
-                                onMoveUp={() =>
-                                  handleMoveDrill(item.instanceId, -1)
-                                }
-                                onMoveDown={() =>
-                                  handleMoveDrill(item.instanceId, 1)
-                                }
-                                onRemove={() => handleRemoveDrill(item.instanceId)}
-                                onViewDetails={() => onViewDrillDetails(item.drill)}
-                                onDurationClick={(e) =>
-                                  handleDurationClick(
-                                    item.instanceId,
-                                    item.duration,
-                                    item.notes,
-                                    e
-                                  )
-                                }
-                                onDragStart={() => handleDragStart(item.instanceId)}
-                                onDragEnd={handleDragEnd}
-                              />
-
-                              {/* Drop zone after this item */}
-                              {draggedItemId && draggedItemId !== item.instanceId && (
-                                <DropZonePlaceholder
-                                  onDrop={() => handleDrop(globalIndex + 1, group.section!.id)}
-                                />
-                              )}
-                            </React.Fragment>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {group.type === "ungrouped" && (
-                  <div className="ml-2 mt-2">
-                    {/* Drop zone at the start of ungrouped section */}
-                    {draggedItemId && group.items.length === 0 && (
-                      <DropZonePlaceholder
-                        onDrop={() => {
-                          const firstUngroupedIndex = timeline.findIndex(
-                            (item) =>
-                              !item.sectionId ||
-                              !sections.find((s) => s.id === item.sectionId)
-                          );
-                          if (firstUngroupedIndex !== -1) {
-                            handleDrop(firstUngroupedIndex, undefined);
-                          } else {
-                            // Empty ungrouped - add at the end
-                            handleDrop(timeline.length, undefined);
-                          }
-                        }}
-                      />
-                    )}
-
-                    {group.items.map((item, itemIndex) => {
-                      const globalIndex = timeline.indexOf(item);
-                      return (
-                        <React.Fragment key={item.instanceId}>
-                          {/* Drop zone before this item */}
-                          {draggedItemId && draggedItemId !== item.instanceId && itemIndex === 0 && (
-                            <DropZonePlaceholder
-                              onDrop={() => handleDrop(globalIndex, undefined)}
-                            />
-                          )}
-
-                          <DrillItemCard
+                    ) : (
+                      <SortableContext items={sectionItems.map(i => i.instanceId)} strategy={verticalListSortingStrategy}>
+                        {sectionItems.map((item) => (
+                          <SortableDrillCard
+                            key={item.instanceId}
                             item={item}
-                            index={globalIndex}
-                            totalItems={timeline.length}
-                            isDragging={draggedItemId === item.instanceId}
-                            onMoveUp={() => handleMoveDrill(item.instanceId, -1)}
-                            onMoveDown={() => handleMoveDrill(item.instanceId, 1)}
+                            cumulativeTime={getCumulativeTime(item.instanceId)}
                             onRemove={() => handleRemoveDrill(item.instanceId)}
                             onViewDetails={() => onViewDrillDetails(item.drill)}
-                            onDurationClick={(e) =>
-                              handleDurationClick(
-                                item.instanceId,
-                                item.duration,
-                                item.notes,
-                                e
-                              )
-                            }
-                            onDragStart={() => handleDragStart(item.instanceId)}
-                            onDragEnd={handleDragEnd}
+                            onDurationClick={(e) => handleDurationClick(item.instanceId, item.duration, item.notes, e)}
                           />
+                        ))}
+                      </SortableContext>
+                    )}
+                  </SortableSection>
+                );
+              })}
+            </SortableContext>
 
-                          {/* Drop zone after this item */}
-                          {draggedItemId && draggedItemId !== item.instanceId && (
-                            <DropZonePlaceholder
-                              onDrop={() => handleDrop(globalIndex + 1, undefined)}
-                            />
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {/* Drop zone at bottom */}
-            {draggedItemId ? (
-              <div className="mt-4">
-                <DropZonePlaceholder
-                  onDrop={() => handleDrop(timeline.length, undefined)}
-                />
-              </div>
-            ) : (
-              <div
-                className="mt-4 rounded-xl border-2 border-dashed border-border/50 p-6 text-center transition-all hover:border-accent/40 hover:bg-accent/5 group"
-                onDragOver={handleDragOver}
-                onDrop={() => handleDrop(timeline.length, undefined)}
-              >
-                <Plus size={20} className="mx-auto mb-2 text-muted/50 group-hover:text-accent transition-colors" />
-                <p className="text-sm text-muted group-hover:text-foreground transition-colors">
-                  Drop drills here or browse library
-                </p>
+            {/* Ungrouped items */}
+            {(groupedItems.get('__ungrouped__') || []).length > 0 && (
+              <div className="mb-4">
+                <SortableContext items={(groupedItems.get('__ungrouped__') || []).map(i => i.instanceId)} strategy={verticalListSortingStrategy}>
+                  {(groupedItems.get('__ungrouped__') || []).map((item) => (
+                    <SortableDrillCard
+                      key={item.instanceId}
+                      item={item}
+                      cumulativeTime={getCumulativeTime(item.instanceId)}
+                      onRemove={() => handleRemoveDrill(item.instanceId)}
+                      onViewDetails={() => onViewDrillDetails(item.drill)}
+                      onDurationClick={(e) => handleDurationClick(item.instanceId, item.duration, item.notes, e)}
+                    />
+                  ))}
+                </SortableContext>
               </div>
             )}
-          </div>
+
+            {/* End time marker */}
+            {timeline.length > 0 && (
+              <div className="flex items-center gap-3 mt-3 pt-3 border-t border-border/30">
+                <div className="flex-shrink-0 w-10 text-right">
+                  <span className="text-[11px] font-semibold tabular-nums text-accent">{totalDuration}m</span>
+                </div>
+                <span className="text-xs text-muted">End of session</span>
+              </div>
+            )}
+
+            {/* Drop zone at bottom */}
+            <div className="mt-4 ml-6 rounded-xl border-2 border-dashed border-border/50 p-6 text-center transition-all hover:border-accent/40 hover:bg-accent/5">
+              <Plus size={20} className="mx-auto mb-2 text-muted/50" />
+              <p className="text-sm text-muted">Drop drills here or browse library</p>
+            </div>
+
+            {/* Drag Overlay */}
+            <DragOverlay>
+              {activeItem && (
+                <SortableDrillCard
+                  item={activeItem}
+                  cumulativeTime={getCumulativeTime(activeItem.instanceId)}
+                  onRemove={() => {}}
+                  onViewDetails={() => {}}
+                  onDurationClick={() => {}}
+                  isOverlay
+                />
+              )}
+            </DragOverlay>
+          </DndContext>
         )}
       </div>
 
       {/* Duration Editor Popover */}
       {editingDuration && (
         <DurationEditor
-          instanceId={editingDuration.instanceId}
           duration={editingDuration.duration}
           notes={editingDuration.notes}
           position={editingDuration.position}
@@ -878,6 +814,60 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelPropsExtended> =
           onCancel={() => setEditingDuration(null)}
         />
       )}
+
+      {/* Delete Section Confirmation Dialog */}
+      {deletingSectionId && (() => {
+        const sectionToDelete = sections.find(s => s.id === deletingSectionId);
+        const drillsInSection = timeline.filter(item => item.sectionId === deletingSectionId);
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setDeletingSectionId(null)} />
+            <div className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-raised p-6 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-warning/10">
+                  <AlertTriangle size={24} className="text-warning" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-foreground">Delete "{sectionToDelete?.name}"?</h3>
+                  <p className="mt-1 text-sm text-muted">
+                    {drillsInSection.length > 0
+                      ? `This section contains ${drillsInSection.length} drill${drillsInSection.length > 1 ? 's' : ''}. What would you like to do with them?`
+                      : 'This section is empty and will be removed.'}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-6 flex flex-col gap-2">
+                {drillsInSection.length > 0 ? (
+                  <>
+                    <Button variant="outline" onClick={handleConfirmDeleteKeepDrills} className="justify-start gap-3 h-auto py-3 px-4">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10">
+                        <GripVertical size={16} className="text-accent" />
+                      </div>
+                      <div className="text-left">
+                        <div className="font-medium">Keep drills</div>
+                        <div className="text-xs text-muted">Move drills to ungrouped</div>
+                      </div>
+                    </Button>
+                    <Button variant="outline" onClick={handleConfirmDeleteWithDrills} className="justify-start gap-3 h-auto py-3 px-4 hover:border-error/30 hover:bg-error/5">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-error/10">
+                        <Trash2 size={16} className="text-error" />
+                      </div>
+                      <div className="text-left">
+                        <div className="font-medium text-error">Delete everything</div>
+                        <div className="text-xs text-muted">Remove section and all drills</div>
+                      </div>
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="outline" onClick={handleConfirmDeleteKeepDrills}>Delete Section</Button>
+                )}
+                <Button variant="ghost" onClick={() => setDeletingSectionId(null)} className="mt-1">Cancel</Button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

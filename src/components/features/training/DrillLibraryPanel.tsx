@@ -666,10 +666,17 @@ function DrillListItem({ drill, onAdd, onViewDetails }: DrillListItemProps) {
 	const categoryColor = CATEGORY_COLORS[drill.category];
 	const intensityColor = INTENSITY_COLORS[drill.intensity];
 
+	const handleDragStart = (e: React.DragEvent) => {
+		e.dataTransfer.setData("application/json", JSON.stringify(drill));
+		e.dataTransfer.effectAllowed = "copy";
+	};
+
 	return (
 		<div
 			role="button"
 			tabIndex={0}
+			draggable
+			onDragStart={handleDragStart}
 			onKeyDown={(e) => {
 				if (e.key === 'Enter' || e.key === ' ') {
 					e.preventDefault();

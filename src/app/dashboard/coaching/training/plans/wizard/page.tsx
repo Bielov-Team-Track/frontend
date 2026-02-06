@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button, Input, TextArea, Card } from "@/components";
@@ -19,10 +19,25 @@ import { useQuery } from "@tanstack/react-query";
 import { getClubs } from "@/lib/api/clubs";
 import type { Drill } from "@/lib/models/Drill";
 import type { TemplateVisibility } from "@/lib/models/Template";
-import { ArrowLeft, Save, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Save, ChevronDown, ChevronUp, Cloud, CloudOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const SECTION_COLORS = ["#FF7D00", "#29757A", "#2E5A88", "#D99100", "#4A7A45", "#BE3F23"];
+
+const AUTOSAVE_KEY_NEW = "training-plan-wizard-draft-new";
+const AUTOSAVE_KEY_EDIT_PREFIX = "training-plan-wizard-draft-edit-";
+const AUTOSAVE_DEBOUNCE_MS = 1000;
+
+interface DraftData {
+	name: string;
+	description: string;
+	clubId: string;
+	visibility: TemplateVisibility;
+	sessionDuration: number;
+	timeline: TimelineItem[];
+	sections: Section[];
+	savedAt: number;
+}
 
 export default function TrainingPlanWizardPage() {
 	const router = useRouter();
@@ -60,42 +75,170 @@ export default function TrainingPlanWizardPage() {
 	// Mobile tab switcher
 	const [mobileTab, setMobileTab] = useState<"timeline" | "library">("timeline");
 
+	// Autosave state
+	const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+	const [draftLoaded, setDraftLoaded] = useState(false);
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+	// Get the appropriate localStorage key
+	const autosaveKey = isEditMode && editId ? `${AUTOSAVE_KEY_EDIT_PREFIX}${editId}` : AUTOSAVE_KEY_NEW;
+
 	// Load existing template data in edit mode
 	useEffect(() => {
-		if (existingTemplate) {
-			setName(existingTemplate.name);
-			setDescription(existingTemplate.description || "");
-			setClubId(existingTemplate.clubId || "");
-			setVisibility(existingTemplate.visibility);
+		if (existingTemplate && !draftLoaded) {
+			// Check if there's a local draft that's newer
+			let useDraft = false;
+			let draft: DraftData | null = null;
 
-			// Convert template sections to local sections
-			const loadedSections: Section[] = (existingTemplate.sections || []).map((s, idx) => ({
-				id: s.id,
-				name: s.name,
-				color: SECTION_COLORS[idx % SECTION_COLORS.length],
-			}));
-			setSections(loadedSections);
+			try {
+				const saved = localStorage.getItem(autosaveKey);
+				if (saved) {
+					draft = JSON.parse(saved);
+					const templateUpdated = new Date(existingTemplate.updatedAt || existingTemplate.createdAt).getTime();
+					if (draft && draft.savedAt > templateUpdated) {
+						useDraft = confirm(
+							"You have unsaved changes from a previous session. Would you like to restore them?\n\n" +
+							"Click OK to restore your draft, or Cancel to use the saved version."
+						);
+					}
+				}
+			} catch (e) {
+				console.error("Failed to check draft:", e);
+			}
 
-			// Convert template items to timeline items
-			const loadedTimeline: TimelineItem[] = (existingTemplate.items || [])
-				.filter((item) => item.drill)
-				.map((item) => ({
-					instanceId: item.id,
-					drill: item.drill!,
-					duration: item.duration,
-					notes: item.notes || "",
-					sectionId: item.sectionId,
+			if (useDraft && draft) {
+				// Use the local draft
+				setName(draft.name || "");
+				setDescription(draft.description || "");
+				setClubId(draft.clubId || "");
+				setVisibility(draft.visibility || "Private");
+				setSessionDuration(draft.sessionDuration || 90);
+				setTimeline(draft.timeline || []);
+				setSections(draft.sections || []);
+				setLastSavedAt(draft.savedAt);
+				setHasUnsavedChanges(true);
+			} else {
+				// Use server data
+				setName(existingTemplate.name);
+				setDescription(existingTemplate.description || "");
+				setClubId(existingTemplate.clubId || "");
+				setVisibility(existingTemplate.visibility);
+
+				// Convert template sections to local sections
+				const loadedSections: Section[] = (existingTemplate.sections || []).map((s, idx) => ({
+					id: s.id,
+					name: s.name,
+					color: SECTION_COLORS[idx % SECTION_COLORS.length],
 				}));
-			setTimeline(loadedTimeline);
+				setSections(loadedSections);
 
-			// Calculate session duration from items
-			const totalDuration = loadedTimeline.reduce((sum, item) => sum + item.duration, 0);
-			setSessionDuration(Math.max(90, Math.ceil(totalDuration / 30) * 30));
+				// Convert template items to timeline items
+				const loadedTimeline: TimelineItem[] = (existingTemplate.items || [])
+					.filter((item) => item.drill)
+					.map((item) => ({
+						instanceId: item.id,
+						drill: item.drill!,
+						duration: item.duration,
+						notes: item.notes || "",
+						sectionId: item.sectionId,
+					}));
+				setTimeline(loadedTimeline);
+
+				// Calculate session duration from items
+				const totalDuration = loadedTimeline.reduce((sum, item) => sum + item.duration, 0);
+				setSessionDuration(Math.max(90, Math.ceil(totalDuration / 30) * 30));
+
+				// Clear any stale draft
+				try {
+					localStorage.removeItem(autosaveKey);
+				} catch (e) {
+					// Ignore
+				}
+			}
 
 			// Collapse details if we have data
 			setDetailsExpanded(false);
+			setDraftLoaded(true);
 		}
-	}, [existingTemplate]);
+	}, [existingTemplate, draftLoaded, autosaveKey]);
+
+	// Load draft from localStorage on mount (only for new templates)
+	useEffect(() => {
+		if (isEditMode || draftLoaded) return;
+
+		try {
+			const saved = localStorage.getItem(autosaveKey);
+			if (saved) {
+				const draft: DraftData = JSON.parse(saved);
+				setName(draft.name || "");
+				setDescription(draft.description || "");
+				setClubId(draft.clubId || "");
+				setVisibility(draft.visibility || "Private");
+				setSessionDuration(draft.sessionDuration || 90);
+				setTimeline(draft.timeline || []);
+				setSections(draft.sections || []);
+				setLastSavedAt(draft.savedAt);
+
+				// Collapse details if we have a name
+				if (draft.name) {
+					setDetailsExpanded(false);
+				}
+			}
+		} catch (e) {
+			console.error("Failed to load draft:", e);
+		}
+		setDraftLoaded(true);
+	}, [isEditMode, draftLoaded, autosaveKey]);
+
+	// Autosave to localStorage (debounced)
+	useEffect(() => {
+		// Don't autosave before initial load
+		if (!draftLoaded) return;
+
+		// Clear previous timeout
+		if (autosaveTimeoutRef.current) {
+			clearTimeout(autosaveTimeoutRef.current);
+		}
+
+		// Debounce the save
+		autosaveTimeoutRef.current = setTimeout(() => {
+			try {
+				const draft: DraftData = {
+					name,
+					description,
+					clubId,
+					visibility,
+					sessionDuration,
+					timeline,
+					sections,
+					savedAt: Date.now(),
+				};
+				localStorage.setItem(autosaveKey, JSON.stringify(draft));
+				setLastSavedAt(draft.savedAt);
+				setHasUnsavedChanges(true);
+			} catch (e) {
+				console.error("Failed to save draft:", e);
+			}
+		}, AUTOSAVE_DEBOUNCE_MS);
+
+		return () => {
+			if (autosaveTimeoutRef.current) {
+				clearTimeout(autosaveTimeoutRef.current);
+			}
+		};
+	}, [name, description, clubId, visibility, sessionDuration, timeline, sections, draftLoaded, autosaveKey]);
+
+	// Clear draft after successful save
+	const clearDraft = useCallback(() => {
+		try {
+			localStorage.removeItem(autosaveKey);
+			setLastSavedAt(null);
+			setHasUnsavedChanges(false);
+		} catch (e) {
+			console.error("Failed to clear draft:", e);
+		}
+	}, [autosaveKey]);
 
 	// Save template - defined before keyboard shortcuts useEffect that references it
 	const handleSave = useCallback(async () => {
@@ -135,6 +278,8 @@ export default function TrainingPlanWizardPage() {
 					sections: sectionsDto,
 					items: itemsDto,
 				});
+				// Clear draft after successful save
+				clearDraft();
 				router.push(`/dashboard/coaching/training/plans/${editId}`);
 			} else {
 				const result = await createMutation.mutateAsync({
@@ -145,13 +290,15 @@ export default function TrainingPlanWizardPage() {
 					sections: sectionsDto.length > 0 ? sectionsDto : undefined,
 					items: itemsDto.length > 0 ? itemsDto : undefined,
 				});
+				// Clear draft after successful save
+				clearDraft();
 				router.push(`/dashboard/coaching/training/plans/${result.id}`);
 			}
 		} catch (error) {
 			console.error("Failed to save template:", error);
 			alert("Failed to save template. Please try again.");
 		}
-	}, [name, description, clubId, visibility, sections, timeline, isEditMode, editId, router, createMutation, updateMutation]);
+	}, [name, description, clubId, visibility, sections, timeline, isEditMode, editId, router, createMutation, updateMutation, clearDraft]);
 
 	// Keyboard shortcuts handler
 	useEffect(() => {
@@ -258,10 +405,33 @@ export default function TrainingPlanWizardPage() {
 
 	const isSaving = createMutation.isPending || updateMutation.isPending;
 
-	if (isEditMode && isLoadingTemplate) {
+	// Format "saved X ago" text
+	const formatSavedAgo = useCallback((timestamp: number) => {
+		const seconds = Math.floor((Date.now() - timestamp) / 1000);
+		if (seconds < 5) return "just now";
+		if (seconds < 60) return `${seconds}s ago`;
+		const minutes = Math.floor(seconds / 60);
+		if (minutes < 60) return `${minutes}m ago`;
+		const hours = Math.floor(minutes / 60);
+		return `${hours}h ago`;
+	}, []);
+
+	// Update "saved ago" text periodically
+	const [, forceUpdate] = useState(0);
+	useEffect(() => {
+		if (!lastSavedAt) return;
+		const interval = setInterval(() => forceUpdate((n) => n + 1), 10000);
+		return () => clearInterval(interval);
+	}, [lastSavedAt]);
+
+	// Show loading state while loading template or draft
+	if ((isEditMode && isLoadingTemplate) || !draftLoaded) {
 		return (
-			<div className="flex items-center justify-center h-64">
+			<div className="flex flex-col items-center justify-center h-64 gap-3">
 				<Loader size="lg" />
+				<p className="text-sm text-muted-foreground">
+					{isEditMode ? "Loading template..." : "Loading draft..."}
+				</p>
 			</div>
 		);
 	}
@@ -300,9 +470,65 @@ export default function TrainingPlanWizardPage() {
 				</Link>
 				<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 					<div>
-						<h1 className="text-2xl font-bold text-foreground">
-							{isEditMode ? "Edit Training Plan" : "Create Training Plan"}
-						</h1>
+						<div className="flex items-center gap-3">
+							<h1 className="text-2xl font-bold text-foreground">
+								{isEditMode ? "Edit Training Plan" : "Create Training Plan"}
+							</h1>
+							{/* Draft indicator */}
+							{lastSavedAt && (
+								<div className="flex items-center gap-2">
+									<div className={cn(
+										"flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium",
+										isEditMode && hasUnsavedChanges
+											? "bg-warning/10 text-warning"
+											: "bg-accent/10 text-accent"
+									)}>
+										<Cloud size={12} />
+										<span>
+											{isEditMode && hasUnsavedChanges
+												? `Unsaved changes (${formatSavedAgo(lastSavedAt)})`
+												: `Draft saved ${formatSavedAgo(lastSavedAt)}`
+											}
+										</span>
+									</div>
+									{!isEditMode && (
+										<button
+											type="button"
+											onClick={() => {
+												if (confirm("Clear draft and start fresh?")) {
+													clearDraft();
+													setName("");
+													setDescription("");
+													setClubId("");
+													setVisibility("Private");
+													setSessionDuration(90);
+													setTimeline([]);
+													setSections([]);
+													setDetailsExpanded(true);
+												}
+											}}
+											className="text-xs text-muted hover:text-foreground transition-colors"
+										>
+											Clear
+										</button>
+									)}
+									{isEditMode && hasUnsavedChanges && (
+										<button
+											type="button"
+											onClick={() => {
+												if (confirm("Discard changes and reload from server?")) {
+													clearDraft();
+													setDraftLoaded(false); // Trigger reload
+												}
+											}}
+											className="text-xs text-muted hover:text-foreground transition-colors"
+										>
+											Discard
+										</button>
+									)}
+								</div>
+							)}
+						</div>
 						<p className="text-sm text-muted-foreground mt-1">Build a reusable training session template</p>
 					</div>
 					<div className="hidden lg:flex items-center gap-3">
@@ -475,6 +701,7 @@ export default function TrainingPlanWizardPage() {
 						onTimelineChange={setTimeline}
 						onSectionsChange={setSections}
 						onViewDrillDetails={handleViewDetails}
+						onAddDrill={handleAddDrill}
 						sessionDuration={sessionDuration}
 					/>
 				</div>
