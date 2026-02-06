@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { Slider as SliderPrimitive } from "@base-ui/react/slider";
 import { AlertCircle, X } from "lucide-react";
-import { forwardRef, useId, useMemo } from "react";
+import { forwardRef, useCallback, useId, useMemo, useRef, useState } from "react";
 import { Label } from "../label";
 
 type SliderSize = "sm" | "md" | "lg";
@@ -63,6 +63,8 @@ export interface SliderProps {
 	onValueChange?: (value: number | null) => void;
 	/** Callback for range value change */
 	onRangeChange?: (values: [number, number]) => void;
+	/** Allow clicking the value display to type a number directly */
+	editable?: boolean;
 }
 
 const sizeStyles: Record<SliderSize, { track: string; thumb: string }> = {
@@ -158,6 +160,7 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
 			onChange,
 			onValueChange,
 			onRangeChange,
+			editable = false,
 			id: providedId,
 		},
 		ref
@@ -166,6 +169,8 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
 		const id = providedId || generatedId;
 		const hasError = Boolean(error);
 		const effectiveColor = hasError ? "error" : color;
+		const [isEditing, setIsEditing] = useState(false);
+		const editInputRef = useRef<HTMLInputElement>(null);
 		const sizeStyle = sizeStyles[size];
 		const variantStyle = variantStyles[variant];
 		const colorStyle = colorStyles[effectiveColor];
@@ -197,6 +202,19 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
 			onChange?.({ target: { value: null } });
 			onValueChange?.(null);
 		};
+
+		// Handle committing an edited value from the inline input
+		const commitEditValue = useCallback(
+			(rawValue: string) => {
+				setIsEditing(false);
+				const parsed = parseFloat(rawValue);
+				if (isNaN(parsed)) return;
+				const val = Math.max(min, parsed);
+				onChange?.({ target: { value: val } });
+				onValueChange?.(val);
+			},
+			[min, onChange, onValueChange]
+		);
 
 		// Render value display
 		const renderValueDisplay = () => {
@@ -230,9 +248,37 @@ const Slider = forwardRef<HTMLDivElement, SliderProps>(
 			}
 
 			const singleValue = currentValues[0];
+
+			if (editable && isEditing) {
+				return (
+					<input
+						ref={editInputRef}
+						type="number"
+						min={min}
+						step={step}
+						defaultValue={singleValue}
+						autoFocus
+						className="w-20 text-sm font-semibold tabular-nums text-right bg-surface border border-border rounded px-1.5 py-0.5 outline-none focus:border-accent"
+						onBlur={(e) => commitEditValue(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") commitEditValue(e.currentTarget.value);
+							if (e.key === "Escape") setIsEditing(false);
+						}}
+					/>
+				);
+			}
+
 			return (
 				<div className="flex items-center gap-1.5">
-					<span className={cn("text-sm font-semibold tabular-nums", hasError ? "text-destructive" : "text-foreground")}>
+					<span
+						className={cn(
+							"text-sm font-semibold tabular-nums",
+							hasError ? "text-destructive" : "text-foreground",
+							editable && !disabled && "cursor-pointer hover:bg-muted rounded px-1 -mx-1 transition-colors"
+						)}
+						onClick={editable && !disabled ? () => setIsEditing(true) : undefined}
+						title={editable && !disabled ? "Click to edit" : undefined}
+					>
 						{formatDisplayValue(singleValue)}
 					</span>
 					{alternativeValues?.map((fn, index) => (

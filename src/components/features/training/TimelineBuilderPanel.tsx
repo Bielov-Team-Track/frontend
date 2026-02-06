@@ -692,18 +692,22 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
         onDrop={handleExternalDrop}
       >
         {timeline.length === 0 && sections.length === 0 ? (
-          <Card className="p-12 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-subtle">
-              <Clock size={28} className="text-muted" strokeWidth={1.5} />
+          <Card className={`p-12 text-center transition-all ${isDragOver ? 'border-accent border-dashed bg-accent/5' : ''}`}>
+            <div className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl ${isDragOver ? 'bg-accent/20' : 'bg-subtle'}`}>
+              <Clock size={28} className={isDragOver ? 'text-accent' : 'text-muted'} strokeWidth={1.5} />
             </div>
-            <h3 className="mb-1 text-lg font-bold text-foreground">Build your training timeline</h3>
+            <h3 className="mb-1 text-lg font-bold text-foreground">
+              {isDragOver ? 'Drop drill here' : 'Build your training timeline'}
+            </h3>
             <p className="mx-auto mb-6 max-w-sm text-sm text-muted">
-              Drag drills from the library or click + to add them to your session
+              Drag drills from the library or click to add them to your session
             </p>
-            <Button variant="outline" className="mx-auto">
-              <Download size={16} />
-              Load Template
-            </Button>
+            {!isDragOver && (
+              <Button variant="outline" className="mx-auto">
+                <Download size={16} />
+                Load Template
+              </Button>
+            )}
           </Card>
         ) : (
           <DndContext
@@ -782,9 +786,15 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
             )}
 
             {/* Drop zone at bottom */}
-            <div className="mt-4 ml-6 rounded-xl border-2 border-dashed border-border/50 p-6 text-center transition-all hover:border-accent/40 hover:bg-accent/5">
-              <Plus size={20} className="mx-auto mb-2 text-muted/50" />
-              <p className="text-sm text-muted">Drop drills here or browse library</p>
+            <div className={`mt-4 ml-6 rounded-xl border-2 border-dashed p-6 text-center transition-all ${
+              isDragOver
+                ? 'border-accent bg-accent/10'
+                : 'border-border/50 hover:border-accent/40 hover:bg-accent/5'
+            }`}>
+              <Plus size={20} className={`mx-auto mb-2 ${isDragOver ? 'text-accent' : 'text-muted/50'}`} />
+              <p className={`text-sm ${isDragOver ? 'text-accent font-medium' : 'text-muted'}`}>
+                {isDragOver ? 'Drop to add drill' : 'Drop drills here or browse library'}
+              </p>
             </div>
 
             {/* Drag Overlay */}
