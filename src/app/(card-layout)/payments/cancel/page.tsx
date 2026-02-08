@@ -21,10 +21,10 @@ async function PaymentCancelPage() {
 				</p>
 
 				<div className="flex flex-col gap-3">
-					<Link href="/dashboard/events">
+					<Link href="/hub/events">
 						<Button fullWidth>Back to Events</Button>
 					</Link>
-					<Link href="/dashboard">
+					<Link href="/hub">
 						<Button variant="outline" fullWidth>
 							Go to Dashboard
 						</Button>

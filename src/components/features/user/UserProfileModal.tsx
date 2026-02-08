@@ -28,7 +28,7 @@ export default function UserProfileModal({ user, isOpen, onClose, onChatCreated 
 			if (onChatCreated) {
 				onChatCreated(chat.id);
 			} else {
-				router.push(`/dashboard/messages/${chat.id}`);
+				router.push(`/hub/messages/${chat.id}`);
 			}
 		} catch (error) {
 			console.error("Failed to create chat", error);
@@ -39,7 +39,7 @@ export default function UserProfileModal({ user, isOpen, onClose, onChatCreated 
 
 	const handleViewProfile = () => {
 		onClose();
-		router.push(`/dashboard/profile/${user.id}`);
+		router.push(`/hub/profile/${user.id}`);
 	};
 
 	const initials = (user.name || "?")

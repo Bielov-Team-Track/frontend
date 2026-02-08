@@ -28,35 +28,35 @@ export function getNotificationLink(notification: Notification): string | null {
 			break;
 		case "clubUpdates":
 			if (payload?.clubId) {
-				return `/dashboard/clubs/${payload.clubId}`;
+				return `/hub/clubs/${payload.clubId}`;
 			}
 			break;
 		case "invitations":
 			if (payload?.clubId) {
-				return `/dashboard/clubs/${payload.clubId}`;
+				return `/hub/clubs/${payload.clubId}`;
 			}
 			if (payload?.eventId) {
-				return `/dashboard/events/${payload.eventId}`;
+				return `/hub/events/${payload.eventId}`;
 			}
 			break;
 		case "events":
 			if (payload?.eventId) {
-				return `/dashboard/events/${payload.eventId}`;
+				return `/hub/events/${payload.eventId}`;
 			}
 			break;
 		case "teamAssignments":
 			if (payload?.teamId) {
-				return `/dashboard/teams/${payload.teamId}`;
+				return `/hub/teams/${payload.teamId}`;
 			}
 			break;
 		case "messages":
 			if (payload?.chatId) {
-				return `/dashboard/messages?chat=${payload.chatId}`;
+				return `/hub/messages?chat=${payload.chatId}`;
 			}
 			break;
 		case "payments":
 			if (payload?.eventId) {
-				return `/dashboard/events/${payload.eventId}`;
+				return `/hub/events/${payload.eventId}`;
 			}
 			break;
 	}

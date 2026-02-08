@@ -30,7 +30,7 @@ function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 					)}
 
 					{/* Logo */}
-					<Link href="/dashboard" className="flex items-center gap-3">
+					<Link href="/hub" className="flex items-center gap-3">
 						<div className="w-9 h-9 bg-linear-to-tr from-secondary to-primary rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 text-white">
 							<Volleyball size={18} />
 						</div>

@@ -11,6 +11,11 @@ function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
 
+/** Dialog with outside click prevention */
+function DialogPreventClose({ ...props }: Omit<DialogPrimitive.Root.Props, 'disablePointerDismissal'>) {
+  return <DialogPrimitive.Root data-slot="dialog" disablePointerDismissal {...props} />
+}
+
 function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
 }
@@ -139,6 +144,7 @@ function DialogDescription({
 
 export {
   Dialog,
+  DialogPreventClose,
   DialogClose,
   DialogContent,
   DialogDescription,

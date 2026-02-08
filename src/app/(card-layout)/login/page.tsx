@@ -30,7 +30,7 @@ function LoginContent() {
 		try {
 			await login(email, password);
 
-			const targetRoute = callback || "/dashboard/events";
+			const targetRoute = callback || "/hub/events";
 
 			router.push(targetRoute);
 		} catch (error: any) {

@@ -108,7 +108,7 @@ export default function DrillCard({
 	if (variant === "compact") {
 		return (
 			<Link
-				href={`/dashboard/coaching/training/drills/${drill.id}`}
+				href={`/hub/coaching/training/drills/${drill.id}`}
 				onClick={handleCardClick}
 				className="group block p-3 rounded-xl bg-surface hover:bg-hover transition-all">
 				<div className="flex items-start justify-between gap-3">
@@ -131,7 +131,7 @@ export default function DrillCard({
 						{/* Club (priority) or Author */}
 						{drill.clubName ? (
 							<Link
-								href={`/dashboard/clubs/${drill.clubId}`}
+								href={`/hub/clubs/${drill.clubId}`}
 								onClick={(e) => e.stopPropagation()}
 								className="flex items-center gap-1.5 mt-1.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors group/club">
 								<Avatar size="sm" className="size-4">
@@ -146,7 +146,7 @@ export default function DrillCard({
 							</Link>
 						) : authorName ? (
 							<Link
-								href={`/dashboard/profile/${drill.author?.id}`}
+								href={`/hub/profile/${drill.author?.id}`}
 								onClick={(e) => e.stopPropagation()}
 								className="flex items-center gap-1.5 mt-1.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors group/author">
 								<Avatar size="sm" className="size-4">
@@ -175,7 +175,7 @@ export default function DrillCard({
 
 	return (
 		<Link
-			href={`/dashboard/coaching/training/drills/${drill.id}`}
+			href={`/hub/coaching/training/drills/${drill.id}`}
 			onClick={handleCardClick}
 			className="group block h-full rounded-2xl bg-surface border border-border hover:border-border/80 hover:bg-hover transition-all">
 			<div className="p-5 h-full flex flex-col">
@@ -296,7 +296,7 @@ export default function DrillCard({
 					{/* Right: Club (priority) or Author */}
 					{drill.clubName ? (
 						<Link
-							href={`/dashboard/clubs/${drill.clubId}`}
+							href={`/hub/clubs/${drill.clubId}`}
 							onClick={(e) => e.stopPropagation()}
 							className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors group/club">
 							<span className="truncate max-w-[100px] group-hover/club:underline">{drill.clubName}</span>
@@ -311,7 +311,7 @@ export default function DrillCard({
 						</Link>
 					) : authorName ? (
 						<Link
-							href={`/dashboard/profile/${drill.author?.id}`}
+							href={`/hub/profile/${drill.author?.id}`}
 							onClick={(e) => e.stopPropagation()}
 							className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors group/author">
 							<span className="truncate max-w-[100px] group-hover/author:underline">{authorName}</span>

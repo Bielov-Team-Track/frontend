@@ -9,16 +9,16 @@ import { MediaLightbox, type MediaItem, formatFileSize, parseEmbedUrl as parseEm
 
 interface DrillAttachmentsProps {
 	attachments: DrillAttachment[];
-	animation?: DrillAnimation;
+	animations?: DrillAnimation[];
 	className?: string;
 }
 
-export default function DrillAttachments({ attachments, animation, className }: DrillAttachmentsProps) {
+export default function DrillAttachments({ attachments, animations, className }: DrillAttachmentsProps) {
 	const [lightboxOpen, setLightboxOpen] = useState(false);
 	const [lightboxIndex, setLightboxIndex] = useState(0);
 
 	const hasAttachments = attachments?.length > 0;
-	const hasAnimation = animation && animation.keyframes?.length > 0;
+	const hasAnimation = animations && animations.length > 0 && animations.some(a => a.keyframes?.length > 0);
 
 	if (!hasAttachments && !hasAnimation) {
 		return null;
@@ -31,37 +31,40 @@ export default function DrillAttachments({ attachments, animation, className }: 
 	// Build unified media items array
 	const mediaItems: MediaItem[] = [];
 
-	// Add animation first if exists
-	if (hasAnimation) {
-		mediaItems.push({
-			id: "drill-animation",
-			type: "animation",
-			url: "",
-			fileName: "Drill Animation",
-			animation: {
-				keyframes: animation.keyframes.map(kf => ({
-					id: kf.id,
-					players: kf.players.map(p => ({
-						id: p.id,
-						x: p.x,
-						y: p.y,
-						color: p.color,
-						label: p.label,
+	// Add animations first if they exist
+	if (hasAnimation && animations) {
+		animations.filter(anim => anim.keyframes?.length > 0).forEach((anim, i) => {
+			mediaItems.push({
+				id: `drill-animation-${i}`,
+				type: "animation",
+				url: "",
+				fileName: anim.name || `Animation ${i + 1}`,
+				animation: {
+					keyframes: anim.keyframes.map(kf => ({
+						id: kf.id,
+						players: kf.players.map(p => ({
+							id: p.id,
+							x: p.x,
+							y: p.y,
+							color: p.color,
+							label: p.label,
+						})),
+						ball: kf.ball,
+						equipment: kf.equipment?.map(e => ({
+							id: e.id,
+							type: e.type,
+							x: e.x,
+							y: e.y,
+							rotation: e.rotation,
+							label: e.label,
+						})),
 					})),
-					ball: kf.ball,
-					equipment: kf.equipment?.map(e => ({
-						id: e.id,
-						type: e.type,
-						x: e.x,
-						y: e.y,
-						rotation: e.rotation,
-						label: e.label,
-					})),
-				})),
-				speed: animation.speed,
-			},
+					speed: anim.speed,
+				},
+			});
 		});
 	}
+	const firstAnimationId = hasAnimation ? "drill-animation-0" : null;
 
 	// Add embeds as MediaItems
 	embeds.forEach((embed) => {
@@ -104,28 +107,33 @@ export default function DrillAttachments({ attachments, animation, className }: 
 
 	return (
 		<div className={cn("space-y-6", className)}>
-			{/* Animation Preview */}
-			{hasAnimation && (
+			{/* Animation Previews */}
+			{hasAnimation && animations && (
 				<div className="space-y-3">
 					{(embeds.length > 0 || images.length > 0 || videos.length > 0 || documents.length > 0) && (
-						<h4 className="text-xs font-bold text-muted uppercase tracking-wider">Animation</h4>
+						<h4 className="text-xs font-bold text-muted uppercase tracking-wider">{animations.length > 1 ? "Animations" : "Animation"}</h4>
 					)}
-					<button
-						type="button"
-						onClick={() => openLightbox("drill-animation")}
-						className="relative w-full max-w-xs aspect-[1/2] rounded-xl overflow-hidden group cursor-pointer bg-green-800"
-					>
-						<div className="absolute inset-0 flex items-center justify-center">
-							<div className="w-16 h-16 rounded-full bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
-								<Play size={32} className="text-white ml-1" fill="currentColor" />
-							</div>
-						</div>
-						<div className="absolute bottom-3 left-3 right-3 text-center">
-							<span className="text-sm text-white/80 bg-black/50 px-3 py-1 rounded-full">
-								{animation.keyframes.length} frames
-							</span>
-						</div>
-					</button>
+					<div className="flex gap-3 flex-wrap">
+						{animations.filter(a => a.keyframes?.length > 0).map((anim, i) => (
+							<button
+								key={i}
+								type="button"
+								onClick={() => openLightbox(`drill-animation-${i}`)}
+								className="relative w-full max-w-xs aspect-[1/2] rounded-xl overflow-hidden group cursor-pointer bg-green-800"
+							>
+								<div className="absolute inset-0 flex items-center justify-center">
+									<div className="w-16 h-16 rounded-full bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
+										<Play size={32} className="text-white ml-1" fill="currentColor" />
+									</div>
+								</div>
+								<div className="absolute bottom-3 left-3 right-3 text-center">
+									<span className="text-sm text-white/80 bg-black/50 px-3 py-1 rounded-full">
+										{anim.name || `Animation ${i + 1}`} - {anim.keyframes.length} frames
+									</span>
+								</div>
+							</button>
+						))}
+					</div>
 				</div>
 			)}
 

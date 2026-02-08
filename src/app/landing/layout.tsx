@@ -1,9 +1,4 @@
-import { FeedbackButton } from "@/components/features/feedback";
-import { ThemeScript } from "@/components/ui/theme-script";
-import { AuthProvider, ThemeProvider } from "@/providers";
-import { inter } from "@/lib/fonts";
 import type { Metadata } from "next";
-import "../globals.css";
 
 export const metadata: Metadata = {
 	title: "Bielov Volleyer - Volleyball Community Platform",
@@ -18,20 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function LandingLayout({ children }: { children: React.ReactNode }) {
-	return (
-		<html lang="en" suppressHydrationWarning className={`${inter.variable} min-h-screen relative`}>
-			<head>
-				<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-				<ThemeScript />
-			</head>
-			<body className="font-sans min-h-screen antialiased selection:bg-accent/30">
-				<ThemeProvider>
-					<AuthProvider>
-						{children}
-						<FeedbackButton />
-					</AuthProvider>
-				</ThemeProvider>
-			</body>
-		</html>
-	);
+	return <>{children}</>;
 }

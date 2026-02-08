@@ -28,7 +28,7 @@ export default function PlanListItem({ plan }: PlanListItemProps) {
 
 	return (
 		<Link
-			href={`/dashboard/coaching/evaluations/plans/${plan.id}`}
+			href={`/hub/coaching/evaluations/plans/${plan.id}`}
 			className="group block"
 		>
 			<div className="flex items-center gap-4 p-4 rounded-xl bg-surface border border-border hover:border-border hover:bg-hover transition-all">
@@ -58,7 +58,7 @@ export default function PlanListItem({ plan }: PlanListItemProps) {
 						{/* Event link */}
 						{plan.eventId && (
 							<Link
-								href={`/dashboard/events/${plan.eventId}`}
+								href={`/hub/events/${plan.eventId}`}
 								onClick={(e) => e.stopPropagation()}
 								className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
 							>

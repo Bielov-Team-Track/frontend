@@ -159,7 +159,7 @@ export const MOCK_DRILLS: Drill[] = [
 		],
 		minPlayers: 6,
 		maxPlayers: 16,
-		animation: butterflyPassingAnimation,
+		animations: [butterflyPassingAnimation],
 	},
 	{
 		id: "d2",
@@ -370,7 +370,7 @@ export const MOCK_DRILLS: Drill[] = [
 		],
 		minPlayers: 2,
 		maxPlayers: 20,
-		animation: pepperDrillAnimation,
+		animations: [pepperDrillAnimation],
 	},
 	{
 		id: "d9",

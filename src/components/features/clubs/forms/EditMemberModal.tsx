@@ -47,7 +47,7 @@ export default function EditMemberModal({ isOpen, member, onClose, onSubmit, isL
 	const memberName = member?.userProfile ? `${member.userProfile.name} ${member.userProfile.surname}` : "Member";
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} title="Edit Member" description={`Update settings for ${memberName}`} size="md">
+		<Modal isOpen={isOpen} onClose={onClose} title="Edit Member" description={`Update settings for ${memberName}`} size="md" preventOutsideClose>
 			<form onSubmit={handleSubmit} className="space-y-5">
 				{/* Role Selection */}
 				<div>

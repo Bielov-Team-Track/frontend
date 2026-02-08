@@ -56,9 +56,9 @@ export function useEventForm(event?: Event, contextSelection?: ContextSelection,
 				// Default: navigate to the event detail page if available
 				const eventId = result?.id;
 				if (eventId) {
-					router.push(`/dashboard/events/${eventId}`);
+					router.push(`/hub/events/${eventId}`);
 				} else {
-					router.push("/dashboard/events");
+					router.push("/hub/events");
 				}
 				router.refresh();
 			}

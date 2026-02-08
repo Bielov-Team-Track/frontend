@@ -48,6 +48,7 @@ export interface AnimationKeyframe {
 }
 
 export interface DrillAnimation {
+	name?: string;
 	keyframes: AnimationKeyframe[];
 	speed: number; // ms per frame transition
 }
@@ -85,7 +86,7 @@ export interface Drill {
 	equipment?: DrillEquipment[];
 	minPlayers?: number;
 	maxPlayers?: number;
-	animation?: DrillAnimation;
+	animations?: DrillAnimation[];
 	likeCount?: number;
 	bookmarkCount?: number;
 	isLiked?: boolean;

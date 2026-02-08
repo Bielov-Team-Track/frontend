@@ -199,7 +199,7 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 	const hasAttachments = attachments.length > 0;
 
 	return (
-		<Modal isOpen={isOpen} onClose={handleClose} title="Create Post" size="lg">
+		<Modal isOpen={isOpen} onClose={handleClose} title="Create Post" size="lg" preventOutsideClose>
 			<div className="space-y-4">
 				{/* Author info */}
 				<div className="flex items-center gap-3">

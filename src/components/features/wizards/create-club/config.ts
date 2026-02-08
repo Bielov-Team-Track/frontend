@@ -111,6 +111,6 @@ export const createClubWizardConfig: WizardConfig<ClubFormData> = {
 		title: "Club Created!",
 		message: "Your club has been created successfully. Start adding teams and events!",
 		linkText: "View Club",
-		getLinkHref: (id) => `/dashboard/clubs/${id}`,
+		getLinkHref: (id) => `/hub/clubs/${id}`,
 	},
 };

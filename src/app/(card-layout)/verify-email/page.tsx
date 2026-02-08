@@ -63,7 +63,7 @@ const VerifyEmailPageContent = () => {
 					setCountdown((prev) => {
 						if (prev <= 1) {
 							clearInterval(timer);
-							router.push("/dashboard/events/my");
+							router.push("/hub/events/my");
 							return 0;
 						}
 						return prev - 1;
@@ -107,7 +107,7 @@ const VerifyEmailPageContent = () => {
 					</p>
 					<Button
 						variant="link"
-						onClick={() => router.push("/dashboard/events/my")}
+						onClick={() => router.push("/hub/events/my")}
 					>
 						go to dashboard straight away
 					</Button>

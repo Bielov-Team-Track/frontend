@@ -50,7 +50,7 @@ export function WizardModal<TData extends FieldValues>({
 	const StepComponent = currentStepConfig?.component;
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} size="xl" className="max-h-[90vh] overflow-hidden">
+		<Modal isOpen={isOpen} onClose={onClose} size="xl" className="max-h-[90vh] overflow-hidden" preventOutsideClose>
 			{state.isSuccess && state.createdId ? (
 				<WizardSuccessScreen config={config.successConfig} createdId={state.createdId} onClose={onClose} />
 			) : (

@@ -79,7 +79,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 	};
 
 	return (
-		<Link href={`/dashboard/coaching/training/drills/${drill.id}`} className="group block">
+		<Link href={`/hub/coaching/training/drills/${drill.id}`} className="group block">
 			<div className="flex items-center gap-4 p-4 rounded-xl bg-surface border border-border hover:border-border hover:bg-hover transition-all">
 				{/* Content */}
 				<div className="flex-1 min-w-0">
@@ -193,7 +193,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 						{/* Right: Club (priority) or Author */}
 						{drill.clubName ? (
 							<Link
-								href={`/dashboard/clubs/${drill.clubId}`}
+								href={`/hub/clubs/${drill.clubId}`}
 								onClick={(e) => e.stopPropagation()}
 								className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors group/club">
 								<span className="truncate max-w-[100px] group-hover/club:underline">{drill.clubName}</span>
@@ -208,7 +208,7 @@ export default function DrillListItem({ drill, onSkillClick, onLikeClick, onBook
 							</Link>
 						) : authorName ? (
 							<Link
-								href={`/dashboard/profile/${drill.author?.id}`}
+								href={`/hub/profile/${drill.author?.id}`}
 								onClick={(e) => e.stopPropagation()}
 								className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors group/author">
 								<span className="truncate max-w-[100px] group-hover/author:underline">{authorName}</span>

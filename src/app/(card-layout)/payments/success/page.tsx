@@ -15,7 +15,7 @@ async function PaymentSuccessPage({ searchParams }: SuccessPageParams) {
 	const sessionId = params.session_id;
 
 	if (!sessionId) {
-		redirect("/dashboard");
+		redirect("/hub");
 	}
 
 	let eventId: string | null = null;
@@ -61,11 +61,11 @@ async function PaymentSuccessPage({ searchParams }: SuccessPageParams) {
 							<Button fullWidth>Back to Event</Button>
 						</Link>
 					) : (
-						<Link href="/dashboard/events">
+						<Link href="/hub/events">
 							<Button fullWidth>View My Events</Button>
 						</Link>
 					)}
-					<Link href="/dashboard">
+					<Link href="/hub">
 						<Button variant="outline" fullWidth>
 							Go to Dashboard
 						</Button>

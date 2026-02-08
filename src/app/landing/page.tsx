@@ -718,7 +718,7 @@ export default function LandingPage() {
 
 	useEffect(() => {
 		if (!isLoading && isAuthenticated) {
-			router.replace("/dashboard/events");
+			router.replace("/hub/events");
 		}
 	}, [isAuthenticated, isLoading, router]);
 

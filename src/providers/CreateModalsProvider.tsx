@@ -82,7 +82,7 @@ export function CreateModalsProvider({ children }: { children: React.ReactNode }
 	const handleEventSuccess = useCallback(() => {
 		setIsCreateEventOpen(false);
 		// Navigate to events page if not already there
-		router.push("/dashboard/events");
+		router.push("/hub/events");
 		// Refresh to get updated data from server components
 		// This ensures the event list is updated even if we're already on the events page
 		router.refresh();

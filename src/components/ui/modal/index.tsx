@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../dialog";
+import { Dialog, DialogPreventClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../dialog";
 import Loader from "../loader";
 
 type ModalSize = "sm" | "md" | "lg" | "xl" | "full";
@@ -16,6 +16,7 @@ interface ModalProps {
 	isLoading?: boolean;
 	className?: string;
 	showCloseButton?: boolean;
+	preventOutsideClose?: boolean;
 }
 
 const sizeClasses: Record<ModalSize, string> = {
@@ -36,9 +37,12 @@ export default function Modal({
 	isLoading = false,
 	className,
 	showCloseButton = true,
+	preventOutsideClose = false,
 }: ModalProps) {
+	const DialogRoot = preventOutsideClose ? DialogPreventClose : Dialog;
+
 	return (
-		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+		<DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<DialogContent showCloseButton={showCloseButton} className={cn(sizeClasses[size], className)}>
 				{isLoading && (
 					<div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-xl">
@@ -55,7 +59,7 @@ export default function Modal({
 
 				<div className="max-h-[80dvh] overflow-auto">{children}</div>
 			</DialogContent>
-		</Dialog>
+		</DialogRoot>
 	);
 }
 

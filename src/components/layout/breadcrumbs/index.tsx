@@ -5,7 +5,7 @@ const Breadcrumbs = () => {
 		<nav className="flex items-center space-x-2 ml-2">
 			<ol className="list-reset flex items-center">
 				<li>
-					<Link href="/dashboard">
+					<Link href="/hub">
 						Home
 					</Link>
 				</li>

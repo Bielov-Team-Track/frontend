@@ -200,6 +200,37 @@ export async function deleteDrillComment(drillId: string, commentId: string): Pr
 // =============================================================================
 
 /**
+ * Get a presigned upload URL for a drill attachment (permanent path: drills/{drillId}/)
+ */
+export async function getDrillAttachmentUploadUrl(
+    drillId: string,
+    fileName: string,
+    contentType: string,
+    fileSize: number
+): Promise<{ uploadUrl: string; fileUrl: string }> {
+    const endpoint = `/v1/drills/${drillId}/attachments/upload-url`;
+    const response = await client.post<{ uploadUrl: string; fileUrl: string }>(PREFIX + endpoint, {
+        fileName,
+        contentType,
+        fileSize,
+    });
+    return response.data;
+}
+
+/**
+ * Upload a file directly to S3 via presigned URL
+ */
+export async function uploadFileToS3(uploadUrl: string, file: File): Promise<void> {
+    await fetch(uploadUrl, {
+        method: "PUT",
+        body: file,
+        headers: {
+            "Content-Type": file.type || "application/octet-stream",
+        },
+    });
+}
+
+/**
  * Add an attachment to a drill
  */
 export async function addDrillAttachment(
@@ -220,14 +251,14 @@ export async function deleteDrillAttachment(drillId: string, attachmentId: strin
 }
 
 // =============================================================================
-// ANIMATION
+// ANIMATIONS
 // =============================================================================
 
 /**
- * Update a drill's animation
+ * Update a drill's animations
  */
-export async function updateDrillAnimation(drillId: string, animation: DrillAnimation | null): Promise<Drill> {
-    const endpoint = `/v1/drills/${drillId}/animation`;
-    const response = await client.put<DrillDto>(PREFIX + endpoint, { animation });
+export async function updateDrillAnimations(drillId: string, animations: DrillAnimation[]): Promise<Drill> {
+    const endpoint = `/v1/drills/${drillId}/animations`;
+    const response = await client.put<DrillDto>(PREFIX + endpoint, { animations });
     return transformDrillDto(response.data);
 }

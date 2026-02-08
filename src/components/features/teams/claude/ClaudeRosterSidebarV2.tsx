@@ -443,7 +443,7 @@ function ClaudeDraggableMemberRow({
 
 				{/* Avatar */}
 				<Link
-					href={`/dashboard/clubs/${clubId}/members/${member.userId}`}
+					href={`/hub/clubs/${clubId}/members/${member.userId}`}
 					className="relative z-10 shrink-0"
 					onClick={(e) => isDragging && e.preventDefault()}
 				>
@@ -463,7 +463,7 @@ function ClaudeDraggableMemberRow({
 
 				{/* Name & Status */}
 				<Link
-					href={`/dashboard/clubs/${clubId}/members/${member.userId}`}
+					href={`/hub/clubs/${clubId}/members/${member.userId}`}
 					className="flex-1 min-w-0 z-10"
 					onClick={(e) => isDragging && e.preventDefault()}
 				>

@@ -60,7 +60,7 @@ export default function EditTeamMemberModal({ isOpen, member, onClose, onSave, i
 	const memberName = `${member.userProfile?.name || ""} ${member.userProfile?.surname || ""}`.trim();
 
 	return (
-		<Modal isOpen={isOpen} onClose={handleClose} title="Edit Player" size="md">
+		<Modal isOpen={isOpen} onClose={handleClose} title="Edit Player" size="md" preventOutsideClose>
 			<div className="space-y-6">
 				{/* Player Info Header */}
 				<div className="flex items-center gap-4 p-4 rounded-xl bg-surface border border-border">

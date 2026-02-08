@@ -10,7 +10,7 @@ const CompleteProfileSetupPage = () => {
 
 	const handleProfileComplete = () => {
 		// Redirect to the main application page or dashboard after profile completion
-		router.push("/dashboard");
+		router.push("/hub");
 	};
 
 	return (

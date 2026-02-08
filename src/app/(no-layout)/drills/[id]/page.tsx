@@ -52,7 +52,7 @@ function DrillDetailContent() {
 		);
 	}
 
-	const currentAnimation = drill.animation;
+	const animations = drill.animations || [];
 	const intensityColor = INTENSITY_COLORS[drill.intensity].color;
 	const intensityDot = intensityColor === "success" ? "bg-success" : intensityColor === "warning" ? "bg-warning" : "bg-error";
 
@@ -61,37 +61,8 @@ function DrillDetailContent() {
 	const hasCoachingPoints = drill.coachingPoints?.length > 0;
 	const hasVariations = drill.variations?.length > 0;
 	const hasAttachments = drill.attachments?.length > 0;
-	const hasAnimation = currentAnimation && currentAnimation.keyframes?.length > 0;
-	const hasMedia = hasAttachments || hasAnimation;
-
-	const animationMediaItem: MediaItem | null = hasAnimation ? {
-		id: "drill-animation",
-		type: "animation",
-		url: "",
-		fileName: "Drill Animation",
-		animation: {
-			keyframes: currentAnimation.keyframes.map(kf => ({
-				id: kf.id,
-				players: kf.players.map(p => ({
-					id: p.id,
-					x: p.x,
-					y: p.y,
-					color: p.color,
-					label: p.label,
-				})),
-				ball: kf.ball,
-				equipment: kf.equipment?.map(e => ({
-					id: e.id,
-					type: e.type,
-					x: e.x,
-					y: e.y,
-					rotation: e.rotation,
-					label: e.label,
-				})),
-			})),
-			speed: currentAnimation.speed,
-		},
-	} : null;
+	const hasAnimations = animations.length > 0 && animations.some(a => a.keyframes?.length > 0);
+	const hasMedia = hasAttachments || hasAnimations;
 
 	return (
 		<>
@@ -148,7 +119,7 @@ function DrillDetailContent() {
 			{/* Media */}
 			{hasMedia && (
 				<section className="mb-10">
-					<DrillAttachments attachments={drill.attachments} animation={currentAnimation} />
+					<DrillAttachments attachments={drill.attachments} animations={animations} />
 				</section>
 			)}
 
@@ -239,25 +210,32 @@ function DrillDetailContent() {
 						</section>
 					)}
 
-					{hasAnimation && (
+					{hasAnimations && (
 						<section>
-							<h3 className="text-xs font-bold text-white/50 uppercase tracking-widest mb-4">Animation</h3>
-							<button
-								type="button"
-								onClick={() => setShowAnimationLightbox(true)}
-								className="relative w-full aspect-[4/3] rounded-xl overflow-hidden group cursor-pointer bg-green-800"
-							>
-								<div className="absolute inset-0 flex items-center justify-center">
-									<div className="w-12 h-12 rounded-full bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
-										<Play size={24} className="text-white ml-0.5" fill="currentColor" />
-									</div>
-								</div>
-								<div className="absolute bottom-2 left-2">
-									<span className="text-xs text-white/80 bg-black/50 px-2 py-0.5 rounded-full">
-										{currentAnimation.keyframes.length} frames
-									</span>
-								</div>
-							</button>
+							<h3 className="text-xs font-bold text-white/50 uppercase tracking-widest mb-4">
+								{animations.length > 1 ? "Animations" : "Animation"}
+							</h3>
+							<div className="space-y-2">
+								{animations.filter(a => a.keyframes?.length > 0).map((anim, i) => (
+									<button
+										key={i}
+										type="button"
+										onClick={() => setShowAnimationLightbox(true)}
+										className="relative w-full aspect-[4/3] rounded-xl overflow-hidden group cursor-pointer bg-green-800"
+									>
+										<div className="absolute inset-0 flex items-center justify-center">
+											<div className="w-12 h-12 rounded-full bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
+												<Play size={24} className="text-white ml-0.5" fill="currentColor" />
+											</div>
+										</div>
+										<div className="absolute bottom-2 left-2">
+											<span className="text-xs text-white/80 bg-black/50 px-2 py-0.5 rounded-full">
+												{anim.name || `Animation ${i + 1}`} - {anim.keyframes.length} frames
+											</span>
+										</div>
+									</button>
+								))}
+							</div>
 						</section>
 					)}
 				</aside>
@@ -269,9 +247,27 @@ function DrillDetailContent() {
 			</div>
 		</div>
 
-		{animationMediaItem && (
+		{hasAnimations && (
 			<MediaLightbox
-				items={[animationMediaItem]}
+				items={animations.filter(a => a.keyframes?.length > 0).map((anim, i) => ({
+					id: `drill-animation-${i}`,
+					type: "animation" as const,
+					url: "",
+					fileName: anim.name || `Animation ${i + 1}`,
+					animation: {
+						keyframes: anim.keyframes.map(kf => ({
+							id: kf.id,
+							players: kf.players.map(p => ({
+								id: p.id, x: p.x, y: p.y, color: p.color, label: p.label,
+							})),
+							ball: kf.ball,
+							equipment: kf.equipment?.map(e => ({
+								id: e.id, type: e.type, x: e.x, y: e.y, rotation: e.rotation, label: e.label,
+							})),
+						})),
+						speed: anim.speed,
+					},
+				}))}
 				initialIndex={0}
 				isOpen={showAnimationLightbox}
 				onClose={() => setShowAnimationLightbox(false)}

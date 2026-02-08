@@ -18,7 +18,7 @@ import {
     deleteDrillComment,
     addDrillAttachment,
     deleteDrillAttachment,
-    updateDrillAnimation,
+    updateDrillAnimations,
 } from "@/lib/api/drills";
 import { getMyClubMembership } from "@/lib/api/clubs/clubs";
 import {
@@ -356,18 +356,18 @@ export function useDeleteDrillAttachment() {
 }
 
 // =============================================================================
-// ANIMATION MUTATIONS
+// ANIMATIONS MUTATIONS
 // =============================================================================
 
 /**
- * Hook to update a drill's animation
+ * Hook to update a drill's animations
  */
-export function useUpdateDrillAnimation() {
+export function useUpdateDrillAnimations() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ drillId, animation }: { drillId: string; animation: DrillAnimation | null }) =>
-            updateDrillAnimation(drillId, animation),
+        mutationFn: ({ drillId, animations }: { drillId: string; animations: DrillAnimation[] }) =>
+            updateDrillAnimations(drillId, animations),
         onSuccess: (updatedDrill) => {
             // Update cache with the returned drill data
             queryClient.setQueryData(drillKeys.detail(updatedDrill.id), updatedDrill);

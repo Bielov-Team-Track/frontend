@@ -38,6 +38,7 @@ export interface AnimationKeyframe {
 }
 
 export interface DrillAnimation {
+    name?: string;
     keyframes: AnimationKeyframe[];
     speed: number;
 }
@@ -169,7 +170,7 @@ export interface DrillDto {
     updatedAt?: string;
     attachments: DrillAttachmentDto[];
     variations: DrillVariationDto[];
-    animation?: DrillAnimation;
+    animations: DrillAnimation[];
 }
 
 export interface DrillAttachmentDto {
@@ -323,7 +324,7 @@ export interface Drill {
     updatedAt?: Date;
     attachments: DrillAttachment[];
     variations: DrillVariation[];
-    animation?: DrillAnimation;
+    animations: DrillAnimation[];
 }
 
 export interface DrillAttachment {
@@ -365,7 +366,7 @@ export interface CreateDrillRequest {
     equipment: DrillEquipmentInput[];
     videoUrl?: string;
     clubId?: string;
-    animation?: DrillAnimation;
+    animations?: DrillAnimation[];
 }
 
 export interface UpdateDrillRequest {
@@ -385,7 +386,7 @@ export interface UpdateDrillRequest {
     equipment: DrillEquipmentInput[];
     videoUrl?: string;
     clubId?: string;
-    animation?: DrillAnimation;
+    animations?: DrillAnimation[];
 }
 
 export interface DrillFilterRequest {
@@ -463,7 +464,7 @@ export function transformDrillDto(dto: DrillDto): Drill {
         updatedAt: dto.updatedAt ? new Date(dto.updatedAt) : undefined,
         attachments: dto.attachments?.map(transformAttachmentDto) || [],
         variations: dto.variations?.map(transformVariationDto) || [],
-        animation: dto.animation,
+        animations: dto.animations || [],
     };
 }
 

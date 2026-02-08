@@ -28,7 +28,7 @@ const AuditEventItem = async ({ event }: AuditEventItemProps) => {
 						<AlertTriangle size={16} className="text-warning" />
 					)}
 				</div>
-				<Link href={`/dashboard/events/${event.id}`} className="px-0">
+				<Link href={`/hub/events/${event.id}`} className="px-0">
 					{event.name}
 				</Link>
 				<div className="text-muted">
@@ -36,7 +36,7 @@ const AuditEventItem = async ({ event }: AuditEventItemProps) => {
 				</div>
 			</div>
 
-			<Link href={`/dashboard/audit/${event.id}`}>Details</Link>
+			<Link href={`/hub/audit/${event.id}`}>Details</Link>
 		</div>
 	);
 };

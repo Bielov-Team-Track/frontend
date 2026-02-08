@@ -1,6 +1,6 @@
 "use client";
 
-import EventsPageClient from "@/app/dashboard/events/EventsPageClient";
+import EventsPageClient from "@/app/hub/events/EventsPageClient";
 import { Loader } from "@/components";
 import EmptyState from "@/components/ui/empty-state";
 import { loadEventsByFilter } from "@/lib/api/events";

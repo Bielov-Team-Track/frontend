@@ -299,7 +299,7 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 							<tr
 								key={row.id}
 								className="border-b border-border hover:bg-hover transition-colors cursor-pointer group"
-								onClick={() => router.push(`/dashboard/audit/${row.original.id}`)}
+								onClick={() => router.push(`/hub/audit/${row.original.id}`)}
 							>
 								{row.getVisibleCells().map((cell) => (
 									<td

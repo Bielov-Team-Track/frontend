@@ -13,7 +13,7 @@ interface TeamCardProps {
 export default function TeamCard({ team, onEdit, onDelete }: TeamCardProps) {
 	return (
 		<Link
-			href={`/dashboard/teams/${team.id}`}
+			href={`/hub/teams/${team.id}`}
 			className="rounded-xl bg-surface border border-border p-4 hover:border-accent/30 transition-colors group block">
 			<div className="flex items-center gap-3 mb-3">
 				<div className="w-12 h-12 rounded-lg bg-surface-elevated flex items-center justify-center">

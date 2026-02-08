@@ -27,7 +27,7 @@ const ClickableMention = Mention.extend({
 		return [
 			"a",
 			mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-				href: `/dashboard/profile/${userId}`,
+				href: `/hub/profile/${userId}`,
 				"data-mention-id": userId,
 			}),
 			`@${label}`,

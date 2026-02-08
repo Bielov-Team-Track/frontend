@@ -59,7 +59,7 @@ export default function TeamFormModal({ isOpen, team, clubId, onClose, onSubmit,
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit Team" : "Create Team"} size="md">
+		<Modal isOpen={isOpen} onClose={onClose} title={isEditing ? "Edit Team" : "Create Team"} size="md" preventOutsideClose>
 			<form onSubmit={handleSubmit} className="space-y-4">
 				<Input label="Team Name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter team name" required />
 

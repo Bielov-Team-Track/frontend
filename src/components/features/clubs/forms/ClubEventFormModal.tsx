@@ -26,7 +26,7 @@ interface ClubEventFormModalProps {
 
 export default function ClubEventFormModal({ isOpen, contextSelection, onClose, onSubmit }: ClubEventFormModalProps) {
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} title="Create Event" size="lg">
+		<Modal isOpen={isOpen} onClose={onClose} title="Create Event" size="lg" preventOutsideClose>
 			<CreateEventForm variant="embedded" contextSelection={contextSelection} />
 		</Modal>
 	);

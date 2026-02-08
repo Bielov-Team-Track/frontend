@@ -260,6 +260,7 @@ export interface Group {
 	club?: Club;
 	description?: string;
 	color?: string;
+	logoUrl?: string;
 	skillLevel?: SkillLevel;
 	createdByUserId: string;
 	isActive: boolean;
@@ -284,6 +285,7 @@ export interface CreateGroupRequest {
 	name: string;
 	description?: string;
 	color?: string;
+	logoUrl?: string;
 	skillLevel?: string;
 }
 
@@ -291,6 +293,7 @@ export interface UpdateGroupRequest {
 	name?: string;
 	description?: string;
 	color?: string;
+	logoUrl?: string;
 	skillLevel?: string;
 }
 // Invitation types

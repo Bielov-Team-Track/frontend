@@ -23,7 +23,7 @@ function UserMenu({ user, isLoading }: UserMenuProps) {
 
 	const links = [
 		{
-			href: "/dashboard/events",
+			href: "/hub/events",
 			label: "Dashboard",
 			icon: LayoutDashboard,
 		},

@@ -39,7 +39,7 @@ export default async function proxy(request: NextRequest) {
 
 	// If user has token and tries to access auth pages, redirect to dashboard
 	if (hasToken && isAuthRoute) {
-		return NextResponse.redirect(new URL("/dashboard", request.url));
+		return NextResponse.redirect(new URL("/hub", request.url));
 	}
 
 	// If route is public, allow access

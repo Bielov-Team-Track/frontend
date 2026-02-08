@@ -16,7 +16,7 @@ export default function GroupCard({ group, onEdit, onDelete }: GroupCardProps) {
 
 	return (
 		<Link
-			href={`/dashboard/groups/${group.id}`}
+			href={`/hub/groups/${group.id}`}
 			className="rounded-xl bg-surface border border-border p-4 hover:border-accent/30 transition-colors group block">
 			<div className="flex items-center gap-3 mb-3">
 				<Avatar size={"md"} variant="group" color={groupColor} />

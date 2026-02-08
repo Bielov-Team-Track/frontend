@@ -10,7 +10,10 @@ export { default as DrillSelector } from "./DrillSelector";
 export { default as SkillFilter } from "./SkillFilter";
 export { DrillFilters, type DrillFiltersProps, type AuthorOption, type ClubOption, type DrillSortBy, type DrillSortOrder, SORT_OPTIONS } from "./DrillFilters";
 export { AnimationPreview } from "./AnimationPreview";
-export { AnimationEditor } from "./AnimationEditor";
+export { AnimationEditor } from "./animation-editor";
+export { default as AnimationThumbnail } from "./AnimationThumbnail";
+export { default as MediaThumbnail, UploadingThumbnail, type UploadingFile } from "./MediaThumbnail";
+export { default as MediaStrip } from "./MediaStrip";
 
 // Interaction components
 export { default as DrillLikeButton } from "./DrillLikeButton";

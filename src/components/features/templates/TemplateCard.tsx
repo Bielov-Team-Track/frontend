@@ -55,7 +55,7 @@ function InlineLink({
 }
 
 export default function TemplateCard({ template, href, showCreator = false, variant = "default" }: TemplateCardProps) {
-	const cardHref = href || `/dashboard/coaching/training/plans/${template.id}`;
+	const cardHref = href || `/hub/coaching/training/plans/${template.id}`;
 
 	// Get author display name
 	const authorName = template.author?.firstName && template.author?.lastName
@@ -102,7 +102,7 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 					{/* Club (priority) or Author */}
 					{showClub && (
 						<InlineLink
-							href={`/dashboard/clubs/${template.clubId}`}
+							href={`/hub/clubs/${template.clubId}`}
 							className="flex items-center gap-1.5 mt-2 py-0.5 text-xs text-muted-foreground/70 hover:text-foreground transition-colors cursor-pointer group/club">
 							<Avatar size="sm" className="size-4">
 								{template.clubLogoUrl ? (
@@ -117,7 +117,7 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 					)}
 					{showAuthor && (
 						<InlineLink
-							href={`/dashboard/profile/${template.author?.id}`}
+							href={`/hub/profile/${template.author?.id}`}
 							className="flex items-center gap-1.5 mt-2 py-0.5 text-xs text-muted-foreground/70 hover:text-foreground transition-colors cursor-pointer group/source">
 							<span className="text-muted-foreground/50">by</span>
 							<Avatar size="sm" className="size-4">
@@ -219,7 +219,7 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 					{/* Club (priority) or Author */}
 					{showClub && (
 						<InlineLink
-							href={`/dashboard/clubs/${template.clubId}`}
+							href={`/hub/clubs/${template.clubId}`}
 							className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer group/club">
 							<Avatar size="sm" className="size-5">
 								{template.clubLogoUrl ? (
@@ -234,7 +234,7 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 					)}
 					{showAuthor && (
 						<InlineLink
-							href={`/dashboard/profile/${template.author?.id}`}
+							href={`/hub/profile/${template.author?.id}`}
 							className="flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-foreground transition-colors cursor-pointer group/source">
 							<Avatar size="sm" className="size-5">
 								{template.author?.avatarUrl ? (

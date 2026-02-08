@@ -56,10 +56,17 @@ export default function DrillDetailModal({
 					)}
 				</div>
 
-				{/* Animation Preview */}
-				{drill.animation && (
-					<Section title="Animation">
-						<AnimationPreview animation={drill.animation} width={380} height={285} />
+				{/* Animation Previews */}
+				{drill.animations?.length > 0 && (
+					<Section title={drill.animations.length > 1 ? "Animations" : "Animation"}>
+						<div className="space-y-4">
+							{drill.animations.map((anim, i) => (
+								<div key={i}>
+									{anim.name && <p className="text-xs text-muted mb-1">{anim.name}</p>}
+									<AnimationPreview animation={anim} width={380} height={285} />
+								</div>
+							))}
+						</div>
 					</Section>
 				)}
 

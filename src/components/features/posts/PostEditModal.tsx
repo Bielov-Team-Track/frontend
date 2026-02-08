@@ -41,7 +41,7 @@ export default function PostEditModal({ isOpen, onClose, post }: PostEditModalPr
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} title="Edit Post" size="lg">
+		<Modal isOpen={isOpen} onClose={onClose} title="Edit Post" size="lg" preventOutsideClose>
 			<div className="space-y-4">
 				{/* Editor */}
 				<RichTextEditor content={content} onChange={setContent} />

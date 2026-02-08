@@ -40,7 +40,7 @@ export default function PlanCard({ plan, onClick }: PlanCardProps) {
 
 	return (
 		<Link
-			href={`/dashboard/coaching/evaluations/plans/${plan.id}`}
+			href={`/hub/coaching/evaluations/plans/${plan.id}`}
 			onClick={handleCardClick}
 			className="group block h-full rounded-2xl bg-surface border border-border hover:border-border/80 hover:bg-hover transition-all"
 		>
@@ -128,7 +128,7 @@ export default function PlanCard({ plan, onClick }: PlanCardProps) {
 					{/* Event link - placeholder for now */}
 					{plan.eventId && (
 						<Link
-							href={`/dashboard/events/${plan.eventId}`}
+							href={`/hub/events/${plan.eventId}`}
 							onClick={(e) => e.stopPropagation()}
 							className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors group/event"
 						>

@@ -39,7 +39,7 @@ export default function TeamEventFormModal({ isOpen, onClose, onSubmit }: TeamEv
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} title="Create Event" size="md">
+		<Modal isOpen={isOpen} onClose={onClose} title="Create Event" size="md" preventOutsideClose>
 			<form onSubmit={handleSubmit} className="space-y-4">
 				<Input label="Event Name" value={name} onChange={(e) => setName(e.target.value)} required />
 

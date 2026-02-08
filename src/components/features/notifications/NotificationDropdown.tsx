@@ -65,7 +65,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps) {
 			{hasNotifications && (
 				<div className="border-t border-border p-2">
 					<Link
-						href="/dashboard/notifications"
+						href="/hub/notifications"
 						onClick={onClose}
 						className={cn(
 							"flex w-full items-center justify-center gap-1 rounded-md px-3 py-2 text-sm font-medium",

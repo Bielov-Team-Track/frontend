@@ -110,7 +110,7 @@ const CompleteProfileForm = ({ onProfileComplete }: CompleteProfileFormProps) =>
 			if (onProfileComplete) {
 				onProfileComplete();
 			} else {
-				router.push("/dashboard");
+				router.push("/hub");
 			}
 		} catch (error: any) {
 			console.error("Profile update error:", error);

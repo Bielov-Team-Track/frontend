@@ -255,7 +255,7 @@ export default function CreateDrillModal({ isOpen, onClose, onSuccess }: CreateD
 	const isLoading = createDrill.isPending || addAttachment.isPending;
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} size="lg" showCloseButton={true}>
+		<Modal isOpen={isOpen} onClose={onClose} size="lg" showCloseButton={true} preventOutsideClose>
 			<div className="flex flex-col h-full">
 				{/* Header */}
 				<div className="mb-6">
@@ -634,6 +634,8 @@ interface DynamicListProps {
 
 function DynamicList({ label, icon, items, onChange, placeholder, ordered, helperText }: DynamicListProps) {
 	const [newItem, setNewItem] = useState("");
+	const [editingIndex, setEditingIndex] = useState<number | null>(null);
+	const [editingValue, setEditingValue] = useState("");
 
 	const addItem = () => {
 		if (newItem.trim()) {
@@ -644,6 +646,36 @@ function DynamicList({ label, icon, items, onChange, placeholder, ordered, helpe
 
 	const removeItem = (index: number) => {
 		onChange(items.filter((_, i) => i !== index));
+		if (editingIndex === index) setEditingIndex(null);
+	};
+
+	const startEditing = (index: number) => {
+		setEditingIndex(index);
+		setEditingValue(items[index]);
+	};
+
+	const saveEdit = () => {
+		if (editingIndex === null) return;
+		if (editingValue.trim()) {
+			onChange(items.map((item, i) => (i === editingIndex ? editingValue.trim() : item)));
+		}
+		setEditingIndex(null);
+		setEditingValue("");
+	};
+
+	const cancelEdit = () => {
+		setEditingIndex(null);
+		setEditingValue("");
+	};
+
+	const handleEditKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			saveEdit();
+		} else if (e.key === "Escape") {
+			e.preventDefault();
+			cancelEdit();
+		}
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -673,7 +705,25 @@ function DynamicList({ label, icon, items, onChange, placeholder, ordered, helpe
 								</span>
 							)}
 							{!ordered && <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />}
-							<span className="flex-1 text-sm text-white">{item}</span>
+							{editingIndex === index ? (
+								<input
+									type="text"
+									value={editingValue}
+									onChange={(e) => setEditingValue(e.target.value)}
+									onKeyDown={handleEditKeyDown}
+									onBlur={saveEdit}
+									autoFocus
+									className="flex-1 px-2 py-1 rounded-lg bg-surface border border-primary/50 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+								/>
+							) : (
+								<span
+									className="flex-1 text-sm text-white cursor-pointer hover:text-accent transition-colors"
+									onClick={() => startEditing(index)}
+									title="Click to edit"
+								>
+									{item}
+								</span>
+							)}
 							<button
 								type="button"
 								onClick={() => removeItem(index)}

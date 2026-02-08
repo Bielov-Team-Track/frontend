@@ -333,7 +333,7 @@ function DraggableMemberRow({
 
 				{/* Avatar - clickable link to member page */}
 				<Link
-					href={`/dashboard/clubs/${clubId}/members/${member.userId}`}
+					href={`/hub/clubs/${clubId}/members/${member.userId}`}
 					className="relative z-10 shrink-0"
 					onClick={(e) => isDragging && e.preventDefault()}>
 					<div className="relative">
@@ -350,7 +350,7 @@ function DraggableMemberRow({
 
 				{/* Name - clickable link to member page */}
 				<Link
-					href={`/dashboard/clubs/${clubId}/members/${member.userId}`}
+					href={`/hub/clubs/${clubId}/members/${member.userId}`}
 					className="flex-1 min-w-0 z-10"
 					onClick={(e) => isDragging && e.preventDefault()}>
 					<div className="text-sm font-medium text-foreground hover:text-accent transition-colors truncate flex items-center gap-1.5">

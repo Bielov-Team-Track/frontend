@@ -33,7 +33,7 @@ export default function ExerciseListItem({ exercise, highlightedSkills = [] }: E
 		: null;
 
 	return (
-		<Link href={`/dashboard/coaching/evaluations/exercises/${exercise.id}`} className="group block">
+		<Link href={`/hub/coaching/evaluations/exercises/${exercise.id}`} className="group block">
 			<div className="flex items-center gap-4 p-4 rounded-xl bg-surface border border-border hover:border-border hover:bg-hover transition-all">
 				{/* Content */}
 				<div className="flex-1 min-w-0">
@@ -115,7 +115,7 @@ export default function ExerciseListItem({ exercise, highlightedSkills = [] }: E
 						{/* Right: Club name if club-scoped */}
 						{exercise.clubId && (
 							<Link
-								href={`/dashboard/clubs/${exercise.clubId}`}
+								href={`/hub/clubs/${exercise.clubId}`}
 								onClick={(e) => e.stopPropagation()}
 								className="flex items-center gap-1.5 text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors group/club"
 							>

@@ -129,7 +129,7 @@ export default function CreatePlanModal({
 	const isLoading = createPlan.isPending;
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} size="lg" showCloseButton={true}>
+		<Modal isOpen={isOpen} onClose={onClose} size="lg" showCloseButton={true} preventOutsideClose>
 			<div className="flex flex-col h-full">
 				{/* Header */}
 				<div className="mb-6">

@@ -2,10 +2,12 @@
 
 import { Button } from "@/components";
 import type { DrillAttachment } from "@/lib/models/Drill";
-import { Plus, X, Link2, FileText, ImageIcon, Film, GripVertical, ExternalLink } from "lucide-react";
-import { useState } from "react";
+import { Plus, X, Link2, FileText, ImageIcon, Film, ExternalLink, Loader2, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { useState, useEffect } from "react";
 import { isEmbedUrl, parseEmbedUrl, getProviderDisplayName } from "./embedUtils";
+import { useUrlVerification, type VerifiedType } from "./useUrlVerification";
 import { formatFileSize } from "@/components/ui/media-preview";
+import { cn } from "@/lib/utils";
 
 export type AttachmentType = "Image" | "Video" | "Document";
 
@@ -26,32 +28,28 @@ interface DrillAttachmentInputProps {
 
 export default function DrillAttachmentInput({ attachments, onChange, className }: DrillAttachmentInputProps) {
 	const [newUrl, setNewUrl] = useState("");
-	const [newType, setNewType] = useState<AttachmentType>("Video");
+	const [typeOverride, setTypeOverride] = useState<AttachmentType | null>(null);
 	const [showAddForm, setShowAddForm] = useState(false);
 
-	const detectType = (url: string): AttachmentType => {
-		const lowerUrl = url.toLowerCase();
+	const verification = useUrlVerification(newUrl);
 
-		// Check for embed URLs first
-		if (isEmbedUrl(url)) {
-			return "Video";
-		}
+	// Derive the effective type: verification auto-detect, then manual override
+	const autoType: AttachmentType = verification.detectedType || "Video";
+	const effectiveType = typeOverride || autoType;
 
-		// Check file extensions
-		if (/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i.test(lowerUrl)) {
-			return "Image";
-		}
-		if (/\.(mp4|webm|mov|avi|mkv|m4v)(\?|$)/i.test(lowerUrl)) {
-			return "Video";
-		}
-		if (/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|txt)(\?|$)/i.test(lowerUrl)) {
-			return "Document";
-		}
+	// Reset override when URL changes and auto-detect picks a different type
+	useEffect(() => {
+		setTypeOverride(null);
+	}, [verification.detectedType]);
 
-		return "Video"; // Default for embeds
-	};
+	const canAdd =
+		newUrl.trim() &&
+		(verification.status === "valid" || verification.status === "warning");
 
 	const getFileName = (url: string): string => {
+		// Use verified title if available
+		if (verification.title) return verification.title;
+
 		// For embeds, use provider name
 		const embed = parseEmbedUrl(url);
 		if (embed) {
@@ -65,7 +63,6 @@ export default function DrillAttachmentInput({ attachments, onChange, className 
 			const segments = pathname.split("/").filter(Boolean);
 			if (segments.length > 0) {
 				const lastSegment = segments[segments.length - 1];
-				// Decode and clean up
 				const decoded = decodeURIComponent(lastSegment);
 				if (decoded.includes(".")) {
 					return decoded;
@@ -78,28 +75,21 @@ export default function DrillAttachmentInput({ attachments, onChange, className 
 		return "Attachment";
 	};
 
-	const handleUrlChange = (url: string) => {
-		setNewUrl(url);
-		// Auto-detect type
-		if (url.trim()) {
-			setNewType(detectType(url));
-		}
-	};
-
 	const addAttachment = () => {
-		if (!newUrl.trim()) return;
+		if (!canAdd) return;
 
 		const attachment: AttachmentInput = {
 			id: `new-${Date.now()}`,
 			fileName: getFileName(newUrl),
 			fileUrl: newUrl.trim(),
-			fileType: newType,
+			fileType: effectiveType,
 			fileSize: 0,
 			isNew: true,
 		};
 
 		onChange([...attachments, attachment]);
 		setNewUrl("");
+		setTypeOverride(null);
 		setShowAddForm(false);
 	};
 
@@ -126,6 +116,7 @@ export default function DrillAttachmentInput({ attachments, onChange, className 
 		if (e.key === "Escape") {
 			setShowAddForm(false);
 			setNewUrl("");
+			setTypeOverride(null);
 		}
 	};
 
@@ -186,21 +177,75 @@ export default function DrillAttachmentInput({ attachments, onChange, className 
 			{/* Add form */}
 			{showAddForm ? (
 				<div className="space-y-3 p-3 rounded-xl bg-surface border border-border">
-					<div className="flex gap-2">
-						<div className="flex-1">
-							<input
-								type="url"
-								value={newUrl}
-								onChange={(e) => handleUrlChange(e.target.value)}
-								onKeyDown={handleKeyDown}
-								placeholder="Paste URL (YouTube, image, document...)"
-								className="w-full px-4 py-2 rounded-xl bg-surface border border-border text-white placeholder:text-muted/50 focus:outline-hidden focus:border-accent text-sm"
-								autoFocus
-							/>
-						</div>
+					{/* URL input */}
+					<div className="relative">
+						<input
+							type="url"
+							value={newUrl}
+							onChange={(e) => setNewUrl(e.target.value)}
+							onKeyDown={handleKeyDown}
+							placeholder="Paste URL (YouTube, image, document...)"
+							className={cn(
+								"w-full px-4 py-2 pr-9 rounded-xl bg-surface border text-white placeholder:text-muted/50 focus:outline-hidden text-sm",
+								verification.status === "invalid"
+									? "border-error/50 focus:border-error"
+									: "border-border focus:border-accent",
+							)}
+							autoFocus
+						/>
+						{newUrl.trim() && (
+							<div className="absolute right-3 top-1/2 -translate-y-1/2">
+								{verification.status === "validating" && (
+									<Loader2 size={14} className="text-muted animate-spin" />
+								)}
+								{verification.status === "valid" && (
+									<CheckCircle2 size={14} className="text-green-400" />
+								)}
+								{verification.status === "warning" && (
+									<AlertTriangle size={14} className="text-yellow-400" />
+								)}
+								{verification.status === "invalid" && (
+									<XCircle size={14} className="text-error" />
+								)}
+							</div>
+						)}
 					</div>
 
-					{newUrl.trim() && (
+					{/* Verification preview */}
+					{newUrl.trim() && verification.status !== "idle" && verification.status !== "validating" && (
+						<div className="flex items-start gap-2.5">
+							{verification.thumbnailUrl && (
+								<div className="flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden bg-surface border border-border">
+									<img
+										src={verification.thumbnailUrl}
+										alt=""
+										className="w-full h-full object-cover"
+									/>
+								</div>
+							)}
+							<div className="flex-1 min-w-0">
+								{verification.title && (
+									<p className="text-xs text-white truncate mb-0.5">{verification.title}</p>
+								)}
+								{verification.provider && (
+									<p className="text-xs text-accent">
+										{verification.provider === "youtube" ? "YouTube" : "Vimeo"}
+									</p>
+								)}
+								{verification.error && (
+									<p className={cn(
+										"text-xs",
+										verification.status === "invalid" ? "text-error" : "text-yellow-400/80",
+									)}>
+										{verification.error}
+									</p>
+								)}
+							</div>
+						</div>
+					)}
+
+					{/* Type selector - only show when URL is valid and not an embed (embeds are always Video) */}
+					{newUrl.trim() && !verification.provider && (verification.status === "valid" || verification.status === "warning") && (
 						<div className="flex items-center gap-3">
 							<span className="text-xs text-muted">Type:</span>
 							<div className="flex gap-1">
@@ -208,9 +253,9 @@ export default function DrillAttachmentInput({ attachments, onChange, className 
 									<button
 										key={type}
 										type="button"
-										onClick={() => setNewType(type)}
+										onClick={() => setTypeOverride(type)}
 										className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
-											newType === type
+											effectiveType === type
 												? "bg-accent text-white"
 												: "bg-surface text-muted hover:bg-hover"
 										}`}
@@ -222,6 +267,7 @@ export default function DrillAttachmentInput({ attachments, onChange, className 
 						</div>
 					)}
 
+					{/* Actions */}
 					<div className="flex gap-2">
 						<Button
 							type="button"
@@ -231,6 +277,7 @@ export default function DrillAttachmentInput({ attachments, onChange, className 
 							onClick={() => {
 								setShowAddForm(false);
 								setNewUrl("");
+								setTypeOverride(null);
 							}}
 						>
 							Cancel
@@ -241,7 +288,7 @@ export default function DrillAttachmentInput({ attachments, onChange, className 
 							color="accent"
 							size="sm"
 							onClick={addAttachment}
-							disabled={!newUrl.trim()}
+							disabled={!canAdd}
 						>
 							Add Attachment
 						</Button>

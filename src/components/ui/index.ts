@@ -1,4 +1,6 @@
 // UI Components - Reusable, design system components
+export { default as AddMediaMenu } from "./add-media-menu";
+export type { AddMediaMenuProps } from "./add-media-menu";
 export { default as AttachmentsUploader } from "./attachments-uploader";
 export { default as AvatarStack } from "./avatar-stack/index";
 export { default as Avatar } from "./avatar/index";
