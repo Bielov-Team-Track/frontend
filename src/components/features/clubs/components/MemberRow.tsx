@@ -2,7 +2,9 @@
 
 import { Avatar } from "@/components";
 import { RoleBadgeList } from "@/components/ui/role-badge";
+import { SubscriptionBadge } from "@/components/features/subscriptions/SubscriptionBadge";
 import { ClubMember, ClubRole } from "@/lib/models/Club";
+import { Subscription } from "@/lib/models/Subscription";
 import { Edit, UserMinus } from "lucide-react";
 import Link from "next/link";
 
@@ -16,6 +18,7 @@ interface MemberRowProps {
 	member: ClubMember;
 	clubId: string;
 	currentUserRole?: ClubRole;
+	subscription?: Subscription;
 	onEdit: () => void;
 	onRemove?: () => void;
 }
@@ -35,8 +38,8 @@ const getSkillLevelBadge = (skillLevel?: string) => {
 	);
 };
 
-export default function MemberRow({ member, clubId, currentUserRole, onEdit, onRemove }: MemberRowProps) {
-	const memberUrl = `/dashboard/clubs/${clubId}/members/${member.userId}`;
+export default function MemberRow({ member, clubId, currentUserRole, subscription, onEdit, onRemove }: MemberRowProps) {
+	const memberUrl = `/hub/clubs/${clubId}/members/${member.userId}`;
 
 	// Check if current user can remove this member
 	// Owners and Admins can remove members, but not themselves or other owners
@@ -56,8 +59,11 @@ export default function MemberRow({ member, clubId, currentUserRole, onEdit, onR
 				</Link>
 			</td>
 			<td className="px-4 py-3">
-				<Link href={memberUrl}>
+				<Link href={memberUrl} className="flex flex-wrap items-center gap-1">
 					<RoleBadgeList roles={extractRoleStrings(member.roles)} />
+					{subscription && (
+						<SubscriptionBadge status={subscription.status} planName={subscription.planName} />
+					)}
 				</Link>
 			</td>
 			<td className="px-4 py-3">
