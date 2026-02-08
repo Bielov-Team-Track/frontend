@@ -2,6 +2,7 @@ export * from "./audit";
 export * from "./auth";
 export * from "./drills";
 export * from "./events";
+export * from "./family";
 export * from "./groups";
 export * from "./locations";
 export * from "./payments";
