@@ -97,6 +97,13 @@ client.interceptors.request.use(
 			if (token) {
 				config.headers.Authorization = `Bearer ${token}`;
 			}
+
+			// If acting as a minor (guardian feature), include the X-Acting-As header
+			const { useFamilyStore } = await import("../realtime/familyStore");
+			const actingAsUserId = useFamilyStore.getState().actingAsUserId;
+			if (actingAsUserId) {
+				config.headers["X-Acting-As"] = actingAsUserId;
+			}
 		}
 		return config;
 	},
