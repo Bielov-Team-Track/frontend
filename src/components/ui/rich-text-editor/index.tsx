@@ -11,6 +11,7 @@ import { forwardRef, useCallback, useImperativeHandle } from "react";
 
 export interface RichTextEditorRef {
 	insertContent: (content: string) => void;
+	setContent: (content: string) => void;
 	focus: () => void;
 	getEditor: () => Editor | null;
 }
@@ -74,6 +75,9 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(functi
 	useImperativeHandle(ref, () => ({
 		insertContent: (content: string) => {
 			editor?.chain().focus().insertContent(content).run();
+		},
+		setContent: (content: string) => {
+			editor?.commands.setContent(content);
 		},
 		focus: () => {
 			editor?.chain().focus().run();

@@ -45,7 +45,7 @@ export default async function DashboardPage() {
 
 	// Calculate unpaid events (events with cost where payment isn't completed)
 	const unpaidEvents = allEvents.filter((e) => {
-		const cost = e.budget?.cost || e.costToEnter || 0;
+		const cost = e.paymentConfig?.cost || e.costToEnter || 0;
 		return cost > 0;
 	});
 

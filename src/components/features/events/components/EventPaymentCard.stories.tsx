@@ -17,7 +17,7 @@ const createMockEvent = (overrides: Partial<Event> = {}): Event => ({
 	teamsNumber: 2,
 	costToEnter: 15,
 	registrationUnit: Unit.Individual,
-	budget: {
+	paymentConfig: {
 		id: "budget-123",
 		pricingModel: PricingModel.Individual,
 		cost: 15,
@@ -68,7 +68,7 @@ const meta: Meta<typeof EventPaymentCard> = {
 	],
 	argTypes: {
 		event: {
-			description: "The event object with budget configuration",
+			description: "The event object with payment configuration",
 		},
 		userParticipant: {
 			description: "The current user's participant record, if any",
@@ -96,7 +96,7 @@ export const PayToJoinEnabled: Story = {
 export const PayToJoinDisabled: Story = {
 	args: {
 		event: createMockEvent({
-			budget: {
+			paymentConfig: {
 				pricingModel: PricingModel.Individual,
 				cost: 15,
 				currency: "£",
@@ -108,11 +108,11 @@ export const PayToJoinDisabled: Story = {
 	},
 };
 
-// Component doesn't render when budget is null
+// Component doesn't render when paymentConfig is null
 export const NoBudget: Story = {
 	args: {
 		event: createMockEvent({
-			budget: undefined,
+			paymentConfig: undefined,
 		}),
 		userParticipant: null,
 		isInvited: false,
@@ -137,13 +137,13 @@ export const InvitedUser: Story = {
 	},
 };
 
-// Displays correct amount from event.budget.cost
+// Displays correct amount from event.paymentConfig.cost
 export const DifferentAmounts: Story = {
 	render: () => (
 		<div className="space-y-4">
 			<EventPaymentCard
 				event={createMockEvent({
-					budget: {
+					paymentConfig: {
 						pricingModel: PricingModel.Individual,
 						cost: 10,
 						currency: "£",
@@ -155,7 +155,7 @@ export const DifferentAmounts: Story = {
 			/>
 			<EventPaymentCard
 				event={createMockEvent({
-					budget: {
+					paymentConfig: {
 						pricingModel: PricingModel.Individual,
 						cost: 25.5,
 						currency: "$",
@@ -167,7 +167,7 @@ export const DifferentAmounts: Story = {
 			/>
 			<EventPaymentCard
 				event={createMockEvent({
-					budget: {
+					paymentConfig: {
 						pricingModel: PricingModel.Individual,
 						cost: 100,
 						currency: "€",

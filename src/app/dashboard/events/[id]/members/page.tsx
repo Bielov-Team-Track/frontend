@@ -132,7 +132,7 @@ export default function EventMembersPage() {
 
 	if (!event) return null;
 
-	const hasBudget = !!(event.budget || event.costToEnter);
+	const hasPaymentConfig = !!(event.paymentConfig || event.costToEnter);
 
 	// Get existing participant user IDs to exclude from invite modal
 	const existingUserIds = participants.map((p) => p.userId);
@@ -249,7 +249,7 @@ export default function EventMembersPage() {
 								<th className="text-left text-xs font-medium text-muted px-4 py-3">Member</th>
 								<th className="text-left text-xs font-medium text-muted px-4 py-3">Status</th>
 								<th className="text-left text-xs font-medium text-muted px-4 py-3 hidden md:table-cell">Joined</th>
-								{hasBudget && (
+								{hasPaymentConfig && (
 									<th className="text-left text-xs font-medium text-muted px-4 py-3 hidden lg:table-cell">Payment</th>
 								)}
 								<th className="text-left text-xs font-medium text-muted px-4 py-3 hidden lg:table-cell">Source</th>
@@ -319,7 +319,7 @@ export default function EventMembersPage() {
 										</td>
 
 										{/* Payment */}
-										{hasBudget && (
+										{hasPaymentConfig && (
 											<td className="px-4 py-3 hidden lg:table-cell">
 												<div className="flex items-center gap-1.5">
 													<CreditCard size={14} className={payment.color} />

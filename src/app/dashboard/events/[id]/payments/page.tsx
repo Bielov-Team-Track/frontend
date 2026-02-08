@@ -8,7 +8,7 @@ export default function EventPaymentsPage() {
 
 	if (!event) return null;
 
-	const hasBudget = !!event.budget;
+	const hasPaymentConfig = !!event.paymentConfig;
 
 	return (
 		<div className="space-y-6">
@@ -17,12 +17,12 @@ export default function EventPaymentsPage() {
 				<div>
 					<h2 className="text-xl font-bold text-white">Payments</h2>
 					<p className="text-sm text-muted">
-						{hasBudget ? "Manage event payments and fees" : "This is a free event"}
+						{hasPaymentConfig ? "Manage event payments and fees" : "This is a free event"}
 					</p>
 				</div>
 			</div>
 
-			{hasBudget ? (
+			{hasPaymentConfig ? (
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 					{/* Main Content */}
 					<div className="lg:col-span-2 space-y-6">
@@ -31,10 +31,10 @@ export default function EventPaymentsPage() {
 							<div className="flex items-center justify-between">
 								<div>
 									<h3 className="text-lg font-bold text-white">Event Fee</h3>
-									<p className="text-sm text-muted">Per {event.budget?.pricingModel || "person"}</p>
+									<p className="text-sm text-muted">Per {event.paymentConfig?.pricingModel || "person"}</p>
 								</div>
 								<div className="text-4xl font-extrabold text-accent">
-									{event.budget?.currency || "£"}{event.budget?.cost}
+									{event.paymentConfig?.currency || "£"}{event.paymentConfig?.cost}
 								</div>
 							</div>
 						</div>
@@ -53,7 +53,7 @@ export default function EventPaymentsPage() {
 									</div>
 								</div>
 								<div className="font-bold text-white">
-									{event.budget?.currency || "£"}{event.budget?.cost}
+									{event.paymentConfig?.currency || "£"}{event.paymentConfig?.cost}
 								</div>
 							</div>
 						</div>
@@ -82,21 +82,21 @@ export default function EventPaymentsPage() {
 								<div className="flex justify-between items-center">
 									<span className="text-sm text-muted">Total Expected</span>
 									<span className="text-sm font-medium text-white">
-										{event.budget?.currency || "£"}
-										{(event.budget?.cost || 0) * teams.reduce((sum, t) => sum + (t.positions?.length || 0), 0)}
+										{event.paymentConfig?.currency || "£"}
+										{(event.paymentConfig?.cost || 0) * teams.reduce((sum, t) => sum + (t.positions?.length || 0), 0)}
 									</span>
 								</div>
 								<div className="flex justify-between items-center">
 									<span className="text-sm text-muted">Collected</span>
 									<span className="text-sm font-medium text-success">
-										{event.budget?.currency || "£"}0
+										{event.paymentConfig?.currency || "£"}0
 									</span>
 								</div>
 								<div className="flex justify-between items-center">
 									<span className="text-sm text-muted">Outstanding</span>
 									<span className="text-sm font-medium text-warning">
-										{event.budget?.currency || "£"}
-										{(event.budget?.cost || 0) * teams.reduce((sum, t) => sum + (t.positions?.length || 0), 0)}
+										{event.paymentConfig?.currency || "£"}
+										{(event.paymentConfig?.cost || 0) * teams.reduce((sum, t) => sum + (t.positions?.length || 0), 0)}
 									</span>
 								</div>
 							</div>

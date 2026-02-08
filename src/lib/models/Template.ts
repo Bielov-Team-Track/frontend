@@ -82,9 +82,12 @@ export interface UpdateTemplateRequest {
   clubId?: string;
   visibility?: TemplateVisibility;
   level?: DifficultyLevel;
+  sections?: CreateTemplateSectionRequest[];
+  items?: CreateTemplateItemRequest[];
 }
 
 export interface CreateTemplateSectionRequest {
+  id?: string;
   name: string;
   order: number;
 }

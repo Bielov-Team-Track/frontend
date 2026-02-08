@@ -143,6 +143,7 @@ export default function EventCommentsSection({ eventId }: EventCommentsSectionPr
 					placeholder="Share your thoughts about this event..."
 					isSubmitting={createComment.isPending}
 					eventId={eventId}
+					draftKey={["event", eventId]}
 					compact
 					replyingTo={
 						replyingTo

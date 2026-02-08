@@ -39,7 +39,7 @@ export function NextEventHero({ event, isHosting, participant, participantCount 
 	const startDate = new Date(event.startTime);
 	const timeUntil = getTimeUntilEvent(startDate);
 	const paymentStatus = participant?.payment?.status;
-	const amountDue = event.budget?.cost || event.costToEnter || 0;
+	const amountDue = event.paymentConfig?.cost || event.costToEnter || 0;
 	const isUnpaid = amountDue > 0 && paymentStatus !== "completed";
 
 	return (

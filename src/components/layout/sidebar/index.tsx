@@ -21,6 +21,7 @@ interface SidebarItemProps {
 	checkExpanded: (item: NavigationItem, items: NavigationItem[]) => boolean;
 	allItems: NavigationItem[];
 	onLinkClick?: () => void;
+	alwaysFull?: boolean; // true = mobile drawer (always show text/chevrons), false = desktop responsive
 }
 
 interface BadgeProps {
@@ -71,7 +72,7 @@ const Badge = ({ value, isCollapsed = false }: BadgeProps) => {
 
 // --- Recursive Item Component ---
 
-const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkExpanded, allItems, onLinkClick }: SidebarItemProps) => {
+const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkExpanded, allItems, onLinkClick, alwaysFull = false }: SidebarItemProps) => {
 	const isActive = checkActive(item);
 	const isExpanded = checkExpanded(item, allItems);
 	const hasSubItems = !!item.subItems?.length;
@@ -82,31 +83,48 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 
 	// Styles based on depth/nesting
 	const containerBaseStyles = isRoot
-		? "group relative flex items-center justify-center xl:justify-start px-3 py-3 rounded-xl transition-all duration-200"
-		: "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors";
+		? `group relative flex items-center ${alwaysFull ? "justify-start" : "justify-center xl:justify-start"} px-3 py-3 rounded-xl transition-all duration-200`
+		: `flex items-center ${alwaysFull ? "" : "justify-center xl:justify-start"} px-3 py-2 rounded-lg text-sm font-medium transition-colors`;
 
 	const activeStyles = isActive ? (isRoot ? "bg-surface text-foreground" : "bg-hover text-foreground") : "text-muted-foreground hover:bg-hover hover:text-foreground";
 
 	const iconSize = isRoot ? 20 : 16;
-	const indentSize = isRoot ? "ml-5 pl-3" : "ml-4 pl-3";
-	const textStyles = isRoot ? "md:hidden xl:block ml-4 font-medium text-sm" : "ml-3";
+
+	// Text: hidden in collapsed desktop for all depths, always visible in mobile drawer
+	const textStyles = alwaysFull
+		? (isRoot ? "ml-4 font-medium text-sm" : "ml-3")
+		: (isRoot ? "md:hidden xl:block ml-4 font-medium text-sm" : "md:hidden xl:block ml-3");
+
+	// Chevron styles: always visible, positioned differently based on context
+	const chevronStyles = alwaysFull
+		? `p-1 text-muted/50 group-hover:text-foreground ${isRoot ? "ml-2 -mr-1" : "-mr-1"}`
+		: `p-1 text-muted/50 group-hover:text-foreground ${isRoot ? "ml-auto xl:ml-2 -mr-1" : "-mr-1"}`;
+
+	// Sub-items container: no indentation in collapsed, normal indentation in full
+	const subItemsStyles = alwaysFull
+		? `mt-1 space-y-1 border-l border-border ${isRoot ? "ml-5 pl-3" : "ml-4 pl-3"}`
+		: `mt-1 space-y-1 border-l-0 xl:border-l border-border ${isRoot ? "ml-1 xl:ml-5 pl-1 xl:pl-3" : "ml-1 xl:ml-4 pl-1 xl:pl-3"}`;
 
 	// Render Content Wrapper (Link vs Button logic)
 	const ItemContent = () => (
 		<>
 			<div className="relative shrink-0" title={item.name}>
 				<ItemIcon item={item} size={iconSize} isActive={isActive} className={!isRoot ? "opacity-70" : ""} />
-				{isRoot && <Badge value={badgeValue} isCollapsed={true} />}
+				{isRoot && !alwaysFull && <Badge value={badgeValue} isCollapsed={true} />}
 			</div>
 
 			<span className={`${textStyles} flex-1 truncate`}>{item.name}</span>
 
 			{/* Desktop Full Badge */}
-			<div className={isRoot ? "hidden xl:block" : ""}>
+			<div className={alwaysFull ? "" : (isRoot ? "hidden xl:block" : "")}>
 				<Badge value={badgeValue} />
 			</div>
 		</>
 	);
+
+	const ChevronIcon = isExpanded
+		? <ChevronDown size={isRoot ? 14 : 12} />
+		: <ChevronRight size={isRoot ? 14 : 12} />;
 
 	return (
 		<div>
@@ -118,14 +136,25 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 						className="flex min-w-0 flex-1 items-center w-full text-left"
 					>
 						<ItemContent />
-						<span className={`p-1 text-muted/50 group-hover:text-foreground ${isRoot ? "hidden xl:block ml-2 -mr-1" : "-mr-1"}`}>
-							{isExpanded ? <ChevronDown size={isRoot ? 14 : 12} /> : <ChevronRight size={isRoot ? 14 : 12} />}
+						<span className={chevronStyles}>
+							{ChevronIcon}
 						</span>
 					</button>
 				) : hasSubItems ? (
-					// Parent Item with URL (Click to navigate, toggle button separate)
+					// Parent Item with URL — behavior differs by context
 					<>
-						<Link href={item.href!} className="flex min-w-0 flex-1 items-center" onClick={(e) => {
+						{/* Collapsed desktop: entire row toggles expansion */}
+						{!alwaysFull && (
+							<button
+								onClick={() => onToggle(item.name)}
+								className="flex xl:hidden min-w-0 flex-1 items-center w-full text-left"
+							>
+								<ItemContent />
+							</button>
+						)}
+
+						{/* Full width (mobile drawer or xl desktop): link navigates */}
+						<Link href={item.href!} className={`${alwaysFull ? "flex" : "hidden xl:flex"} min-w-0 flex-1 items-center`} onClick={(e) => {
 							if (isRoot) e.stopPropagation();
 							onLinkClick?.();
 						}}>
@@ -138,8 +167,8 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 								e.stopPropagation();
 								onToggle(item.name);
 							}}
-							className={`p-1 text-muted/50 hover:text-foreground ${isRoot ? "hidden xl:block ml-2 -mr-1" : "-mr-1"}`}>
-							{isExpanded ? <ChevronDown size={isRoot ? 14 : 12} /> : <ChevronRight size={isRoot ? 14 : 12} />}
+							className={chevronStyles}>
+							{ChevronIcon}
 						</button>
 					</>
 				) : (
@@ -152,7 +181,7 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 
 			{/* Recursive Sub-items */}
 			{hasSubItems && isExpanded && (
-				<div className={`${isRoot ? "hidden xl:block" : ""} mt-1 space-y-1 border-l border-border ${indentSize}`}>
+				<div className={subItemsStyles}>
 					{item.subItems!.map((subItem) => (
 						<SidebarItem
 							key={subItem.name}
@@ -164,6 +193,7 @@ const SidebarItem = ({ item, depth = 0, pathname, onToggle, checkActive, checkEx
 							checkExpanded={checkExpanded}
 							allItems={allItems}
 							onLinkClick={onLinkClick}
+							alwaysFull={alwaysFull}
 						/>
 					))}
 				</div>
@@ -243,7 +273,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 		return filterVisibleItems(navigationItems);
 	}, [navigationItems, roleSummary]);
 
-	const renderNavItems = (onLinkClick?: () => void) => (
+	const renderNavItems = (onLinkClick?: () => void, alwaysFull?: boolean) => (
 		<nav className="space-y-1">
 			{visibleNavigationItems.map((item) => (
 				<SidebarItem
@@ -256,6 +286,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 					checkExpanded={isExpanded}
 					allItems={visibleNavigationItems}
 					onLinkClick={onLinkClick}
+					alwaysFull={alwaysFull}
 				/>
 			))}
 		</nav>
@@ -264,7 +295,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 	return (
 		<>
 			<MobileDrawer isOpen={isOpen} onClose={onClose!}>
-				{renderNavItems(onClose)}
+				{renderNavItems(onClose, true)}
 			</MobileDrawer>
 
 			<DesktopSidebar>{renderNavItems()}</DesktopSidebar>

@@ -2,6 +2,7 @@
 
 import { Button, EmojiPicker, RichTextEditor, RichTextEditorRef } from "@/components/ui";
 import AttachmentsUploader, { UploadedAttachment } from "@/components/ui/attachments-uploader";
+import { useDraft } from "@/hooks/useDraft";
 import { useEventMediaUpload } from "@/hooks/useEventComments";
 import { getEventMentionSuggestions } from "@/lib/api/comments";
 import { Media } from "@/lib/models/shared/models";
@@ -44,6 +45,8 @@ interface RichCommentEditorProps {
 	hideAttachments?: boolean;
 	/** Custom upload function - if not provided, uses event media upload */
 	customUpload?: (file: File) => Promise<string>;
+	/** Key segments for draft persistence (e.g. ["event", eventId]) */
+	draftKey?: string[];
 }
 
 // Convert Media objects to UploadedAttachment format
@@ -78,9 +81,24 @@ export default function RichCommentEditor({
 	onScrollToReply,
 	hideAttachments = false,
 	customUpload,
+	draftKey,
 }: RichCommentEditorProps) {
 	const { userProfile, isAuthenticated } = useAuth();
-	const [content, setContent] = useState(initialContent);
+	const segments = draftKey ? ["rich-comment", ...draftKey] : [];
+	const { value: draftContent, setValue: setDraftContent, clearDraft } = useDraft<string>(
+		segments.length > 0 ? segments : ["rich-comment", "noop"],
+		initialContent,
+	);
+	// Use draft when no initialContent (new comment), otherwise use initialContent (edit mode)
+	const isEditMode = !!initialContent;
+	const [content, setContent] = useState(isEditMode ? initialContent : draftContent);
+
+	// Sync content changes to draft (only for new comments, not edit mode)
+	useEffect(() => {
+		if (!isEditMode && draftKey) {
+			setDraftContent(content);
+		}
+	}, [content, isEditMode, draftKey, setDraftContent]);
 	// Initialize attachments from initialMedia if provided
 	const [attachments, setAttachments] = useState<UploadedAttachment[]>(() => {
 		if (initialMedia && initialMedia.length > 0) {
@@ -105,6 +123,7 @@ export default function RichCommentEditor({
 		setContent("");
 		setAttachments([]);
 		setIsFocused(false);
+		if (!isEditMode && draftKey) clearDraft();
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {

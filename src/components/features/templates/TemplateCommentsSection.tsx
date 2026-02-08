@@ -158,6 +158,7 @@ export default function TemplateCommentsSection({ templateId, className }: Templ
 						placeholder={replyingTo ? "Write a reply..." : "Add a comment..."}
 						isSubmitting={createComment.isPending}
 						compact={true}
+						draftKey={["template", templateId]}
 						replyingTo={replyingTo}
 						onCancelReply={handleCancelReply}
 						onScrollToReply={handleScrollToReply}

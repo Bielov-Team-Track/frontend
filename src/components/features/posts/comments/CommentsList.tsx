@@ -89,6 +89,7 @@ export default function CommentsList({ postId, commentCount }: CommentsListProps
 				onSubmit={handleSubmitComment}
 				placeholder={replyingTo ? `Reply to ${replyingTo.author.name}...` : "Write a comment..."}
 				isSubmitting={createComment.isPending}
+				draftKey={postId}
 			/>
 
 			{/* Comments list */}

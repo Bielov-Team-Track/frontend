@@ -57,7 +57,7 @@ export const clubKeys = {
 };
 
 // Roles that can edit club drills
-const DRILL_EDIT_ROLES: ClubRole[] = [ClubRole.Owner, ClubRole.Admin, ClubRole.Coach];
+const DRILL_EDIT_ROLES: ClubRole[] = [ClubRole.Owner, ClubRole.Admin, ClubRole.HeadCoach];
 
 // =============================================================================
 // DRILLS QUERIES

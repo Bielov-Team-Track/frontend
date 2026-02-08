@@ -31,7 +31,7 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
 		const sizeClass = `badge-${size}`;
 
 		return (
-			<span ref={ref} className={cn("badge", colorClass, variantClass, sizeClass, "gap-1", className)} {...props}>
+			<span ref={ref} className={cn("badge inline-flex items-center", colorClass, variantClass, sizeClass, "gap-1", className)} {...props}>
 				{icon && iconPosition === "left" && <span className="shrink-0">{icon}</span>}
 				{children}
 				{icon && iconPosition === "right" && <span className="shrink-0">{icon}</span>}

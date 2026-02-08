@@ -145,7 +145,7 @@ function Team({ team: defaultTeam, open = false, editable = false, audit = false
 								open={open}
 								audit={audit}
 								editable={editable}
-								payToJoin={team.event.budget?.payToJoin}
+								payToJoin={team.event.paymentConfig?.payToJoin}
 								team={team}
 								position={p}
 								onPositionRemoved={(id) => {

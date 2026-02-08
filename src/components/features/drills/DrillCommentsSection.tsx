@@ -160,6 +160,7 @@ export default function DrillCommentsSection({ drillId, className }: DrillCommen
 						placeholder={replyingTo ? "Write a reply..." : "Add a comment..."}
 						isSubmitting={createComment.isPending}
 						compact={true}
+						draftKey={["drill", drillId]}
 						replyingTo={replyingTo}
 						onCancelReply={handleCancelReply}
 						onScrollToReply={handleScrollToReply}

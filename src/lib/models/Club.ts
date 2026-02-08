@@ -47,8 +47,6 @@ export enum ClubRole {
 	Treasurer = "Treasurer",
 	Admin = "Admin",
 	HeadCoach = "HeadCoach",
-	Coach = "Coach",
-	Assistant = "Assistant",
 	Owner = "Owner",
 }
 

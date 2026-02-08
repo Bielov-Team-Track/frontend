@@ -22,6 +22,12 @@ import {
 	horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import {
+	CATEGORY_SEGMENT_COLORS,
+	INTENSITY_SEGMENT_COLORS,
+	CATEGORY_PILL_COLORS,
+	INTENSITY_PILL_COLORS,
+} from "./colors";
 
 // =============================================================================
 // TYPES & CONSTANTS
@@ -58,37 +64,9 @@ const SKILLS: DrillSkill[] = ["Serving", "Passing", "Setting", "Attacking", "Blo
 const CATEGORIES: DrillCategory[] = ["Warmup", "Technical", "Tactical", "Game", "Conditioning", "Cooldown"];
 const INTENSITIES: DrillIntensity[] = ["Low", "Medium", "High"];
 
-// Segment colors (for timeline bar)
-const CATEGORY_COLORS: Record<DrillCategory, string> = {
-	Warmup: "#29757A",
-	Technical: "#2E5A88",
-	Tactical: "#FF7D00",
-	Game: "#D99100",
-	Conditioning: "#BE3F23",
-	Cooldown: "#4A7A45",
-};
-
-const INTENSITY_COLORS: Record<DrillIntensity, string> = {
-	Low: "#4A7A45",
-	Medium: "#D99100",
-	High: "#BE3F23",
-};
-
-// Pill colors (brighter for better readability)
-const CATEGORY_PILL_COLORS: Record<DrillCategory, string> = {
-	Warmup: "#3DBCC4",
-	Technical: "#5B9BD5",
-	Tactical: "#FF9533",
-	Game: "#FFBC33",
-	Conditioning: "#E85A3D",
-	Cooldown: "#6ABF62",
-};
-
-const INTENSITY_PILL_COLORS: Record<DrillIntensity, string> = {
-	Low: "#6ABF62",
-	Medium: "#FFBC33",
-	High: "#E85A3D",
-};
+// Aliases for local usage
+const CATEGORY_COLORS = CATEGORY_SEGMENT_COLORS;
+const INTENSITY_COLORS = INTENSITY_SEGMENT_COLORS;
 
 const SNAP_POINTS = [30, 60, 90, 120, 150, 180];
 const SNAP_THRESHOLD = 4;

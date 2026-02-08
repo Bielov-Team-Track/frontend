@@ -169,7 +169,7 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 				header: "Amount Owed",
 				cell: (info) => {
 					const amount = info.getValue() || 0;
-					const currency = info.row.original.budget?.currency || "gbp";
+					const currency = info.row.original.paymentConfig?.currency || "gbp";
 					return (
 						<span className="font-bold text-yellow-500">
 							{getFormatedCurrency(amount, currency)}
@@ -186,7 +186,7 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 				header: "Amount Paid",
 				cell: (info) => {
 					const amount = info.getValue() || 0;
-					const currency = info.row.original.budget?.currency || "gbp";
+					const currency = info.row.original.paymentConfig?.currency || "gbp";
 					return (
 						<span className="font-bold text-green-500">
 							{getFormatedCurrency(amount, currency)}
@@ -203,7 +203,7 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 				header: "Balance",
 				cell: (info) => {
 					const balance = info.getValue() as Balance;
-					const currency = info.row.original.budget?.currency || "gbp";
+					const currency = info.row.original.paymentConfig?.currency || "gbp";
 					return (
 						<div className="flex gap-2">
 							<span className="font-bold text-yellow-500">

@@ -23,7 +23,7 @@ export interface ClubOption {
 }
 
 // Source filter
-export type TemplateSource = "discover" | "my-plans" | "club" | "bookmarked";
+export type TemplateSource = "discover" | "club" | "bookmarked";
 
 // Sort options
 export type TemplateSortBy = "newest" | "mostUsed" | "mostLiked" | "shortest" | "longest";
@@ -221,13 +221,6 @@ function CompactFilters(props: TemplateFiltersProps) {
 			{/* Filter Chips Row */}
 			<div className="flex flex-wrap items-center gap-2">
 				{/* Source Filters */}
-				<FilterPill
-					selected={props.source === "my-plans"}
-					onClick={() => props.onSourceChange(props.source === "my-plans" ? "discover" : "my-plans")}
-					icon={<UserIcon size={12} />}
-					color="emerald">
-					My Plans
-				</FilterPill>
 				<FilterPill
 					selected={props.source === "bookmarked"}
 					onClick={() => props.onSourceChange(props.source === "bookmarked" ? "discover" : "bookmarked")}
@@ -436,13 +429,6 @@ function DrawerFilters(props: TemplateFiltersProps) {
 					</Button>
 
 					{/* Source Toggles */}
-					<FilterPill
-						selected={props.source === "my-plans"}
-						onClick={() => props.onSourceChange(props.source === "my-plans" ? "discover" : "my-plans")}
-						icon={<UserIcon size={12} />}
-						color="emerald">
-						My Plans
-					</FilterPill>
 					<FilterPill
 						selected={props.source === "bookmarked"}
 						onClick={() => props.onSourceChange(props.source === "bookmarked" ? "discover" : "bookmarked")}

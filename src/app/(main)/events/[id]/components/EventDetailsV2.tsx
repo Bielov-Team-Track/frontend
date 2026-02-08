@@ -172,7 +172,7 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 						{activeTab === "overview" && (
 							<>
 								{/* Pay to Join Card - shown when payment is required and user hasn't paid */}
-								{event.budget?.payToJoin && (
+								{event.paymentConfig?.payToJoin && (
 									<EventPaymentCard
 										event={event}
 										userParticipant={userParticipant}
@@ -202,7 +202,7 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 									<div className="p-4 rounded-xl bg-surface border border-border text-center">
 										<div className="text-xs text-muted uppercase font-bold mb-1">Cost</div>
 										<div className="text-lg font-bold text-accent">
-											{event.budget ? `${event.budget.currency || "£"}${event.budget.cost}` : "Free"}
+											{event.paymentConfig ? `${event.paymentConfig.currency || "£"}${event.paymentConfig.cost}` : "Free"}
 										</div>
 									</div>
 									<div className="p-4 rounded-xl bg-surface border border-border text-center">

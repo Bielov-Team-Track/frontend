@@ -18,7 +18,7 @@ export default function EventPaymentCard({ event, userParticipant, isInvited = f
 	const [error, setError] = useState<string | null>(null);
 
 	// Only show if payToJoin is enabled
-	if (!event.budget?.payToJoin) {
+	if (!event.paymentConfig?.payToJoin) {
 		return null;
 	}
 
@@ -40,8 +40,8 @@ export default function EventPaymentCard({ event, userParticipant, isInvited = f
 	};
 
 	const buttonText = isInvited ? "Pay and accept" : "Pay and join";
-	const currency = event.budget.currency || "£";
-	const cost = event.budget.cost;
+	const currency = event.paymentConfig.currency || "£";
+	const cost = event.paymentConfig.cost;
 
 	return (
 		<div className="p-6 rounded-2xl bg-surface border border-border">

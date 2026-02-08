@@ -19,7 +19,7 @@ function getRoleBadgeVariant(role: ClubRole): "solid" | "soft" | "outline" {
 		case ClubRole.Owner:
 		case ClubRole.Admin:
 			return "solid";
-		case ClubRole.Coach:
+		case ClubRole.HeadCoach:
 			return "soft";
 		default:
 			return "outline";
@@ -32,10 +32,8 @@ function getRoleLabel(role: ClubRole): string {
 			return "Owner";
 		case ClubRole.Admin:
 			return "Admin";
-		case ClubRole.Coach:
-			return "Coach";
-		case ClubRole.Assistant:
-			return "Assistant";
+		case ClubRole.HeadCoach:
+			return "Head Coach";
 		case ClubRole.Member:
 			return "Player";
 		default:

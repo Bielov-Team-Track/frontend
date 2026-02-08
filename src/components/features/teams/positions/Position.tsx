@@ -119,11 +119,11 @@ const AvailablePosition = ({ position, team, editable, open, takePosition, handl
 							{/* Take position option for all users */}
 							<li>
 								<button
-									onClick={team.event.budget?.payToJoin && team.event.registrationUnit === Unit.Individual ? handlePayment : takePosition}
+									onClick={team.event.paymentConfig?.payToJoin && team.event.registrationUnit === Unit.Individual ? handlePayment : takePosition}
 									className="text-xs hover:bg-hover hover:text-foreground text-gray-300 gap-2">
 									<Plus size={14} />
-									{team.event.budget?.payToJoin && team.event.registrationUnit === Unit.Individual
-										? `Pay ${team.event.budget.cost} to join`
+									{team.event.paymentConfig?.payToJoin && team.event.registrationUnit === Unit.Individual
+										? `Pay ${team.event.paymentConfig.cost} to join`
 										: "Take position"}
 								</button>
 							</li>

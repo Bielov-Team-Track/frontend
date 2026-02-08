@@ -8,8 +8,8 @@ import { Unit } from "@/lib/models/EventPaymentConfig";
 import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { Team } from "@/lib/models/Team";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { ArrowLeft, Calendar, Clock, ClipboardList, CreditCard, Edit, MapPin, MessageCircle, MoreHorizontal, Settings, Share2, Trash2, Users, XCircle } from "lucide-react";
+import { format, formatDistanceToNow } from "date-fns";
+import { ArrowLeft, Calendar, Check, Clock, ClipboardList, CreditCard, Edit, MapPin, MessageCircle, MoreHorizontal, Settings, Share2, Trash2, Users, X, XCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -42,7 +42,7 @@ export function useEventContext() {
 	return context;
 }
 
-type TabType = "overview" | "teams" | "members" | "training" | "payments" | "settings";
+type TabType = "overview" | "teams" | "members" | "discussion" | "training" | "payments" | "settings";
 
 interface TabConfig {
 	id: TabType;
@@ -57,6 +57,7 @@ const TABS: TabConfig[] = [
 	{ id: "overview", label: "Overview", icon: Calendar, href: "" },
 	{ id: "teams", label: "Teams", icon: Users, href: "/teams", teamsOnly: true },
 	{ id: "members", label: "Members", icon: Users, href: "/members" },
+	{ id: "discussion", label: "Discussion", icon: MessageCircle, href: "/discussion" },
 	{ id: "training", label: "Training Plan", icon: ClipboardList, href: "/training", trainingOnly: true },
 	{ id: "payments", label: "Payments", icon: CreditCard, href: "/payments" },
 	{ id: "settings", label: "Settings", icon: Settings, href: "/settings" },
@@ -75,6 +76,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 		if (pathname.includes("/settings")) return "settings";
 		if (pathname.includes("/teams")) return "teams";
 		if (pathname.includes("/members")) return "members";
+		if (pathname.includes("/discussion")) return "discussion";
 		if (pathname.includes("/training")) return "training";
 		if (pathname.includes("/payments")) return "payments";
 		return "overview";
@@ -133,6 +135,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 	const isFull = totalSpots > 0 && totalParticipants >= totalSpots;
 	// API may return status as string or enum value
 	const hasInvitation = myParticipation?.status === ParticipationStatus.Invited;
+	const isParticipant = myParticipation?.status === ParticipationStatus.Accepted;
 
 	// Memoize context value to prevent unnecessary re-renders of consumers
 	// Must be before early returns to maintain hook order
@@ -180,58 +183,42 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 	return (
 		<EventContext.Provider value={contextValue}>
 			<div className="space-y-6">
-				{/* Header */}
+				{/* Header - Simplified */}
 				<div className="flex items-center gap-4">
 					<Link href="/dashboard/events" className="p-2 rounded-lg bg-surface hover:bg-hover transition-colors">
 						<ArrowLeft size={20} />
 					</Link>
 					<div className="flex-1">
 						<h1 className="text-2xl font-bold text-white">{event.name}</h1>
-						<p className="text-sm text-muted">Event Management</p>
 					</div>
 
-					{/* Action Buttons */}
-					<div className="flex items-center gap-2">
-						{/* Join/Register Button - only if open */}
-						{isOpen && !isFull && <Button color="primary">Join Event</Button>}
-
-						{/* Waitlist Button - if full */}
-						{isOpen && isFull && (
-							<Button variant="outline" color="primary">
-								Join Waitlist
-							</Button>
-						)}
-
-						{/* Message Hosts */}
-						<Button variant="ghost" color="neutral" leftIcon={<MessageCircle size={16} />}>
-							<span className="hidden sm:inline">Message</span>
+					{/* Overflow Menu for ALL users */}
+					<div className="relative">
+						<Button variant="ghost" color="neutral" className="p-2" onClick={() => setShowAdminMenu(!showAdminMenu)}>
+							<MoreHorizontal size={18} />
 						</Button>
 
-						{/* Share */}
-						<Button variant="ghost" color="neutral" className="p-2">
-							<Share2 size={18} />
-						</Button>
-
-						{/* Admin Menu */}
-						{isAdmin && (
-							<div className="relative">
-								<Button variant="ghost" color="neutral" className="p-2" onClick={() => setShowAdminMenu(!showAdminMenu)}>
-									<MoreHorizontal size={18} />
-								</Button>
-
-								{showAdminMenu && (
-									<>
-										<div className="fixed inset-0 z-40" onClick={() => setShowAdminMenu(false)} />
-										<div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-raised border border-border shadow-xl z-50 py-1">
+						{showAdminMenu && (
+							<>
+								<div className="fixed inset-0 z-40" onClick={() => setShowAdminMenu(false)} />
+								<div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-raised border border-border shadow-xl z-50 py-1">
+									{/* Actions for all users */}
+									<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3">
+										<Share2 size={16} className="text-muted" />
+										Share
+									</button>
+									<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3">
+										<MessageCircle size={16} className="text-muted" />
+										Message Hosts
+									</button>
+									{/* Admin-only actions */}
+									{isAdmin && (
+										<>
+											<div className="border-t border-border my-1" />
 											<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3">
 												<Edit size={16} className="text-muted" />
 												Edit Event
 											</button>
-											<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3">
-												<MessageCircle size={16} className="text-muted" />
-												Message All
-											</button>
-											<div className="border-t border-border my-1" />
 											<button className="w-full px-4 py-2.5 text-left text-sm text-warning hover:bg-surface flex items-center gap-3">
 												<XCircle size={16} />
 												Cancel Event
@@ -240,89 +227,104 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 												<Trash2 size={16} />
 												Delete Event
 											</button>
-										</div>
-									</>
-								)}
-							</div>
+										</>
+									)}
+								</div>
+							</>
 						)}
 					</div>
 				</div>
 
-				{/* Event Banner and Info Card */}
+				{/* Event Banner with Overlaid Content */}
 				<div className="rounded-2xl overflow-hidden border border-border bg-surface">
-					{/* Banner */}
-					<div className="h-48 md:h-60 relative bg-gradient-to-r from-accent/20 to-secondary/20 overflow-hidden">
+					{/* Banner with gradient overlay */}
+					<div className="h-48 md:h-56 relative bg-gradient-to-r from-accent/20 to-secondary/20 overflow-hidden">
 						{event.imageUrl && !bannerError && (
 							<>
 								<Image src={event.imageUrl} alt="" fill className="object-cover" onError={() => setBannerError(true)} />
-								<div className="absolute inset-0 bg-overlay-light" />
 							</>
 						)}
-					</div>
-
-					{/* Info Row */}
-					<div className="p-6 flex flex-col md:flex-row md:items-center gap-6">
-						{/* Date Badge */}
-						<div className="-mt-20 md:-mt-16 relative z-10 self-start">
-							<div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl bg-background border-4 border-background flex flex-col items-center justify-center shadow-xl">
-								<span className="text-3xl md:text-4xl font-extrabold text-accent leading-none">{format(startDate, "dd")}</span>
-								<span className="text-sm font-bold text-muted uppercase mt-1">{format(startDate, "MMM")}</span>
-								<span className="text-xs text-muted/70">{format(startDate, "yyyy")}</span>
-							</div>
-						</div>
-
-						{/* Details */}
-						<div className="flex-1 min-w-0 space-y-2">
-							<div className="flex flex-wrap items-center gap-2">
-								<span className="px-2 py-1 rounded-lg bg-secondary/20 text-secondary border border-secondary/30 text-xs font-bold uppercase">
+						<div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-[var(--card)]/40 to-transparent" />
+						<div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
+							{/* Event type badge */}
+							<div className="flex items-center gap-2 mb-2">
+								<span className="px-2 py-0.5 rounded-lg bg-accent/20 text-accent border border-accent/20 text-xs font-bold uppercase">
 									{event.type || "Event"}
 								</span>
 								{event.canceled && (
-									<span className="px-2 py-1 rounded-lg bg-error/20 text-error border border-error/30 text-xs font-bold uppercase">
+									<span className="px-2 py-0.5 rounded-lg bg-destructive/20 text-destructive border border-destructive/30 text-xs font-bold uppercase">
 										Canceled
 									</span>
 								)}
 								{isFull && !event.canceled && (
-									<span className="px-2 py-1 rounded-lg bg-warning/20 text-warning border border-warning/30 text-xs font-bold uppercase">
+									<span className="px-2 py-0.5 rounded-lg bg-warning/20 text-warning border border-warning/30 text-xs font-bold uppercase">
 										Full
 									</span>
 								)}
-								{/* Event Context Badge */}
 								<EventContextBadge contextId={event.contextId} contextType={event.contextType} />
 							</div>
-							<h2 className="text-xl font-bold text-white truncate">{event.name}</h2>
-							<div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
+							{/* Event name */}
+							<h2 className="text-xl md:text-2xl font-bold text-white mb-2">{event.name}</h2>
+							{/* Date & time */}
+							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+								<span className="flex items-center gap-1.5">
+									<Calendar size={14} className="text-accent" />
+									<span className="text-white font-medium">{format(startDate, "EEE, MMM d")}</span>
+									<span className="text-warning font-semibold">· {formatDistanceToNow(startDate, { addSuffix: true })}</span>
+								</span>
 								<span className="flex items-center gap-1.5">
 									<Clock size={14} className="text-accent" />
 									{format(startDate, "HH:mm")} - {format(new Date(event.endTime), "HH:mm")}
 								</span>
+							</div>
+							{/* Location & host */}
+							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground mt-1.5">
 								{event.location?.address && (
 									<span className="flex items-center gap-1.5">
 										<MapPin size={14} className="text-accent" />
-										{event.location.address}
+										<span className="text-white">{event.location.address}</span>
 									</span>
 								)}
-								{/* Organizers Display - inline with other meta */}
-								<div className="flex items-center gap-1.5 border-l border-border pl-4 ml-1">
-									<EventOrganizers participants={participants} />
-								</div>
+								<EventOrganizers participants={participants} />
 							</div>
 						</div>
+					</div>
 
-						{/* Quick Stats */}
-						<div className="flex gap-6">
-							<div className="text-center">
-								<div className="text-2xl font-bold text-white">{teams.length}</div>
-								<div className="text-xs text-muted">Teams</div>
+					{/* Stats Bar with context-aware CTA */}
+					<div className="px-5 py-3 flex items-center justify-between border-t border-border">
+						{/* Left: stats */}
+						<div className="flex items-center gap-4 text-sm">
+							<div className="flex items-center gap-1.5">
+								<Users size={14} className="text-muted-foreground" />
+								<span className="font-semibold text-white">
+									{totalParticipants}
+									{totalSpots > 0 ? `/${totalSpots}` : ""} Players
+								</span>
+								{totalSpots > 0 && totalParticipants < totalSpots && (
+									<span className="text-xs text-green-500 font-medium">({totalSpots - totalParticipants} spots left)</span>
+								)}
 							</div>
-							<div className="text-center">
-								<div className="text-2xl font-bold text-white">{totalParticipants}</div>
-								<div className="text-xs text-muted">Players</div>
-							</div>
-							<div className="text-center">
-								<div className="text-2xl font-bold text-accent">{event.budget ? `£${event.budget.cost}` : "Free"}</div>
-								<div className="text-xs text-muted">Cost</div>
-							</div>
+							<span className="text-muted-foreground">{teams.length} Teams</span>
+							<span className="font-bold text-accent">{event.paymentConfig ? `£${event.paymentConfig.cost}` : "Free"}</span>
+						</div>
+						{/* Right: context-aware CTA - hidden on mobile (StickyBottomBar handles mobile) */}
+						<div className="hidden lg:flex items-center gap-2">
+							{hasInvitation && (
+								<>
+									<Button variant="outline" color="neutral" size="sm" leftIcon={<X size={14} />}>
+										Decline
+									</Button>
+									<Button color="primary" size="sm" leftIcon={<Check size={14} />}>
+										Accept
+									</Button>
+								</>
+							)}
+							{isOpen && !isFull && !hasInvitation && !isParticipant && <Button color="primary" size="sm">Join Event</Button>}
+							{isOpen && isFull && !hasInvitation && !isParticipant && (
+								<Button variant="outline" color="primary" size="sm">
+									Join Waitlist
+								</Button>
+							)}
 						</div>
 					</div>
 
@@ -344,7 +346,6 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 										className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap shrink-0 ${
 											isActive ? "text-accent" : "text-muted hover:text-white"
 										}`}>
-										<tab.icon size={16} />
 										{tab.label}
 										{count !== undefined && count > 0 && <span className="px-1.5 py-0.5 rounded-full bg-hover text-xs">{count}</span>}
 										{isActive && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />}
@@ -356,7 +357,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 				</div>
 
 				{/* Tab Content */}
-				<div className="min-h-100">{children}</div>
+				<div className="min-h-100 pb-20 lg:pb-0">{children}</div>
 			</div>
 		</EventContext.Provider>
 	);

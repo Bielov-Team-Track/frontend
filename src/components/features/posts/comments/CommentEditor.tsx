@@ -1,25 +1,28 @@
 "use client";
 
 import { Avatar, Button, Input } from "@/components/ui";
+import { useDraft } from "@/hooks/useDraft";
 import { useAuth } from "@/providers";
 import { Loader2, Send } from "lucide-react";
-import { useState } from "react";
 
 interface CommentEditorProps {
 	onSubmit: (content: string) => Promise<void>;
 	placeholder?: string;
 	autoFocus?: boolean;
 	isSubmitting?: boolean;
+	/** Used to scope the draft (e.g. postId). */
+	draftKey?: string;
 }
 
-export default function CommentEditor({ onSubmit, placeholder = "Write a comment...", autoFocus = false, isSubmitting = false }: CommentEditorProps) {
+export default function CommentEditor({ onSubmit, placeholder = "Write a comment...", autoFocus = false, isSubmitting = false, draftKey }: CommentEditorProps) {
 	const { userProfile } = useAuth();
-	const [content, setContent] = useState("");
+	const segments = draftKey ? ["comment", draftKey] : ["comment", "global"];
+	const { value: content, setValue: setContent, clearDraft } = useDraft<string>(segments, "");
 
 	const handleSubmit = async () => {
 		if (!content.trim() || isSubmitting) return;
 		await onSubmit(content.trim());
-		setContent("");
+		clearDraft();
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {

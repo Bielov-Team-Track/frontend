@@ -2,17 +2,17 @@
 
 import { Button } from "@/components";
 import EventCommentsSection from "@/components/features/comments/components/EventCommentsSection";
-import { TeamsList } from "@/components/features/teams";
 import { Modal } from "@/components/ui";
 import { respondToInvitation } from "@/lib/api/events";
 import { EventType } from "@/lib/models/Event";
-import { Unit } from "@/lib/models/EventPaymentConfig";
 import { useMutation } from "@tanstack/react-query";
-import { ClipboardCheck, MapPin, Users } from "lucide-react";
+import { ClipboardCheck, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 import { InvitationSidebarCard } from "./components/InvitationResponseVariants";
+import StickyBottomBar from "./components/StickyBottomBar";
+import WhosComingSection from "./components/WhosComingSection";
 import { useEventContext } from "./layout";
 
 // Lazy load Map component - it's below the fold and heavy
@@ -25,7 +25,7 @@ const Map = dynamic(() => import("@/components/features/locations").then((mod) =
 // MAIN PAGE COMPONENT
 // =============================================================================
 export default function EventOverviewPage() {
-	const { event, teams, hasInvitation, myParticipation, refetchMyParticipation, isAdmin } = useEventContext();
+	const { event, teams, hasInvitation, myParticipation, refetchMyParticipation, isAdmin, participants, eventId, isOpen, isFull } = useEventContext();
 	const [showDeclineModal, setShowDeclineModal] = useState(false);
 	const [declineNote, setDeclineNote] = useState("");
 
@@ -123,49 +123,11 @@ export default function EventOverviewPage() {
 						<div className="rounded-2xl bg-surface border border-border p-6">
 							<h3 className="text-lg font-bold text-white mb-4">About This Event</h3>
 							<p className="text-muted text-sm leading-relaxed">{event.description}</p>
-
-							{/* Mobile: Clickable address link */}
-							{event.location?.address && (
-								<Link
-									href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(event.location.address)}`}
-									target="_blank"
-									className="mt-4 flex items-center gap-2 text-sm text-accent hover:underline lg:hidden">
-									<MapPin size={16} />
-									{event.location.address}
-								</Link>
-							)}
 						</div>
 					)}
 
-					{/* Mobile: Standalone address link when no description */}
-					{!event.description && event.location?.address && (
-						<Link
-							href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(event.location.address)}`}
-							target="_blank"
-							className="flex items-center gap-2 p-4 rounded-2xl bg-surface border border-border text-sm text-accent hover:underline lg:hidden">
-							<MapPin size={16} />
-							{event.location.address}
-						</Link>
-					)}
-
-					{/* Teams Preview */}
-					<div className="rounded-2xl bg-surface border border-border p-6">
-						<div className="flex items-center justify-between mb-4">
-							<h3 className="text-lg font-bold text-white">Teams</h3>
-							<Link href={`/dashboard/events/${event.id}/teams`} className="text-sm text-accent hover:underline">
-								View All
-							</Link>
-						</div>
-
-						{teams && teams.length > 0 ? (
-							<TeamsList teams={teams.slice(0, 3)} userId="" isAdmin={false} registrationType={event.registrationUnit || Unit.Individual} />
-						) : (
-							<div className="text-center py-8 text-muted">
-								<Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-								<p>No teams registered yet</p>
-							</div>
-						)}
-					</div>
+					{/* Who's Coming */}
+					<WhosComingSection participants={participants} eventId={eventId} />
 
 					{/* Comments Section */}
 					<div className="rounded-2xl bg-surface border border-border p-6">
@@ -212,7 +174,20 @@ export default function EventOverviewPage() {
 				</div>
 			</div>
 
-			{/* Decline Invitation Modal */}
+			{/* Sticky Bottom Bar for mobile */}
+		<StickyBottomBar
+			event={event}
+			participants={participants}
+			teams={teams}
+			myParticipation={myParticipation}
+			isOpen={isOpen}
+			isFull={isFull}
+			hasInvitation={hasInvitation}
+			onAccept={handleAcceptInvitation}
+			onDecline={() => handleDeclineInvitation()}
+		/>
+
+		{/* Decline Invitation Modal */}
 			<Modal
 				isOpen={showDeclineModal}
 				onClose={handleCloseModal}

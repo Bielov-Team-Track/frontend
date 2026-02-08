@@ -26,7 +26,7 @@ const PLAYERS_MAX = 24;
 
 export default function DrillsPage() {
 	// Fetch drills
-	const { data: drills = [], isLoading, error } = useDrills();
+	const { data: drills = [], isLoading, error } = useDrills({ limit: 200 });
 
 	// Debug logging
 	console.log("[DrillsPage] isLoading:", isLoading, "error:", error, "drills count:", drills.length);

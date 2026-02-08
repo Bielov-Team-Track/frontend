@@ -52,11 +52,10 @@ export interface Event {
 
 	// Registration and pricing
 	registrationUnit: Unit; // How people register for this event
-	budget?: EventPaymentsConfig; // Budget configuration (new approach)
-	budgetId?: string; // Reference to budget if using separate budget entity
+	paymentConfig?: EventPaymentsConfig; // Payment configuration from backend
 
 	// Legacy pricing fields (for backward compatibility)
-	costToEnter: number; // @deprecated - use budget instead
+	costToEnter: number; // @deprecated - use paymentConfig instead
 
 	// Extended fields to match backend model
 	type: EventType;

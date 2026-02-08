@@ -9,6 +9,8 @@ import {
 	Compass,
 	Dumbbell,
 	FileText,
+	GraduationCap,
+	Layers,
 	LayoutDashboard,
 	MessageSquare,
 	Settings,
@@ -111,7 +113,7 @@ export const getNavigationItems = (
 	// Groups (expandable parent, visible if user belongs to any group)
 	{
 		name: "Groups",
-		icon: Users,
+		icon: Layers,
 		visible: (s) => (s?.groups?.length ?? 0) > 0,
 		subItems: [
 			{ name: "My Groups", href: "/dashboard/groups", icon: Users },
@@ -150,7 +152,7 @@ export const getNavigationItems = (
 	{
 		name: "Coaching",
 		href: "/dashboard/coaching",
-		icon: Users,
+		icon: GraduationCap,
 		visible: (s) => s?.isCoach ?? false,
 		subItems: [
 			{

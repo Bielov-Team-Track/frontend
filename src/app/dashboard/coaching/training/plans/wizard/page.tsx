@@ -21,6 +21,7 @@ import type { Drill } from "@/lib/models/Drill";
 import type { TemplateVisibility } from "@/lib/models/Template";
 import { ArrowLeft, Save, ChevronDown, ChevronUp, Cloud, CloudOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { showErrorToast } from "@/lib/errors";
 
 const SECTION_COLORS = ["#FF7D00", "#29757A", "#2E5A88", "#D99100", "#4A7A45", "#BE3F23"];
 
@@ -243,22 +244,19 @@ export default function TrainingPlanWizardPage() {
 	// Save template - defined before keyboard shortcuts useEffect that references it
 	const handleSave = useCallback(async () => {
 		if (!name.trim()) {
-			alert("Please enter a template name");
+			showErrorToast(new Error("Please enter a template name"), { message: "Please enter a template name" });
 			return;
 		}
 
 		try {
 			// Build sections DTO
 			const sectionsDto = sections.map((section, idx) => ({
-				id: isEditMode ? section.id : undefined,
+				id: section.id,
 				name: section.name,
 				order: idx,
 			}));
 
-			// Build items DTO - need to map section IDs
-			const sectionIdMap = new Map<string, number>();
-			sections.forEach((s, idx) => sectionIdMap.set(s.id, idx));
-
+			// Build items DTO
 			const itemsDto = timeline.map((item, idx) => ({
 				id: isEditMode ? (item.instanceId.startsWith("item-") ? undefined : item.instanceId) : undefined,
 				drillId: item.drill.id,
@@ -271,12 +269,14 @@ export default function TrainingPlanWizardPage() {
 			if (isEditMode && editId) {
 				await updateMutation.mutateAsync({
 					id: editId,
-					name: name.trim(),
-					description: description.trim() || undefined,
-					clubId: clubId || undefined,
-					visibility,
-					sections: sectionsDto,
-					items: itemsDto,
+					data: {
+						name: name.trim(),
+						description: description.trim() || undefined,
+						clubId: clubId || undefined,
+						visibility,
+						sections: sectionsDto.length > 0 ? sectionsDto : undefined,
+						items: itemsDto.length > 0 ? itemsDto : undefined,
+					},
 				});
 				// Clear draft after successful save
 				clearDraft();
@@ -296,7 +296,7 @@ export default function TrainingPlanWizardPage() {
 			}
 		} catch (error) {
 			console.error("Failed to save template:", error);
-			alert("Failed to save template. Please try again.");
+			showErrorToast(error, { fallback: "Failed to save template. Please try again." });
 		}
 	}, [name, description, clubId, visibility, sections, timeline, isEditMode, editId, router, createMutation, updateMutation, clearDraft]);
 

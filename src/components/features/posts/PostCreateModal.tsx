@@ -2,6 +2,7 @@
 
 import { Avatar, Button, EmojiPicker, Modal, RichTextEditor, RichTextEditorRef, Select } from "@/components/";
 import AttachmentsUploader, { UploadedAttachment } from "@/components/ui/attachments-uploader";
+import { useDraft } from "@/hooks/useDraft";
 import { useCreatePost, useMediaUpload } from "@/hooks/usePosts";
 import { getMentionSuggestions } from "@/lib/api/posts";
 import { CreatePollRequest, Visibility, VisibilityOptions } from "@/lib/models/Post";
@@ -9,9 +10,16 @@ import { ContextType } from "@/lib/models/shared/models";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers";
 import { BarChart3, Paperclip, Pin, Send, Smile } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PollCreator } from "./polls";
+
+interface PostDraft {
+	content: string;
+	visibility: Visibility;
+	poll: CreatePollRequest | null;
+	isPinned: boolean;
+}
 
 interface PostCreateModalProps {
 	isOpen: boolean;
@@ -24,19 +32,39 @@ interface PostCreateModalProps {
 export default function PostCreateModal({ isOpen, onClose, contextType, contextId, contextName }: PostCreateModalProps) {
 	const { userProfile } = useAuth();
 	const [showPollCreator, setShowPollCreator] = useState(false);
-	const [poll, setPoll] = useState<CreatePollRequest | null>(null);
 	const createPost = useCreatePost();
 	const uploadMutation = useMediaUpload();
 
-	const [content, setContent] = useState("");
-	const [visibility, setVisibility] = useState<Visibility>("membersOnly");
+	const emptyDraft: PostDraft = { content: "", visibility: "membersOnly", poll: null, isPinned: false };
+	const { value: draft, setValue: setDraft, hasDraft, clearDraft } = useDraft<PostDraft>(["post", contextType, contextId], emptyDraft);
+
+	const content = draft.content;
+	const visibility = draft.visibility;
+	const poll = draft.poll;
+	const isPinned = draft.isPinned;
+
+	const setContent = useCallback((c: string) => setDraft((prev) => ({ ...prev, content: c })), [setDraft]);
+	const setVisibility = useCallback((v: Visibility) => setDraft((prev) => ({ ...prev, visibility: v })), [setDraft]);
+	const setPoll = useCallback((p: CreatePollRequest | null) => setDraft((prev) => ({ ...prev, poll: p })), [setDraft]);
+	const setIsPinned = useCallback((pinned: boolean) => setDraft((prev) => ({ ...prev, isPinned: pinned })), [setDraft]);
+
 	const [attachments, setAttachments] = useState<UploadedAttachment[]>([]);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-	const [isPinned, setIsPinned] = useState(false);
 
 	const editorRef = useRef<RichTextEditorRef>(null);
 	const emojiButtonRef = useRef<HTMLButtonElement>(null);
+
+	// Sync editor content when modal opens with a saved draft
+	const hasRestoredRef = useRef(false);
+	useEffect(() => {
+		if (isOpen && hasDraft && !hasRestoredRef.current) {
+			editorRef.current?.setContent(draft.content);
+			if (draft.poll) setShowPollCreator(false);
+			hasRestoredRef.current = true;
+		}
+		if (!isOpen) hasRestoredRef.current = false;
+	}, [isOpen, hasDraft, draft.content, draft.poll]);
 
 	const hasContent = content.replace(/<[^>]*>/g, "").trim().length > 0;
 	const mediaIds = attachments.filter((a) => a.status === "done").map((a) => a.id);
@@ -139,12 +167,9 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 			});
 
 			// Reset and close
-			setContent("");
-			setVisibility("membersOnly");
+			clearDraft();
 			setAttachments([]);
-			setPoll(null);
 			setShowPollCreator(false);
-			setIsPinned(false);
 			onClose();
 		} catch (error) {
 			console.error("Failed to create post:", error);
@@ -153,14 +178,21 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 	};
 
 	const handleClose = () => {
-		if (hasContent || attachments.length > 0 || poll !== null) {
-			if (!confirm("Discard this post?")) return;
-		}
-		setContent("");
+		// Draft auto-saves, so just close — content will be restored next time
 		setAttachments([]);
-		setPoll(null);
 		setShowPollCreator(false);
-		setIsPinned(false);
+		onClose();
+	};
+
+	const handleDiscard = () => {
+		if (!hasContent && attachments.length === 0 && poll === null) {
+			handleClose();
+			return;
+		}
+		if (!confirm("Discard this draft? This cannot be undone.")) return;
+		clearDraft();
+		setAttachments([]);
+		setShowPollCreator(false);
 		onClose();
 	};
 
@@ -302,14 +334,19 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 				</div>
 
 				{/* Submit */}
-				<div className="flex justify-end gap-3 pt-2">
-					<Button variant="ghost" onClick={handleClose}>
-						Cancel
+				<div className="flex items-center justify-between gap-3 pt-2">
+				<div>
+					{hasDraft && <span className="text-xs text-muted-foreground">Draft saved</span>}
+				</div>
+				<div className="flex items-center gap-3">
+					<Button variant="ghost" onClick={handleDiscard}>
+						Discard
 					</Button>
 					<Button onClick={handleSubmit} disabled={!canSubmit || createPost.isPending} loading={createPost.isPending}>
 						<Send size={16} className="mr-2" />
 						Post
 					</Button>
+				</div>
 				</div>
 			</div>
 		</Modal>

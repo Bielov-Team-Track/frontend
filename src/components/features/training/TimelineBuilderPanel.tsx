@@ -21,7 +21,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Drill, DrillCategory, DrillIntensity } from "@/lib/models/Drill";
-import { Button, Badge, Input, TextArea, Card } from "@/components";
+import { Button, Badge, Input, TextArea, Card, Modal } from "@/components";
 import {
   Clock,
   Plus,
@@ -464,7 +464,7 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
   // Section handlers
   const handleAddSection = () => {
     const newSection: Section = {
-      id: `sec-${Date.now()}`,
+      id: crypto.randomUUID(),
       name: `Section ${sections.length + 1}`,
       color: SECTION_COLORS[sections.length % SECTION_COLORS.length],
     };
@@ -825,29 +825,29 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
         />
       )}
 
-      {/* Delete Section Confirmation Dialog */}
-      {deletingSectionId && (() => {
-        const sectionToDelete = sections.find(s => s.id === deletingSectionId);
-        const drillsInSection = timeline.filter(item => item.sectionId === deletingSectionId);
+      {/* Delete Section Confirmation Modal */}
+      <Modal
+        isOpen={!!deletingSectionId}
+        onClose={() => setDeletingSectionId(null)}
+        size="sm"
+        showCloseButton={false}
+      >
+        {(() => {
+          const sectionToDelete = sections.find(s => s.id === deletingSectionId);
+          const drillsInSection = timeline.filter(item => item.sectionId === deletingSectionId);
 
-        return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setDeletingSectionId(null)} />
-            <div className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-raised p-6 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200">
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-warning/10">
-                  <AlertTriangle size={24} className="text-warning" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-foreground">Delete "{sectionToDelete?.name}"?</h3>
-                  <p className="mt-1 text-sm text-muted">
-                    {drillsInSection.length > 0
-                      ? `This section contains ${drillsInSection.length} drill${drillsInSection.length > 1 ? 's' : ''}. What would you like to do with them?`
-                      : 'This section is empty and will be removed.'}
-                  </p>
-                </div>
+          return (
+            <div className="text-center">
+              <div className="flex h-12 w-12 mx-auto mb-4 items-center justify-center rounded-full bg-warning/10">
+                <AlertTriangle size={24} className="text-warning" />
               </div>
-              <div className="mt-6 flex flex-col gap-2">
+              <h3 className="text-lg font-bold text-foreground mb-2">Delete "{sectionToDelete?.name}"?</h3>
+              <p className="text-sm text-muted mb-6">
+                {drillsInSection.length > 0
+                  ? `This section contains ${drillsInSection.length} drill${drillsInSection.length > 1 ? 's' : ''}. What would you like to do with them?`
+                  : 'This section is empty and will be removed.'}
+              </p>
+              <div className="flex flex-col gap-2">
                 {drillsInSection.length > 0 ? (
                   <>
                     <Button variant="outline" onClick={handleConfirmDeleteKeepDrills} className="justify-start gap-3 h-auto py-3 px-4">
@@ -875,9 +875,9 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
                 <Button variant="ghost" onClick={() => setDeletingSectionId(null)} className="mt-1">Cancel</Button>
               </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
+      </Modal>
     </div>
   );
 };

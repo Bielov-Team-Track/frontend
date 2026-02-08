@@ -86,13 +86,13 @@ function eventToFormData(event: Event): EventSettingsFormData {
 		capacity: undefined, // TODO: Get from event when available
 		registrationDeadline: undefined,
 		registrationOpenTime: undefined,
-		usePaymentConfig: !!event.budget,
-		paymentConfig: event.budget
+		usePaymentConfig: !!event.paymentConfig,
+		paymentConfig: event.paymentConfig
 			? {
-					pricingModel: event.budget.pricingModel,
-					cost: event.budget.cost,
-					payToJoin: event.budget.payToJoin,
-					dropoutDeadlineHours: event.budget.dropoutDeadlineHours,
+					pricingModel: event.paymentConfig.pricingModel,
+					cost: event.paymentConfig.cost,
+					payToJoin: event.paymentConfig.payToJoin,
+					dropoutDeadlineHours: event.paymentConfig.dropoutDeadlineHours,
 				}
 			: undefined,
 	};

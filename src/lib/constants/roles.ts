@@ -28,16 +28,6 @@ export const CLUB_ROLE_OPTIONS: RoleOption<ClubRole>[] = [
 		label: "Welfare Officer",
 		description: "Attendance tracking",
 	},
-	{
-		value: ClubRole.Coach,
-		label: "Coach",
-		description: "Team coaching responsibilities",
-	},
-	{
-		value: ClubRole.Assistant,
-		label: "Assistant",
-		description: "Supports coaching staff",
-	},
 ];
 
 export const TEAM_ROLE_OPTIONS: RoleOption<TeamRole>[] = [

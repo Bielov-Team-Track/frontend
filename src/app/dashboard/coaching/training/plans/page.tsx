@@ -14,7 +14,7 @@ import {
 import { TEMPLATE_SORT_OPTIONS } from "@/components/features/templates/TemplateFilters";
 import type { TemplateSortBy } from "@/components/features/templates";
 import { DifficultyLevel, TemplateFilterRequest } from "@/lib/models/Template";
-import { ArrowUpDown, BookOpen, ChevronDown, Plus } from "lucide-react";
+import { ArrowUpDown, BookOpen, ChevronDown, ChevronRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -62,12 +62,12 @@ export default function CoachingTrainingPlansPage() {
 		[search, selectedSkills, selectedLevel, sortBy]
 	);
 
-	// Fetch data based on active source
+	// Always fetch user's own templates (shown in pinned section)
 	const {
 		data: myTemplates = [],
 		isLoading: isLoadingMy,
 		error: errorMy,
-	} = useMyTemplates(filter, source === "my-plans");
+	} = useMyTemplates();
 
 	const {
 		data: clubTemplates = [],
@@ -87,11 +87,9 @@ export default function CoachingTrainingPlansPage() {
 		error: errorBookmarked,
 	} = useBookmarkedTemplates(filter, source === "bookmarked");
 
-	// Get current data based on source
+	// Get current data based on source (discover section)
 	const templates = useMemo(() => {
 		switch (source) {
-			case "my-plans":
-				return myTemplates;
 			case "club":
 				return clubTemplates;
 			case "discover":
@@ -101,10 +99,9 @@ export default function CoachingTrainingPlansPage() {
 			default:
 				return [];
 		}
-	}, [source, myTemplates, clubTemplates, publicTemplates, bookmarkedTemplates]);
+	}, [source, clubTemplates, publicTemplates, bookmarkedTemplates]);
 
 	const isLoading =
-		(source === "my-plans" && isLoadingMy) ||
 		(source === "club" && isLoadingClub) ||
 		(source === "discover" && isLoadingPublic) ||
 		(source === "bookmarked" && isLoadingBookmarked);
@@ -206,13 +203,11 @@ export default function CoachingTrainingPlansPage() {
 
 	// Source label for empty state context
 	const sourceLabel =
-		source === "my-plans"
-			? "your"
-			: source === "club"
-				? "club"
-				: source === "bookmarked"
-					? "bookmarked"
-					: "public";
+		source === "club"
+			? "club"
+			: source === "bookmarked"
+				? "bookmarked"
+				: "public";
 
 	if (error) {
 		return (
@@ -243,6 +238,54 @@ export default function CoachingTrainingPlansPage() {
 						Create Plan
 					</Button>
 				</Link>
+			</div>
+
+			{/* Your Plans - Pinned Section */}
+			<div className="pb-6 border-b border-border">
+				<div className="flex items-center justify-between mb-4">
+					<div className="flex items-center gap-2">
+						<h2 className="text-lg font-semibold text-foreground">Your Plans</h2>
+						{myTemplates.length > 0 && (
+							<span className="px-2 py-0.5 rounded-full bg-foreground/10 text-xs font-bold text-muted-foreground">
+								{myTemplates.length}
+							</span>
+						)}
+					</div>
+					{myTemplates.length > 6 && (
+						<Link
+							href="/dashboard/coaching/training/plans/wizard"
+							className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors">
+							View All
+							<ChevronRight size={14} />
+						</Link>
+					)}
+				</div>
+
+				{isLoadingMy ? (
+					<div className="flex justify-center py-6">
+						<Loader />
+					</div>
+				) : myTemplates.length === 0 ? (
+					<Link
+						href="/dashboard/coaching/training/plans/wizard"
+						className="flex items-center gap-4 p-4 rounded-xl border border-dashed border-border hover:border-accent/40 hover:bg-accent/5 transition-colors group">
+						<div className="flex items-center justify-center size-10 rounded-lg bg-accent/10 text-accent group-hover:bg-accent/20 transition-colors">
+							<Plus size={20} />
+						</div>
+						<div>
+							<p className="text-sm font-semibold text-foreground">Create your first training plan</p>
+							<p className="text-xs text-muted-foreground">Build a reusable template for your training sessions</p>
+						</div>
+					</Link>
+				) : (
+					<div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-thin">
+						{myTemplates.map((template) => (
+							<div key={template.id} className="shrink-0 w-[280px]">
+								<TemplateCard template={template} variant="compact" />
+							</div>
+						))}
+					</div>
+				)}
 			</div>
 
 			{/* Filters */}
@@ -329,18 +372,16 @@ export default function CoachingTrainingPlansPage() {
 					description={
 						hasFilters
 							? "Try adjusting your search or filters"
-							: source === "my-plans"
-								? "Create your first training plan template to reuse it across events"
-								: source === "bookmarked"
-									? "You haven't bookmarked any training plans yet"
-									: source === "club"
-										? "Your club hasn't created any training plan templates yet"
-										: "No public training plans have been shared yet"
+							: source === "bookmarked"
+								? "You haven't bookmarked any training plans yet"
+								: source === "club"
+									? "Your club hasn't created any training plan templates yet"
+									: "No public training plans have been shared yet"
 					}
 					action={
 						hasFilters
 							? { label: "Clear Filters", onClick: clearFilters }
-							: source === "my-plans" || source === "discover"
+							: source === "discover"
 								? {
 										label: "Create Plan",
 										onClick: () => (window.location.href = "/dashboard/coaching/training/plans/wizard"),

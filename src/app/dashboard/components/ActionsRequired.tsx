@@ -27,7 +27,7 @@ export function ActionsRequired({ unpaidEvents, pendingInvitations, eventsNeedin
 
 	// Add unpaid events
 	if (unpaidEvents.length > 0) {
-		const totalAmount = unpaidEvents.reduce((sum, e) => sum + (e.amountDue || e.budget?.cost || 0), 0);
+		const totalAmount = unpaidEvents.reduce((sum, e) => sum + (e.amountDue || e.paymentConfig?.cost || 0), 0);
 		actions.push({
 			id: "unpaid-events",
 			type: "payment",

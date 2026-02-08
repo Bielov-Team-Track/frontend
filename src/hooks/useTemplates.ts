@@ -62,7 +62,7 @@ export const clubKeys = {
 };
 
 // Roles that can edit club templates
-const TEMPLATE_EDIT_ROLES: ClubRole[] = [ClubRole.Owner, ClubRole.Admin, ClubRole.Coach];
+const TEMPLATE_EDIT_ROLES: ClubRole[] = [ClubRole.Owner, ClubRole.Admin, ClubRole.HeadCoach];
 
 // =============================================================================
 // TEMPLATES QUERIES

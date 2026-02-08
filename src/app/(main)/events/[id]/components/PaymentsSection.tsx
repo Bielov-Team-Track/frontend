@@ -15,7 +15,7 @@ type PaymentsSectionProps = {
 };
 
 const PaymentsSection = async ({ event, teams, userProfile }: PaymentsSectionProps) => {
-	if (!event.budget) {
+	if (!event.paymentConfig) {
 		return null;
 	}
 
@@ -26,7 +26,7 @@ const PaymentsSection = async ({ event, teams, userProfile }: PaymentsSectionPro
 	const teamPayments = captainsTeams.map(async (t) => await loadTeamPayments(t.id!));
 
 	const getBudgetUnit = () => {
-		switch (event.budget?.pricingModel) {
+		switch (event.paymentConfig?.pricingModel) {
 			case PricingModel.Individual:
 				return "person";
 			case PricingModel.Team:
@@ -59,7 +59,7 @@ const PaymentsSection = async ({ event, teams, userProfile }: PaymentsSectionPro
 				<span className="text-3xl font-bold">Payments</span>
 			</span>
 			<div className=" flex flex-col w-full gap-2">
-				{event.budget && (
+				{event.paymentConfig && (
 					<div className="flex items-center justify-between py-4 px-6 rounded-lg bg-background">
 						<div className="flex gap-2 flex-col">
 							<span className="font-medium">Event Fee</span>
@@ -67,8 +67,8 @@ const PaymentsSection = async ({ event, teams, userProfile }: PaymentsSectionPro
 						</div>
 
 						<span className="text-3xl font-bold">
-							{event.budget.currency || "£"}
-							{event.budget.cost}
+							{event.paymentConfig.currency || "£"}
+							{event.paymentConfig.cost}
 						</span>
 					</div>
 				)}
@@ -78,11 +78,11 @@ const PaymentsSection = async ({ event, teams, userProfile }: PaymentsSectionPro
 							<span className="font-medium">Your Payment</span>
 							<span>{getPaymentStatus(userPayment)}</span>
 						</div>
-						{event.budget?.paymentMethods?.includes(PaymentMethod.Card) ? (
+						{event.paymentConfig?.paymentMethods?.includes(PaymentMethod.Card) ? (
 							userPayment &&
 							!userPayment.paidAt &&
 							userPayment.eventParticipant?.id && (
-								<PaymentButton participantId={userPayment.eventParticipant.id} amount={userPayment.amount} currency={event.budget?.currency} />
+								<PaymentButton participantId={userPayment.eventParticipant.id} amount={userPayment.amount} currency={event.paymentConfig?.currency} />
 							)
 						) : (
 							<span className="text-sm text-muted">You can pay with cash or bank transfer to the event organizer. Contact them for details.</span>
@@ -107,7 +107,7 @@ const PaymentsSection = async ({ event, teams, userProfile }: PaymentsSectionPro
 											{notPaidPayments.length}/{payments.length} paid
 										</span>
 										<span className="font-medium">
-											{event.budget?.currency || "£"}
+											{event.paymentConfig?.currency || "£"}
 											{remainingAmount} remaining
 										</span>
 									</div>
@@ -126,16 +126,16 @@ const PaymentsSection = async ({ event, teams, userProfile }: PaymentsSectionPro
 														</span>
 													</div>
 													<div className="flex items-center gap-2">
-														{event.budget?.currency || "£"}
+														{event.paymentConfig?.currency || "£"}
 														{p.amount} {getPaymentStatus(p, true)}
 													</div>
 												</div>
 											);
 										})}
 									</div>
-									{event.budget?.paymentMethods?.includes(PaymentMethod.Card) && remainingAmount > 0 && (
+									{event.paymentConfig?.paymentMethods?.includes(PaymentMethod.Card) && remainingAmount > 0 && (
 										<Button fullWidth={true} className="mt-4">
-											Pay {event.budget?.currency || "£"}
+											Pay {event.paymentConfig?.currency || "£"}
 											{remainingAmount}
 										</Button>
 									)}
