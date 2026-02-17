@@ -2,13 +2,16 @@
 
 import { Event } from "@/lib/models/Event";
 import { endOfWeek, format, getMonth, getWeek, getYear, isPast, isThisWeek, isToday, startOfWeek } from "date-fns";
-import { ChevronDown, ChevronRight, ChevronUp, Clock, MapPin } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronUp, Clock, Loader2, MapPin } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import EventsListEmptyState from "./EmptyState";
 
 interface EventListViewProps {
 	events: Event[];
+	loadMoreRef?: (node: HTMLDivElement | null) => void;
+	hasNextPage?: boolean;
+	isFetchingNextPage?: boolean;
 }
 
 interface GroupedEvents {
@@ -81,7 +84,7 @@ function groupEventsByTime(events: Event[]): GroupedEvents[] {
 	return result.sort((a, b) => a.year - b.year);
 }
 
-export function EventListView({ events }: EventListViewProps) {
+export function EventListView({ events, loadMoreRef, hasNextPage, isFetchingNextPage }: EventListViewProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [activeSection, setActiveSection] = useState<string>("");
 	const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set());
@@ -210,6 +213,14 @@ export function EventListView({ events }: EventListViewProps) {
 						))}
 					</div>
 				))}
+
+				{/* Load more sentinel */}
+				{loadMoreRef && <div ref={loadMoreRef} className="h-10" />}
+				{isFetchingNextPage && (
+					<div className="flex justify-center py-4">
+						<Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+					</div>
+				)}
 			</div>
 
 			{/* Timeline Navigation Sidebar */}

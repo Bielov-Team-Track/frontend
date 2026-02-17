@@ -14,9 +14,9 @@ import {
 	TemplateCommentsSection,
 } from "@/components/features/templates";
 import { DrillCard, type Drill as ComponentDrill } from "@/components/features/drills";
-import { useTemplate } from "@/hooks/useTemplates";
+import { usePlan } from "@/hooks/useTemplates";
 import { AuthProvider } from "@/providers";
-import type { TemplateSection, TemplateItem } from "@/lib/models/Template";
+import type { PlanSection, PlanItem } from "@/lib/models/Template";
 import {
 	CATEGORY_SEGMENT_COLORS,
 	INTENSITY_SEGMENT_COLORS,
@@ -57,7 +57,7 @@ function TemplateDetailContent() {
 	const params = useParams();
 	const templateId = params.id as string;
 
-	const { data: template, isLoading, error } = useTemplate(templateId);
+	const { data: template, isLoading, error } = usePlan(templateId);
 
 	const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
 	const [timelineView, setTimelineView] = useState<"categories" | "intensity">("categories");
@@ -93,7 +93,7 @@ function TemplateDetailContent() {
 	}, [template]);
 
 	const allItemsInOrder = useMemo(() => {
-		const items: (TemplateItem & { sectionIndex: number })[] = [];
+		const items: (PlanItem & { sectionIndex: number })[] = [];
 		sectionsWithItems.forEach((section, sIdx) => {
 			section.items.forEach((item) => {
 				items.push({ ...item, sectionIndex: sIdx });

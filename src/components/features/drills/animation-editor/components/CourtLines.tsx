@@ -6,6 +6,31 @@ interface CourtLinesProps {
 	viewMode: CourtViewMode
 }
 
+const POSITION_MARKERS = {
+	// Bottom half (home team) - standard volleyball rotation
+	bottom: [
+		// Front row (near net)
+		{ x: 60, y: COURT_HEIGHT / 2 + 70, label: "4" },
+		{ x: 160, y: COURT_HEIGHT / 2 + 70, label: "3" },
+		{ x: 260, y: COURT_HEIGHT / 2 + 70, label: "2" },
+		// Back row
+		{ x: 60, y: COURT_HEIGHT / 2 + 200, label: "5" },
+		{ x: 160, y: COURT_HEIGHT / 2 + 200, label: "6" },
+		{ x: 260, y: COURT_HEIGHT / 2 + 200, label: "1" },
+	],
+	// Top half (opponent team) - mirrored
+	top: [
+		// Front row (near net)
+		{ x: 260, y: COURT_HEIGHT / 2 - 70, label: "4" },
+		{ x: 160, y: COURT_HEIGHT / 2 - 70, label: "3" },
+		{ x: 60, y: COURT_HEIGHT / 2 - 70, label: "2" },
+		// Back row
+		{ x: 260, y: COURT_HEIGHT / 2 - 200, label: "5" },
+		{ x: 160, y: COURT_HEIGHT / 2 - 200, label: "6" },
+		{ x: 60, y: COURT_HEIGHT / 2 - 200, label: "1" },
+	],
+}
+
 const CourtLinesInner = ({ viewMode }: CourtLinesProps) => {
 	// Court boundaries
 	const courtLeft = COURT_PADDING
@@ -51,19 +76,10 @@ const CourtLinesInner = ({ viewMode }: CourtLinesProps) => {
 				strokeWidth="1"
 				strokeDasharray="5"
 			/>
-			{/* Position markers for bottom half (home team) - standard volleyball rotation */}
-			{viewMode === "full" && [
-				// Front row (near net)
-				{ x: 60, y: courtMidY + 70, label: "4" },
-				{ x: 160, y: courtMidY + 70, label: "3" },
-				{ x: 260, y: courtMidY + 70, label: "2" },
-				// Back row
-				{ x: 60, y: courtMidY + 200, label: "5" },
-				{ x: 160, y: courtMidY + 200, label: "6" },
-				{ x: 260, y: courtMidY + 200, label: "1" },
-			].map((pos) => (
+			{/* Position markers for both halves */}
+			{[...POSITION_MARKERS.bottom, ...(viewMode === "full" ? POSITION_MARKERS.top : [])].map((pos, i) => (
 				<text
-					key={pos.label}
+					key={`${pos.label}-${i}`}
 					x={pos.x}
 					y={pos.y}
 					textAnchor="middle"

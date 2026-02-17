@@ -2,11 +2,10 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { AddMediaMenu, Loader } from "@/components/ui";
-import { MediaLightbox, type MediaItem, parseEmbedUrl as parseEmbedUrlMedia } from "@/components/ui/media-preview";
+import { MediaLightbox, type MediaItem, parseEmbedUrl, isEmbedUrl } from "@/components/ui/media-preview";
 import MediaThumbnail, { UploadingThumbnail, type UploadingFile } from "@/components/features/drills/MediaThumbnail";
 import { useDrill, useCanEditDrill, useAddDrillAttachment, useDeleteDrillAttachment } from "@/hooks/useDrills";
 import { useAuth } from "@/providers";
-import { isEmbedUrl } from "@/components/features/drills/attachments/embedUtils";
 import { DrillAttachmentTypeEnum } from "@/lib/models/Drill";
 import { getDrillAttachmentUploadUrl, uploadFileToS3 } from "@/lib/api/drills";
 import {
@@ -159,7 +158,7 @@ export default function DrillMediaGalleryPage() {
 
 	const embeds = attachments.filter((a) => a.fileType === "Video" && isEmbedUrl(a.fileUrl));
 	embeds.forEach((embed) => {
-		const embedInfo = parseEmbedUrlMedia(embed.fileUrl);
+		const embedInfo = parseEmbedUrl(embed.fileUrl);
 		if (embedInfo) {
 			mediaItems.push({
 				id: embed.id,

@@ -5,13 +5,13 @@ import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
 import { ListToolbar } from "@/components/ui/list-toolbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserSelectorModal } from "@/components/features/users";
-import { inviteUsers, removeParticipant, updateParticipantStatus } from "@/lib/api/events";
+import { inviteUsers, removeParticipant, revokeInvitation, updateParticipantStatus } from "@/lib/api/events";
 import { InvitedVia } from "@/lib/models/EventParticipant";
 import { UserProfile } from "@/lib/models/User";
 import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowDownAZ, Clock, CreditCard, Search, UserMinus, UserPlus, Users, XCircle } from "lucide-react";
+import { ArrowDownAZ, Clock, CreditCard, MailX, Search, UserMinus, UserPlus, Users, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useEventContext } from "../layout";
 
@@ -120,6 +120,13 @@ export default function EventMembersPage() {
 		},
 	});
 
+	const revokeMutation = useMutation({
+		mutationFn: (userId: string) => revokeInvitation(eventId, userId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
+		},
+	});
+
 	const statusMutation = useMutation({
 		mutationFn: ({ userId, status, declineNote }: { userId: string; status: string; declineNote?: string }) =>
 			updateParticipantStatus(eventId, userId, status, declineNote),
@@ -218,7 +225,7 @@ export default function EventMembersPage() {
 			<div className="flex items-center justify-between">
 				<h2 className="text-lg font-semibold text-foreground">Members</h2>
 				{isAdmin && (
-					<Button variant="outline" leftIcon={<UserPlus size={16} />} onClick={() => setShowInviteModal(true)}>
+					<Button variant="outline" leftIcon={<UserPlus size={16} />} onClick={() => setShowInviteModal(true)} data-testid="invite-members-button">
 						Invite
 					</Button>
 				)}
@@ -238,12 +245,13 @@ export default function EventMembersPage() {
 				count={filteredParticipants.length}
 				itemLabel="member"
 				showViewToggle={false}
+				searchTestId="members-search"
 			/>
 
 			{/* Participants Table */}
 			{filteredParticipants.length > 0 ? (
 				<div className="rounded-xl bg-surface border border-border overflow-hidden">
-					<table className="w-full">
+					<table className="w-full" data-testid="members-table">
 						<thead>
 							<tr className="border-b border-border">
 								<th className="text-left text-xs font-medium text-muted px-4 py-3">Member</th>
@@ -259,14 +267,14 @@ export default function EventMembersPage() {
 							</tr>
 						</thead>
 						<tbody>
-							{filteredParticipants.map((participant) => {
+							{filteredParticipants.map((participant, index) => {
 								const { userProfile } = participant;
 								const statusStr = participant.status as unknown as string;
 								const name = getParticipantName(userProfile);
 								const payment = getPaymentLabel(participant.payment?.status);
 
 								return (
-									<tr key={participant.id} className="border-b border-border last:border-b-0 hover:bg-hover transition-colors">
+									<tr key={participant.id} className="border-b border-border last:border-b-0 hover:bg-hover transition-colors" data-testid={`participant-row-${index}`}>
 										{/* Member */}
 										<td className="px-4 py-3">
 											<div className="flex items-center gap-3">
@@ -287,7 +295,7 @@ export default function EventMembersPage() {
 													value={statusStr}
 													onValueChange={(value) => value && handleStatusChange(participant.userId, name, value)}
 												>
-													<SelectTrigger className="w-[130px] h-7 text-xs" size="sm">
+													<SelectTrigger className="w-[130px] h-7 text-xs" size="sm" data-testid={`participant-status-${index}`}>
 														<span className={`inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded text-xs font-medium ${getStatusColor(statusStr)}`}>
 															{getStatusLabel(statusStr)}
 														</span>
@@ -303,7 +311,7 @@ export default function EventMembersPage() {
 													</SelectContent>
 												</Select>
 											) : (
-												<span className={`px-2 py-0.5 rounded-md text-xs font-medium border ${getStatusColor(statusStr)}`}>
+												<span className={`px-2 py-0.5 rounded-md text-xs font-medium border ${getStatusColor(statusStr)}`} data-testid={`participant-status-${index}`}>
 													{getStatusLabel(statusStr)}
 												</span>
 											)}
@@ -323,7 +331,7 @@ export default function EventMembersPage() {
 											<td className="px-4 py-3 hidden lg:table-cell">
 												<div className="flex items-center gap-1.5">
 													<CreditCard size={14} className={payment.color} />
-													<span className={`text-sm font-medium ${payment.color}`}>{payment.label}</span>
+													<span className={`text-sm font-medium ${payment.color}`} data-testid={`participant-payment-${index}`}>{payment.label}</span>
 												</div>
 											</td>
 										)}
@@ -339,9 +347,22 @@ export default function EventMembersPage() {
 										{isAdmin && (
 											<td className="px-4 py-3 text-right">
 												<DropdownMenu
+											data-testid={`participant-actions-${index}`}
 													items={[
+														...(statusStr === "Invited"
+															? [
+																	{
+																		label: "Revoke Invitation",
+																	"data-testid": "revoke-invitation-action",
+																		icon: <MailX size={16} />,
+																		variant: "destructive" as const,
+																		onClick: () => revokeMutation.mutate(participant.userId),
+																	},
+																]
+															: []),
 														{
 															label: "Remove",
+															"data-testid": "remove-participant-action",
 															icon: <UserMinus size={16} />,
 															variant: "destructive" as const,
 															onClick: () => setRemovingParticipant({ id: participant.id, userId: participant.userId, name }),

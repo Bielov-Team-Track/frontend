@@ -145,11 +145,15 @@ export default function CreateClubPage() {
 
 			// Now upload images if provided
 			let logoUrl: string | undefined;
+			let logoThumbHash: string | undefined;
 			let bannerUrl: string | undefined;
+			let bannerThumbHash: string | undefined;
 
 			if (data.logo) {
 				try {
-					logoUrl = await uploadClubImage(createdClub.id, data.logo, "logo");
+					const result = await uploadClubImage(createdClub.id, data.logo, "logo");
+					logoUrl = result.url;
+					logoThumbHash = result.thumbHash;
 				} catch (error) {
 					console.error("Failed to upload logo:", error);
 				}
@@ -157,28 +161,31 @@ export default function CreateClubPage() {
 
 			if (data.banner) {
 				try {
-					bannerUrl = await uploadClubImage(createdClub.id, data.banner, "banner");
+					const result = await uploadClubImage(createdClub.id, data.banner, "banner");
+					bannerUrl = result.url;
+					bannerThumbHash = result.thumbHash;
 				} catch (error) {
 					console.error("Failed to upload banner:", error);
 				}
 			}
 
-			// Update club with image URLs if any were uploaded
+			// Update club with image URLs and thumbhashes if any were uploaded
 			if (logoUrl || bannerUrl) {
 				await updateClub(createdClub.id, {
 					logoUrl,
+					logoThumbHash,
 					bannerUrl,
+					bannerThumbHash,
 				});
 			}
 
 			showSuccessToast("Club created successfully!");
-			router.push(`/clubs/${createdClub.id}`);
+			router.push(`/hub/clubs/${createdClub.id}`);
 		} catch (error: any) {
 			console.error("Failed to create club", error);
 			showErrorToast(error, {
 				fallback: "Failed to create club. Please try again.",
 			});
-		} finally {
 			setIsSubmitting(false);
 		}
 	};

@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { EVENTS_API_V1 } from "../constants";
 import { Event, EventFilterRequest } from "../models/Event";
+import { PaginatedResponse } from "../models/Pagination";
 import { getParamsFromObject } from "../utils/request";
 
 /**
@@ -34,7 +35,8 @@ export async function loadEventsByFilterServer(
 		const response = await fetch(url, fetchOptions);
 
 		if (response.ok) {
-			return await response.json();
+			const data: PaginatedResponse<Event> = await response.json();
+			return data.items;
 		} else if (response.status === 401 || response.status === 403) {
 			return [];
 		} else {

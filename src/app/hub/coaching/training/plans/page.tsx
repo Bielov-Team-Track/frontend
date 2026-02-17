@@ -6,14 +6,14 @@ import type { TemplateSource } from "@/components/features/templates";
 import type { AuthorOption, ClubOption } from "@/components/features/templates/TemplateFilters";
 import { EmptyState, Loader } from "@/components/ui";
 import {
-	useMyTemplates,
-	useClubTemplates,
-	usePublicTemplates,
-	useBookmarkedTemplates,
+	useMyPlans,
+	useClubPlans,
+	usePublicPlans,
+	useBookmarkedPlans,
 } from "@/hooks/useTemplates";
 import { TEMPLATE_SORT_OPTIONS } from "@/components/features/templates/TemplateFilters";
 import type { TemplateSortBy } from "@/components/features/templates";
-import { DifficultyLevel, TemplateFilterRequest } from "@/lib/models/Template";
+import { DifficultyLevel, PlanFilterRequest } from "@/lib/models/Template";
 import { ArrowUpDown, BookOpen, ChevronDown, ChevronRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -52,7 +52,7 @@ export default function CoachingTrainingPlansPage() {
 	const currentSort = TEMPLATE_SORT_OPTIONS.find((opt) => opt.value === sortBy) || TEMPLATE_SORT_OPTIONS[0];
 
 	// Build filter request for API
-	const filter: TemplateFilterRequest = useMemo(
+	const filter: PlanFilterRequest = useMemo(
 		() => ({
 			searchTerm: search || undefined,
 			skills: selectedSkills.length > 0 ? selectedSkills : undefined,
@@ -67,25 +67,25 @@ export default function CoachingTrainingPlansPage() {
 		data: myTemplates = [],
 		isLoading: isLoadingMy,
 		error: errorMy,
-	} = useMyTemplates();
+	} = useMyPlans();
 
 	const {
 		data: clubTemplates = [],
 		isLoading: isLoadingClub,
 		error: errorClub,
-	} = useClubTemplates("", filter, source === "club");
+	} = useClubPlans("", filter, source === "club");
 
 	const {
 		data: publicTemplates = [],
 		isLoading: isLoadingPublic,
 		error: errorPublic,
-	} = usePublicTemplates(filter, source === "discover");
+	} = usePublicPlans(filter, source === "discover");
 
 	const {
 		data: bookmarkedTemplates = [],
 		isLoading: isLoadingBookmarked,
 		error: errorBookmarked,
-	} = useBookmarkedTemplates(filter, source === "bookmarked");
+	} = useBookmarkedPlans(filter, source === "bookmarked");
 
 	// Get current data based on source (discover section)
 	const templates = useMemo(() => {

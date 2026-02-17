@@ -18,28 +18,41 @@ import {
     DrillCommentsResponse,
     DrillComment,
     CreateDrillCommentRequest,
+    DrillsPagedResponse,
+    DrillsPagedResponseDto,
     transformDrillDto,
     transformAttachmentDto,
     transformBookmarkedDrillDto,
     transformCommentDto,
     transformCommentsResponseDto,
+    transformDrillsPagedResponseDto,
 } from "../models/Drill";
 import { getParamsFromObject } from "../utils/request";
 
-const PREFIX = "/events";
+const PREFIX = "/coaching";
 
 // =============================================================================
 // DRILLS
 // =============================================================================
 
 /**
- * Get all public drills with optional filtering
+ * Get all public drills with optional filtering (legacy - returns flat array)
  */
 export async function loadDrills(filter?: DrillFilterRequest): Promise<Drill[]> {
     const endpoint = "/v1/drills";
     const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
-    const response = await client.get<DrillDto[]>(PREFIX + endpoint, { params });
-    return response.data.map(transformDrillDto);
+    const response = await client.get<DrillsPagedResponseDto>(PREFIX + endpoint, { params });
+    return response.data.items.map(transformDrillDto);
+}
+
+/**
+ * Get public drills with pagination (returns paged response)
+ */
+export async function loadDrillsPaged(filter?: DrillFilterRequest): Promise<DrillsPagedResponse> {
+    const endpoint = "/v1/drills";
+    const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
+    const response = await client.get<DrillsPagedResponseDto>(PREFIX + endpoint, { params });
+    return transformDrillsPagedResponseDto(response.data);
 }
 
 /**

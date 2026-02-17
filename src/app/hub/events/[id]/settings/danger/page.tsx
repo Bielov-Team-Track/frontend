@@ -49,7 +49,8 @@ export default function EventDangerSettingsPage() {
 						color="error"
 						leftIcon={<XCircle size={16} />}
 						onClick={() => setShowCancelModal(true)}
-						disabled={event.canceled}>
+						disabled={event.canceled}
+						data-testid="cancel-event-button">
 						{event.canceled ? "Already Canceled" : "Cancel Event"}
 					</Button>
 				</div>
@@ -80,7 +81,7 @@ export default function EventDangerSettingsPage() {
 				<>
 					<div className="fixed inset-0 bg-overlay z-50" onClick={() => setShowCancelModal(false)} />
 					<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-						<div className="bg-raised border border-border rounded-2xl w-full max-w-md p-6 shadow-2xl">
+						<div className="bg-raised border border-border rounded-2xl w-full max-w-md p-6 shadow-2xl" data-testid="cancel-event-modal">
 							<div className="flex items-center gap-3 mb-4">
 								<div className="w-10 h-10 rounded-full bg-warning/20 flex items-center justify-center">
 									<XCircle className="text-warning" size={20} />
@@ -95,7 +96,7 @@ export default function EventDangerSettingsPage() {
 								<Button variant="ghost" color="neutral" onClick={() => setShowCancelModal(false)}>
 									Keep Event
 								</Button>
-								<Button variant="destructive" color="error" onClick={handleCancelEvent}>
+								<Button variant="destructive" color="error" onClick={handleCancelEvent} data-testid="confirm-cancel-event">
 									Cancel Event
 								</Button>
 							</div>

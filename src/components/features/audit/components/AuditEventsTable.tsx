@@ -61,7 +61,8 @@ const AuditEventsTable = ({ events }: AuditEventsListProps) => {
 				try {
 					let participants = participantsData[event.id];
 					if (!participants) {
-						participants = await loadParticipants(event.id);
+						const result = await loadParticipants(event.id);
+						participants = result.items;
 						setParticipantsData((prev) => ({
 							...prev,
 							[event.id]: participants,

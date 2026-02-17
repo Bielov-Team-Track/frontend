@@ -4,7 +4,7 @@ import { Button } from "@/components";
 import type { DrillAttachment } from "@/lib/models/Drill";
 import { Plus, X, Link2, FileText, ImageIcon, Film, ExternalLink, Loader2, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { useState, useEffect } from "react";
-import { isEmbedUrl, parseEmbedUrl, getProviderDisplayName } from "./embedUtils";
+import { isEmbedUrl, parseEmbedUrl, getProviderDisplayName } from "@/components/ui/media-preview";
 import { useUrlVerification, type VerifiedType } from "./useUrlVerification";
 import { formatFileSize } from "@/components/ui/media-preview";
 import { cn } from "@/lib/utils";

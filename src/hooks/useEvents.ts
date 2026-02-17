@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
 	loadEvent,
 	loadEvents,
@@ -22,6 +22,8 @@ export const eventKeys = {
 	all: ["events"] as const,
 	lists: () => [...eventKeys.all, "list"] as const,
 	list: (filter?: EventFilterRequest) => [...eventKeys.lists(), filter] as const,
+	infiniteLists: () => [...eventKeys.all, "infinite"] as const,
+	infiniteList: (filter?: EventFilterRequest) => [...eventKeys.infiniteLists(), filter] as const,
 	details: () => [...eventKeys.all, "detail"] as const,
 	detail: (id: string) => [...eventKeys.details(), id] as const,
 	participants: (eventId: string) => ["event-participants", eventId] as const,
@@ -45,24 +47,49 @@ export function useEvent(eventId: string, enabled: boolean = true) {
 }
 
 /**
- * Hook to fetch events with optional filters
+ * Hook to fetch events with optional filters (single page)
  */
 export function useEvents(filter?: EventFilterRequest, enabled: boolean = true) {
 	return useQuery({
 		queryKey: eventKeys.list(filter),
-		queryFn: () => loadEvents(filter),
+		queryFn: async () => {
+			const response = await loadEvents(filter);
+			return response.items;
+		},
 		enabled,
 		staleTime: 2 * 60 * 1000, // 2 minutes
 	});
 }
 
 /**
- * Hook to fetch event participants
+ * Hook to fetch events with infinite scroll pagination.
+ * Uses offset-based pagination with useInfiniteQuery.
  */
-export function useEventParticipants(eventId: string, enabled: boolean = true) {
-	return useQuery({
+export function useInfiniteEvents(filter?: EventFilterRequest, enabled: boolean = true) {
+	return useInfiniteQuery({
+		queryKey: eventKeys.infiniteList(filter),
+		queryFn: ({ pageParam = 1 }) => loadEvents(filter, pageParam),
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => {
+			if (lastPage.page < lastPage.totalPages) {
+				return lastPage.page + 1;
+			}
+			return undefined;
+		},
+		enabled,
+		staleTime: 2 * 60 * 1000, // 2 minutes
+	});
+}
+
+/**
+ * Hook to fetch event participants with infinite scroll pagination
+ */
+export function useEventParticipants(eventId: string, limit: number = 20, enabled: boolean = true) {
+	return useInfiniteQuery({
 		queryKey: eventKeys.participants(eventId),
-		queryFn: () => loadParticipants(eventId),
+		queryFn: ({ pageParam }) => loadParticipants(eventId, pageParam, limit),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
 		enabled: enabled && !!eventId,
 		staleTime: 2 * 60 * 1000, // 2 minutes
 	});
@@ -94,7 +121,7 @@ export function useCreateEvent() {
 		mutationFn: (event: CreateEvent) => createEvent(event),
 		onSuccess: () => {
 			// Invalidate events list
-			queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
+			queryClient.invalidateQueries({ queryKey: eventKeys.all });
 		},
 	});
 }
@@ -111,7 +138,7 @@ export function useUpdateEvent() {
 			// Update cache
 			queryClient.setQueryData(eventKeys.detail(variables.id), variables);
 			// Invalidate events list
-			queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
+			queryClient.invalidateQueries({ queryKey: eventKeys.all });
 		},
 	});
 }
@@ -128,7 +155,7 @@ export function useDeleteEvent() {
 			// Remove from cache
 			queryClient.removeQueries({ queryKey: eventKeys.detail(eventId) });
 			// Invalidate events list
-			queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
+			queryClient.invalidateQueries({ queryKey: eventKeys.all });
 		},
 	});
 }
@@ -145,7 +172,7 @@ export function useCancelEvent() {
 			// Invalidate event details
 			queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
 			// Invalidate events list
-			queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
+			queryClient.invalidateQueries({ queryKey: eventKeys.all });
 		},
 	});
 }

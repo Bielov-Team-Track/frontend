@@ -50,6 +50,7 @@ export interface MediaItem {
 	id: string;
 	type: MediaPreviewType;
 	url: string;
+	thumbHash?: string;
 	thumbnailUrl?: string;
 	fileName?: string;
 	mimeType?: string;

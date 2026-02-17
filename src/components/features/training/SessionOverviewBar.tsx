@@ -453,9 +453,9 @@ export const SessionOverviewBar: React.FC<SessionOverviewBarProps> = ({
 							{totalDuration} / {sessionDuration}m
 						</span>
 					</div>
-					<button type="button" className="text-muted-foreground">
+					<span className="text-muted-foreground">
 						{isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-					</button>
+					</span>
 				</button>
 				<div className="mt-2 h-2 bg-subtle rounded-full overflow-hidden">
 					<div

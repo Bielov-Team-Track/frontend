@@ -6,7 +6,9 @@ export interface Club {
 	name: string;
 	description?: string;
 	logoUrl?: string;
+	logoThumbHash?: string;
 	bannerUrl?: string;
+	bannerThumbHash?: string;
 	contactEmail?: string;
 	contactPhone?: string;
 	isPublic: boolean;
@@ -137,13 +139,17 @@ export interface ClubSearchFilters {
 	level?: SkillLevel[];
 	surface?: string[];
 	isPublic?: boolean;
+	cursor?: string;
+	limit?: number;
 }
 
 export interface CreateClubRequest {
 	name: string;
 	description?: string;
 	logoUrl?: string;
+	logoThumbHash?: string;
 	bannerUrl?: string;
+	bannerThumbHash?: string;
 	websiteUrl?: string;
 	contactEmail?: string;
 	contactPhone?: string;
@@ -343,6 +349,22 @@ export enum RegistrationStatus {
 	Declined = "Declined",
 }
 
+export enum ClubMembersSortBy {
+	Name = "Name",
+	Role = "Role",
+	JoinDate = "JoinDate",
+}
+
+export interface ClubMembersSearchFilters {
+	query?: string;
+	teamId?: string;
+	groupId?: string;
+	sortBy?: ClubMembersSortBy;
+	sortDirection?: SortDirection;
+	cursor?: string;
+	limit?: number;
+}
+
 export enum RegistrationSortBy {
 	SubmittedAt = "SubmittedAt",
 	Status = "Status",
@@ -540,7 +562,9 @@ export interface UpdateClubRequest {
 	name?: string;
 	description?: string;
 	logoUrl?: string;
+	logoThumbHash?: string;
 	bannerUrl?: string;
+	bannerThumbHash?: string;
 	contactEmail?: string;
 	contactPhone?: string;
 	websiteUrl?: string;

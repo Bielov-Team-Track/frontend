@@ -98,7 +98,9 @@ export const eventValidationSchema = yup.object().shape({
 			longitude: yup.number().optional(),
 			instructions: yup.string().optional(),
 		})
-		.required("Location is required"),
+		.nullable()
+		.optional()
+		.default(undefined),
 	name: yup.string().required("Name is required"),
 	type: yup
 		.mixed<EventType>()

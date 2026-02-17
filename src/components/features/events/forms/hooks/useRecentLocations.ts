@@ -18,7 +18,7 @@ export function useRecentLocations() {
 			}
 
 			// Fetch recent events organized by the current user
-			const events = await loadEvents({
+			const response = await loadEvents({
 				organizerId: userProfile.id,
 				limit: 20,
 				sortBy: "startDate",
@@ -28,7 +28,7 @@ export function useRecentLocations() {
 			// Extract locations and deduplicate by name
 			const locationMap = new Map<string, Location>();
 
-			for (const event of events) {
+			for (const event of response.items) {
 				if (event.location && event.location.name) {
 					const key = event.location.name.toLowerCase();
 					if (!locationMap.has(key)) {

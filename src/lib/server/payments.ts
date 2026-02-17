@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { EVENTS_API_V1 } from "../constants";
+import { PAYMENTS_API_V1 } from "../constants";
 import { AccountBalance, AccountPayoutInfo } from "../models/Payment";
 
 export const getAccountBalance = async (): Promise<AccountBalance | null> => {
@@ -10,7 +10,7 @@ export const getAccountBalance = async (): Promise<AccountBalance | null> => {
 		return null;
 	}
 
-	const backendUrl = `${EVENTS_API_V1}/payments/account/balance`;
+	const backendUrl = `${PAYMENTS_API_V1}/payments/account/balance`;
 
 	const fetchOptions: RequestInit = {
 		method: "GET",
@@ -47,7 +47,7 @@ export const getAccountPayoutInfo = async (): Promise<AccountPayoutInfo | null> 
 		return null;
 	}
 
-	const backendUrl = `${EVENTS_API_V1}/payments/account/payout-info`;
+	const backendUrl = `${PAYMENTS_API_V1}/payments/account/payout-info`;
 
 	const fetchOptions: RequestInit = {
 		method: "GET",

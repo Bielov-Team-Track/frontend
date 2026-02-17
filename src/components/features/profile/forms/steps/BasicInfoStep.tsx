@@ -1,23 +1,20 @@
-import { Button, Input } from "@/components/ui";
+import { Button } from "@/components/ui";
 import ImageCropper from "@/components/ui/image-cropper";
 import { updateProfileImage } from "@/lib/api/user";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Camera, User } from "lucide-react";
+import { Camera } from "lucide-react";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
 const schema = yup.object().shape({
-	name: yup.string().required("Name is required").min(2, "Name must be at least 2 characters"),
-	surname: yup.string().required("Surname is required").min(2, "Surname must be at least 2 characters"),
 	imageUrl: yup.string().url("Invalid image URL").optional(),
 });
 
 type BasicInfoData = {
-	name: string;
-	surname: string;
 	imageUrl?: string;
+	imageThumbHash?: string;
 };
 
 type Props = {
@@ -31,18 +28,15 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 	const [imageFile, setImageFile] = useState<File | null>(null);
 	const [showImageCropper, setShowImageCropper] = useState(false);
 	const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(defaultValues?.imageUrl || null);
+	const [uploadedThumbHash, setUploadedThumbHash] = useState<string | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const {
-		control,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<BasicInfoData>({
 		resolver: yupResolver(schema) as any,
-		defaultValues: {
-			name: defaultValues?.name || "",
-			surname: defaultValues?.surname || "",
-		},
+		defaultValues: {},
 	});
 
 	const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,8 +56,9 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 		}
 
 		try {
-			const imageUrl = await updateProfileImage(croppedImage);
+			const { imageUrl, imageThumbHash } = await updateProfileImage(croppedImage);
 			setUploadedImageUrl(imageUrl);
+			setUploadedThumbHash(imageThumbHash);
 			setShowImageCropper(false);
 			setImageError(null);
 		} catch (error: any) {
@@ -76,6 +71,7 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 		onNext({
 			...data,
 			imageUrl: uploadedImageUrl || undefined,
+			imageThumbHash: uploadedThumbHash || undefined,
 		});
 	};
 
@@ -105,44 +101,8 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 	return (
 		<form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 			<div className="flex flex-col gap-2">
-				<h2 className="text-xl font-semibold text-foreground">Basic Information</h2>
-				<p className="text-sm text-muted">Let's start with your name and photo.</p>
-			</div>
-
-			<div>
-				<Controller
-					name="name"
-					control={control}
-					render={({ field }) => (
-						<Input
-							{...field}
-							type="text"
-							label="First Name"
-							placeholder="Enter your first name"
-							leftIcon={<User />}
-							required
-							error={errors.name?.message}
-						/>
-					)}
-				/>
-			</div>
-
-			<div>
-				<Controller
-					name="surname"
-					control={control}
-					render={({ field }) => (
-						<Input
-							{...field}
-							type="text"
-							label="Last Name"
-							placeholder="Enter your last name"
-							leftIcon={<User />}
-							required
-							error={errors.surname?.message}
-						/>
-					)}
-				/>
+				<h2 className="text-xl font-semibold text-foreground">Profile Picture</h2>
+				<p className="text-sm text-muted">Add a profile picture to help others recognize you.</p>
 			</div>
 
 			<div className="flex flex-col gap-2">
@@ -158,7 +118,7 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 						<Button
 							type="button"
 							variant="ghost"
-							onClick={() => setUploadedImageUrl(null)}
+							onClick={() => { setUploadedImageUrl(null); setUploadedThumbHash(null); }}
 							className="text-red-400 hover:text-red-300 hover:bg-red-400/10">
 							Remove Photo
 						</Button>

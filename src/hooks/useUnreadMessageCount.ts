@@ -1,33 +1,50 @@
 "use client";
 
-import { Chat } from "@/lib/models/Messages";
-import { useQueryClient } from "@tanstack/react-query";
-import { useSyncExternalStore } from "react";
+import { getUnreadMessageCount } from "@/lib/api/messages";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
+
+const QUERY_KEY = ["unread-message-count"];
 
 /**
- * Hook to calculate total unread message count across all chats
- * Uses React Query cache as the source of truth
- * @returns Total number of unread messages
+ * Hook to get total unread message count across all chats.
+ * Fetches from backend on mount, and can be invalidated by real-time events.
  */
 export function useUnreadMessageCount(): number {
+	const { data } = useQuery({
+		queryKey: QUERY_KEY,
+		queryFn: getUnreadMessageCount,
+		staleTime: 1000 * 60 * 2,
+		refetchOnWindowFocus: true,
+	});
+
+	return data ?? 0;
+}
+
+/**
+ * Returns helpers to optimistically update the unread count
+ * without waiting for a server round-trip.
+ */
+export function useUnreadMessageCountUpdater() {
 	const queryClient = useQueryClient();
 
-	return useSyncExternalStore(
-		(callback) => {
-			// Subscribe to changes in the chats query
-			const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
-				if (event.query.queryKey[0] === "chats") {
-					callback();
-				}
-			});
-			return unsubscribe;
+	const increment = useCallback(
+		(by = 1) => {
+			queryClient.setQueryData<number>(QUERY_KEY, (old) => (old ?? 0) + by);
 		},
-		() => {
-			// Get current snapshot of unread count
-			const chats = queryClient.getQueryData<Chat[]>(["chats"]);
-			if (!chats) return 0;
-			return chats.reduce((total, chat) => total + (chat.unreadCount || 0), 0);
-		},
-		() => 0 // Server snapshot
+		[queryClient]
 	);
+
+	const decrement = useCallback(
+		(by: number) => {
+			queryClient.setQueryData<number>(QUERY_KEY, (old) => Math.max(0, (old ?? 0) - by));
+		},
+		[queryClient]
+	);
+
+	const invalidate = useCallback(() => {
+		queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+	}, [queryClient]);
+
+	return { increment, decrement, invalidate };
 }

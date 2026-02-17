@@ -1,59 +1,73 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import {
-    loadTemplate,
-    createTemplate,
-    updateTemplate,
-    deleteTemplate,
-    loadMyTemplates,
-    loadClubTemplates,
-    loadPublicTemplates,
-    loadBookmarkedTemplates,
-    addTemplateSection,
-    updateTemplateSection,
-    deleteTemplateSection,
-    addTemplateItem,
-    updateTemplateItem,
-    deleteTemplateItem,
-    reorderTemplateItems,
-    likeTemplate,
-    unlikeTemplate,
-    getTemplateLikeStatus,
-    bookmarkTemplate,
-    unbookmarkTemplate,
-    createTemplateComment,
-    loadTemplateComments,
-    deleteTemplateComment,
-    saveEventPlanAsTemplate,
-    loadTemplateToEvent,
+    loadPlan,
+    createPlan,
+    updatePlan,
+    deletePlan,
+    loadMyPlans,
+    loadClubPlans,
+    loadPublicPlans,
+    loadBookmarkedPlans,
+    addPlanSection,
+    updatePlanSection,
+    deletePlanSection,
+    addPlanItem,
+    updatePlanItem,
+    deletePlanItem,
+    reorderPlanItems,
+    likePlan,
+    unlikePlan,
+    getPlanLikeStatus,
+    bookmarkPlan,
+    unbookmarkPlan,
+    createPlanComment,
+    loadPlanComments,
+    deletePlanComment,
+    createEventPlan,
+    getEventPlan,
+    promoteToTemplate,
 } from "@/lib/api/templates";
 import { getMyClubMembership } from "@/lib/api/clubs/clubs";
 import {
-    TrainingPlanTemplateDetail,
-    TemplateFilterRequest,
-    CreateTemplateRequest,
-    UpdateTemplateRequest,
-    CreateTemplateSectionRequest,
-    UpdateTemplateSectionRequest,
-    CreateTemplateItemRequest,
-    UpdateTemplateItemRequest,
-    SaveAsTemplateRequest,
+    TrainingPlanDetail,
+    PlanFilterRequest,
+    CreatePlanRequest,
+    UpdatePlanRequest,
+    CreatePlanSectionRequest,
+    UpdatePlanSectionRequest,
+    CreatePlanItemRequest,
+    UpdatePlanItemRequest,
+    CreateEventPlanRequest,
 } from "@/lib/models/Template";
 import { ClubRole } from "@/lib/models/Club";
 import { useMemo } from "react";
 
+// Backward-compatible type re-exports for consumers that haven't migrated yet
+export type { PlanFilterRequest as TemplateFilterRequest } from "@/lib/models/Template";
+export type { CreatePlanRequest as CreateTemplateRequest } from "@/lib/models/Template";
+export type { UpdatePlanRequest as UpdateTemplateRequest } from "@/lib/models/Template";
+export type { CreatePlanSectionRequest as CreateTemplateSectionRequest } from "@/lib/models/Template";
+export type { UpdatePlanSectionRequest as UpdateTemplateSectionRequest } from "@/lib/models/Template";
+export type { CreatePlanItemRequest as CreateTemplateItemRequest } from "@/lib/models/Template";
+export type { UpdatePlanItemRequest as UpdateTemplateItemRequest } from "@/lib/models/Template";
+
 // Query keys
-export const templateKeys = {
-    all: ["templates"] as const,
-    lists: () => [...templateKeys.all, "list"] as const,
-    list: (filters?: TemplateFilterRequest) => [...templateKeys.lists(), filters] as const,
-    myList: (filters?: TemplateFilterRequest) => [...templateKeys.all, "my", filters] as const,
-    clubList: (clubId: string, filters?: TemplateFilterRequest) => [...templateKeys.all, "club", clubId, filters] as const,
-    bookmarkedList: (filters?: TemplateFilterRequest) => [...templateKeys.all, "bookmarked", filters] as const,
-    details: () => [...templateKeys.all, "detail"] as const,
-    detail: (id: string) => [...templateKeys.details(), id] as const,
-    comments: (id: string) => [...templateKeys.detail(id), "comments"] as const,
-    likeStatus: (id: string) => [...templateKeys.detail(id), "likeStatus"] as const,
+export const planKeys = {
+    all: ["plans"] as const,
+    lists: () => [...planKeys.all, "list"] as const,
+    list: (filters?: PlanFilterRequest) => [...planKeys.lists(), filters] as const,
+    myList: (filters?: PlanFilterRequest) => [...planKeys.all, "my", filters] as const,
+    clubList: (clubId: string, filters?: PlanFilterRequest) => [...planKeys.all, "club", clubId, filters] as const,
+    bookmarkedList: (filters?: PlanFilterRequest) => [...planKeys.all, "bookmarked", filters] as const,
+    details: () => [...planKeys.all, "detail"] as const,
+    detail: (id: string) => [...planKeys.details(), id] as const,
+    eventPlan: (eventId: string) => [...planKeys.all, "event", eventId] as const,
+    comments: (id: string) => [...planKeys.detail(id), "comments"] as const,
+    likeStatus: (id: string) => [...planKeys.detail(id), "likeStatus"] as const,
 };
+
+/** @deprecated Use planKeys instead */
+export const templateKeys = planKeys;
 
 // Club query keys (for membership checks)
 export const clubKeys = {
@@ -61,423 +75,484 @@ export const clubKeys = {
     myMembership: (clubId: string) => [...clubKeys.all, "my-membership", clubId] as const,
 };
 
-// Roles that can edit club templates
-const TEMPLATE_EDIT_ROLES: ClubRole[] = [ClubRole.Owner, ClubRole.Admin, ClubRole.HeadCoach];
+// Roles that can edit club plans
+const PLAN_EDIT_ROLES: ClubRole[] = [ClubRole.Owner, ClubRole.Admin, ClubRole.HeadCoach];
 
 // =============================================================================
-// TEMPLATES QUERIES
+// PLAN QUERIES
 // =============================================================================
 
 /**
- * Hook to fetch a single template by ID
+ * Hook to fetch a single plan by ID
  */
-export function useTemplate(id: string, enabled: boolean = true) {
+export function usePlan(id: string, enabled: boolean = true) {
     return useQuery({
-        queryKey: templateKeys.detail(id),
-        queryFn: () => loadTemplate(id),
+        queryKey: planKeys.detail(id),
+        queryFn: () => loadPlan(id),
         enabled: enabled && !!id,
     });
 }
 
+/** @deprecated Use usePlan instead */
+export const useTemplate = usePlan;
+
 /**
- * Hook to fetch current user's templates (includes private)
+ * Hook to fetch current user's plans (includes private)
  */
-export function useMyTemplates(filter?: TemplateFilterRequest, enabled: boolean = true) {
+export function useMyPlans(filter?: PlanFilterRequest, enabled: boolean = true) {
     return useQuery({
-        queryKey: templateKeys.myList(filter),
-        queryFn: () => loadMyTemplates(filter),
+        queryKey: planKeys.myList(filter),
+        queryFn: () => loadMyPlans(filter),
         select: (data) => data.items,
         enabled,
     });
 }
 
+/** @deprecated Use useMyPlans instead */
+export const useMyTemplates = useMyPlans;
+
 /**
- * Hook to fetch templates for a specific club
+ * Hook to fetch plans for a specific club
  */
-export function useClubTemplates(clubId: string, filter?: TemplateFilterRequest, enabled: boolean = true) {
+export function useClubPlans(clubId: string, filter?: PlanFilterRequest, enabled: boolean = true) {
     return useQuery({
-        queryKey: templateKeys.clubList(clubId, filter),
-        queryFn: () => loadClubTemplates(clubId, filter),
+        queryKey: planKeys.clubList(clubId, filter),
+        queryFn: () => loadClubPlans(clubId, filter),
         select: (data) => data.items,
         enabled: enabled && !!clubId,
     });
 }
 
+/** @deprecated Use useClubPlans instead */
+export const useClubTemplates = useClubPlans;
+
 /**
- * Hook to fetch all public templates with optional filtering
+ * Hook to fetch all public plans with optional filtering
  */
-export function usePublicTemplates(filter?: TemplateFilterRequest, enabled: boolean = true) {
+export function usePublicPlans(filter?: PlanFilterRequest, enabled: boolean = true) {
     return useQuery({
-        queryKey: templateKeys.list(filter),
-        queryFn: () => loadPublicTemplates(filter),
+        queryKey: planKeys.list(filter),
+        queryFn: () => loadPublicPlans(filter),
         select: (data) => data.items,
         enabled,
     });
 }
 
+/** @deprecated Use usePublicPlans instead */
+export const usePublicTemplates = usePublicPlans;
+
 /**
- * Hook to fetch current user's bookmarked templates
+ * Hook to fetch current user's bookmarked plans
  */
-export function useBookmarkedTemplates(filter?: TemplateFilterRequest, enabled: boolean = true) {
+export function useBookmarkedPlans(filter?: PlanFilterRequest, enabled: boolean = true) {
     return useQuery({
-        queryKey: templateKeys.bookmarkedList(filter),
-        queryFn: () => loadBookmarkedTemplates(filter),
+        queryKey: planKeys.bookmarkedList(filter),
+        queryFn: () => loadBookmarkedPlans(filter),
         select: (data) => data.items,
         enabled,
     });
 }
 
+/** @deprecated Use useBookmarkedPlans instead */
+export const useBookmarkedTemplates = useBookmarkedPlans;
+
 // =============================================================================
-// TEMPLATE MUTATIONS
+// PLAN MUTATIONS
 // =============================================================================
 
 /**
- * Hook to create a new template
+ * Hook to create a new plan
  */
-export function useCreateTemplate() {
+export function useCreatePlan() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (request: CreateTemplateRequest) => createTemplate(request),
+        mutationFn: (request: CreatePlanRequest) => createPlan(request),
         onSuccess: () => {
-            // Invalidate template lists
-            queryClient.invalidateQueries({ queryKey: templateKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: templateKeys.myList() });
+            // Invalidate plan lists
+            queryClient.invalidateQueries({ queryKey: planKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: planKeys.myList() });
         },
     });
 }
 
+/** @deprecated Use useCreatePlan instead */
+export const useCreateTemplate = useCreatePlan;
+
 /**
- * Hook to update a template
+ * Hook to update a plan
  */
-export function useUpdateTemplate() {
+export function useUpdatePlan() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ id, data }: { id: string; data: UpdateTemplateRequest }) =>
-            updateTemplate(id, data),
-        onSuccess: (updatedTemplate) => {
+        mutationFn: ({ id, data }: { id: string; data: UpdatePlanRequest }) =>
+            updatePlan(id, data),
+        onSuccess: (updatedPlan) => {
             // Update cache
-            queryClient.setQueryData(templateKeys.detail(updatedTemplate.id), updatedTemplate);
+            queryClient.setQueryData(planKeys.detail(updatedPlan.id), updatedPlan);
             // Invalidate lists
-            queryClient.invalidateQueries({ queryKey: templateKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: templateKeys.myList() });
+            queryClient.invalidateQueries({ queryKey: planKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: planKeys.myList() });
         },
     });
 }
 
+/** @deprecated Use useUpdatePlan instead */
+export const useUpdateTemplate = useUpdatePlan;
+
 /**
- * Hook to delete a template
+ * Hook to delete a plan
  */
-export function useDeleteTemplate() {
+export function useDeletePlan() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: string) => deleteTemplate(id),
+        mutationFn: (id: string) => deletePlan(id),
         onSuccess: (_, id) => {
             // Remove from cache
-            queryClient.removeQueries({ queryKey: templateKeys.detail(id) });
+            queryClient.removeQueries({ queryKey: planKeys.detail(id) });
             // Invalidate lists
-            queryClient.invalidateQueries({ queryKey: templateKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: templateKeys.myList() });
+            queryClient.invalidateQueries({ queryKey: planKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: planKeys.myList() });
         },
     });
 }
+
+/** @deprecated Use useDeletePlan instead */
+export const useDeleteTemplate = useDeletePlan;
 
 // =============================================================================
 // SECTION MUTATIONS
 // =============================================================================
 
 /**
- * Hook to add a section to a template
+ * Hook to add a section to a plan
  */
-export function useAddTemplateSection() {
+export function useAddPlanSection() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ templateId, data }: { templateId: string; data: CreateTemplateSectionRequest }) =>
-            addTemplateSection(templateId, data),
-        onSuccess: (_, { templateId }) => {
-            // Invalidate template detail
-            queryClient.invalidateQueries({ queryKey: templateKeys.detail(templateId) });
+        mutationFn: ({ planId, data }: { planId: string; data: CreatePlanSectionRequest }) =>
+            addPlanSection(planId, data),
+        onSuccess: (_, { planId }) => {
+            queryClient.invalidateQueries({ queryKey: planKeys.detail(planId) });
         },
     });
 }
+
+/** @deprecated Use useAddPlanSection instead */
+export const useAddTemplateSection = useAddPlanSection;
 
 /**
- * Hook to update a template section
+ * Hook to update a plan section
  */
-export function useUpdateTemplateSection() {
+export function useUpdatePlanSection() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ templateId, sectionId, data }: { templateId: string; sectionId: string; data: UpdateTemplateSectionRequest }) =>
-            updateTemplateSection(templateId, sectionId, data),
-        onSuccess: (_, { templateId }) => {
-            // Invalidate template detail
-            queryClient.invalidateQueries({ queryKey: templateKeys.detail(templateId) });
+        mutationFn: ({ planId, sectionId, data }: { planId: string; sectionId: string; data: UpdatePlanSectionRequest }) =>
+            updatePlanSection(planId, sectionId, data),
+        onSuccess: (_, { planId }) => {
+            queryClient.invalidateQueries({ queryKey: planKeys.detail(planId) });
         },
     });
 }
+
+/** @deprecated Use useUpdatePlanSection instead */
+export const useUpdateTemplateSection = useUpdatePlanSection;
 
 /**
- * Hook to delete a template section
+ * Hook to delete a plan section
  */
-export function useDeleteTemplateSection() {
+export function useDeletePlanSection() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ templateId, sectionId }: { templateId: string; sectionId: string }) =>
-            deleteTemplateSection(templateId, sectionId),
-        onSuccess: (_, { templateId }) => {
-            // Invalidate template detail
-            queryClient.invalidateQueries({ queryKey: templateKeys.detail(templateId) });
+        mutationFn: ({ planId, sectionId }: { planId: string; sectionId: string }) =>
+            deletePlanSection(planId, sectionId),
+        onSuccess: (_, { planId }) => {
+            queryClient.invalidateQueries({ queryKey: planKeys.detail(planId) });
         },
     });
 }
+
+/** @deprecated Use useDeletePlanSection instead */
+export const useDeleteTemplateSection = useDeletePlanSection;
 
 // =============================================================================
 // ITEM MUTATIONS
 // =============================================================================
 
 /**
- * Hook to add an item to a template
+ * Hook to add an item to a plan
  */
-export function useAddTemplateItem() {
+export function useAddPlanItem() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ templateId, data }: { templateId: string; data: CreateTemplateItemRequest }) =>
-            addTemplateItem(templateId, data),
-        onSuccess: (_, { templateId }) => {
-            // Invalidate template detail
-            queryClient.invalidateQueries({ queryKey: templateKeys.detail(templateId) });
+        mutationFn: ({ planId, data }: { planId: string; data: CreatePlanItemRequest }) =>
+            addPlanItem(planId, data),
+        onSuccess: (_, { planId }) => {
+            queryClient.invalidateQueries({ queryKey: planKeys.detail(planId) });
         },
     });
 }
+
+/** @deprecated Use useAddPlanItem instead */
+export const useAddTemplateItem = useAddPlanItem;
 
 /**
- * Hook to update a template item
+ * Hook to update a plan item
  */
-export function useUpdateTemplateItem() {
+export function useUpdatePlanItem() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ templateId, itemId, data }: { templateId: string; itemId: string; data: UpdateTemplateItemRequest }) =>
-            updateTemplateItem(templateId, itemId, data),
-        onSuccess: (_, { templateId }) => {
-            // Invalidate template detail
-            queryClient.invalidateQueries({ queryKey: templateKeys.detail(templateId) });
+        mutationFn: ({ planId, itemId, data }: { planId: string; itemId: string; data: UpdatePlanItemRequest }) =>
+            updatePlanItem(planId, itemId, data),
+        onSuccess: (_, { planId }) => {
+            queryClient.invalidateQueries({ queryKey: planKeys.detail(planId) });
         },
     });
 }
+
+/** @deprecated Use useUpdatePlanItem instead */
+export const useUpdateTemplateItem = useUpdatePlanItem;
 
 /**
- * Hook to delete a template item
+ * Hook to delete a plan item
  */
-export function useDeleteTemplateItem() {
+export function useDeletePlanItem() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ templateId, itemId }: { templateId: string; itemId: string }) =>
-            deleteTemplateItem(templateId, itemId),
-        onSuccess: (_, { templateId }) => {
-            // Invalidate template detail
-            queryClient.invalidateQueries({ queryKey: templateKeys.detail(templateId) });
+        mutationFn: ({ planId, itemId }: { planId: string; itemId: string }) =>
+            deletePlanItem(planId, itemId),
+        onSuccess: (_, { planId }) => {
+            queryClient.invalidateQueries({ queryKey: planKeys.detail(planId) });
         },
     });
 }
+
+/** @deprecated Use useDeletePlanItem instead */
+export const useDeleteTemplateItem = useDeletePlanItem;
 
 /**
- * Hook to reorder items in a template
+ * Hook to reorder items in a plan
  */
-export function useReorderTemplateItems() {
+export function useReorderPlanItems() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ templateId, itemIds }: { templateId: string; itemIds: string[] }) =>
-            reorderTemplateItems(templateId, itemIds),
-        onSuccess: (_, { templateId }) => {
-            // Invalidate template detail
-            queryClient.invalidateQueries({ queryKey: templateKeys.detail(templateId) });
+        mutationFn: ({ planId, itemIds }: { planId: string; itemIds: string[] }) =>
+            reorderPlanItems(planId, itemIds),
+        onSuccess: (_, { planId }) => {
+            queryClient.invalidateQueries({ queryKey: planKeys.detail(planId) });
         },
     });
 }
+
+/** @deprecated Use useReorderPlanItems instead */
+export const useReorderTemplateItems = useReorderPlanItems;
 
 // =============================================================================
 // LIKES QUERIES & MUTATIONS
 // =============================================================================
 
 /**
- * Hook to get like status for a template
+ * Hook to get like status for a plan
  */
-export function useTemplateLikeStatus(templateId: string, enabled: boolean = true) {
+export function usePlanLikeStatus(planId: string, enabled: boolean = true) {
     return useQuery({
-        queryKey: templateKeys.likeStatus(templateId),
-        queryFn: () => getTemplateLikeStatus(templateId),
-        enabled: enabled && !!templateId,
+        queryKey: planKeys.likeStatus(planId),
+        queryFn: () => getPlanLikeStatus(planId),
+        enabled: enabled && !!planId,
     });
 }
 
+/** @deprecated Use usePlanLikeStatus instead */
+export const useTemplateLikeStatus = usePlanLikeStatus;
+
 /**
- * Hook to like a template
+ * Hook to like a plan
  */
-export function useLikeTemplate() {
+export function useLikePlan() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (templateId: string) => likeTemplate(templateId),
-        onSuccess: (status, templateId) => {
-            // Update like status cache
-            queryClient.setQueryData(templateKeys.likeStatus(templateId), status);
-            // Invalidate template detail to update like count
-            queryClient.invalidateQueries({ queryKey: templateKeys.detail(templateId) });
-            queryClient.invalidateQueries({ queryKey: templateKeys.lists() });
+        mutationFn: (planId: string) => likePlan(planId),
+        onSuccess: (status, planId) => {
+            queryClient.setQueryData(planKeys.likeStatus(planId), status);
+            queryClient.invalidateQueries({ queryKey: planKeys.detail(planId) });
+            queryClient.invalidateQueries({ queryKey: planKeys.lists() });
         },
     });
 }
 
+/** @deprecated Use useLikePlan instead */
+export const useLikeTemplate = useLikePlan;
+
 /**
- * Hook to unlike a template
+ * Hook to unlike a plan
  */
-export function useUnlikeTemplate() {
+export function useUnlikePlan() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (templateId: string) => unlikeTemplate(templateId),
-        onSuccess: (status, templateId) => {
-            // Update like status cache
-            queryClient.setQueryData(templateKeys.likeStatus(templateId), status);
-            // Invalidate template detail to update like count
-            queryClient.invalidateQueries({ queryKey: templateKeys.detail(templateId) });
-            queryClient.invalidateQueries({ queryKey: templateKeys.lists() });
+        mutationFn: (planId: string) => unlikePlan(planId),
+        onSuccess: (status, planId) => {
+            queryClient.setQueryData(planKeys.likeStatus(planId), status);
+            queryClient.invalidateQueries({ queryKey: planKeys.detail(planId) });
+            queryClient.invalidateQueries({ queryKey: planKeys.lists() });
         },
     });
 }
+
+/** @deprecated Use useUnlikePlan instead */
+export const useUnlikeTemplate = useUnlikePlan;
 
 // =============================================================================
 // BOOKMARKS MUTATIONS
 // =============================================================================
 
 /**
- * Hook to bookmark a template
+ * Hook to bookmark a plan
  */
-export function useBookmarkTemplate() {
+export function useBookmarkPlan() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (templateId: string) => bookmarkTemplate(templateId),
+        mutationFn: (planId: string) => bookmarkPlan(planId),
         onSuccess: () => {
-            // Invalidate bookmarks list
-            queryClient.invalidateQueries({ queryKey: templateKeys.bookmarkedList() });
+            queryClient.invalidateQueries({ queryKey: planKeys.bookmarkedList() });
         },
     });
 }
+
+/** @deprecated Use useBookmarkPlan instead */
+export const useBookmarkTemplate = useBookmarkPlan;
 
 /**
- * Hook to remove bookmark from a template
+ * Hook to remove bookmark from a plan
  */
-export function useUnbookmarkTemplate() {
+export function useUnbookmarkPlan() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (templateId: string) => unbookmarkTemplate(templateId),
+        mutationFn: (planId: string) => unbookmarkPlan(planId),
         onSuccess: () => {
-            // Invalidate bookmarks list
-            queryClient.invalidateQueries({ queryKey: templateKeys.bookmarkedList() });
+            queryClient.invalidateQueries({ queryKey: planKeys.bookmarkedList() });
         },
     });
 }
+
+/** @deprecated Use useUnbookmarkPlan instead */
+export const useUnbookmarkTemplate = useUnbookmarkPlan;
 
 // =============================================================================
 // COMMENTS QUERIES & MUTATIONS
 // =============================================================================
 
 /**
- * Hook to fetch comments for a template with infinite scrolling
+ * Hook to fetch comments for a plan with infinite scrolling
  */
-export function useTemplateComments(templateId: string, limit: number = 20, enabled: boolean = true) {
+export function usePlanComments(planId: string, limit: number = 20, enabled: boolean = true) {
     return useInfiniteQuery({
-        queryKey: templateKeys.comments(templateId),
-        queryFn: ({ pageParam }) => loadTemplateComments(templateId, pageParam, limit),
+        queryKey: planKeys.comments(planId),
+        queryFn: ({ pageParam }) => loadPlanComments(planId, pageParam, limit),
         initialPageParam: undefined as string | undefined,
         getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
-        enabled: enabled && !!templateId,
+        enabled: enabled && !!planId,
     });
 }
 
+/** @deprecated Use usePlanComments instead */
+export const useTemplateComments = usePlanComments;
+
 /**
- * Hook to create a comment on a template
+ * Hook to create a comment on a plan
  */
-export function useCreateTemplateComment() {
+export function useCreatePlanComment() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ templateId, content, parentCommentId }: { templateId: string; content: string; parentCommentId?: string }) =>
-            createTemplateComment(templateId, content, parentCommentId),
-        onSuccess: (_, { templateId }) => {
-            // Invalidate comments
-            queryClient.invalidateQueries({ queryKey: templateKeys.comments(templateId) });
+        mutationFn: ({ planId, content, parentCommentId }: { planId: string; content: string; parentCommentId?: string }) =>
+            createPlanComment(planId, content, parentCommentId),
+        onSuccess: (_, { planId }) => {
+            queryClient.invalidateQueries({ queryKey: planKeys.comments(planId) });
         },
     });
 }
+
+/** @deprecated Use useCreatePlanComment instead */
+export const useCreateTemplateComment = useCreatePlanComment;
 
 /**
  * Hook to delete a comment
  */
-export function useDeleteTemplateComment() {
+export function useDeletePlanComment() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ templateId, commentId }: { templateId: string; commentId: string }) =>
-            deleteTemplateComment(templateId, commentId),
-        onSuccess: (_, { templateId }) => {
-            // Invalidate comments
-            queryClient.invalidateQueries({ queryKey: templateKeys.comments(templateId) });
+        mutationFn: ({ planId, commentId }: { planId: string; commentId: string }) =>
+            deletePlanComment(planId, commentId),
+        onSuccess: (_, { planId }) => {
+            queryClient.invalidateQueries({ queryKey: planKeys.comments(planId) });
         },
     });
 }
 
+/** @deprecated Use useDeletePlanComment instead */
+export const useDeleteTemplateComment = useDeletePlanComment;
+
 // =============================================================================
-// EVENT INTEGRATION MUTATIONS
+// EVENT PLAN HOOKS
 // =============================================================================
 
 /**
- * Hook to save an event's training plan as a template
+ * Hook to fetch the training plan for an event
  */
-export function useSaveEventPlanAsTemplate() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: ({ eventId, data }: { eventId: string; data: SaveAsTemplateRequest }) =>
-            saveEventPlanAsTemplate(eventId, data),
-        onSuccess: () => {
-            // Invalidate template lists
-            queryClient.invalidateQueries({ queryKey: templateKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: templateKeys.myList() });
-        },
+export function useEventPlan(eventId: string | undefined, options?: { enabled?: boolean }) {
+    return useQuery({
+        queryKey: planKeys.eventPlan(eventId!),
+        queryFn: () => getEventPlan(eventId!),
+        enabled: !!eventId && (options?.enabled !== false),
     });
 }
 
 /**
- * Hook to load a template into an event's training plan
+ * Hook to create a training plan for an event
  */
-export function useLoadTemplateToEvent() {
+export function useCreateEventPlan() {
     const queryClient = useQueryClient();
-
     return useMutation({
-        mutationFn: ({ eventId, templateId, replace }: { eventId: string; templateId: string; replace?: boolean }) =>
-            loadTemplateToEvent(eventId, templateId, replace),
-        onSuccess: () => {
-            // Invalidate event-related queries if they exist
-            // Note: You may need to import event query keys if available
+        mutationFn: ({ eventId, request }: { eventId: string; request: CreateEventPlanRequest }) =>
+            createEventPlan(eventId, request),
+        onSuccess: (_, { eventId }) => {
+            queryClient.invalidateQueries({ queryKey: planKeys.eventPlan(eventId) });
+            queryClient.invalidateQueries({ queryKey: ["event", eventId] });
             queryClient.invalidateQueries({ queryKey: ["events"] });
         },
     });
 }
 
+/**
+ * Hook to promote an event plan to a reusable template
+ */
+export function usePromoteToTemplate() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ planId, request }: { planId: string; request?: { name?: string; clubId?: string } }) =>
+            promoteToTemplate(planId, request),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: planKeys.all });
+        },
+    });
+}
+
 // =============================================================================
-// CLUB MEMBERSHIP QUERIES (for template edit permissions)
+// CLUB MEMBERSHIP QUERIES (for plan edit permissions)
 // =============================================================================
 
 /**
@@ -493,35 +568,45 @@ export function useMyClubMembership(clubId: string | undefined, enabled: boolean
 }
 
 /**
- * Hook to check if the current user can edit a template
+ * Hook to check if the current user can edit a plan
  * Returns true if:
- * - User is the creator of the template
- * - OR template belongs to a club and user is Owner, Admin, or Coach in that club
+ * - User is the creator of the plan
+ * - OR plan belongs to a club and user is Owner, Admin, or Coach in that club
  */
-export function useCanEditTemplate(template: TrainingPlanTemplateDetail | undefined, currentUserId: string | undefined) {
+export function useCanEditPlan(plan: TrainingPlanDetail | undefined, currentUserId: string | undefined) {
     const { data: membership, isLoading: isLoadingMembership } = useMyClubMembership(
-        template?.clubId,
-        !!template?.clubId && !!currentUserId
+        plan?.clubId,
+        !!plan?.clubId && !!currentUserId
     );
 
     const canEdit = useMemo(() => {
-        if (!template || !currentUserId) return false;
+        if (!plan || !currentUserId) return false;
 
         // Check if user is the creator
-        if (template.createdByUserId === currentUserId) return true;
+        if (plan.createdByUserId === currentUserId) return true;
 
-        // If template belongs to a club, check if user has edit permissions
-        if (template.clubId && membership) {
-            if (membership.isActive && membership.roles.some(role => TEMPLATE_EDIT_ROLES.includes(role))) {
+        // If plan belongs to a club, check if user has edit permissions
+        if (plan.clubId && membership) {
+            if (membership.isActive && membership.roles.some(role => PLAN_EDIT_ROLES.includes(role))) {
                 return true;
             }
         }
 
         return false;
-    }, [template, currentUserId, membership]);
+    }, [plan, currentUserId, membership]);
 
     return {
         canEdit,
-        isLoading: !!template?.clubId && isLoadingMembership,
+        isLoading: !!plan?.clubId && isLoadingMembership,
     };
 }
+
+/** @deprecated Use useCanEditPlan instead */
+export const useCanEditTemplate = useCanEditPlan;
+
+// =============================================================================
+// BACKWARD COMPATIBILITY - Old event integration hooks (removed)
+// =============================================================================
+
+// useSaveEventPlanAsTemplate and useLoadTemplateToEvent have been removed.
+// Use useCreateEventPlan and usePromoteToTemplate instead.

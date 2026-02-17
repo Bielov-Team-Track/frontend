@@ -193,7 +193,8 @@ const ProfilePage = async ({ params }: { params: Promise<{ id: string }> }) => {
 		notFound();
 	}
 
-	const events = await loadEventsByFilter({ organizerId: id });
+	const eventsResponse = await loadEventsByFilter({ organizerId: id });
+	const events = eventsResponse.items;
 
 	return (
 		<div className="container mx-auto px-4 py-6 max-w-5xl">

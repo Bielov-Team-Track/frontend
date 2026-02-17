@@ -102,6 +102,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 			{/* --- MODE SWITCHER --- */}
 			<div className="flex p-1 bg-surface rounded-xl mb-4 border border-border">
 				<button
+					data-testid="direct-message-tab"
 					onClick={() => {
 						setMode("direct");
 						setSelectedUsers([]);
@@ -114,6 +115,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 					Direct Message
 				</button>
 				<button
+					data-testid="new-group-tab"
 					onClick={() => {
 						setMode("group");
 						setError(null);
@@ -133,6 +135,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 							<Camera size={20} />
 						</div>
 						<input
+							data-testid="group-name-input"
 							type="text"
 							value={groupName}
 							onChange={(e) => setGroupName(e.target.value)}
@@ -147,11 +150,12 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 							{selectedUsers.map((user) => (
 								<div
 									key={user.id}
+									data-testid="selected-user-chip"
 									className="flex items-center gap-1 pl-2 pr-1 py-1 rounded-full bg-accent/20 text-accent text-xs font-medium border border-accent/20">
 									<span>
 										{user.name} {user.surname}
 									</span>
-									<button onClick={(e) => removeSelected(user.id, e)} className="p-0.5 hover:bg-active rounded-full">
+									<button data-testid="remove-chip-button" onClick={(e) => removeSelected(user.id, e)} className="p-0.5 hover:bg-active rounded-full">
 										<X size={12} />
 									</button>
 								</div>
@@ -164,6 +168,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 			{/* Search Bar */}
 			<div className="relative mb-3">
 				<Input
+					data-testid="user-search"
 					type="text"
 					leftIcon={<Search className="absolute left-3 top-2.5 text-muted" size={18} />}
 					value={searchQuery}
@@ -180,10 +185,10 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 					</div>
 				)}
 
-				{searchError && <div className="text-center py-8 text-error text-sm">{searchError}</div>}
+				{searchError && <div data-testid="search-error" className="text-center py-8 text-error text-sm">{searchError}</div>}
 
 				{!isSearching && !searchError && searchQuery.length >= 3 && users.length === 0 && (
-					<div className="text-center py-8 text-muted text-sm">No players found.</div>
+					<div data-testid="no-players-found" className="text-center py-8 text-muted text-sm">No players found.</div>
 				)}
 
 				{!isSearching &&
@@ -194,6 +199,7 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 						return (
 							<div
 								key={user.id}
+								data-testid="user-item"
 								onClick={() => toggleUser(user)}
 								className={`
                    flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all group
@@ -229,12 +235,13 @@ export default function NewChat({ onChatCreated }: NewChatModalProps) {
 			</div>
 
 			{/* Error message */}
-			{error && <div className="py-2 text-error text-sm text-center mt-4">{error}</div>}
+			{error && <div data-testid="create-error" className="py-2 text-error text-sm text-center mt-4">{error}</div>}
 
 			{/* --- FOOTER (Group Mode Only) --- */}
 			{mode === "group" && (
 				<div className="pt-4 border-t border-border mt-4">
 					<Button
+						data-testid="create-group-button"
 						onClick={handleCreateGroup}
 						disabled={selectedUsers.length === 0 || !groupName.trim() || isCreating}
 						loading={isCreating}

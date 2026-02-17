@@ -39,11 +39,11 @@ export async function getUserProfile(userId: string): Promise<UserProfile | unde
 export async function getFullUserProfile(userId: string): Promise<FullProfileDto | undefined> {
 	try {
 		// Fetch all profile data in parallel
-		const [userProfile, playerProfile, coachProfile, history] = await Promise.all([
+		const [userProfile, playerProfile, coachProfile, historyResult] = await Promise.all([
 			getUserProfile(userId),
 			getPlayerProfile(userId).catch(() => undefined),
 			getCoachProfile(userId).catch(() => undefined),
-			getUserHistory(userId).catch(() => []),
+			getUserHistory(userId).catch(() => ({ items: [], hasMore: false })),
 		]);
 
 		if (!userProfile) return undefined;
@@ -52,7 +52,7 @@ export async function getFullUserProfile(userId: string): Promise<FullProfileDto
 			userProfile,
 			playerProfile,
 			coachProfile,
-			historyEntries: history,
+			historyEntries: historyResult.items,
 		};
 	} catch (error) {
 		if (error instanceof AxiosError && error.response?.status === 404) {
@@ -146,14 +146,29 @@ export async function deleteCoachProfile(): Promise<void> {
 
 // ==================== History ====================
 
-export async function getCurrentUserHistory(): Promise<HistoryDto[]> {
+export async function getCurrentUserHistory(
+	cursor?: string,
+	limit: number = 20,
+): Promise<CursorPagedResult<HistoryDto>> {
 	const endpoint = `/profiles/me/history`;
-	return (await client.get<HistoryDto[]>(PREFIX + endpoint)).data;
+	const params: Record<string, string | number> = { limit };
+	if (cursor) {
+		params.cursor = cursor;
+	}
+	return (await client.get<CursorPagedResult<HistoryDto>>(PREFIX + endpoint, { params })).data;
 }
 
-export async function getUserHistory(userId: string): Promise<HistoryDto[]> {
+export async function getUserHistory(
+	userId: string,
+	cursor?: string,
+	limit: number = 20,
+): Promise<CursorPagedResult<HistoryDto>> {
 	const endpoint = `/profiles/${userId}/history`;
-	return (await client.get<HistoryDto[]>(PREFIX + endpoint)).data;
+	const params: Record<string, string | number> = { limit };
+	if (cursor) {
+		params.cursor = cursor;
+	}
+	return (await client.get<CursorPagedResult<HistoryDto>>(PREFIX + endpoint, { params })).data;
 }
 
 export async function createHistory(data: CreateHistoryDto): Promise<HistoryDto> {
@@ -217,9 +232,18 @@ export async function saveGoogleUser(user: GoogleUserCreate) {
 	return (await client.put<AuthResponse>(PREFIX + endpoint, user)).data;
 }
 
-export async function updateProfileImage(image: Blob): Promise<string> {
+export async function updateProfileImage(image: Blob): Promise<{ imageUrl: string; imageThumbHash: string }> {
+	// Step 0: Compress image before upload
+	const { compressImage } = await import("@/lib/utils/image");
+	const file = new File([image], "profile.jpg", { type: image.type || "image/jpeg" });
+	const compressed = await compressImage(file, { maxSizeMB: 1, maxWidthOrHeight: 2048 });
+
+	// Step 0.5: Generate thumbhash from compressed image
+	const { generateThumbHash } = await import("@/lib/utils/thumbhash");
+	const imageThumbHash = await generateThumbHash(compressed);
+
 	// Step 1: Get presigned URL from backend
-	const fileType = image.type; // e.g., "image/jpeg", "image/png"
+	const fileType = compressed.type;
 	const getUploadUrlEndpoint = `/profiles/me/profile-image-upload-url?fileType=${encodeURIComponent(fileType)}`;
 
 	const response = await client.get(PREFIX + getUploadUrlEndpoint);
@@ -228,7 +252,7 @@ export async function updateProfileImage(image: Blob): Promise<string> {
 	// Step 2: Upload directly to S3 using presigned URL
 	const uploadResponse = await fetch(presignedUrl, {
 		method: "PUT",
-		body: image,
+		body: compressed,
 		headers: {
 			"Content-Type": fileType,
 		},
@@ -240,7 +264,7 @@ export async function updateProfileImage(image: Blob): Promise<string> {
 
 	// Step 3: Extract the public URL (remove query parameters from presigned URL)
 	const imageUrl = presignedUrl.split("?")[0];
-	return imageUrl;
+	return { imageUrl, imageThumbHash };
 }
 
 export async function followUser(userId: string) {

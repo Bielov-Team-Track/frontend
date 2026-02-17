@@ -17,6 +17,7 @@ interface ModalProps {
 	className?: string;
 	showCloseButton?: boolean;
 	preventOutsideClose?: boolean;
+	"data-testid"?: string;
 }
 
 const sizeClasses: Record<ModalSize, string> = {
@@ -38,12 +39,13 @@ export default function Modal({
 	className,
 	showCloseButton = true,
 	preventOutsideClose = false,
+	"data-testid": dataTestId,
 }: ModalProps) {
 	const DialogRoot = preventOutsideClose ? DialogPreventClose : Dialog;
 
 	return (
 		<DialogRoot open={isOpen} onOpenChange={(open) => !open && onClose()}>
-			<DialogContent showCloseButton={showCloseButton} className={cn(sizeClasses[size], className)}>
+			<DialogContent showCloseButton={showCloseButton} className={cn(sizeClasses[size], className)} data-testid={dataTestId}>
 				{isLoading && (
 					<div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-xl">
 						<Loader />

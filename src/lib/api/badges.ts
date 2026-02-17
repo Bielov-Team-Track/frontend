@@ -9,7 +9,7 @@ import {
 	transformBadgeStatsDto,
 } from "../models/Evaluation";
 
-const PREFIX = "/events";
+const PREFIX = "/coaching";
 
 /**
  * Get current user's badges with pagination

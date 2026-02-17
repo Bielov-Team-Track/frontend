@@ -10,13 +10,16 @@ import { createTeam, deleteTeam, updateTeam } from "@/lib/api/clubs";
 import { ClubMember, CreateTeamRequest, Team, UpdateTeamRequest } from "@/lib/models/Club";
 import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowDownAZ, Clock, Plus, Search, Users } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowDownAZ, Clock, Loader2, Plus, Search, Users } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 interface TeamsTabProps {
 	teams: Team[];
 	clubId: string;
 	clubMembers: ClubMember[];
+	hasNextPage?: boolean;
+	isFetchingNextPage?: boolean;
+	fetchNextPage?: () => void;
 }
 
 type SortOption = "name" | "memberCount" | "createdAt";
@@ -27,7 +30,7 @@ const SORT_OPTIONS = [
 	{ value: "createdAt", label: "Newest First", icon: <Clock size={14} /> },
 ];
 
-export default function TeamsTab({ teams, clubId, clubMembers }: TeamsTabProps) {
+export default function TeamsTab({ teams, clubId, clubMembers, hasNextPage, isFetchingNextPage, fetchNextPage }: TeamsTabProps) {
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [editingTeam, setEditingTeam] = useState<Team | null>(null);
 	const [deletingTeam, setDeletingTeam] = useState<Team | null>(null);
@@ -36,6 +39,7 @@ export default function TeamsTab({ teams, clubId, clubMembers }: TeamsTabProps) 
 	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 	const [memberCountFilter, setMemberCountFilter] = useState<string>("all");
 	const queryClient = useQueryClient();
+	const sentinelRef = useRef<HTMLDivElement>(null);
 
 	const createMutation = useMutation({
 		mutationFn: createTeam,
@@ -60,6 +64,27 @@ export default function TeamsTab({ teams, clubId, clubMembers }: TeamsTabProps) 
 			setDeletingTeam(null);
 		},
 	});
+
+	// Infinite scroll observer
+	useEffect(() => {
+		if (!hasNextPage || isFetchingNextPage || !fetchNextPage) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting) {
+					fetchNextPage();
+				}
+			},
+			{ threshold: 0.1 }
+		);
+
+		const el = sentinelRef.current;
+		if (el) observer.observe(el);
+
+		return () => {
+			if (el) observer.unobserve(el);
+		};
+	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	// Filter and sort teams
 	const filteredTeams = useMemo(() => {
@@ -207,6 +232,13 @@ export default function TeamsTab({ teams, clubId, clubMembers }: TeamsTabProps) 
 						{filteredTeams.map((team) => (
 							<TeamListItem key={team.id} team={team} onEdit={() => setEditingTeam(team)} onDelete={() => setDeletingTeam(team)} />
 						))}
+					</div>
+				)}
+
+				{/* Infinite scroll sentinel */}
+				{hasNextPage && (
+					<div ref={sentinelRef} className="flex justify-center py-4">
+						{isFetchingNextPage && <Loader2 className="animate-spin text-muted-foreground" size={20} />}
 					</div>
 				)}
 			</div>

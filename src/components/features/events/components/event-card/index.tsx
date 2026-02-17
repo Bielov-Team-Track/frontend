@@ -4,6 +4,7 @@ import {
 	getFormattedDateWithDay,
 	getFormattedTime,
 } from "@/lib/utils/date";
+import { shimmerBlur } from "@/lib/utils/image";
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
@@ -42,26 +43,26 @@ const EventCard = memo(function EventCard({ event, variant = "horizontal" }: Eve
 					"active:scale-100",
 				)}
 			>
-				{
-					<div
-						className={clsx(
-							imageVariantClasses[variant],
-							"aspect-square h-32 bg-secondary self-stretch grid place-items-center",
-						)}
-					>
-						{event.image ? (
-							<Image
-								src="/images/event-placeholder.png"
-								alt="Event Image"
-								className="object-cover"
-								width={32}
-								height={32}
-							/>
-						) : (
-							<VolleyballIcon className="text-8xl text-accent" />
-						)}
-					</div>
-				}
+				<div
+					className={clsx(
+						imageVariantClasses[variant],
+						"aspect-square h-32 bg-secondary self-stretch grid place-items-center relative",
+					)}
+				>
+					{event.image ? (
+						<Image
+							src={event.image}
+							alt={event.name}
+							fill
+							sizes="128px"
+							className="object-cover"
+							placeholder="blur"
+							blurDataURL={shimmerBlur(128, 128)}
+						/>
+					) : (
+						<VolleyballIcon className="text-8xl text-accent" />
+					)}
+				</div>
 				<div
 					className={clsx(
 						contentVariantClasses[variant],

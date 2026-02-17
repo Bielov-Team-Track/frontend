@@ -24,7 +24,7 @@ export const surfaceOptions = [
 
 export const STEP_VALIDATION_FIELDS: Record<number, string[]> = {
 	1: ["name", "type"], // Basics - conditional validation for recurring/non-recurring handled in hook
-	2: ["location.address"], // Location - address is the primary required field
+	2: [], // Location - optional step, no required fields
 	3: ["eventFormat"], // Participants - conditional validation handled in hook
 	4: [], // Payment - conditional validation handled in hook
 	5: [], // Review step - no validation

@@ -44,7 +44,7 @@ export default function EventPaymentCard({ event, userParticipant, isInvited = f
 	const cost = event.paymentConfig.cost;
 
 	return (
-		<div className="p-6 rounded-2xl bg-surface border border-border">
+		<div className="p-6 rounded-2xl bg-surface border border-border" data-testid="event-payment-card">
 			<div className="flex flex-col gap-4">
 				<div className="flex items-center justify-between">
 					<div>
@@ -58,7 +58,7 @@ export default function EventPaymentCard({ event, userParticipant, isInvited = f
 						</p>
 					</div>
 					<div className="text-right">
-						<div className="text-2xl font-bold text-accent">
+						<div className="text-2xl font-bold text-accent" data-testid="payment-card-cost">
 							{currency}
 							{cost}
 						</div>
@@ -76,6 +76,7 @@ export default function EventPaymentCard({ event, userParticipant, isInvited = f
 					loading={isLoading}
 					disabled={isLoading}
 					fullWidth
+					data-testid="pay-to-join-button"
 				>
 					{buttonText} - {currency}
 					{cost}

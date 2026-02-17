@@ -37,7 +37,8 @@ export function ClubProvider({ children }: { children: ReactNode }) {
 
 		setIsLoading(true);
 		try {
-			const userClubs = await getUserClubs(userProfile.id);
+			const result = await getUserClubs(userProfile.id);
+			const userClubs = result.items;
 			setClubs(userClubs);
 
 			// Restore selected club or select the first one

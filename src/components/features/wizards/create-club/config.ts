@@ -80,11 +80,15 @@ export const createClubWizardConfig: WizardConfig<ClubFormData> = {
 
 		// Upload images if provided
 		let logoUrl: string | undefined;
+		let logoThumbHash: string | undefined;
 		let bannerUrl: string | undefined;
+		let bannerThumbHash: string | undefined;
 
 		if (data.logo) {
 			try {
-				logoUrl = await uploadClubImage(club.id, data.logo, "logo");
+				const result = await uploadClubImage(club.id, data.logo, "logo");
+				logoUrl = result.url;
+				logoThumbHash = result.thumbHash;
 			} catch (error) {
 				console.error("Failed to upload logo:", error);
 			}
@@ -92,15 +96,17 @@ export const createClubWizardConfig: WizardConfig<ClubFormData> = {
 
 		if (data.banner) {
 			try {
-				bannerUrl = await uploadClubImage(club.id, data.banner, "banner");
+				const result = await uploadClubImage(club.id, data.banner, "banner");
+				bannerUrl = result.url;
+				bannerThumbHash = result.thumbHash;
 			} catch (error) {
 				console.error("Failed to upload banner:", error);
 			}
 		}
 
-		// Update with image URLs
+		// Update with image URLs and thumbhashes
 		if (logoUrl || bannerUrl) {
-			await updateClub(club.id, { logoUrl, bannerUrl });
+			await updateClub(club.id, { logoUrl, logoThumbHash, bannerUrl, bannerThumbHash });
 		}
 
 		// TODO: Send invitations to invitees

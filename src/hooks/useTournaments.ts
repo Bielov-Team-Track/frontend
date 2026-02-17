@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
 	createTournament,
 	loadTournament,
@@ -62,24 +62,28 @@ export function useTournament(id: string, enabled: boolean = true) {
 }
 
 /**
- * Hook to fetch all public tournaments
+ * Hook to fetch all public tournaments with infinite scroll pagination
  */
-export function useTournaments(enabled: boolean = true) {
-	return useQuery({
+export function useTournaments(limit: number = 20, enabled: boolean = true) {
+	return useInfiniteQuery({
 		queryKey: tournamentKeys.list(),
-		queryFn: () => loadTournaments(),
+		queryFn: ({ pageParam }) => loadTournaments(pageParam, limit),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
 		enabled,
 		staleTime: 2 * 60 * 1000, // 2 minutes
 	});
 }
 
 /**
- * Hook to fetch tournaments organized by the current user
+ * Hook to fetch tournaments organized by the current user with infinite scroll pagination
  */
-export function useMyTournaments(enabled: boolean = true) {
-	return useQuery({
+export function useMyTournaments(limit: number = 20, enabled: boolean = true) {
+	return useInfiniteQuery({
 		queryKey: tournamentKeys.myList(),
-		queryFn: () => loadMyTournaments(),
+		queryFn: ({ pageParam }) => loadMyTournaments(pageParam, limit),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
 		enabled,
 		staleTime: 2 * 60 * 1000, // 2 minutes
 	});

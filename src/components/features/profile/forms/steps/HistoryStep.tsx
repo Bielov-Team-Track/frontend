@@ -2,7 +2,7 @@ import { Button, Input, MultiSelectPills, Select } from "@/components/ui";
 import { getTeamsByClub, searchClubs } from "@/lib/api/clubs/clubs";
 import { Club, Team } from "@/lib/models/Club";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Calendar, Loader2, Plus, Shield, Trash2 } from "lucide-react";
+import { Calendar, Loader2, Pencil, Plus, Shield, Trash2 } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -77,7 +77,8 @@ export type HistoryEntry = {
 const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 	const [entries, setEntries] = useState<HistoryEntry[]>(initialEntries);
 
-	// Add Entry State
+	// Add/Edit Entry State
+	const [editingId, setEditingId] = useState<string | null>(null);
 	const [year, setYear] = useState<string | undefined>();
 	const [clubName, setClubName] = useState("");
 	const [teamName, setTeamName] = useState("");
@@ -155,8 +156,8 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 
 			setIsLoadingClubs(true);
 			try {
-				const clubs = await searchClubs({ query: debouncedClubSearch });
-				setFilteredClubSuggestions(clubs.map(clubToSuggestion));
+				const result = await searchClubs({ query: debouncedClubSearch });
+				setFilteredClubSuggestions(result.items.map(clubToSuggestion));
 			} catch (error) {
 				console.error("Failed to search clubs:", error);
 				setFilteredClubSuggestions([]);
@@ -252,8 +253,8 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 			if (match) finalTeamLogo = match.logoUrl;
 		}
 
-		const newEntry: HistoryEntry = {
-			id: Date.now().toString(),
+		const updatedEntry: HistoryEntry = {
+			id: editingId || Date.now().toString(),
 			year,
 			clubName,
 			clubLogoUrl: finalClubLogo,
@@ -263,10 +264,19 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 			positions: role === "Player" ? positions : [],
 		};
 
-		// Add to top
-		setEntries([newEntry, ...entries]);
+		if (editingId) {
+			// Replace existing entry in-place
+			setEntries(entries.map((e) => (e.id === editingId ? updatedEntry : e)));
+		} else {
+			// Add to top
+			setEntries([updatedEntry, ...entries]);
+		}
 
-		// Reset form
+		resetForm();
+	};
+
+	const resetForm = () => {
+		setYear(undefined);
 		setClubName("");
 		setTeamName("");
 		setSelectedClub(null);
@@ -276,10 +286,24 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 		setRole(undefined);
 		setPositions([]);
 		setAddError(null);
+		setEditingId(null);
+	};
+
+	const handleEditEntry = (entry: HistoryEntry) => {
+		setEditingId(entry.id);
+		setYear(entry.year);
+		setClubName(entry.clubName);
+		setTeamName(entry.teamName || "");
+		setRole(entry.role);
+		setPositions(entry.positions);
+		setSelectedClub(entry.clubLogoUrl ? { id: "", name: entry.clubName, logoUrl: entry.clubLogoUrl } : null);
+		setSelectedTeam(entry.teamLogoUrl ? { id: "", name: entry.teamName || "", logoUrl: entry.teamLogoUrl } : null);
+		setAddError(null);
 	};
 
 	const handleRemoveEntry = (id: string) => {
 		setEntries(entries.filter((e) => e.id !== id));
+		if (editingId === id) resetForm();
 	};
 
 	// Sort entries by year descending
@@ -345,9 +369,20 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 
 			{/* Add Entry Form */}
 			<div className="bg-surface rounded-xl border border-border p-4 flex flex-col gap-4">
-				<h3 className="font-medium text-foreground flex items-center gap-2">
-					<Plus size={16} className="text-accent" /> Add New Entry
-				</h3>
+				<div className="flex items-center justify-between">
+					<h3 className="font-medium text-foreground flex items-center gap-2">
+						{editingId ? (
+							<><Pencil size={16} className="text-accent" /> Edit Entry</>
+						) : (
+							<><Plus size={16} className="text-accent" /> Add New Entry</>
+						)}
+					</h3>
+					{editingId && (
+						<Button type="button" variant="ghost" size="sm" onClick={resetForm}>
+							Cancel Edit
+						</Button>
+					)}
+				</div>
 
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 					<Select
@@ -439,7 +474,7 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 				{addError && <p className="text-red-400 text-xs">{addError}</p>}
 
 				<Button type="button" variant="outline" size="sm" onClick={handleAddEntry} className="self-end px-6">
-					Add Entry
+					{editingId ? "Update Entry" : "Add Entry"}
 				</Button>
 			</div>
 
@@ -505,13 +540,22 @@ const HistoryStep = ({ onNext, formId, initialEntries = [] }: Props) => {
 															</div>
 														</div>
 
-														<button
-															type="button"
-															onClick={() => handleRemoveEntry(entry.id)}
-															className="text-muted-foreground hover:text-red-400 transition-colors p-1"
-															title="Remove entry">
-															<Trash2 size={14} />
-														</button>
+														<div className="flex items-center gap-1">
+															<button
+																type="button"
+																onClick={() => handleEditEntry(entry)}
+																className="text-muted-foreground hover:text-accent transition-colors p-1"
+																title="Edit entry">
+																<Pencil size={14} />
+															</button>
+															<button
+																type="button"
+																onClick={() => handleRemoveEntry(entry.id)}
+																className="text-muted-foreground hover:text-red-400 transition-colors p-1"
+																title="Remove entry">
+																<Trash2 size={14} />
+															</button>
+														</div>
 													</div>
 												))}
 											</div>

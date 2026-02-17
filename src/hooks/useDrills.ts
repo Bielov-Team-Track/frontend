@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import {
     loadDrills,
+    loadDrillsPaged,
     loadDrill,
     createDrill,
     updateDrill,
@@ -73,6 +74,21 @@ export function useDrills(filter?: DrillFilterRequest, enabled: boolean = true) 
         enabled,
         staleTime: 0, // Data is immediately stale
         refetchOnMount: "always", // Always refetch when component mounts
+    });
+}
+
+/**
+ * Hook to fetch drills with infinite scrolling (page-based pagination)
+ */
+export function useInfiniteDrills(filter?: DrillFilterRequest, limit: number = 20, enabled: boolean = true) {
+    return useInfiniteQuery({
+        queryKey: drillKeys.list({ ...filter, limit }),
+        queryFn: ({ pageParam = 1 }) => loadDrillsPaged({ ...filter, page: pageParam, limit }),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.page + 1 : undefined),
+        enabled,
+        staleTime: 0,
+        refetchOnMount: "always",
     });
 }
 

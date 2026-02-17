@@ -19,6 +19,7 @@ export default function PostMedia({ media }: PostMediaProps) {
 			id: m.id,
 			type: m.mediaType as "image" | "video" | "document",
 			url: m.url,
+			thumbHash: m.thumbHash,
 			thumbnailUrl: m.thumbnailUrl,
 			fileName: m.fileName,
 			mimeType: m.mimeType,

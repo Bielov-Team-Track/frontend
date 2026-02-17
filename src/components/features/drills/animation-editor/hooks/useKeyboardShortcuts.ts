@@ -11,24 +11,24 @@ export const SHORTCUT_LEGEND: ShortcutEntry[] = [
 	// Playback
 	{ keys: "Space", description: "Play / Pause", group: "Playback" },
 	// Navigation
-	{ keys: "←", description: "Previous frame", group: "Navigation" },
-	{ keys: "→", description: "Next frame", group: "Navigation" },
-	{ keys: "Shift+←", description: "First frame", group: "Navigation" },
-	{ keys: "Shift+→", description: "Last frame", group: "Navigation" },
+	{ keys: "↑", description: "Previous frame", group: "Navigation" },
+	{ keys: "↓", description: "Next frame", group: "Navigation" },
+	{ keys: "Shift+↑", description: "First frame", group: "Navigation" },
+	{ keys: "Shift+↓", description: "Last frame", group: "Navigation" },
 	// Selection
 	{ keys: "Ctrl+A", description: "Select all elements", group: "Selection" },
 	{ keys: "Escape", description: "Deselect all / Close popups", group: "Selection" },
 	{ keys: "Shift+Click", description: "Add to selection", group: "Selection" },
-	{ keys: "Shift+Drag", description: "Marquee select (on background)", group: "Selection" },
+	{ keys: "Click+Drag", description: "Area select (on background)", group: "Selection" },
 	// Editing
 	{ keys: "Delete / Backspace", description: "Delete selected", group: "Editing" },
 	{ keys: "Ctrl+Z", description: "Undo", group: "Editing" },
+	{ keys: "Ctrl+Y", description: "Redo", group: "Editing" },
 	{ keys: "Ctrl+Shift+Z", description: "Redo", group: "Editing" },
 	{ keys: "Ctrl+D", description: "Duplicate selected", group: "Editing" },
-	{ keys: "Ctrl+C", description: "Copy positions", group: "Editing" },
-	{ keys: "Ctrl+V", description: "Paste positions", group: "Editing" },
-	{ keys: "↑/↓/←/→", description: "Nudge 1px (when selected)", group: "Editing" },
-	{ keys: "Shift+↑/↓/←/→", description: "Nudge 10px", group: "Editing" },
+	{ keys: "Ctrl+C", description: "Copy selected elements", group: "Editing" },
+	{ keys: "Ctrl+V", description: "Paste elements", group: "Editing" },
+	{ keys: "Ctrl+S", description: "Save animation", group: "Editing" },
 	// Animation
 	{ keys: "K", description: "Add keyframe", group: "Animation" },
 	// Sport
@@ -58,14 +58,15 @@ interface UseKeyboardShortcutsParams {
 	// Editing
 	deleteSelected: () => void
 	duplicateSelected: () => void
-	copyPositions: () => void
-	pastePositions: () => void
-	nudge: (dx: number, dy: number) => void
+	copyElements: () => void
+	pasteElements: () => void
 	// Animation
 	addKeyframe: () => void
 	// Sport
 	mirrorFormation: () => void
 	swapPlayers: () => void
+	// Save
+	save: () => void
 	// UI
 	closePopups: () => void
 	openShortcutLegend: () => void
@@ -103,6 +104,20 @@ export function useKeyboardShortcuts(params: UseKeyboardShortcutsParams) {
 				return
 			}
 
+			// Ctrl+S → save
+			if (ctrl && key === "s") {
+				e.preventDefault()
+				params.save()
+				return
+			}
+
+			// Ctrl+Y → redo
+			if (ctrl && key === "y") {
+				e.preventDefault()
+				params.redo()
+				return
+			}
+
 			// Ctrl+Shift+Z → redo
 			if (ctrl && shift && key === "Z") {
 				e.preventDefault()
@@ -133,19 +148,19 @@ export function useKeyboardShortcuts(params: UseKeyboardShortcutsParams) {
 				return
 			}
 
-			// Ctrl+C → copy positions
+			// Ctrl+C → copy elements
 			if (ctrl && key === "c") {
 				if (params.isPlaying) return
 				e.preventDefault()
-				params.copyPositions()
+				params.copyElements()
 				return
 			}
 
-			// Ctrl+V → paste positions
+			// Ctrl+V → paste elements
 			if (ctrl && key === "v") {
 				if (params.isPlaying) return
 				e.preventDefault()
-				params.pastePositions()
+				params.pasteElements()
 				return
 			}
 
@@ -157,24 +172,14 @@ export function useKeyboardShortcuts(params: UseKeyboardShortcutsParams) {
 				return
 			}
 
-			// Arrow keys: nudge if selection exists, else navigate frames
-			if (key === "ArrowLeft" || key === "ArrowRight" || key === "ArrowUp" || key === "ArrowDown") {
+			// Up/Down arrows: frame navigation
+			if (key === "ArrowUp" || key === "ArrowDown") {
 				if (params.isPlaying) return
 				e.preventDefault()
-
-				if (params.hasSelection) {
-					// Nudge
-					const step = shift ? 10 : 1
-					const dx = key === "ArrowLeft" ? -step : key === "ArrowRight" ? step : 0
-					const dy = key === "ArrowUp" ? -step : key === "ArrowDown" ? step : 0
-					params.nudge(dx, dy)
-				} else {
-					// Frame navigation
-					if (shift && key === "ArrowLeft") params.firstFrame()
-					else if (shift && key === "ArrowRight") params.lastFrame()
-					else if (key === "ArrowLeft") params.prevFrame()
-					else if (key === "ArrowRight") params.nextFrame()
-				}
+				if (shift && key === "ArrowUp") params.firstFrame()
+				else if (shift && key === "ArrowDown") params.lastFrame()
+				else if (key === "ArrowUp") params.prevFrame()
+				else if (key === "ArrowDown") params.nextFrame()
 				return
 			}
 

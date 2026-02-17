@@ -92,7 +92,9 @@ function VerticalFrameThumb({
 					{frame.players.map((player) => (
 						<circle key={player.id} cx={player.x} cy={player.y} r="12" fill={player.color} />
 					))}
-					<circle cx={frame.ball.x} cy={frame.ball.y} r="8" fill="#fef3c7" stroke="#f59e0b" strokeWidth="2" />
+					{frame.ball && (
+						<circle cx={frame.ball.x} cy={frame.ball.y} r="8" fill="#fef3c7" stroke="#f59e0b" strokeWidth="2" />
+					)}
 				</svg>
 				<span className="absolute bottom-0.5 right-0.5 bg-gray-800/80 text-white text-[10px] leading-none px-1 py-0.5 rounded">
 					{index + 1}
@@ -108,7 +110,6 @@ export function AnimationEditor({ initialAnimation, onSave, onCancel, isSaving =
 
 	const [animationName, setAnimationName] = useState(initialAnimation?.name || "")
 	const [courtViewMode, setCourtViewMode] = useState<CourtViewMode>("full")
-	const [infoCollapsed, setInfoCollapsed] = useState(false)
 	const [framesCollapsed, setFramesCollapsed] = useState(false)
 	const [showShortcutLegend, setShowShortcutLegend] = useState(false)
 
@@ -129,6 +130,7 @@ export function AnimationEditor({ initialAnimation, onSave, onCancel, isSaving =
 		svgRef,
 		courtViewMode,
 		isPlaying: playback.isPlaying,
+		selectedElements: selection.selectedElements,
 		onDragStart: handleDragStart,
 		onBatchStart: undoRedo.beginBatch,
 		onBatchEnd: undoRedo.commitBatch,
@@ -191,22 +193,26 @@ export function AnimationEditor({ initialAnimation, onSave, onCancel, isSaving =
 		handleGoToFrame(frames.keyframes.length - 1)
 	}, [handleGoToFrame, frames.keyframes.length])
 
-	const handleToggleInfo = useCallback(() => {
-		setInfoCollapsed(prev => !prev)
-	}, [])
-
 	// Track selection when mousedown on player/equipment (with Shift for additive)
 	const handlePlayerMouseDown = useCallback((e: React.MouseEvent, playerId: string) => {
-		selection.select({ type: "player", id: playerId }, e.shiftKey)
+		if (!e.shiftKey) {
+			selection.select({ type: "player", id: playerId }, false)
+		} else {
+			selection.select({ type: "player", id: playerId }, true)
+		}
 		drag.onPlayerMouseDown(e, playerId)
 	}, [drag.onPlayerMouseDown, selection.select])
 
 	const handleEquipmentMouseDown = useCallback((e: React.MouseEvent, equipmentId: string) => {
-		selection.select({ type: "equipment", id: equipmentId }, e.shiftKey)
+		if (!e.shiftKey) {
+			selection.select({ type: "equipment", id: equipmentId }, false)
+		} else {
+			selection.select({ type: "equipment", id: equipmentId }, true)
+		}
 		drag.onEquipmentMouseDown(e, equipmentId)
 	}, [drag.onEquipmentMouseDown, selection.select])
 
-	// Background click: start marquee (Shift) or deselect
+	// Background click: deselect
 	const handleBackgroundClick = useCallback(() => {
 		selection.deselectAll()
 		popups.closeAll()
@@ -230,9 +236,9 @@ export function AnimationEditor({ initialAnimation, onSave, onCancel, isSaving =
 		drag.onMouseUp()
 	}, [marquee.isMarqueing, marquee.onMarqueeEnd, drag.onMouseUp])
 
-	// Called by CourtCanvas only when mousedown hits background
+	// Called by CourtCanvas when mousedown hits background — start marquee (no Shift needed)
 	const handleBackgroundMouseDown = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
-		if (!e.shiftKey || playback.isPlaying) return
+		if (playback.isPlaying) return
 		const coords = getSVGCoordinates(e, svgRef, courtViewMode)
 		if (coords) {
 			e.preventDefault()
@@ -258,13 +264,9 @@ export function AnimationEditor({ initialAnimation, onSave, onCancel, isSaving =
 		elements.duplicateSelected(selection.selectedElements)
 	}, [elements.duplicateSelected, selection.selectedElements])
 
-	const handleCopyPositions = useCallback(() => {
-		elements.copyPositions(selection.selectedElements)
-	}, [elements.copyPositions, selection.selectedElements])
-
-	const handleNudge = useCallback((dx: number, dy: number) => {
-		elements.nudge(selection.selectedElements, dx, dy)
-	}, [elements.nudge, selection.selectedElements])
+	const handleCopyElements = useCallback(() => {
+		elements.copyElements(selection.selectedElements)
+	}, [elements.copyElements, selection.selectedElements])
 
 	const handleSwapPlayers = useCallback(() => {
 		const players = selection.selectedElements.filter((el) => el.type === "player")
@@ -289,37 +291,32 @@ export function AnimationEditor({ initialAnimation, onSave, onCancel, isSaving =
 		deselectAll: selection.deselectAll,
 		deleteSelected: handleDeleteSelected,
 		duplicateSelected: handleDuplicateSelected,
-		copyPositions: handleCopyPositions,
-		pastePositions: elements.pastePositions,
-		nudge: handleNudge,
+		copyElements: handleCopyElements,
+		pasteElements: elements.pasteElements,
 		addKeyframe: frames.addKeyframe,
 		mirrorFormation: elements.mirrorFormation,
 		swapPlayers: handleSwapPlayers,
+		save: handleSave,
 		closePopups: popups.closeAll,
 		openShortcutLegend: () => setShowShortcutLegend(true),
 	})
 
 	return (
 		<div className="relative space-y-4" ref={containerRef}>
-			{/* Top bar: Name + Save/Cancel + Shortcuts */}
+			{/* Top bar: Name + Save/Cancel */}
 			<div className="flex items-center gap-4 justify-between">
-				<div className="flex-1 max-w-md">
-					<Input
-						value={animationName}
-						onChange={(e) => setAnimationName(e.target.value)}
-						placeholder="Animation name..."
-						maxLength={100}
-					/>
+				<div className="flex items-center gap-3 flex-1">
+					<div className="flex-1 max-w-md">
+						<Input
+							value={animationName}
+							onChange={(e) => setAnimationName(e.target.value)}
+							placeholder="Animation name..."
+							maxLength={100}
+						/>
+					</div>
+					<InstructionsPanel />
 				</div>
 				<div className="flex items-center gap-2">
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={() => setShowShortcutLegend(true)}
-						title="Keyboard shortcuts (Ctrl+/ or ?)"
-					>
-						<Keyboard className="h-4 w-4" />
-					</Button>
 					{onCancel && (
 						<Button variant="outline" size="sm" onClick={onCancel}>
 							Cancel
@@ -341,8 +338,6 @@ export function AnimationEditor({ initialAnimation, onSave, onCancel, isSaving =
 					)}
 				</div>
 			</div>
-
-			<InstructionsPanel collapsed={infoCollapsed} onToggle={handleToggleInfo} />
 
 			{/* Playback controls — original position above the court */}
 			<PlaybackControls
@@ -382,58 +377,70 @@ export function AnimationEditor({ initialAnimation, onSave, onCancel, isSaving =
 				{/* Center: Court */}
 				<div className="flex flex-col gap-2">
 					<CourtViewSelector value={courtViewMode} onChange={setCourtViewMode} />
-					<CourtCanvas
-						svgRef={svgRef}
-						viewMode={courtViewMode}
-						onMouseMove={handleSvgMouseMove}
-						onMouseUp={handleSvgMouseUp}
-						onMouseLeave={handleSvgMouseUp}
-						onDragOver={drag.onDragOver}
-						onDrop={drag.onDrop}
-						onBackgroundClick={handleBackgroundClick}
-						onBackgroundMouseDown={handleBackgroundMouseDown}
-						marqueeRect={marquee.marqueeRect}
-					>
-							{(displayState.equipment || []).map((item) => (
-								<EquipmentRenderer
-									key={item.id}
-									item={item}
-									scale={playback.isPlaying ? (equipmentScales[item.id] ?? 1) : 1}
-									isDragging={drag.draggingEquipment === item.id}
-									isSelected={selection.selectedIds.has(item.id)}
-									isPlaying={playback.isPlaying}
-									currentFrameIndex={frames.currentFrameIndex}
-									onMouseDown={handleEquipmentMouseDown}
-									onContextMenu={popups.openContextMenu}
-									onDoubleClick={popups.openLabelEditorFromDoubleClick}
-									onDelete={elements.deleteEquipment}
-									onDeleteNote={(id) => elements.updateNote("equipment", id, "")}
-								/>
-							))}
-							{displayState.players.map((player) => (
-								<PlayerRenderer
-									key={player.id}
-									player={player}
-									scale={playback.isPlaying ? (playerScales[player.id] ?? 1) : 1}
-									isDragging={drag.draggingPlayer === player.id}
-									isSelected={selection.selectedIds.has(player.id)}
-									isPlaying={playback.isPlaying}
-									currentFrameIndex={frames.currentFrameIndex}
-									canDelete={frames.currentKeyframe.players.length > 1}
-									onMouseDown={handlePlayerMouseDown}
-									onContextMenu={popups.openContextMenu}
-									onDoubleClick={popups.openLabelEditorFromDoubleClick}
-									onDelete={elements.deletePlayer}
-									onDeleteNote={(id) => elements.updateNote("player", id, "")}
-								/>
-							))}
-							<BallRenderer
-								ball={displayState.ball}
-								isDragging={drag.draggingBall}
-								isPlaying={playback.isPlaying}
-								onMouseDown={drag.onBallMouseDown}
-							/>
-						</CourtCanvas>
+					<div className="relative">
+						<CourtCanvas
+							svgRef={svgRef}
+							viewMode={courtViewMode}
+							onMouseMove={handleSvgMouseMove}
+							onMouseUp={handleSvgMouseUp}
+							onMouseLeave={handleSvgMouseUp}
+							onDragOver={drag.onDragOver}
+							onDrop={drag.onDrop}
+							onBackgroundClick={handleBackgroundClick}
+							onBackgroundMouseDown={handleBackgroundMouseDown}
+							marqueeRect={marquee.marqueeRect}
+						>
+								{(displayState.equipment || []).map((item) => (
+									<EquipmentRenderer
+										key={item.id}
+										item={item}
+										scale={playback.isPlaying ? (equipmentScales[item.id] ?? 1) : 1}
+										isDragging={drag.draggingEquipment === item.id}
+										isSelected={selection.selectedIds.has(item.id)}
+										isPlaying={playback.isPlaying}
+										currentFrameIndex={frames.currentFrameIndex}
+										onMouseDown={handleEquipmentMouseDown}
+										onContextMenu={popups.openContextMenu}
+										onDoubleClick={popups.openLabelEditorFromDoubleClick}
+										onDelete={elements.deleteEquipment}
+										onDeleteNote={(id) => elements.updateNote("equipment", id, "")}
+									/>
+								))}
+								{displayState.players.map((player) => (
+									<PlayerRenderer
+										key={player.id}
+										player={player}
+										scale={playback.isPlaying ? (playerScales[player.id] ?? 1) : 1}
+										isDragging={drag.draggingPlayer === player.id}
+										isSelected={selection.selectedIds.has(player.id)}
+										isPlaying={playback.isPlaying}
+										currentFrameIndex={frames.currentFrameIndex}
+										canDelete={true}
+										onMouseDown={handlePlayerMouseDown}
+										onContextMenu={popups.openContextMenu}
+										onDoubleClick={popups.openLabelEditorFromDoubleClick}
+										onDelete={elements.deletePlayer}
+										onDeleteNote={(id) => elements.updateNote("player", id, "")}
+									/>
+								))}
+								{displayState.ball && (
+									<BallRenderer
+										ball={displayState.ball}
+										isDragging={drag.draggingBall}
+										isPlaying={playback.isPlaying}
+										onMouseDown={drag.onBallMouseDown}
+									/>
+								)}
+							</CourtCanvas>
+						{/* Keyboard shortcuts button in bottom-right corner of court */}
+						<button
+							onClick={() => setShowShortcutLegend(true)}
+							className="absolute bottom-2 right-2 p-1.5 rounded-md bg-black/40 hover:bg-black/60 text-white/60 hover:text-white/90 transition-colors"
+							title="Keyboard shortcuts (Ctrl+/ or ?)"
+						>
+							<Keyboard className="h-3.5 w-3.5" />
+						</button>
+					</div>
 				</div>
 
 				{/* Right sidebar: Frames only */}

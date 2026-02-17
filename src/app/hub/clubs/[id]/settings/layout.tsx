@@ -1,7 +1,7 @@
 "use client";
 
 import { SettingsLayout, SettingsNavItem } from "@/components/layout/settings-layout";
-import { AlertTriangle, CreditCard, FileText, Settings } from "lucide-react";
+import { AlertTriangle, BarChart3, CreditCard, FileText, Settings } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
 
 export default function ClubSettingsLayout({ children }: { children: React.ReactNode }) {
@@ -33,6 +33,12 @@ export default function ClubSettingsLayout({ children }: { children: React.React
 			label: "Subscriptions",
 			icon: CreditCard,
 			href: `/hub/clubs/${clubId}/settings/subscriptions`,
+		},
+		{
+			id: "evaluations",
+			label: "Skill Levels",
+			icon: BarChart3,
+			href: `/hub/clubs/${clubId}/settings/evaluations`,
 		},
 		{
 			id: "danger",

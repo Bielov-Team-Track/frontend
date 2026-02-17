@@ -4,8 +4,7 @@ import { cn } from "@/lib/utils";
 import type { DrillAttachment, DrillAnimation } from "@/lib/models/Drill";
 import { FileText, Film, ImageIcon, ExternalLink, Play } from "lucide-react";
 import { useState } from "react";
-import { isEmbedUrl, parseEmbedUrl } from "./embedUtils";
-import { MediaLightbox, type MediaItem, formatFileSize, parseEmbedUrl as parseEmbedUrlMedia } from "@/components/ui/media-preview";
+import { MediaLightbox, type MediaItem, formatFileSize, isEmbedUrl, parseEmbedUrl } from "@/components/ui/media-preview";
 
 interface DrillAttachmentsProps {
 	attachments: DrillAttachment[];
@@ -68,7 +67,7 @@ export default function DrillAttachments({ attachments, animations, className }:
 
 	// Add embeds as MediaItems
 	embeds.forEach((embed) => {
-		const embedInfo = parseEmbedUrlMedia(embed.fileUrl);
+		const embedInfo = parseEmbedUrl(embed.fileUrl);
 		if (embedInfo) {
 			mediaItems.push({
 				id: embed.id,

@@ -7,6 +7,7 @@ export interface Media {
 	id: string;
 	mediaType: MediaType;
 	url: string;
+	thumbHash?: string;
 	thumbnailUrl?: string;
 	fileName?: string;
 	fileSize?: number;

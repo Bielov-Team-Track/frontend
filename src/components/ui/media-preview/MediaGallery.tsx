@@ -83,7 +83,7 @@ export default function MediaGallery({
 
 	return (
 		<>
-			<div className={cn("relative", className)}>
+			<div data-testid="media-gallery" className={cn("relative", className)}>
 				{/* Carousel navigation buttons */}
 				{canScrollLeft && (
 					<button
@@ -131,7 +131,7 @@ export default function MediaGallery({
 						const isLastVisible = index === visibleItems.length - 1 && hasMore;
 
 						return (
-							<div key={item.id} className="relative shrink-0">
+							<div key={item.id} data-testid="media-gallery-item" className="relative shrink-0">
 								<MediaThumbnail
 									item={item}
 									size={thumbnailSize}

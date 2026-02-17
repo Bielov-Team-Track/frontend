@@ -9,13 +9,14 @@ interface CollapsibleSectionProps {
 	children: React.ReactNode;
 	defaultOpen?: boolean;
 	className?: string;
+	"data-testid"?: string;
 }
 
-export function CollapsibleSection({ label, children, defaultOpen = false, className }: CollapsibleSectionProps) {
+export function CollapsibleSection({ label, children, defaultOpen = false, className, "data-testid": testId }: CollapsibleSectionProps) {
 	const [isOpen, setIsOpen] = React.useState(defaultOpen);
 
 	return (
-		<div className={cn("border border-border rounded-lg", className)}>
+		<div className={cn("border border-border rounded-lg", className)} data-testid={testId}>
 			<button
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}

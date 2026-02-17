@@ -2,7 +2,7 @@
 
 import { Modal, Button, Input, TextArea, Select, SelectOption } from "@/components";
 import { RadioGroup } from "@/components/ui/radio-button/RadioGroup";
-import { TemplateVisibility } from "@/lib/models/Template";
+import { PlanVisibility } from "@/lib/models/Template";
 import { Eye, Lock } from "lucide-react";
 import { useState } from "react";
 
@@ -18,14 +18,14 @@ export interface SaveTemplateData {
 	name: string;
 	description?: string;
 	clubId?: string;
-	visibility: TemplateVisibility;
+	visibility: PlanVisibility;
 }
 
 export default function SaveAsTemplateModal({ isOpen, onClose, onSave, isLoading, clubs = [] }: SaveAsTemplateModalProps) {
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [clubId, setClubId] = useState<string | undefined>(undefined);
-	const [visibility, setVisibility] = useState<TemplateVisibility>("Private");
+	const [visibility, setVisibility] = useState<PlanVisibility>("Private");
 
 	const [errors, setErrors] = useState<{ name?: string }>({});
 
@@ -120,7 +120,7 @@ export default function SaveAsTemplateModal({ isOpen, onClose, onSave, isLoading
 					<RadioGroup
 						name="visibility"
 						value={visibility}
-						onChange={(value) => setVisibility(value as TemplateVisibility)}
+						onChange={(value) => setVisibility(value as PlanVisibility)}
 						options={[
 							{
 								value: "Private",

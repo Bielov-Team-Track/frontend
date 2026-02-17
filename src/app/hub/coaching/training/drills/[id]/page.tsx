@@ -26,10 +26,9 @@ import {
 	AlertDialogAction,
 	AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { MediaLightbox, type MediaItem, parseEmbedUrl as parseEmbedUrlMedia } from "@/components/ui/media-preview";
+import { MediaLightbox, type MediaItem, parseEmbedUrl, isEmbedUrl } from "@/components/ui/media-preview";
 import { useDrill, useUpdateDrillAnimations, useCanEditDrill, useAddDrillAttachment, useDeleteDrillAttachment } from "@/hooks/useDrills";
 import { useAuth } from "@/providers";
-import { isEmbedUrl } from "@/components/features/drills/attachments/embedUtils";
 import { DrillAttachmentTypeEnum } from "@/lib/models/Drill";
 import { getDrillAttachmentUploadUrl, uploadFileToS3 } from "@/lib/api/drills";
 import { Clock, Dumbbell, Users, Pencil, ArrowLeft, ChevronRight, ListPlus, Clapperboard, ImagePlus, Trash2 } from "lucide-react";
@@ -189,7 +188,7 @@ export default function DrillDetailPage() {
 	const mediaItems: MediaItem[] = [];
 	const embeds = attachments.filter((a) => a.fileType === "Video" && isEmbedUrl(a.fileUrl));
 	embeds.forEach((embed) => {
-		const embedInfo = parseEmbedUrlMedia(embed.fileUrl);
+		const embedInfo = parseEmbedUrl(embed.fileUrl);
 		if (embedInfo) {
 			mediaItems.push({
 				id: embed.id,

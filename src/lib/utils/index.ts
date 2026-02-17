@@ -7,3 +7,4 @@ export * from "./request";
 export * from "./responsive";
 export * from "./string";
 export * from "./user";
+export * from "./image";

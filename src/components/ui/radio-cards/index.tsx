@@ -20,6 +20,7 @@ export interface RadioCardsProps<T extends string = string> {
 	columns?: 2 | 3 | 4;
 	size?: "sm" | "md" | "lg";
 	className?: string;
+	"data-testid"?: string;
 }
 
 function RadioCards<T extends string = string>({
@@ -32,6 +33,7 @@ function RadioCards<T extends string = string>({
 	columns = 3,
 	size = "md",
 	className = "",
+	"data-testid": testId,
 }: RadioCardsProps<T>) {
 	const gridCols = {
 		2: "grid-cols-1 sm:grid-cols-2",
@@ -66,7 +68,7 @@ function RadioCards<T extends string = string>({
 	const styles = sizeStyles[size];
 
 	return (
-		<div className={`space-y-3 ${className}`}>
+		<div className={`space-y-3 ${className}`} data-testid={testId}>
 			{label && (
 				<label className="text-sm font-medium text-foreground">{label}</label>
 			)}

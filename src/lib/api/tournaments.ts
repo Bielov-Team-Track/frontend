@@ -13,6 +13,7 @@ import {
 	AddStageRequest,
 	AssignTeamsToGroupRequest,
 } from "../models/Tournament";
+import { CursorPagedResult } from "../models/Pagination";
 
 const PREFIX = "/events";
 
@@ -25,9 +26,16 @@ export async function createTournament(req: CreateTournamentRequest): Promise<To
 	return (await client.post<Tournament>(PREFIX + endpoint, req)).data;
 }
 
-export async function loadTournaments(): Promise<Tournament[]> {
+export async function loadTournaments(
+	cursor?: string,
+	limit: number = 20,
+): Promise<CursorPagedResult<Tournament>> {
 	const endpoint = "/v1/tournaments";
-	return (await client.get<Tournament[]>(PREFIX + endpoint)).data;
+	const params: Record<string, string | number> = { limit };
+	if (cursor) {
+		params.cursor = cursor;
+	}
+	return (await client.get<CursorPagedResult<Tournament>>(PREFIX + endpoint, { params })).data;
 }
 
 export async function loadTournament(id: string): Promise<Tournament> {
@@ -45,9 +53,16 @@ export async function deleteTournament(id: string): Promise<void> {
 	await client.delete(PREFIX + endpoint);
 }
 
-export async function loadMyTournaments(): Promise<Tournament[]> {
+export async function loadMyTournaments(
+	cursor?: string,
+	limit: number = 20,
+): Promise<CursorPagedResult<Tournament>> {
 	const endpoint = "/v1/me/tournaments";
-	return (await client.get<Tournament[]>(PREFIX + endpoint)).data;
+	const params: Record<string, string | number> = { limit };
+	if (cursor) {
+		params.cursor = cursor;
+	}
+	return (await client.get<CursorPagedResult<Tournament>>(PREFIX + endpoint, { params })).data;
 }
 
 // =============================================================================

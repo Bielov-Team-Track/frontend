@@ -1,9 +1,10 @@
 "use client";
 
-import { Avatar, Button, EmojiPicker, Modal, RichTextEditor, RichTextEditorRef, Select } from "@/components/";
+import { Avatar, Button, EmbedCard, EmojiPicker, Modal, RichTextEditor, RichTextEditorRef, Select } from "@/components/";
 import AttachmentsUploader, { UploadedAttachment } from "@/components/ui/attachments-uploader";
 import { useDraft } from "@/hooks/useDraft";
 import { useCreatePost, useMediaUpload } from "@/hooks/usePosts";
+import { useUrlEmbedDetection } from "@/hooks/useUrlEmbedDetection";
 import { getMentionSuggestions } from "@/lib/api/posts";
 import { CreatePollRequest, Visibility, VisibilityOptions } from "@/lib/models/Post";
 import { ContextType } from "@/lib/models/shared/models";
@@ -43,7 +44,14 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 	const poll = draft.poll;
 	const isPinned = draft.isPinned;
 
-	const setContent = useCallback((c: string) => setDraft((prev) => ({ ...prev, content: c })), [setDraft]);
+	const setContent = useCallback(
+		(c: string) => {
+			setDraft((prev) => ({ ...prev, content: c }));
+			const plainText = editorRef.current?.getEditor()?.getText() || "";
+			setEditorText(plainText);
+		},
+		[setDraft],
+	);
 	const setVisibility = useCallback((v: Visibility) => setDraft((prev) => ({ ...prev, visibility: v })), [setDraft]);
 	const setPoll = useCallback((p: CreatePollRequest | null) => setDraft((prev) => ({ ...prev, poll: p })), [setDraft]);
 	const setIsPinned = useCallback((pinned: boolean) => setDraft((prev) => ({ ...prev, isPinned: pinned })), [setDraft]);
@@ -51,6 +59,8 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 	const [attachments, setAttachments] = useState<UploadedAttachment[]>([]);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+	const [editorText, setEditorText] = useState("");
+	const { embeds: detectedEmbeds, dismiss: dismissEmbed } = useUrlEmbedDetection(editorText);
 
 	const editorRef = useRef<RichTextEditorRef>(null);
 	const emojiButtonRef = useRef<HTMLButtonElement>(null);
@@ -246,7 +256,24 @@ export default function PostCreateModal({ isOpen, onClose, contextType, contextI
 						</div>
 					)}
 
-					{/* Toolbar row */}
+					{/* Embed previews */}
+					{detectedEmbeds.length > 0 && (
+						<div className="space-y-1 px-4 pb-2">
+							{detectedEmbeds.map((embed) => (
+								<EmbedCard
+									key={embed.id}
+									url={embed.url}
+									embedInfo={embed.embedInfo}
+									title={embed.title}
+									thumbnailUrl={embed.thumbnailUrl}
+									onDismiss={() => dismissEmbed(embed.id)}
+									variant="compact"
+								/>
+							))}
+						</div>
+					)}
+
+				{/* Toolbar row */}
 					<div className={cn("flex items-center justify-between px-3 py-2 bg-surface", !hasAttachments && "border-t border-border")}>
 						{/* Left: Actions */}
 						<div className="flex items-center gap-1">

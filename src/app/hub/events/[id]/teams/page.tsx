@@ -23,7 +23,7 @@ export default function EventTeamsPage() {
 	}));
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-6" data-testid="event-teams-page">
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
@@ -43,7 +43,7 @@ export default function EventTeamsPage() {
 					registrationType={event.registrationUnit || Unit.Individual}
 				/>
 			) : (
-				<div className="rounded-2xl bg-surface border border-border p-12 text-center">
+				<div className="rounded-2xl bg-surface border border-border p-12 text-center" data-testid="teams-empty-state">
 					<Users className="w-16 h-16 mx-auto mb-4 text-muted/30" />
 					<h3 className="text-lg font-bold text-white mb-2">No Teams Yet</h3>
 					<p className="text-muted text-sm">Teams will appear here once they register for the event.</p>

@@ -2,23 +2,39 @@
 
 import { Avatar } from "@/components";
 import { InviteeSelectorModal } from "@/components/features/events/forms/steps/registration";
-import { getClub, getClubMembers, getGroupsByClub, getPendingRegistrationsCount, getTeamsByClub, inviteMembers } from "@/lib/api/clubs";
-import { Club } from "@/lib/models/Club";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getClub, getClubMembers, getGroupsByClubPaged, getPendingRegistrationsCount, getTeamsByClubPaged, inviteMembers } from "@/lib/api/clubs";
+import { Club, Group, Team } from "@/lib/models/Club";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ScrollableTabBar } from "@/components";
 import { ArrowLeft, Building2, Calendar, ImageOff, Layers, Newspaper, Settings, Shield, UserPlus, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
+import { CursorPagedResult } from "@/lib/models/Pagination";
+import { InfiniteData, FetchNextPageOptions, InfiniteQueryObserverResult } from "@tanstack/react-query";
 
 // Context to share club data with child pages
 interface ClubContextValue {
 	clubId: string;
 	club: Club | undefined;
 	members: any[];
-	teams: any[];
-	groups: any[];
+	teams: Team[];
+	groups: Group[];
+	teamsQuery: {
+		data: InfiniteData<CursorPagedResult<Team>> | undefined;
+		fetchNextPage: (options?: FetchNextPageOptions) => Promise<InfiniteQueryObserverResult<InfiniteData<CursorPagedResult<Team>>, Error>>;
+		hasNextPage: boolean;
+		isFetchingNextPage: boolean;
+	};
+	groupsQuery: {
+		data: InfiniteData<CursorPagedResult<Group>> | undefined;
+		fetchNextPage: (options?: FetchNextPageOptions) => Promise<InfiniteQueryObserverResult<InfiniteData<CursorPagedResult<Group>>, Error>>;
+		hasNextPage: boolean;
+		isFetchingNextPage: boolean;
+	};
+	teamsTotalCount: number;
+	groupsTotalCount: number;
 	isLoading: boolean;
 	showInviteModal: () => void;
 }
@@ -77,17 +93,34 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 		enabled: !!clubId,
 	});
 
-	const { data: teams = [] } = useQuery({
+	const teamsInfinite = useInfiniteQuery({
 		queryKey: ["club-teams", clubId],
-		queryFn: () => getTeamsByClub(clubId),
+		queryFn: ({ pageParam }) => getTeamsByClubPaged(clubId, pageParam, 20),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
 		enabled: !!clubId,
 	});
 
-	const { data: groups = [] } = useQuery({
+	const groupsInfinite = useInfiniteQuery({
 		queryKey: ["club-groups", clubId],
-		queryFn: () => getGroupsByClub(clubId),
+		queryFn: ({ pageParam }) => getGroupsByClubPaged(clubId, pageParam, 20),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
 		enabled: !!clubId,
 	});
+
+	const teams = useMemo(
+		() => teamsInfinite.data?.pages.flatMap((p) => p.items) ?? [],
+		[teamsInfinite.data]
+	);
+
+	const groups = useMemo(
+		() => groupsInfinite.data?.pages.flatMap((p) => p.items) ?? [],
+		[groupsInfinite.data]
+	);
+
+	const teamsTotalCount = teamsInfinite.data?.pages[0]?.totalCount ?? teams.length;
+	const groupsTotalCount = groupsInfinite.data?.pages[0]?.totalCount ?? groups.length;
 
 	const { data: pendingCount = 0 } = useQuery({
 		queryKey: ["club-registrations-count", clubId],
@@ -108,9 +141,9 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 	const getTabCount = (tabId: TabType): number | string | undefined => {
 		switch (tabId) {
 			case "teams":
-				return teams.length;
+				return teamsTotalCount;
 			case "groups":
-				return groups.length;
+				return groupsTotalCount;
 			case "members":
 				return pendingCount > 0 ? `+${pendingCount}` : members.length;
 			default:
@@ -155,6 +188,20 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 				members,
 				teams,
 				groups,
+				teamsQuery: {
+					data: teamsInfinite.data,
+					fetchNextPage: teamsInfinite.fetchNextPage,
+					hasNextPage: teamsInfinite.hasNextPage,
+					isFetchingNextPage: teamsInfinite.isFetchingNextPage,
+				},
+				groupsQuery: {
+					data: groupsInfinite.data,
+					fetchNextPage: groupsInfinite.fetchNextPage,
+					hasNextPage: groupsInfinite.hasNextPage,
+					isFetchingNextPage: groupsInfinite.isFetchingNextPage,
+				},
+				teamsTotalCount,
+				groupsTotalCount,
 				isLoading: clubLoading,
 				showInviteModal: () => setShowInviteModal(true),
 			}}>
@@ -206,11 +253,11 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 								<div className="text-xs text-muted-foreground">Members</div>
 							</div>
 							<div className="text-center">
-								<div className="text-xl sm:text-2xl font-bold text-foreground">{teams.length}</div>
+								<div className="text-xl sm:text-2xl font-bold text-foreground">{teamsTotalCount}</div>
 								<div className="text-xs text-muted-foreground">Teams</div>
 							</div>
 							<div className="text-center">
-								<div className="text-xl sm:text-2xl font-bold text-foreground">{groups.length}</div>
+								<div className="text-xl sm:text-2xl font-bold text-foreground">{groupsTotalCount}</div>
 								<div className="text-xs text-muted-foreground">Groups</div>
 							</div>
 						</div>

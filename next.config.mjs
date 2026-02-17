@@ -6,7 +6,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-	output: "standalone",
+	output: process.env.NODE_ENV === "production" ? "standalone" : undefined,
 	images: {
 		remotePatterns: [
 			{
@@ -19,6 +19,10 @@ const nextConfig = {
 			},
 			{
 				protocol: "https",
+				hostname: "i.ytimg.com",
+			},
+			{
+				protocol: "https",
 				hostname: "www.gravatar.com",
 			},
 			{
@@ -28,11 +32,13 @@ const nextConfig = {
 		],
 		// Enable image optimization in production for better LCP
 		unoptimized: false,
+		formats: ["image/avif", "image/webp"],
 	},
 	serverExternalPackages: ["@microsoft/signalr"],
 
 	// Optimize package imports for better tree-shaking
 	experimental: {
+		turbopackFileSystemCacheForDev: true,
 		optimizePackageImports: [
 			// External packages
 			"lucide-react",

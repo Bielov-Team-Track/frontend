@@ -14,11 +14,11 @@ import {
 	type Section,
 } from "@/components/features/training";
 import { DrillDetailModal } from "@/components/features/drills";
-import { useCreateTemplate, useUpdateTemplate, useTemplate } from "@/hooks/useTemplates";
+import { useCreatePlan, useUpdatePlan, usePlan, useCreateEventPlan } from "@/hooks/useTemplates";
 import { useQuery } from "@tanstack/react-query";
 import { getClubs } from "@/lib/api/clubs";
 import type { Drill } from "@/lib/models/Drill";
-import type { TemplateVisibility } from "@/lib/models/Template";
+import type { PlanVisibility } from "@/lib/models/Template";
 import { ArrowLeft, Save, ChevronDown, ChevronUp, Cloud, CloudOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { showErrorToast } from "@/lib/errors";
@@ -27,13 +27,14 @@ const SECTION_COLORS = ["#FF7D00", "#29757A", "#2E5A88", "#D99100", "#4A7A45", "
 
 const AUTOSAVE_KEY_NEW = "training-plan-wizard-draft-new";
 const AUTOSAVE_KEY_EDIT_PREFIX = "training-plan-wizard-draft-edit-";
+const AUTOSAVE_KEY_EVENT_PREFIX = "training-plan-wizard-draft-event-";
 const AUTOSAVE_DEBOUNCE_MS = 1000;
 
 interface DraftData {
 	name: string;
 	description: string;
 	clubId: string;
-	visibility: TemplateVisibility;
+	visibility: PlanVisibility;
 	sessionDuration: number;
 	timeline: TimelineItem[];
 	sections: Section[];
@@ -44,12 +45,15 @@ export default function TrainingPlanWizardPage() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const editId = searchParams.get("id");
+	const eventId = searchParams.get("eventId");
 	const isEditMode = !!editId;
+	const isEventMode = !!eventId;
 
 	// API hooks
-	const { data: existingTemplate, isLoading: isLoadingTemplate } = useTemplate(editId || "", isEditMode);
-	const createMutation = useCreateTemplate();
-	const updateMutation = useUpdateTemplate();
+	const { data: existingTemplate, isLoading: isLoadingTemplate } = usePlan(editId || "", isEditMode);
+	const createMutation = useCreatePlan();
+	const updateMutation = useUpdatePlan();
+	const createEventPlanMutation = useCreateEventPlan();
 	const { data: myClubs = [] } = useQuery({
 		queryKey: ["clubs"],
 		queryFn: getClubs,
@@ -59,7 +63,7 @@ export default function TrainingPlanWizardPage() {
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [clubId, setClubId] = useState<string>("");
-	const [visibility, setVisibility] = useState<TemplateVisibility>("Private");
+	const [visibility, setVisibility] = useState<PlanVisibility>("Private");
 	const [detailsExpanded, setDetailsExpanded] = useState(true);
 
 	// Session state
@@ -83,7 +87,11 @@ export default function TrainingPlanWizardPage() {
 	const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	// Get the appropriate localStorage key
-	const autosaveKey = isEditMode && editId ? `${AUTOSAVE_KEY_EDIT_PREFIX}${editId}` : AUTOSAVE_KEY_NEW;
+	const autosaveKey = isEditMode && editId
+		? `${AUTOSAVE_KEY_EDIT_PREFIX}${editId}`
+		: isEventMode && eventId
+			? `${AUTOSAVE_KEY_EVENT_PREFIX}${eventId}`
+			: AUTOSAVE_KEY_NEW;
 
 	// Load existing template data in edit mode
 	useEffect(() => {
@@ -244,7 +252,7 @@ export default function TrainingPlanWizardPage() {
 	// Save template - defined before keyboard shortcuts useEffect that references it
 	const handleSave = useCallback(async () => {
 		if (!name.trim()) {
-			showErrorToast(new Error("Please enter a template name"), { message: "Please enter a template name" });
+			showErrorToast(new Error("Please enter a plan name"), { message: "Please enter a plan name" });
 			return;
 		}
 
@@ -267,21 +275,39 @@ export default function TrainingPlanWizardPage() {
 			}));
 
 			if (isEditMode && editId) {
+				// Edit mode: update existing plan (works for both templates and event plans)
 				await updateMutation.mutateAsync({
 					id: editId,
 					data: {
 						name: name.trim(),
 						description: description.trim() || undefined,
 						clubId: clubId || undefined,
-						visibility,
+						visibility: isEventMode ? undefined : visibility,
 						sections: sectionsDto.length > 0 ? sectionsDto : undefined,
 						items: itemsDto.length > 0 ? itemsDto : undefined,
 					},
 				});
-				// Clear draft after successful save
 				clearDraft();
-				router.push(`/hub/coaching/training/plans/${editId}`);
+				if (isEventMode && eventId) {
+					router.push(`/hub/events/${eventId}/training`);
+				} else {
+					router.push(`/hub/coaching/training/plans/${editId}`);
+				}
+			} else if (isEventMode && eventId) {
+				// Event mode: create event plan
+				await createEventPlanMutation.mutateAsync({
+					eventId,
+					request: {
+						name: name.trim() || undefined,
+						description: description.trim() || undefined,
+						sections: sectionsDto.length > 0 ? sectionsDto : undefined,
+						items: itemsDto.length > 0 ? itemsDto : undefined,
+					},
+				});
+				clearDraft();
+				router.push(`/hub/events/${eventId}/training`);
 			} else {
+				// Template mode: create new template
 				const result = await createMutation.mutateAsync({
 					name: name.trim(),
 					description: description.trim() || undefined,
@@ -290,15 +316,14 @@ export default function TrainingPlanWizardPage() {
 					sections: sectionsDto.length > 0 ? sectionsDto : undefined,
 					items: itemsDto.length > 0 ? itemsDto : undefined,
 				});
-				// Clear draft after successful save
 				clearDraft();
 				router.push(`/hub/coaching/training/plans/${result.id}`);
 			}
 		} catch (error) {
-			console.error("Failed to save template:", error);
-			showErrorToast(error, { fallback: "Failed to save template. Please try again." });
+			console.error("Failed to save plan:", error);
+			showErrorToast(error, { fallback: "Failed to save plan. Please try again." });
 		}
-	}, [name, description, clubId, visibility, sections, timeline, isEditMode, editId, router, createMutation, updateMutation, clearDraft]);
+	}, [name, description, clubId, visibility, sections, timeline, isEditMode, isEventMode, editId, eventId, router, createMutation, updateMutation, createEventPlanMutation, clearDraft]);
 
 	// Keyboard shortcuts handler
 	useEffect(() => {
@@ -354,13 +379,13 @@ export default function TrainingPlanWizardPage() {
 	const detailsSummary = useMemo(() => {
 		const parts: string[] = [];
 		if (name) parts.push(name);
-		if (clubId) {
+		if (!isEventMode && clubId) {
 			const club = myClubs.find((c) => c.id === clubId);
 			if (club) parts.push(club.name);
 		}
-		parts.push(visibility);
+		if (!isEventMode) parts.push(visibility);
 		return parts.join(" · ");
-	}, [name, clubId, visibility, myClubs]);
+	}, [name, clubId, visibility, myClubs, isEventMode]);
 
 	// Add drill to timeline
 	const handleAddDrill = useCallback((drill: Drill) => {
@@ -403,7 +428,7 @@ export default function TrainingPlanWizardPage() {
 		});
 	}, []);
 
-	const isSaving = createMutation.isPending || updateMutation.isPending;
+	const isSaving = createMutation.isPending || updateMutation.isPending || createEventPlanMutation.isPending;
 
 	// Format "saved X ago" text
 	const formatSavedAgo = useCallback((timestamp: number) => {
@@ -430,7 +455,7 @@ export default function TrainingPlanWizardPage() {
 			<div className="flex flex-col items-center justify-center h-64 gap-3">
 				<Loader size="lg" />
 				<p className="text-sm text-muted-foreground">
-					{isEditMode ? "Loading template..." : "Loading draft..."}
+					{isEditMode ? "Loading plan..." : "Loading draft..."}
 				</p>
 			</div>
 		);
@@ -463,16 +488,16 @@ export default function TrainingPlanWizardPage() {
 			{/* Header */}
 			<div>
 				<Link
-					href="/hub/coaching/training/plans"
+					href={isEventMode && eventId ? `/hub/events/${eventId}/training` : "/hub/coaching/training/plans"}
 					className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
 					<ArrowLeft size={16} />
-					Back to Plans
+					{isEventMode ? "Back to Event" : "Back to Plans"}
 				</Link>
 				<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 					<div>
 						<div className="flex items-center gap-3">
 							<h1 className="text-2xl font-bold text-foreground">
-								{isEditMode ? "Edit Training Plan" : "Create Training Plan"}
+								{isEditMode ? "Edit Training Plan" : isEventMode ? "Create Event Plan" : "Create Training Plan"}
 							</h1>
 							{/* Draft indicator */}
 							{lastSavedAt && (
@@ -529,10 +554,12 @@ export default function TrainingPlanWizardPage() {
 								</div>
 							)}
 						</div>
-						<p className="text-sm text-muted-foreground mt-1">Build a reusable training session template</p>
+						<p className="text-sm text-muted-foreground mt-1">
+							{isEventMode ? "Build a training plan for this event" : "Build a reusable training session template"}
+						</p>
 					</div>
 					<div className="hidden lg:flex items-center gap-3">
-						<Link href="/hub/coaching/training/plans">
+						<Link href={isEventMode && eventId ? `/hub/events/${eventId}/training` : "/hub/coaching/training/plans"}>
 							<Button variant="outline" color="neutral">
 								Cancel
 							</Button>
@@ -543,9 +570,9 @@ export default function TrainingPlanWizardPage() {
 							leftIcon={<Save size={16} />}
 							onClick={handleSave}
 							disabled={!name.trim() || isSaving}
-							aria-label="Save training plan template"
+							aria-label={isEventMode ? "Save event training plan" : "Save training plan template"}
 						>
-							{isSaving ? "Saving..." : "Save Template"}
+							{isSaving ? "Saving..." : isEventMode ? "Save Plan" : "Save Template"}
 						</Button>
 					</div>
 				</div>
@@ -558,7 +585,7 @@ export default function TrainingPlanWizardPage() {
 					onClick={() => setDetailsExpanded(!detailsExpanded)}
 					className="flex items-center justify-between w-full px-5 py-3 cursor-pointer hover:bg-hover/50 transition-colors">
 					<div className="flex items-center gap-3">
-						<h2 className="text-sm font-bold text-foreground">Template Details</h2>
+						<h2 className="text-sm font-bold text-foreground">{isEventMode ? "Plan Details" : "Template Details"}</h2>
 						{!detailsExpanded && detailsSummary && (
 							<span className="text-xs text-muted-foreground">{detailsSummary}</span>
 						)}
@@ -572,7 +599,10 @@ export default function TrainingPlanWizardPage() {
 
 				{detailsExpanded && (
 					<div className="px-5 pb-5 border-t border-border">
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+						<div className={cn(
+							"grid grid-cols-1 gap-4 mt-4",
+							isEventMode ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-4"
+						)}>
 							{/* Name */}
 							<div>
 								<label className="block text-xs font-medium text-muted-foreground mb-1.5">
@@ -597,54 +627,58 @@ export default function TrainingPlanWizardPage() {
 								/>
 							</div>
 
-							{/* Club */}
-							<div>
-								<label className="block text-xs font-medium text-muted-foreground mb-1.5">
-									Club <span className="text-muted-foreground/50">(optional)</span>
-								</label>
-								<select
-									value={clubId}
-									onChange={(e) => setClubId(e.target.value)}
-									className="w-full px-3 py-2 rounded-lg bg-surface border border-border text-foreground text-sm outline-none cursor-pointer focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all">
-									<option value="">Personal (no club)</option>
-									{myClubs.map((club) => (
-										<option key={club.id} value={club.id}>
-											{club.name}
-										</option>
-									))}
-								</select>
-							</div>
-
-							{/* Visibility */}
-							<div>
-								<label className="block text-xs font-medium text-muted-foreground mb-1.5">
-									Visibility
-								</label>
-								<div className="flex gap-2">
-									<button
-										type="button"
-										onClick={() => setVisibility("Private")}
-										className={cn(
-											"flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all",
-											visibility === "Private"
-												? "bg-accent/10 text-accent border border-accent/30"
-												: "text-muted-foreground border border-border hover:border-border"
-										)}>
-										Private
-									</button>
-									<button
-										type="button"
-										onClick={() => setVisibility("Public")}
-										className={cn(
-											"flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all",
-											visibility === "Public"
-												? "bg-accent/10 text-accent border border-accent/30"
-												: "text-muted-foreground border border-border hover:border-border"
-										)}>
-										Public
-									</button>
+							{/* Club - hidden in event mode */}
+							{!isEventMode && (
+								<div>
+									<label className="block text-xs font-medium text-muted-foreground mb-1.5">
+										Club <span className="text-muted-foreground/50">(optional)</span>
+									</label>
+									<select
+										value={clubId}
+										onChange={(e) => setClubId(e.target.value)}
+										className="w-full px-3 py-2 rounded-lg bg-surface border border-border text-foreground text-sm outline-none cursor-pointer focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all">
+										<option value="">Personal (no club)</option>
+										{myClubs.map((club) => (
+											<option key={club.id} value={club.id}>
+												{club.name}
+											</option>
+										))}
+									</select>
 								</div>
-							</div>
+							)}
+
+							{/* Visibility - hidden in event mode */}
+							{!isEventMode && (
+								<div>
+									<label className="block text-xs font-medium text-muted-foreground mb-1.5">
+										Visibility
+									</label>
+									<div className="flex gap-2">
+										<button
+											type="button"
+											onClick={() => setVisibility("Private")}
+											className={cn(
+												"flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all",
+												visibility === "Private"
+													? "bg-accent/10 text-accent border border-accent/30"
+													: "text-muted-foreground border border-border hover:border-border"
+											)}>
+											Private
+										</button>
+										<button
+											type="button"
+											onClick={() => setVisibility("Public")}
+											className={cn(
+												"flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all",
+												visibility === "Public"
+													? "bg-accent/10 text-accent border border-accent/30"
+													: "text-muted-foreground border border-border hover:border-border"
+											)}>
+											Public
+										</button>
+									</div>
+								</div>
+							)}
 						</div>
 					</div>
 				)}
@@ -719,7 +753,10 @@ export default function TrainingPlanWizardPage() {
 			{/* Mobile Sticky Footer with Save Button */}
 			<div className="lg:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-border p-4 z-50">
 				<div className="flex items-center gap-3">
-					<Link href="/hub/coaching/training/plans" className="text-sm text-muted-foreground hover:text-foreground">
+					<Link
+						href={isEventMode && eventId ? `/hub/events/${eventId}/training` : "/hub/coaching/training/plans"}
+						className="text-sm text-muted-foreground hover:text-foreground"
+					>
 						Cancel
 					</Link>
 					<Button
@@ -728,9 +765,9 @@ export default function TrainingPlanWizardPage() {
 						onClick={handleSave}
 						disabled={!name.trim() || isSaving}
 						className="flex-1"
-						aria-label="Save training plan template"
+						aria-label={isEventMode ? "Save event training plan" : "Save training plan template"}
 					>
-						{isSaving ? "Saving..." : "Save Template"}
+						{isSaving ? "Saving..." : isEventMode ? "Save Plan" : "Save Template"}
 					</Button>
 				</div>
 			</div>

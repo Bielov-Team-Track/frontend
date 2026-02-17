@@ -19,7 +19,7 @@ export default function InviteesSummaryCard({ selectedUsers, onEdit, disabled = 
 	}));
 
 	return (
-		<div className="p-4 border border-border rounded-xl bg-surface">
+		<div className="p-4 border border-border rounded-xl bg-surface" data-testid="invitees-summary-card">
 			<div className="flex items-center justify-between gap-4">
 				<AvatarStack items={avatarItems} max={maxAvatars} size="sm" emptyText="No invitees selected" />
 				<Button
@@ -28,7 +28,7 @@ export default function InviteesSummaryCard({ selectedUsers, onEdit, disabled = 
 					onClick={onEdit}
 					disabled={disabled}
 					leftIcon={selectedUsers.length > 0 ? <Pencil size={14} /> : <UserPlus size={14} />}
-					className="shrink-0 text-accent hover:text-accent/80 hover:bg-accent/10">
+					className="shrink-0 text-accent hover:text-accent/80 hover:bg-accent/10" data-testid="invitees-edit-button">
 					{selectedUsers.length > 0 ? "Edit" : "Add People"}
 				</Button>
 			</div>

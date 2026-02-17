@@ -107,6 +107,7 @@ function SortableAttachment({ attachment, onRemove, onPreview, onRetry, variant,
 			ref={setNodeRef}
 			style={style}
 			onClick={handleClick}
+			data-testid="attachment-preview"
 			className={cn(
 				"relative group rounded-lg overflow-hidden bg-surface border border-border",
 				variantStyles[variant],
@@ -183,6 +184,7 @@ function SortableAttachment({ attachment, onRemove, onPreview, onRetry, variant,
 			{/* Remove button */}
 			<button
 				type="button"
+				data-testid="attachment-remove"
 				onClick={(e) => {
 					e.stopPropagation();
 					onRemove(attachment.id);

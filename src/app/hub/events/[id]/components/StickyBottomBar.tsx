@@ -58,7 +58,7 @@ export default function StickyBottomBar({
 			: "Organizer";
 
 		return (
-			<div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+			<div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]" data-testid="sticky-bottom-bar">
 				<div className="flex items-center gap-3">
 					<div className="flex-1 min-w-0 pl-1">
 						<div className="text-[10px] text-muted-foreground">Invited by {inviterName}</div>
@@ -70,14 +70,16 @@ export default function StickyBottomBar({
 						variant="outline"
 						size="sm"
 						onClick={onDecline}
-						leftIcon={<X className="size-3.5" />}>
+						leftIcon={<X className="size-3.5" />}
+						data-testid="sticky-decline-button">
 						Decline
 					</Button>
 					<Button
 						variant="default"
 						size="sm"
 						onClick={onAccept}
-						leftIcon={<Check className="size-3.5" />}>
+						leftIcon={<Check className="size-3.5" />}
+						data-testid="sticky-accept-button">
 						Accept
 					</Button>
 				</div>
@@ -88,7 +90,7 @@ export default function StickyBottomBar({
 	// Variant 2: Open registration
 	if (isOpen && !isFull && !isParticipant) {
 		return (
-			<div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+			<div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]" data-testid="sticky-bottom-bar">
 				<div className="flex items-center gap-3">
 					<div className="flex-1 min-w-0 pl-1">
 						<div className="text-xs font-semibold text-foreground">
@@ -99,7 +101,8 @@ export default function StickyBottomBar({
 						variant="default"
 						size="sm"
 						onClick={onJoin}
-						className="min-w-[100px]">
+						className="min-w-[100px]"
+						data-testid="sticky-join-button">
 						Join Event
 					</Button>
 				</div>

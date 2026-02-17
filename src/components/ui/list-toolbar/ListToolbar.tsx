@@ -47,6 +47,9 @@ interface ListToolbarProps {
 	onViewModeChange?: (mode: ViewMode) => void;
 	showViewToggle?: boolean;
 
+	// Test IDs
+	searchTestId?: string;
+
 	// Panel state (controlled from parent if needed)
 	defaultPanel?: "search" | "filter" | null;
 }
@@ -67,6 +70,7 @@ export function ListToolbar({
 	onViewModeChange,
 	showViewToggle = true,
 	defaultPanel = null,
+	searchTestId,
 }: ListToolbarProps) {
 	const [showFilters, setShowFilters] = useState(false);
 	const [showMobileSearch, setShowMobileSearch] = useState(false);
@@ -109,6 +113,7 @@ export function ListToolbar({
 								leftIcon={<Search size={16} className="text-muted-foreground" />}
 								value={search}
 								onChange={(e) => onSearchChange(e.target.value)}
+								{...(searchTestId ? { "data-testid": searchTestId } : {})}
 							/>
 							{search && (
 								<button
@@ -238,6 +243,7 @@ export function ListToolbar({
 								leftIcon={<Search size={16} className="text-muted-foreground" />}
 								value={search}
 								onChange={(e) => onSearchChange(e.target.value)}
+								{...(searchTestId ? { "data-testid": searchTestId } : {})}
 							/>
 							{search && (
 								<button

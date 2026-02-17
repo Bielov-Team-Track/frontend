@@ -120,9 +120,9 @@ export default function EventOverviewPage() {
 
 					{/* About Card */}
 					{event.description && (
-						<div className="rounded-2xl bg-surface border border-border p-6">
+						<div className="rounded-2xl bg-surface border border-border p-6" data-testid="event-description-card">
 							<h3 className="text-lg font-bold text-white mb-4">About This Event</h3>
-							<p className="text-muted text-sm leading-relaxed">{event.description}</p>
+							<p className="text-muted text-sm leading-relaxed" data-testid="event-description">{event.description}</p>
 						</div>
 					)}
 
@@ -191,20 +191,20 @@ export default function EventOverviewPage() {
 			<Modal
 				isOpen={showDeclineModal}
 				onClose={handleCloseModal}
-				title="Decline Invitation"
+				title="Decline Invitation" data-testid="decline-invitation-modal"
 				description="Let the organizers know why you can't make it (optional)."
 				size="sm">
 				<textarea
 					value={declineNote}
 					onChange={(e) => setDeclineNote(e.target.value)}
-					placeholder="Add a note..."
+					placeholder="Add a note..." data-testid="decline-note-input"
 					className="w-full h-24 px-4 py-3 rounded-xl bg-background border border-border text-white placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
 				/>
 				<div className="flex justify-end gap-3 mt-4">
 					<Button variant="ghost" color="neutral" onClick={handleCloseModal}>
 						Cancel
 					</Button>
-					<Button variant="destructive" onClick={handleConfirmDecline}>
+					<Button variant="destructive" onClick={handleConfirmDecline} data-testid="confirm-decline-button">
 						Decline Invitation
 					</Button>
 				</div>

@@ -85,8 +85,8 @@ export default function ReviewStep() {
 				<div className="px-3 sm:px-6 pb-4 sm:pb-6 relative -mt-6 sm:-mt-8">
 					{/* Event Title */}
 					<div className="mb-4 sm:mb-6">
-						<h3 className="text-xl sm:text-2xl font-bold text-foreground mb-1">{values.name || "Untitled Event"}</h3>
-						<p className="text-xs sm:text-sm text-muted-foreground">
+						<h3 className="text-xl sm:text-2xl font-bold text-foreground mb-1" data-testid="review-event-name">{values.name || "Untitled Event"}</h3>
+						<p className="text-xs sm:text-sm text-muted-foreground" data-testid="review-event-meta">
 							{values.type} • {values.surface} • {values.eventFormat}
 						</p>
 					</div>
@@ -120,9 +120,11 @@ export default function ReviewStep() {
 
 						{/* Location */}
 						{values.location?.address && (
-							<ReviewSection title="Location" icon={MapPin} onEdit={() => goToStep(2)}>
-								<p className="text-xs sm:text-sm text-foreground font-medium truncate">{values.location.name || values.location.address}</p>
-							</ReviewSection>
+							<div data-testid="review-location-section">
+								<ReviewSection title="Location" icon={MapPin} onEdit={() => goToStep(2)}>
+									<p className="text-xs sm:text-sm text-foreground font-medium truncate">{values.location.name || values.location.address}</p>
+								</ReviewSection>
+							</div>
 						)}
 					</div>
 
@@ -135,14 +137,14 @@ export default function ReviewStep() {
 						</div>
 						<div className="flex flex-wrap gap-2 sm:gap-3">
 							{/* Payment Badge */}
-							<div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-surface border border-border">
+							<div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-surface border border-border" data-testid="review-payment-badge">
 								<Coins size={10} className="text-accent sm:hidden" />
 								<Coins size={12} className="text-accent hidden sm:block" />
 								<span className="text-[10px] sm:text-xs text-foreground">{!values.usePaymentConfig ? "Free" : getPaymentConfigSummary()}</span>
 							</div>
 
 							{/* Privacy Badge */}
-							<div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-surface border border-border">
+							<div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-surface border border-border" data-testid="review-privacy-badge">
 								{values.isPublic ? (
 									<>
 										<Eye size={10} className="text-accent sm:hidden" />

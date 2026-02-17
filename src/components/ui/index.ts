@@ -21,6 +21,8 @@ export { default as DeleteConfirmModal } from "./delete-confirm-modal";
 export { default as Drawer } from "./drawer";
 export { default as Dropdown } from "./dropdown";
 export { default as DropdownMenu } from "./dropdown-menu/index";
+export { default as EmbedCard } from "./embed-card";
+export type { EmbedCardProps } from "./embed-card";
 export { default as EmojiPicker } from "./emoji-picker";
 export { default as EmptyState } from "./empty-state";
 export { default as FilterDropdown } from "./filter-dropdown";

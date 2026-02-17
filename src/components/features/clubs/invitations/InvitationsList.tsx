@@ -3,10 +3,10 @@
 import { Button } from "@/components";
 import { Dropdown, Loader } from "@/components/ui";
 import { ClubInvitation, InvitationStatus } from "@/lib/models/Club";
-import { getClubInvitations, revokeInvitation } from "@/lib/api/clubs";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Copy, Link, Mail, Trash2, User } from "lucide-react";
-import { useState } from "react";
+import { getClubInvitationsPaged, revokeInvitation } from "@/lib/api/clubs";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Check, Copy, Link, Loader2, Mail, Trash2, User } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface InvitationsListProps {
@@ -25,11 +25,47 @@ const InvitationsList = ({ clubId }: InvitationsListProps) => {
 	const queryClient = useQueryClient();
 	const [statusFilter, setStatusFilter] = useState<InvitationStatus | "">("");
 	const [copiedId, setCopiedId] = useState<string | null>(null);
+	const sentinelRef = useRef<HTMLDivElement>(null);
 
-	const { data: invitations, isLoading } = useQuery({
+	const {
+		data,
+		isLoading,
+		hasNextPage,
+		isFetchingNextPage,
+		fetchNextPage,
+	} = useInfiniteQuery({
 		queryKey: ["club-invitations", clubId, statusFilter],
-		queryFn: () => getClubInvitations(clubId, statusFilter || undefined),
+		queryFn: ({ pageParam }) =>
+			getClubInvitationsPaged(clubId, statusFilter || undefined, pageParam, 20),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
 	});
+
+	const invitations = useMemo(
+		() => data?.pages.flatMap((p) => p.items) ?? [],
+		[data]
+	);
+
+	// Infinite scroll observer
+	useEffect(() => {
+		if (!hasNextPage || isFetchingNextPage) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting) {
+					fetchNextPage();
+				}
+			},
+			{ threshold: 0.1 }
+		);
+
+		const el = sentinelRef.current;
+		if (el) observer.observe(el);
+
+		return () => {
+			if (el) observer.unobserve(el);
+		};
+	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	const revokeMutation = useMutation({
 		mutationFn: (invitationId: string) => revokeInvitation(clubId, invitationId),
@@ -66,7 +102,7 @@ const InvitationsList = ({ clubId }: InvitationsListProps) => {
 				options={filterOptions}
 				placeholder="Filter by status"
 			/>
-			{!invitations || invitations.length === 0 ? (
+			{invitations.length === 0 ? (
 				<div className="p-8 bg-surface rounded-xl text-center">
 					<p className="text-muted-foreground-foreground">No invitations found</p>
 				</div>
@@ -113,6 +149,13 @@ const InvitationsList = ({ clubId }: InvitationsListProps) => {
 							</div>
 						</div>
 					))}
+
+					{/* Infinite scroll sentinel */}
+					{hasNextPage && (
+						<div ref={sentinelRef} className="flex justify-center py-4">
+							{isFetchingNextPage && <Loader2 className="animate-spin text-muted-foreground" size={20} />}
+						</div>
+					)}
 				</div>
 			)}
 		</div>

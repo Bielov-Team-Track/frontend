@@ -2,6 +2,8 @@
 
 import { Avatar } from "@/components";
 import { Club, Venue } from "@/lib/models/Club";
+import { shimmerBlur } from "@/lib/utils/image";
+import { thumbHashToBlurUrl } from "@/lib/utils/thumbhash";
 import { ImageOff, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,9 +35,11 @@ export default function ClubCard({ club, href }: ClubCardProps) {
 						<Image
 							src={club.bannerUrl}
 							alt={`${club.name} banner`}
-							width={400}
-							height={200}
-							className="w-full h-full object-cover"
+							fill
+							sizes="(max-width: 640px) 100vw, 400px"
+							className="object-cover"
+							placeholder="blur"
+							blurDataURL={thumbHashToBlurUrl(club.bannerThumbHash) ?? shimmerBlur(400, 200)}
 							onError={() => setBannerError(true)}
 						/>
 					) : (

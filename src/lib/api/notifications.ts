@@ -31,3 +31,11 @@ export async function getUnreadCount(): Promise<{ count: number }> {
 	const endpoint = `/notifications/unread-count`;
 	return (await client.get(PREFIX + endpoint)).data;
 }
+
+export async function deleteNotification(id: string): Promise<void> {
+	await client.delete(`${PREFIX}/notifications/${id}`);
+}
+
+export async function deleteAllNotifications(): Promise<void> {
+	await client.delete(`${PREFIX}/notifications`);
+}

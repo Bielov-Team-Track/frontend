@@ -1,8 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { thumbHashToBlurUrl } from "@/lib/utils/thumbhash";
 import { AlertCircle, FileSpreadsheet, FileText, Image, Play, Presentation } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { MediaThumbnailProps } from "./types";
 import { getDocumentIconColor, getDocumentSubtype, getFileName } from "./utils";
 
@@ -55,6 +56,8 @@ export default function MediaThumbnail({ item, size = "md", onClick, className }
 	const fileName = getFileName(item);
 	const iconSize = iconSizes[size];
 	const [imageError, setImageError] = useState(false);
+	const [imageLoaded, setImageLoaded] = useState(false);
+	const blurUrl = useMemo(() => thumbHashToBlurUrl(item.thumbHash), [item.thumbHash]);
 
 	const renderContent = () => {
 		switch (item.type) {
@@ -74,13 +77,24 @@ export default function MediaThumbnail({ item, size = "md", onClick, className }
 					);
 				}
 				return (
-					<img
-						src={item.thumbnailUrl || item.url}
-						alt={fileName}
-						className="w-full h-full object-cover"
-						draggable={false}
-						onError={() => setImageError(true)}
-					/>
+					<>
+						{blurUrl && !imageLoaded && (
+							<img
+								src={blurUrl}
+								alt=""
+								className="absolute inset-0 w-full h-full object-cover"
+								aria-hidden="true"
+							/>
+						)}
+						<img
+							src={item.thumbnailUrl || item.url}
+							alt={fileName}
+							className="w-full h-full object-cover"
+							draggable={false}
+							onLoad={() => setImageLoaded(true)}
+							onError={() => setImageError(true)}
+						/>
+					</>
 				);
 
 			case "video":

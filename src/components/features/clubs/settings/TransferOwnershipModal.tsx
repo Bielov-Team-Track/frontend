@@ -50,7 +50,7 @@ export default function TransferOwnershipModal({ isOpen, clubId, clubName, onClo
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={handleClose} title="Transfer Ownership" size="md">
+		<Modal isOpen={isOpen} onClose={handleClose} title="Transfer Ownership" size="md" preventOutsideClose>
 			<div className="space-y-6">
 				<p className="text-sm text-muted">
 					Transfer ownership of <span className="text-white font-medium">{clubName}</span> to another admin. You will become a regular admin after the

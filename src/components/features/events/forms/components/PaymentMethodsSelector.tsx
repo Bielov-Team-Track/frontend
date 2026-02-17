@@ -35,6 +35,7 @@ const PaymentMethodsSelector = ({
 						const isSelected = value.includes(PaymentMethod.Cash);
 						return (
 							<button
+								data-testid="payment-method-cash"
 								type="button"
 								disabled={disabled}
 								onClick={() => {
@@ -106,6 +107,7 @@ const PaymentMethodsSelector = ({
 
 						return (
 							<button
+								data-testid="payment-method-card"
 								type="button"
 								disabled={disabled}
 								onClick={() => {

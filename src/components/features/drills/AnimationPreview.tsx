@@ -221,10 +221,12 @@ export function AnimationPreview({ animation, width = 200, height = 400 }: Anima
 			y: player.y + (toFrame.players[index].y - player.y) * easedProgress,
 		}))
 
-		const interpolatedBall = {
-			x: fromFrame.ball.x + (toFrame.ball.x - fromFrame.ball.x) * easedProgress,
-			y: fromFrame.ball.y + (toFrame.ball.y - fromFrame.ball.y) * easedProgress,
-		}
+		const interpolatedBall = fromFrame.ball && toFrame.ball
+			? {
+				x: fromFrame.ball.x + (toFrame.ball.x - fromFrame.ball.x) * easedProgress,
+				y: fromFrame.ball.y + (toFrame.ball.y - fromFrame.ball.y) * easedProgress,
+			}
+			: fromFrame.ball || toFrame.ball
 
 		// Interpolate equipment positions
 		const interpolatedEquipment = (fromFrame.equipment || []).map((equip, index) => {
@@ -333,21 +335,23 @@ export function AnimationPreview({ animation, width = 200, height = 400 }: Anima
 					))}
 
 					{/* Render ball */}
-					<g>
-						<circle cx={displayState.ball.x} cy={displayState.ball.y} r="8" fill="#fef3c7" stroke="#f59e0b" strokeWidth="2" />
-						<path
-							d={`M ${displayState.ball.x - 5} ${displayState.ball.y} Q ${displayState.ball.x} ${displayState.ball.y - 6} ${displayState.ball.x + 5} ${displayState.ball.y}`}
-							fill="none"
-							stroke="#f59e0b"
-							strokeWidth="1"
-						/>
-						<path
-							d={`M ${displayState.ball.x - 5} ${displayState.ball.y} Q ${displayState.ball.x} ${displayState.ball.y + 6} ${displayState.ball.x + 5} ${displayState.ball.y}`}
-							fill="none"
-							stroke="#f59e0b"
-							strokeWidth="1"
-						/>
-					</g>
+					{displayState.ball && (
+						<g>
+							<circle cx={displayState.ball.x} cy={displayState.ball.y} r="8" fill="#fef3c7" stroke="#f59e0b" strokeWidth="2" />
+							<path
+								d={`M ${displayState.ball.x - 5} ${displayState.ball.y} Q ${displayState.ball.x} ${displayState.ball.y - 6} ${displayState.ball.x + 5} ${displayState.ball.y}`}
+								fill="none"
+								stroke="#f59e0b"
+								strokeWidth="1"
+							/>
+							<path
+								d={`M ${displayState.ball.x - 5} ${displayState.ball.y} Q ${displayState.ball.x} ${displayState.ball.y + 6} ${displayState.ball.x + 5} ${displayState.ball.y}`}
+								fill="none"
+								stroke="#f59e0b"
+								strokeWidth="1"
+							/>
+						</g>
+					)}
 				</CourtPreview>
 			</div>
 

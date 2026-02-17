@@ -12,12 +12,12 @@ import {
 } from "@/components/features/templates";
 import { DrillCard, type Drill as ComponentDrill } from "@/components/features/drills";
 import {
-	useTemplate,
-	useCanEditTemplate,
-	useDeleteTemplate,
+	usePlan,
+	useCanEditPlan,
+	useDeletePlan,
 } from "@/hooks/useTemplates";
 import { useAuth } from "@/providers";
-import type { TemplateSection, TemplateItem } from "@/lib/models/Template";
+import type { PlanSection, PlanItem } from "@/lib/models/Template";
 import {
 	CATEGORY_SEGMENT_COLORS,
 	INTENSITY_SEGMENT_COLORS,
@@ -57,9 +57,9 @@ export default function TemplateDetailPage() {
 	const templateId = params.id as string;
 
 	const { userProfile } = useAuth();
-	const { data: template, isLoading, error } = useTemplate(templateId);
-	const { canEdit, isLoading: isLoadingPermissions } = useCanEditTemplate(template, userProfile?.id);
-	const deleteMutation = useDeleteTemplate();
+	const { data: template, isLoading, error } = usePlan(templateId);
+	const { canEdit, isLoading: isLoadingPermissions } = useCanEditPlan(template, userProfile?.id);
+	const deleteMutation = useDeletePlan();
 
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 	const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
@@ -109,7 +109,7 @@ export default function TemplateDetailPage() {
 
 	// All items in order for the timeline bar
 	const allItemsInOrder = useMemo(() => {
-		const items: (TemplateItem & { sectionIndex: number })[] = [];
+		const items: (PlanItem & { sectionIndex: number })[] = [];
 		sectionsWithItems.forEach((section, sIdx) => {
 			section.items.forEach((item) => {
 				items.push({ ...item, sectionIndex: sIdx });

@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { Play } from "lucide-react";
 import { useState } from "react";
-import { type EmbedInfo, getProviderDisplayName } from "./embedUtils";
+import { type EmbedInfo, getProviderDisplayName } from "@/components/ui/media-preview";
 
 interface EmbedPreviewProps {
 	embed: EmbedInfo;

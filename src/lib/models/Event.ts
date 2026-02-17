@@ -65,6 +65,10 @@ export interface Event {
 	teamsNumber: number;
 	teams?: Team[]; // Array of team IDs
 
+	// Training plan (from coaching-service)
+	trainingPlanId?: string;
+	trainingPlanSummary?: string; // JSON: { name, totalDuration, sectionCount, drillCount }
+
 	// Recurring event series
 	seriesId?: string;
 	seriesOccurrenceNumber?: number;
@@ -79,9 +83,10 @@ export interface EventAdmin {}
 export interface EventFilterRequest {
 	type?: EventType; // Optional filter by event type
 	surface?: PlayingSurface; // Optional filter by playing surface
-	from?: Date; // Optional filter for start time
-	to?: Date; // Optional filter for end time
+	from?: string; // Optional filter for start time (ISO string)
+	to?: string; // Optional filter for end time (ISO string)
 	status?: "outstanding" | "completed" | "cancelled"; // Filter by payment/event status
+	searchTerm?: string; // Search by event name (case-insensitive)
 	organizerId?: string; // Filter by event organizer
 	participantId?: string; // Filter by participant
 	page?: number; // Page number for pagination (default: 1)
@@ -188,6 +193,22 @@ export interface CreateEventSeries {
 	registrationDeadlineOffset?: TimeOffset;
 	contextType?: ContextType;
 	contextId?: string;
+}
+
+export interface TrainingPlanSummary {
+	name: string;
+	totalDuration: number;
+	sectionCount: number;
+	drillCount: number;
+}
+
+export function parseTrainingPlanSummary(json: string | undefined): TrainingPlanSummary | null {
+	if (!json) return null;
+	try {
+		return JSON.parse(json) as TrainingPlanSummary;
+	} catch {
+		return null;
+	}
 }
 
 export interface EventSeries {

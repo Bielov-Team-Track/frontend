@@ -2,6 +2,7 @@
 
 import { Button, Loader } from "@/components";
 import { verifyEmail } from "@/lib/api/auth";
+import { getCookie } from "@/lib/cookies";
 import { useAuth } from "@/providers";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect } from "react";
@@ -10,6 +11,8 @@ import { Check } from "lucide-react";
 const VerifyEmailPageContent = () => {
 	const [error, setError] = React.useState<string | null>(null);
 	const [countdown, setCountdown] = React.useState(5);
+	const [isReady, setIsReady] = React.useState(false);
+	const [redirectTarget, setRedirectTarget] = React.useState("/hub/events");
 	const router = useRouter();
 	const params = useSearchParams();
 	const token = params.get("token");
@@ -46,10 +49,16 @@ const VerifyEmailPageContent = () => {
 				verifiedRef.current = true;
 				setError(null);
 
+				// Determine redirect target based on profile completion
+				let target = "/hub/events";
+
 				// If auth tokens are provided, log in the user automatically
 				if (result.auth) {
 					try {
 						await loginFromTokens(result.auth);
+						// Read the profileStatus cookie that syncProfileStatusCookie just set
+						const status = getCookie("profileStatus");
+						target = status === "incomplete" ? "/complete-profile-setup" : "/hub/events";
 					} catch (loginError) {
 						console.error(
 							"Failed to log in user after verification:",
@@ -59,11 +68,14 @@ const VerifyEmailPageContent = () => {
 					}
 				}
 
+				setRedirectTarget(target);
+				setIsReady(true);
+
 				const timer = setInterval(() => {
 					setCountdown((prev) => {
 						if (prev <= 1) {
 							clearInterval(timer);
-							router.push("/hub/events/my");
+							router.push(target);
 							return 0;
 						}
 						return prev - 1;
@@ -89,7 +101,7 @@ const VerifyEmailPageContent = () => {
 				<>
 					<div className="flex items-center justify-center">
 						<Loader size="24px" className="inline-block mr-2" />
-						<h2>Verifing you email...</h2>
+						<h2>Verifying your email...</h2>
 					</div>
 					<p>
 						We are verifying your email address. This may take a few moments.
@@ -102,14 +114,15 @@ const VerifyEmailPageContent = () => {
 						<h2 className="">Your email is verified!</h2>
 					</div>
 					<p>
-						You will be redirected to your dashboard in{" "}
+						You will be redirected in{" "}
 						<span className="font-bold text-accent">{countdown}</span> seconds
 					</p>
 					<Button
 						variant="link"
-						onClick={() => router.push("/hub/events/my")}
+						onClick={() => router.push(redirectTarget)}
+						disabled={!isReady}
 					>
-						go to dashboard straight away
+						continue
 					</Button>
 				</>
 			)}

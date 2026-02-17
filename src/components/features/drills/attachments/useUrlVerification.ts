@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { isEmbedUrl, isYouTubeUrl, isVimeoUrl } from "./embedUtils";
+import { isEmbedUrl, isYouTubeUrl, isVimeoUrl } from "@/components/ui/media-preview";
 
 // =============================================================================
 // TYPES

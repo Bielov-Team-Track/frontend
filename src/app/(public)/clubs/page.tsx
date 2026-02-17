@@ -1,13 +1,14 @@
 "use client";
 
-import { Button, FilterDropdown, Input } from "@/components";
+import { Button, FilterDropdown, Input, Loader } from "@/components";
 import { Card, CardContent } from "@/components/ui/card";
 import { ClubCard } from "@/components/features/clubs";
-import { getClubs } from "@/lib/api/clubs";
-import { useQuery } from "@tanstack/react-query";
+import { searchClubs } from "@/lib/api/clubs";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { ArrowUpRight, MapPin, Search, Sun, Trophy, Users, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useCallback, useRef, useState } from "react";
 
 // --- Configuration ---
 const FILTERS = {
@@ -42,21 +43,60 @@ const FILTERS = {
 	},
 };
 
+const PAGE_SIZE = 20;
+
+function useInfiniteScroll(fetchNextPage: () => void, hasNextPage: boolean | undefined, isFetchingNextPage: boolean) {
+	const observerRef = useRef<IntersectionObserver | null>(null);
+
+	const targetRef = useCallback(
+		(node: HTMLDivElement | null) => {
+			if (observerRef.current) observerRef.current.disconnect();
+			if (!node) return;
+
+			observerRef.current = new IntersectionObserver(
+				(entries) => {
+					if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+						fetchNextPage();
+					}
+				},
+				{ rootMargin: "200px" }
+			);
+			observerRef.current.observe(node);
+		},
+		[fetchNextPage, hasNextPage, isFetchingNextPage]
+	);
+
+	return targetRef;
+}
+
 export default function ClubsDirectory() {
+	const [searchQuery, setSearchQuery] = useState("");
 	const [selections, setSelections] = useState({
 		level: [] as string[],
 		surface: [] as string[],
 		gender: [] as string[],
 	});
 
+	const debouncedSearch = useDebouncedValue(searchQuery, 300);
+
 	const {
-		data: clubs,
+		data,
 		isLoading,
 		error,
-	} = useQuery({
-		queryKey: ["clubs"],
-		queryFn: getClubs,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useInfiniteQuery({
+		queryKey: ["clubs", { query: debouncedSearch, isPublic: true }],
+		queryFn: ({ pageParam }) =>
+			searchClubs({ query: debouncedSearch || undefined, isPublic: true, cursor: pageParam, limit: PAGE_SIZE }),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
 	});
+
+	const loadMoreRef = useInfiniteScroll(fetchNextPage, hasNextPage, isFetchingNextPage);
+
+	const clubs = data?.pages.flatMap((page) => page.items ?? []) || [];
 
 	const handleFilterChange = (category: keyof typeof selections, values: string[]) => {
 		setSelections((prev) => ({ ...prev, [category]: values }));
@@ -71,7 +111,7 @@ export default function ClubsDirectory() {
 	if (isLoading) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
-				<span className="loading loading-spinner loading-lg text-primary"></span>
+				<Loader />
 			</div>
 		);
 	}
@@ -103,16 +143,10 @@ export default function ClubsDirectory() {
 				{/* Search Bar */}
 				<div className="mb-6">
 					<Input
-						placeholder="Search by name, city, or league..."
+						placeholder="Search by name or description..."
 						leftIcon={<Search size={18} />}
-						rightIcon={
-							<div className="hidden md:flex items-center gap-2">
-								<Button variant="ghost" color="neutral" size="sm" leftIcon={<MapPin size={16} />}>
-									Location
-								</Button>
-								<Button size="sm">Search</Button>
-							</div>
-						}
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
 					/>
 				</div>
 
@@ -142,7 +176,7 @@ export default function ClubsDirectory() {
 
 			{/* --- RESULTS GRID --- */}
 			<div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-				{(clubs || []).map((club) => (
+				{clubs.map((club) => (
 					<ClubCard key={club.id} club={club} />
 				))}
 
@@ -156,6 +190,11 @@ export default function ClubsDirectory() {
 						</Link>
 					</CardContent>
 				</Card>
+			</div>
+
+			{/* Infinite scroll sentinel */}
+			<div ref={loadMoreRef} className="flex justify-center py-8">
+				{isFetchingNextPage && <Loader />}
 			</div>
 		</div>
 	);

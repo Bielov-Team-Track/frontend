@@ -24,7 +24,7 @@ export default function DeleteClubModal({ isOpen, clubName, onClose, onConfirm, 
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={handleClose} size="md" showCloseButton={false}>
+		<Modal isOpen={isOpen} onClose={handleClose} size="md" showCloseButton={false} preventOutsideClose>
 			<div className="space-y-6">
 				<div className="text-center">
 					<div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">

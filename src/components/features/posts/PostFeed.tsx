@@ -4,7 +4,7 @@ import { Button, EmptyState } from "@/components/";
 import { ListToolbar } from "@/components/ui/list-toolbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDeletePost, useHidePost, usePinPost, usePostsFeed, useRestorePost, useUnpinPost } from "@/hooks/usePosts";
-import { Post } from "@/lib/models/Post";
+import { Post, PostFilters } from "@/lib/models/Post";
 import { ContextType } from "@/lib/models/shared/models";
 import { Calendar, Clock, Loader2, Newspaper, Paperclip, Plus, User } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -19,24 +19,41 @@ interface PostFeedProps {
 	contextName: string;
 }
 
-type SortOption = "newest" | "oldest" | "author";
+type SortOption = "newest" | "oldest";
 
 const SORT_OPTIONS = [
 	{ value: "newest", label: "Newest First", icon: <Clock size={14} /> },
 	{ value: "oldest", label: "Oldest First", icon: <Calendar size={14} /> },
-	{ value: "author", label: "By Author", icon: <User size={14} /> },
 ];
 
 export default function PostFeed({ contextType, contextId, contextName }: PostFeedProps) {
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [editingPost, setEditingPost] = useState<Post | null>(null);
 	const [search, setSearch] = useState("");
+	const [debouncedSearch, setDebouncedSearch] = useState("");
 	const [sortBy, setSortBy] = useState<SortOption>("newest");
 	const [authorFilter, setAuthorFilter] = useState<string>("all");
 	const [withAttachments, setWithAttachments] = useState(false);
 	const pinPost = usePinPost();
 	const unpinPost = useUnpinPost();
-	const { data, isLoading, isError, hasNextPage, fetchNextPage, isFetchingNextPage } = usePostsFeed(contextType, contextId);
+
+	// Debounce search input
+	useEffect(() => {
+		const timer = setTimeout(() => setDebouncedSearch(search), 400);
+		return () => clearTimeout(timer);
+	}, [search]);
+
+	// Build filters for the backend query
+	const filters = useMemo<PostFilters>(() => {
+		const f: PostFilters = {};
+		if (debouncedSearch) f.search = debouncedSearch;
+		if (authorFilter !== "all") f.authorId = authorFilter;
+		if (withAttachments) f.hasMedia = true;
+		if (sortBy !== "newest") f.sort = sortBy;
+		return f;
+	}, [debouncedSearch, authorFilter, withAttachments, sortBy]);
+
+	const { data, isLoading, isError, hasNextPage, fetchNextPage, isFetchingNextPage } = usePostsFeed(contextType, contextId, filters);
 
 	const hidePost = useHidePost();
 	const restorePost = useRestorePost();
@@ -46,7 +63,7 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 		const all = data?.pages.flatMap((page) => page.items) ?? [];
 		const pinned = all.filter((post) => post.isPinned).sort((a, b) => (a.pinOrder ?? 0) - (b.pinOrder ?? 0));
 
-		// Get unique authors for filter
+		// Get unique authors for filter dropdown
 		const authorsMap = new Map<string, string>();
 		all.forEach((post) => {
 			if (post.author?.id && !authorsMap.has(post.author.id)) {
@@ -55,46 +72,10 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 		});
 		const authors = Array.from(authorsMap.entries()).map(([id, name]) => ({ value: id, label: name }));
 
-		let regular = all.filter((post) => !post.isPinned);
-
-		// Apply search filter
-		if (search) {
-			const searchLower = search.toLowerCase();
-			regular = regular.filter(
-				(post) =>
-					post.content?.toLowerCase().includes(searchLower) ||
-					`${post.author?.name || ""} ${post.author?.surname || ""}`.toLowerCase().includes(searchLower)
-			);
-		}
-
-		// Apply author filter
-		if (authorFilter !== "all") {
-			regular = regular.filter((post) => post.author?.id === authorFilter);
-		}
-
-		// Apply attachments filter
-		if (withAttachments) {
-			regular = regular.filter((post) => post.media && post.media.length > 0);
-		}
-
-		// Apply sorting
-		regular.sort((a, b) => {
-			switch (sortBy) {
-				case "newest":
-					return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
-				case "oldest":
-					return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
-				case "author":
-					const authorA = `${a.author?.name || ""} ${a.author?.surname || ""}`.toLowerCase();
-					const authorB = `${b.author?.name || ""} ${b.author?.surname || ""}`.toLowerCase();
-					return authorA.localeCompare(authorB);
-				default:
-					return 0;
-			}
-		});
+		const regular = all.filter((post) => !post.isPinned);
 
 		return { allPosts: all, pinnedPosts: pinned, regularPosts: regular, uniqueAuthors: authors };
-	}, [data, search, sortBy, authorFilter, withAttachments]);
+	}, [data]);
 
 	// Native IntersectionObserver for infinite scroll
 	const observerRef = useRef<IntersectionObserver | null>(null);

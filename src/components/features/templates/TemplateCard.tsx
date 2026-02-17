@@ -6,7 +6,7 @@ import type { DifficultyLevel } from "@/lib/models/Template";
 import { Clock, Heart, MessageCircle, TrendingUp, Eye, Lock, Building2, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { TrainingPlanTemplate } from "@/lib/models/Template";
+import { TrainingPlan } from "@/lib/models/Template";
 
 const LEVEL_BADGE_COLOR: Record<DifficultyLevel, "success" | "warning" | "error"> = {
 	Beginner: "success",
@@ -15,7 +15,7 @@ const LEVEL_BADGE_COLOR: Record<DifficultyLevel, "success" | "warning" | "error"
 };
 
 interface TemplateCardProps {
-	template: TrainingPlanTemplate;
+	template: TrainingPlan;
 	href?: string;
 	showCreator?: boolean;
 	variant?: "default" | "compact";

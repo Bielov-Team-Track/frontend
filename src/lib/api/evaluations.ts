@@ -28,7 +28,7 @@ type CreateEventEvaluationPlanRequest = CreateEvaluationPlanRequest;
 type EventEvaluationPlan = EvaluationPlan;
 const transformEventEvaluationPlanDto = transformEvaluationPlanDto;
 
-const PREFIX = "/events";
+const PREFIX = "/coaching";
 
 // =============================================================================
 // EVALUATION EXERCISES

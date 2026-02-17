@@ -7,7 +7,7 @@ import {
 } from "../models/EventComment";
 import client from "./client";
 
-const PREFIX = "/events/v1";
+const PREFIX = "/social/v1";
 
 // =============================================================================
 // LEGACY API (Simple comments - keeping for backwards compatibility)

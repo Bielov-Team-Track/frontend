@@ -2,13 +2,12 @@
 
 import { Badge, Card, Input, Slider } from "@/components";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { loadDrills } from "@/lib/api/drills";
-import { Drill, DrillCategory, DrillFilterRequest, DrillIntensity, DrillSkill } from "@/lib/models/Drill";
+import { useInfiniteDrills } from "@/hooks/useDrills";
+import { Drill, DrillCategory, DrillCategoryEnum, DrillFilterRequest, DrillIntensity, DrillIntensityEnum, DrillSkill, DrillSkillEnum } from "@/lib/models/Drill";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/AuthProvider";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowUpDown, Bookmark, ChevronDown, Clock, Eye, Heart, Search, SlidersHorizontal, User, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowUpDown, Bookmark, ChevronDown, Clock, Eye, Heart, Loader2, Search, SlidersHorizontal, User, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 // =============================================================================
 // TYPES
@@ -61,6 +60,8 @@ const SORT_OPTIONS: { value: SortBy; label: string }[] = [
 	{ value: "bookmarks", label: "Most Saved" },
 	{ value: "recent", label: "Recent" },
 ];
+
+const DRILLS_PAGE_SIZE = 20;
 
 // =============================================================================
 // FILTER TAG COMPONENT
@@ -140,6 +141,22 @@ export default function DrillLibraryPanel({ onAddDrill, onViewDetails }: DrillLi
 			filters.searchTerm = search.trim();
 		}
 
+		// Pass single-value filters to backend (multi-select handled client-side)
+		if (selectedCategories.length === 1) {
+			filters.category = DrillCategoryEnum[selectedCategories[0]];
+		}
+		if (selectedIntensities.length === 1) {
+			filters.intensity = DrillIntensityEnum[selectedIntensities[0]];
+		}
+		if (selectedSkills.length === 1) {
+			filters.skill = DrillSkillEnum[selectedSkills[0]];
+		}
+
+		// "Mine" quick filter - pass createdByUserId to backend
+		if (quickFilters.includes("mine") && user?.id) {
+			filters.createdByUserId = user.id;
+		}
+
 		// Sort mapping
 		if (sortBy === "likes") {
 			filters.sortBy = "likeCount";
@@ -165,44 +182,82 @@ export default function DrillLibraryPanel({ onAddDrill, onViewDetails }: DrillLi
 		}
 
 		return filters;
-	}, [search, sortBy]);
+	}, [search, sortBy, selectedCategories, selectedIntensities, selectedSkills, quickFilters, user?.id]);
 
-	// Fetch drills
-	const { data: drills = [], isLoading } = useQuery({
-		queryKey: ["drills", apiFilters],
-		queryFn: () => loadDrills(apiFilters),
-	});
+	// Fetch drills with infinite scroll
+	const {
+		data: drillsData,
+		isLoading,
+		isFetchingNextPage,
+		hasNextPage,
+		fetchNextPage,
+	} = useInfiniteDrills(apiFilters, DRILLS_PAGE_SIZE);
 
-	// Client-side filtering (for multi-select filters not supported by API)
+	// Flatten all pages into a single array
+	const drills = useMemo(
+		() => drillsData?.pages.flatMap((page) => page.items) ?? [],
+		[drillsData],
+	);
+
+	// Total count from the first page response
+	const totalCount = drillsData?.pages[0]?.totalCount;
+
+	// Intersection observer for infinite scroll
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const loadMoreRef = useRef<HTMLDivElement>(null);
+
+	const handleLoadMore = useCallback(() => {
+		if (hasNextPage && !isFetchingNextPage) {
+			fetchNextPage();
+		}
+	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+	useEffect(() => {
+		const target = loadMoreRef.current;
+		if (!target) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting) {
+					handleLoadMore();
+				}
+			},
+			{ root: scrollContainerRef.current, rootMargin: "200px" },
+		);
+
+		observer.observe(target);
+		return () => observer.disconnect();
+	}, [handleLoadMore]);
+
+	// Client-side filtering (only for filters the backend cannot handle:
+	// - liked/saved quick filters (require user-specific boolean fields)
+	// - multi-select categories/intensities/skills (backend only supports single value)
+	// - duration range (no backend support for min/max duration)
 	const filteredDrills = useMemo(() => {
 		let result = [...drills];
 
-		// Quick filters
+		// Quick filters - liked/saved must be client-side (no backend endpoint for filtering by these)
 		if (quickFilters.includes("liked")) {
 			result = result.filter((drill) => drill.isLiked);
 		}
 		if (quickFilters.includes("saved")) {
 			result = result.filter((drill) => drill.isBookmarked);
 		}
-		if (quickFilters.includes("mine") && user?.id) {
-			result = result.filter((drill) => drill.createdByUserId === user.id);
-		}
 
-		// Category filter
-		if (selectedCategories.length > 0) {
+		// Multi-select category filter (only needed when >1 selected; single value handled by backend)
+		if (selectedCategories.length > 1) {
 			result = result.filter((drill) => selectedCategories.includes(drill.category));
 		}
 
-		// Intensity filter
-		if (selectedIntensities.length > 0) {
+		// Multi-select intensity filter (only needed when >1 selected)
+		if (selectedIntensities.length > 1) {
 			result = result.filter((drill) => selectedIntensities.includes(drill.intensity));
 		}
 
-		// Duration filter
+		// Duration range filter (no backend support)
 		if (isDurationFilterActive) {
 			result = result.filter((drill) => {
 				if (!drill.duration) return false;
-				// If max is at DURATION_MAX, include all drills >= min (no upper bound)
 				if (durationRange[1] >= DURATION_MAX) {
 					return drill.duration >= durationRange[0];
 				}
@@ -210,13 +265,13 @@ export default function DrillLibraryPanel({ onAddDrill, onViewDetails }: DrillLi
 			});
 		}
 
-		// Skills filter
-		if (selectedSkills.length > 0) {
+		// Multi-select skills filter (only needed when >1 selected)
+		if (selectedSkills.length > 1) {
 			result = result.filter((drill) => selectedSkills.some((skill) => drill.skills.includes(skill)));
 		}
 
 		return result;
-	}, [drills, selectedCategories, selectedIntensities, durationRange, isDurationFilterActive, selectedSkills, quickFilters, user?.id]);
+	}, [drills, selectedCategories, selectedIntensities, durationRange, isDurationFilterActive, selectedSkills, quickFilters]);
 
 	// Calculate active filter count
 	const activeFilterCount = useMemo(() => {
@@ -457,7 +512,9 @@ export default function DrillLibraryPanel({ onAddDrill, onViewDetails }: DrillLi
 				<div className="px-4 border-b border-border flex items-center justify-between">
 					<h3 className="font-bold text-foreground text-base flex items-baseline gap-2">
 						Drill Library
-						<span className="text-sm font-normal text-muted-foreground">{isLoading ? "..." : filteredDrills.length}</span>
+						<span className="text-sm font-normal text-muted-foreground">
+							{isLoading ? "..." : totalCount != null ? `${filteredDrills.length} / ${totalCount}` : filteredDrills.length}
+						</span>
 					</h3>
 					{/* Sort Dropdown */}
 					<DropdownMenu>
@@ -498,7 +555,7 @@ export default function DrillLibraryPanel({ onAddDrill, onViewDetails }: DrillLi
 				</div>
 
 				{/* Scrollable drill list */}
-				<div className="flex-1 overflow-y-auto p-2 space-y-1.5">
+				<div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-2 space-y-1.5">
 					{isLoading ? (
 						<div className="space-y-1.5">
 							{[1, 2, 3, 4, 5].map((i) => (
@@ -519,7 +576,18 @@ export default function DrillLibraryPanel({ onAddDrill, onViewDetails }: DrillLi
 							)}
 						</div>
 					) : (
-						filteredDrills.map((drill) => <DrillListItem key={drill.id} drill={drill} onAdd={onAddDrill} onViewDetails={onViewDetails} />)
+						<>
+							{filteredDrills.map((drill) => (
+								<DrillListItem key={drill.id} drill={drill} onAdd={onAddDrill} onViewDetails={onViewDetails} />
+							))}
+							{/* Infinite scroll trigger */}
+							<div ref={loadMoreRef} className="h-1" />
+							{isFetchingNextPage && (
+								<div className="flex items-center justify-center py-3">
+									<Loader2 size={16} className="animate-spin text-muted-foreground" />
+								</div>
+							)}
+						</>
 					)}
 				</div>
 			</Card>

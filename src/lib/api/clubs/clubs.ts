@@ -4,6 +4,7 @@ import {
 	Club,
 	ClubInvitation,
 	ClubMember,
+	ClubMembersSearchFilters,
 	ClubRegistration,
 	ClubSearchFilters,
 	ClubSettings,
@@ -37,7 +38,8 @@ import { CursorPagedResult } from "@/lib/models/Pagination";
 
 export async function getClubs(): Promise<Club[]> {
 	const endpoint = "/clubs";
-	return (await client.get<Club[]>(CLUBS_API_V1 + endpoint)).data;
+	const result = (await client.get<CursorPagedResult<Club>>(CLUBS_API_V1 + endpoint)).data;
+	return result.items;
 }
 
 export async function getClub(id: string): Promise<Club> {
@@ -45,14 +47,16 @@ export async function getClub(id: string): Promise<Club> {
 	return (await client.get<Club>(CLUBS_API_V1 + endpoint)).data;
 }
 
-export async function searchClubs(filters: ClubSearchFilters): Promise<Club[]> {
+export async function searchClubs(filters: ClubSearchFilters): Promise<CursorPagedResult<Club>> {
 	const params = new URLSearchParams();
-	if (filters.query) params.append("query", filters.query);
-	if (filters.isPublic !== undefined) params.append("isPublic", String(filters.isPublic));
+	if (filters.query) params.append("Query", filters.query);
+	if (filters.isPublic !== undefined) params.append("IsPublic", String(filters.isPublic));
+	if (filters.cursor) params.append("Cursor", filters.cursor);
+	if (filters.limit) params.append("Limit", filters.limit.toString());
 
 	const queryString = params.toString();
 	const endpoint = `/clubs${queryString ? `?${queryString}` : ""}`;
-	return (await client.get<Club[]>(CLUBS_API_V1 + endpoint)).data;
+	return (await client.get<CursorPagedResult<Club>>(CLUBS_API_V1 + endpoint)).data;
 }
 
 export async function createClub(data: CreateClubRequest): Promise<Club> {
@@ -70,9 +74,14 @@ export async function deleteClub(id: string): Promise<void> {
 	await client.delete(CLUBS_API_V1 + endpoint);
 }
 
-export async function getUserClubs(userId: string): Promise<Club[]> {
-	const endpoint = `/clubs/users/${userId}/clubs`;
-	return (await client.get<Club[]>(CLUBS_API_V1 + endpoint)).data;
+export async function getUserClubs(userId: string, cursor?: string, limit?: number): Promise<CursorPagedResult<Club>> {
+	const params = new URLSearchParams();
+	if (cursor) params.append("cursor", cursor);
+	if (limit) params.append("limit", limit.toString());
+
+	const queryString = params.toString();
+	const endpoint = `/clubs/users/${userId}/clubs${queryString ? `?${queryString}` : ""}`;
+	return (await client.get<CursorPagedResult<Club>>(CLUBS_API_V1 + endpoint)).data;
 }
 
 export async function joinClub(clubId: string, userId: string): Promise<void> {
@@ -111,6 +120,19 @@ export async function getClubMembers(clubId: string): Promise<ClubMember[]> {
 	return (await client.get<ClubMember[]>(CLUBS_API_V1 + endpoint)).data;
 }
 
+export async function searchClubMembers(clubId: string, filters: ClubMembersSearchFilters): Promise<CursorPagedResult<ClubMember>> {
+	const params = new URLSearchParams();
+	if (filters.query) params.append("Query", filters.query);
+	if (filters.teamId) params.append("TeamId", filters.teamId);
+	if (filters.groupId) params.append("GroupId", filters.groupId);
+	if (filters.sortBy) params.append("SortBy", filters.sortBy);
+	if (filters.sortDirection) params.append("SortDirection", filters.sortDirection);
+	if (filters.cursor) params.append("Cursor", filters.cursor);
+	if (filters.limit) params.append("Limit", filters.limit.toString());
+
+	return (await client.get<CursorPagedResult<ClubMember>>(CLUBS_API_V1 + `/clubs/${clubId}/members/search?${params.toString()}`)).data;
+}
+
 /**
  * Get the current user's membership in a club.
  * Returns null if user is not a member.
@@ -133,8 +155,15 @@ export async function getMyClubMembership(clubId: string): Promise<MyClubMembers
 
 // Team API functions
 export async function getTeamsByClub(clubId: string): Promise<Team[]> {
-	const endpoint = `/teams/club/${clubId}`;
-	return (await client.get<Team[]>(CLUBS_API_V1 + endpoint)).data;
+	const result = await getTeamsByClubPaged(clubId, undefined, 100);
+	return result.items;
+}
+
+export async function getTeamsByClubPaged(clubId: string, cursor?: string, limit: number = 20): Promise<CursorPagedResult<Team>> {
+	const params = new URLSearchParams();
+	if (cursor) params.append("Cursor", cursor);
+	params.append("Limit", limit.toString());
+	return (await client.get<CursorPagedResult<Team>>(CLUBS_API_V1 + `/teams/club/${clubId}?${params.toString()}`)).data;
 }
 
 export async function getTeam(teamId: string): Promise<Team> {
@@ -174,8 +203,15 @@ export async function updateTeamMember(teamId: string, memberId: string, data: U
 
 // Group API functions
 export async function getGroupsByClub(clubId: string): Promise<Group[]> {
-	const endpoint = `/groups/club/${clubId}`;
-	return (await client.get<Group[]>(CLUBS_API_V1 + endpoint)).data;
+	const result = await getGroupsByClubPaged(clubId, undefined, 100);
+	return result.items;
+}
+
+export async function getGroupsByClubPaged(clubId: string, cursor?: string, limit: number = 20): Promise<CursorPagedResult<Group>> {
+	const params = new URLSearchParams();
+	if (cursor) params.append("Cursor", cursor);
+	params.append("Limit", limit.toString());
+	return (await client.get<CursorPagedResult<Group>>(CLUBS_API_V1 + `/groups/club/${clubId}?${params.toString()}`)).data;
 }
 
 export async function getGroup(groupId: string): Promise<Group> {
@@ -226,6 +262,34 @@ export async function updateGroupMember(groupId: string, memberId: string, data:
 	return (await client.put<GroupMember>(CLUBS_API_V1 + endpoint, data)).data;
 }
 
+// Group Image Upload Functions
+export async function getGroupLogoUploadUrl(clubId: string, fileType: string): Promise<string> {
+	const endpoint = `/groups/logo-upload-url?clubId=${encodeURIComponent(clubId)}&fileType=${encodeURIComponent(fileType)}`;
+	const response = await client.get<string>(CLUBS_API_V1 + endpoint);
+	return response.data;
+}
+
+export async function uploadGroupImage(clubId: string, image: Blob): Promise<{ url: string; thumbHash: string }> {
+	const fileType = image.type || "image/png";
+	const presignedUrl = await getGroupLogoUploadUrl(clubId, fileType);
+
+	const [uploadResponse, thumbHash] = await Promise.all([
+		fetch(presignedUrl, {
+			method: "PUT",
+			body: image,
+			headers: { "Content-Type": fileType },
+		}),
+		import("@/lib/utils/thumbhash").then((m) => m.generateThumbHash(image)),
+	]);
+
+	if (!uploadResponse.ok) {
+		throw new Error("Failed to upload group logo");
+	}
+
+	const url = presignedUrl.split("?")[0];
+	return { url, thumbHash };
+}
+
 // Club Image Upload Functions
 export async function getClubLogoUploadUrl(clubId: string, fileType: string): Promise<string> {
 	const endpoint = `/clubs/${clubId}/logo-upload-url?fileType=${encodeURIComponent(fileType)}`;
@@ -239,27 +303,28 @@ export async function getClubBannerUploadUrl(clubId: string, fileType: string): 
 	return response.data;
 }
 
-export async function uploadClubImage(clubId: string, image: Blob, imageType: "logo" | "banner"): Promise<string> {
+export async function uploadClubImage(clubId: string, image: Blob, imageType: "logo" | "banner"): Promise<{ url: string; thumbHash: string }> {
 	const fileType = image.type || "image/png";
 
 	// Get presigned URL
 	const presignedUrl = imageType === "logo" ? await getClubLogoUploadUrl(clubId, fileType) : await getClubBannerUploadUrl(clubId, fileType);
 
-	// Upload directly to S3
-	const uploadResponse = await fetch(presignedUrl, {
-		method: "PUT",
-		body: image,
-		headers: {
-			"Content-Type": fileType,
-		},
-	});
+	// Upload to S3 and generate thumbhash in parallel
+	const [uploadResponse, thumbHash] = await Promise.all([
+		fetch(presignedUrl, {
+			method: "PUT",
+			body: image,
+			headers: { "Content-Type": fileType },
+		}),
+		import("@/lib/utils/thumbhash").then((m) => m.generateThumbHash(image)),
+	]);
 
 	if (!uploadResponse.ok) {
 		throw new Error(`Failed to upload ${imageType}`);
 	}
 
-	// Return public URL (remove query params from presigned URL)
-	return presignedUrl.split("?")[0];
+	const url = presignedUrl.split("?")[0];
+	return { url, thumbHash };
 }
 
 // Invitation endpoints (admin)
@@ -268,8 +333,16 @@ export async function createInvitation(clubId: string, data: CreateInvitationReq
 }
 
 export async function getClubInvitations(clubId: string, status?: InvitationStatus): Promise<ClubInvitation[]> {
-	const params = status ? `?status=${status}` : "";
-	return (await client.get<ClubInvitation[]>(CLUBS_API_V1 + `/clubs/${clubId}/invitations${params}`)).data;
+	const result = await getClubInvitationsPaged(clubId, status, undefined, 100);
+	return result.items;
+}
+
+export async function getClubInvitationsPaged(clubId: string, status?: InvitationStatus, cursor?: string, limit: number = 20): Promise<CursorPagedResult<ClubInvitation>> {
+	const params = new URLSearchParams();
+	if (status) params.append("Status", status);
+	if (cursor) params.append("Cursor", cursor);
+	params.append("Limit", limit.toString());
+	return (await client.get<CursorPagedResult<ClubInvitation>>(CLUBS_API_V1 + `/clubs/${clubId}/invitations?${params.toString()}`)).data;
 }
 
 export async function getClubInvitation(clubId: string, invitationId: string): Promise<ClubInvitation> {

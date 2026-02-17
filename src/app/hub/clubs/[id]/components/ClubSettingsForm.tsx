@@ -56,14 +56,20 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
 	const updateMutation = useMutation({
 		mutationFn: async (data: FormValues) => {
 			let logoUrl = club.logoUrl;
+			let logoThumbHash = club.logoThumbHash;
 			let bannerUrl = club.bannerUrl;
+			let bannerThumbHash = club.bannerThumbHash;
 
 			// Upload new images if changed
 			if (logoBlob) {
-				logoUrl = await uploadClubImage(club.id, logoBlob, "logo");
+				const result = await uploadClubImage(club.id, logoBlob, "logo");
+				logoUrl = result.url;
+				logoThumbHash = result.thumbHash;
 			}
 			if (bannerBlob) {
-				bannerUrl = await uploadClubImage(club.id, bannerBlob, "banner");
+				const result = await uploadClubImage(club.id, bannerBlob, "banner");
+				bannerUrl = result.url;
+				bannerThumbHash = result.thumbHash;
 			}
 
 			return updateClub(club.id, {
@@ -73,7 +79,9 @@ export default function ClubSettingsForm({ club }: ClubSettingsFormProps) {
 				contactPhone: data.contactPhone || undefined,
 				isPublic: data.isPublic,
 				logoUrl,
+				logoThumbHash,
 				bannerUrl,
+				bannerThumbHash,
 			});
 		},
 		onSuccess: () => {

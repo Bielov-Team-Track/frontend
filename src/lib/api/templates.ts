@@ -1,208 +1,257 @@
 import client from "./client";
 import {
-    TrainingPlanTemplate,
-    TrainingPlanTemplateDetail,
-    TemplateListResponse,
-    TemplateFilterRequest,
-    CreateTemplateRequest,
-    UpdateTemplateRequest,
-    CreateTemplateSectionRequest,
-    UpdateTemplateSectionRequest,
-    CreateTemplateItemRequest,
-    UpdateTemplateItemRequest,
-    SaveAsTemplateRequest,
-    TemplateLikeStatus,
-    TemplateBookmarkStatus,
-    TemplateComment,
-    TemplateCommentsResponse,
-    TemplateSection,
-    TemplateItem,
+    TrainingPlan,
+    TrainingPlanDetail,
+    PlanListResponse,
+    PlanFilterRequest,
+    CreatePlanRequest,
+    UpdatePlanRequest,
+    CreatePlanSectionRequest,
+    UpdatePlanSectionRequest,
+    CreatePlanItemRequest,
+    UpdatePlanItemRequest,
+    CreateEventPlanRequest,
+    PlanLikeStatus,
+    PlanBookmarkStatus,
+    PlanComment,
+    PlanCommentsResponse,
+    PlanSection,
+    PlanItem,
 } from "../models/Template";
 import { getParamsFromObject } from "../utils/request";
 
-const PREFIX = "/events";
+const COACHING_PREFIX = "/coaching";
 
 // =============================================================================
 // CRUD OPERATIONS
 // =============================================================================
 
 /**
- * Get a specific template by ID
+ * Get a specific plan by ID
  */
-export async function loadTemplate(id: string): Promise<TrainingPlanTemplateDetail> {
-    const endpoint = `/v1/templates/${id}`;
-    const response = await client.get<TrainingPlanTemplateDetail>(PREFIX + endpoint);
+export async function loadPlan(id: string): Promise<TrainingPlanDetail> {
+    const endpoint = `/v1/plans/${id}`;
+    const response = await client.get<TrainingPlanDetail>(COACHING_PREFIX + endpoint);
     return response.data;
 }
 
+/** @deprecated Use loadPlan instead */
+export const loadTemplate = loadPlan;
+
 /**
- * Create a new template
+ * Create a new plan
  */
-export async function createTemplate(request: CreateTemplateRequest): Promise<TrainingPlanTemplateDetail> {
-    const endpoint = "/v1/templates";
-    const response = await client.post<TrainingPlanTemplateDetail>(PREFIX + endpoint, request);
+export async function createPlan(request: CreatePlanRequest): Promise<TrainingPlanDetail> {
+    const endpoint = "/v1/plans";
+    const response = await client.post<TrainingPlanDetail>(COACHING_PREFIX + endpoint, request);
     return response.data;
 }
 
+/** @deprecated Use createPlan instead */
+export const createTemplate = createPlan;
+
 /**
- * Update an existing template
+ * Update an existing plan
  */
-export async function updateTemplate(id: string, request: UpdateTemplateRequest): Promise<TrainingPlanTemplateDetail> {
-    const endpoint = `/v1/templates/${id}`;
-    const response = await client.put<TrainingPlanTemplateDetail>(PREFIX + endpoint, request);
+export async function updatePlan(id: string, request: UpdatePlanRequest): Promise<TrainingPlanDetail> {
+    const endpoint = `/v1/plans/${id}`;
+    const response = await client.put<TrainingPlanDetail>(COACHING_PREFIX + endpoint, request);
     return response.data;
 }
 
+/** @deprecated Use updatePlan instead */
+export const updateTemplate = updatePlan;
+
 /**
- * Delete a template
+ * Delete a plan
  */
-export async function deleteTemplate(id: string): Promise<void> {
-    const endpoint = `/v1/templates/${id}`;
-    await client.delete(PREFIX + endpoint);
+export async function deletePlan(id: string): Promise<void> {
+    const endpoint = `/v1/plans/${id}`;
+    await client.delete(COACHING_PREFIX + endpoint);
 }
+
+/** @deprecated Use deletePlan instead */
+export const deleteTemplate = deletePlan;
 
 // =============================================================================
 // LIST/BROWSE OPERATIONS
 // =============================================================================
 
 /**
- * Get current user's templates with optional filtering
+ * Get current user's plans with optional filtering
  */
-export async function loadMyTemplates(filter?: TemplateFilterRequest): Promise<TemplateListResponse> {
-    const endpoint = "/v1/me/templates";
+export async function loadMyPlans(filter?: PlanFilterRequest): Promise<PlanListResponse> {
+    const endpoint = "/v1/me/plans";
     const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
-    const response = await client.get<TemplateListResponse>(PREFIX + endpoint, { params });
+    const response = await client.get<PlanListResponse>(COACHING_PREFIX + endpoint, { params });
     return response.data;
 }
 
+/** @deprecated Use loadMyPlans instead */
+export const loadMyTemplates = loadMyPlans;
+
 /**
- * Get templates for a specific club with optional filtering
+ * Get plans for a specific club with optional filtering
  */
-export async function loadClubTemplates(clubId: string, filter?: TemplateFilterRequest): Promise<TemplateListResponse> {
-    const endpoint = `/v1/clubs/${clubId}/templates`;
+export async function loadClubPlans(clubId: string, filter?: PlanFilterRequest): Promise<PlanListResponse> {
+    const endpoint = `/v1/clubs/${clubId}/plans`;
     const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
-    const response = await client.get<TemplateListResponse>(PREFIX + endpoint, { params });
+    const response = await client.get<PlanListResponse>(COACHING_PREFIX + endpoint, { params });
     return response.data;
 }
 
+/** @deprecated Use loadClubPlans instead */
+export const loadClubTemplates = loadClubPlans;
+
 /**
- * Get all public templates with optional filtering
+ * Get all public plans with optional filtering
  */
-export async function loadPublicTemplates(filter?: TemplateFilterRequest): Promise<TemplateListResponse> {
-    const endpoint = "/v1/templates";
+export async function loadPublicPlans(filter?: PlanFilterRequest): Promise<PlanListResponse> {
+    const endpoint = "/v1/plans";
     const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
-    const response = await client.get<TemplateListResponse>(PREFIX + endpoint, { params });
+    const response = await client.get<PlanListResponse>(COACHING_PREFIX + endpoint, { params });
     return response.data;
 }
 
+/** @deprecated Use loadPublicPlans instead */
+export const loadPublicTemplates = loadPublicPlans;
+
 /**
- * Get current user's bookmarked templates with optional filtering
+ * Get current user's bookmarked plans with optional filtering
  */
-export async function loadBookmarkedTemplates(filter?: TemplateFilterRequest): Promise<TemplateListResponse> {
-    const endpoint = "/v1/me/templates/bookmarks";
+export async function loadBookmarkedPlans(filter?: PlanFilterRequest): Promise<PlanListResponse> {
+    const endpoint = "/v1/me/plans/bookmarks";
     const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
-    const response = await client.get<TemplateListResponse>(PREFIX + endpoint, { params });
+    const response = await client.get<PlanListResponse>(COACHING_PREFIX + endpoint, { params });
     return response.data;
 }
+
+/** @deprecated Use loadBookmarkedPlans instead */
+export const loadBookmarkedTemplates = loadBookmarkedPlans;
 
 // =============================================================================
 // SECTIONS
 // =============================================================================
 
 /**
- * Add a section to a template
+ * Add a section to a plan
  */
-export async function addTemplateSection(templateId: string, request: CreateTemplateSectionRequest): Promise<TemplateSection> {
-    const endpoint = `/v1/templates/${templateId}/sections`;
-    const response = await client.post<TemplateSection>(PREFIX + endpoint, request);
+export async function addPlanSection(planId: string, request: CreatePlanSectionRequest): Promise<PlanSection> {
+    const endpoint = `/v1/plans/${planId}/sections`;
+    const response = await client.post<PlanSection>(COACHING_PREFIX + endpoint, request);
     return response.data;
 }
 
+/** @deprecated Use addPlanSection instead */
+export const addTemplateSection = addPlanSection;
+
 /**
- * Update a section in a template
+ * Update a section in a plan
  */
-export async function updateTemplateSection(
-    templateId: string,
+export async function updatePlanSection(
+    planId: string,
     sectionId: string,
-    request: UpdateTemplateSectionRequest
-): Promise<TemplateSection> {
-    const endpoint = `/v1/templates/${templateId}/sections/${sectionId}`;
-    const response = await client.put<TemplateSection>(PREFIX + endpoint, request);
+    request: UpdatePlanSectionRequest
+): Promise<PlanSection> {
+    const endpoint = `/v1/plans/${planId}/sections/${sectionId}`;
+    const response = await client.put<PlanSection>(COACHING_PREFIX + endpoint, request);
     return response.data;
 }
 
+/** @deprecated Use updatePlanSection instead */
+export const updateTemplateSection = updatePlanSection;
+
 /**
- * Delete a section from a template
+ * Delete a section from a plan
  */
-export async function deleteTemplateSection(templateId: string, sectionId: string): Promise<void> {
-    const endpoint = `/v1/templates/${templateId}/sections/${sectionId}`;
-    await client.delete(PREFIX + endpoint);
+export async function deletePlanSection(planId: string, sectionId: string): Promise<void> {
+    const endpoint = `/v1/plans/${planId}/sections/${sectionId}`;
+    await client.delete(COACHING_PREFIX + endpoint);
 }
+
+/** @deprecated Use deletePlanSection instead */
+export const deleteTemplateSection = deletePlanSection;
 
 // =============================================================================
 // ITEMS
 // =============================================================================
 
 /**
- * Add an item to a template
+ * Add an item to a plan
  */
-export async function addTemplateItem(templateId: string, request: CreateTemplateItemRequest): Promise<TemplateItem> {
-    const endpoint = `/v1/templates/${templateId}/items`;
-    const response = await client.post<TemplateItem>(PREFIX + endpoint, request);
+export async function addPlanItem(planId: string, request: CreatePlanItemRequest): Promise<PlanItem> {
+    const endpoint = `/v1/plans/${planId}/items`;
+    const response = await client.post<PlanItem>(COACHING_PREFIX + endpoint, request);
     return response.data;
 }
 
+/** @deprecated Use addPlanItem instead */
+export const addTemplateItem = addPlanItem;
+
 /**
- * Update an item in a template
+ * Update an item in a plan
  */
-export async function updateTemplateItem(
-    templateId: string,
+export async function updatePlanItem(
+    planId: string,
     itemId: string,
-    request: UpdateTemplateItemRequest
-): Promise<TemplateItem> {
-    const endpoint = `/v1/templates/${templateId}/items/${itemId}`;
-    const response = await client.put<TemplateItem>(PREFIX + endpoint, request);
+    request: UpdatePlanItemRequest
+): Promise<PlanItem> {
+    const endpoint = `/v1/plans/${planId}/items/${itemId}`;
+    const response = await client.put<PlanItem>(COACHING_PREFIX + endpoint, request);
     return response.data;
 }
 
-/**
- * Delete an item from a template
- */
-export async function deleteTemplateItem(templateId: string, itemId: string): Promise<void> {
-    const endpoint = `/v1/templates/${templateId}/items/${itemId}`;
-    await client.delete(PREFIX + endpoint);
-}
+/** @deprecated Use updatePlanItem instead */
+export const updateTemplateItem = updatePlanItem;
 
 /**
- * Reorder items in a template
+ * Delete an item from a plan
  */
-export async function reorderTemplateItems(templateId: string, itemIds: string[]): Promise<void> {
-    const endpoint = `/v1/templates/${templateId}/items/reorder`;
-    await client.put(PREFIX + endpoint, { itemIds });
+export async function deletePlanItem(planId: string, itemId: string): Promise<void> {
+    const endpoint = `/v1/plans/${planId}/items/${itemId}`;
+    await client.delete(COACHING_PREFIX + endpoint);
 }
+
+/** @deprecated Use deletePlanItem instead */
+export const deleteTemplateItem = deletePlanItem;
+
+/**
+ * Reorder items in a plan
+ */
+export async function reorderPlanItems(planId: string, itemIds: string[]): Promise<void> {
+    const endpoint = `/v1/plans/${planId}/items/reorder`;
+    await client.put(COACHING_PREFIX + endpoint, { itemIds });
+}
+
+/** @deprecated Use reorderPlanItems instead */
+export const reorderTemplateItems = reorderPlanItems;
 
 // =============================================================================
-// EVENT INTEGRATION
+// EVENT PLAN OPERATIONS
 // =============================================================================
 
 /**
- * Save an event's training plan as a template
+ * Create a training plan for an event
  */
-export async function saveEventPlanAsTemplate(
-    eventId: string,
-    request: SaveAsTemplateRequest
-): Promise<TrainingPlanTemplateDetail> {
-    const endpoint = `/v1/events/${eventId}/training-plan/save-as-template`;
-    const response = await client.post<TrainingPlanTemplateDetail>(PREFIX + endpoint, request);
-    return response.data;
+export async function createEventPlan(eventId: string, request: CreateEventPlanRequest): Promise<TrainingPlanDetail> {
+    const { data } = await client.post<TrainingPlanDetail>(`${COACHING_PREFIX}/v1/events/${eventId}/plans`, request);
+    return data;
 }
 
 /**
- * Load a template into an event's training plan
+ * Get the training plan for an event
  */
-export async function loadTemplateToEvent(eventId: string, templateId: string, replace: boolean = false): Promise<void> {
-    const endpoint = `/v1/events/${eventId}/training-plan/load-template/${templateId}`;
-    await client.post(PREFIX + endpoint, null, { params: { replace } });
+export async function getEventPlan(eventId: string): Promise<TrainingPlanDetail> {
+    const { data } = await client.get<TrainingPlanDetail>(`${COACHING_PREFIX}/v1/events/${eventId}/plans`);
+    return data;
+}
+
+/**
+ * Promote an event plan (Instance) to a reusable template (Template)
+ */
+export async function promoteToTemplate(planId: string, request?: { name?: string; clubId?: string }): Promise<TrainingPlanDetail> {
+    const { data } = await client.post<TrainingPlanDetail>(`${COACHING_PREFIX}/v1/plans/${planId}/promote`, request ?? {});
+    return data;
 }
 
 // =============================================================================
@@ -210,92 +259,116 @@ export async function loadTemplateToEvent(eventId: string, templateId: string, r
 // =============================================================================
 
 /**
- * Like a template
+ * Like a plan
  */
-export async function likeTemplate(id: string): Promise<TemplateLikeStatus> {
-    const endpoint = `/v1/templates/${id}/like`;
-    const response = await client.post<TemplateLikeStatus>(PREFIX + endpoint);
+export async function likePlan(id: string): Promise<PlanLikeStatus> {
+    const endpoint = `/v1/plans/${id}/like`;
+    const response = await client.post<PlanLikeStatus>(COACHING_PREFIX + endpoint);
     return response.data;
 }
 
+/** @deprecated Use likePlan instead */
+export const likeTemplate = likePlan;
+
 /**
- * Unlike a template
+ * Unlike a plan
  */
-export async function unlikeTemplate(id: string): Promise<TemplateLikeStatus> {
-    const endpoint = `/v1/templates/${id}/like`;
-    const response = await client.delete<TemplateLikeStatus>(PREFIX + endpoint);
+export async function unlikePlan(id: string): Promise<PlanLikeStatus> {
+    const endpoint = `/v1/plans/${id}/like`;
+    const response = await client.delete<PlanLikeStatus>(COACHING_PREFIX + endpoint);
     return response.data;
 }
 
+/** @deprecated Use unlikePlan instead */
+export const unlikeTemplate = unlikePlan;
+
 /**
- * Get like status for a template
+ * Get like status for a plan
  */
-export async function getTemplateLikeStatus(id: string): Promise<TemplateLikeStatus> {
-    const endpoint = `/v1/templates/${id}/like`;
-    const response = await client.get<TemplateLikeStatus>(PREFIX + endpoint);
+export async function getPlanLikeStatus(id: string): Promise<PlanLikeStatus> {
+    const endpoint = `/v1/plans/${id}/like`;
+    const response = await client.get<PlanLikeStatus>(COACHING_PREFIX + endpoint);
     return response.data;
 }
+
+/** @deprecated Use getPlanLikeStatus instead */
+export const getTemplateLikeStatus = getPlanLikeStatus;
 
 // =============================================================================
 // BOOKMARKS
 // =============================================================================
 
 /**
- * Bookmark a template
+ * Bookmark a plan
  */
-export async function bookmarkTemplate(id: string): Promise<TemplateBookmarkStatus> {
-    const endpoint = `/v1/templates/${id}/bookmark`;
-    const response = await client.post<TemplateBookmarkStatus>(PREFIX + endpoint);
+export async function bookmarkPlan(id: string): Promise<PlanBookmarkStatus> {
+    const endpoint = `/v1/plans/${id}/bookmark`;
+    const response = await client.post<PlanBookmarkStatus>(COACHING_PREFIX + endpoint);
     return response.data;
 }
 
+/** @deprecated Use bookmarkPlan instead */
+export const bookmarkTemplate = bookmarkPlan;
+
 /**
- * Remove bookmark from a template
+ * Remove bookmark from a plan
  */
-export async function unbookmarkTemplate(id: string): Promise<TemplateBookmarkStatus> {
-    const endpoint = `/v1/templates/${id}/bookmark`;
-    const response = await client.delete<TemplateBookmarkStatus>(PREFIX + endpoint);
+export async function unbookmarkPlan(id: string): Promise<PlanBookmarkStatus> {
+    const endpoint = `/v1/plans/${id}/bookmark`;
+    const response = await client.delete<PlanBookmarkStatus>(COACHING_PREFIX + endpoint);
     return response.data;
 }
+
+/** @deprecated Use unbookmarkPlan instead */
+export const unbookmarkTemplate = unbookmarkPlan;
 
 // =============================================================================
 // COMMENTS
 // =============================================================================
 
 /**
- * Create a comment on a template
+ * Create a comment on a plan
  */
-export async function createTemplateComment(
-    templateId: string,
+export async function createPlanComment(
+    planId: string,
     content: string,
     parentCommentId?: string
-): Promise<TemplateComment> {
-    const endpoint = `/v1/templates/${templateId}/comments`;
-    const response = await client.post<TemplateComment>(PREFIX + endpoint, { content, parentCommentId });
+): Promise<PlanComment> {
+    const endpoint = `/v1/plans/${planId}/comments`;
+    const response = await client.post<PlanComment>(COACHING_PREFIX + endpoint, { content, parentCommentId });
     return response.data;
 }
 
+/** @deprecated Use createPlanComment instead */
+export const createTemplateComment = createPlanComment;
+
 /**
- * Get comments for a template with cursor pagination
+ * Get comments for a plan with cursor pagination
  */
-export async function loadTemplateComments(
-    templateId: string,
+export async function loadPlanComments(
+    planId: string,
     cursor?: string,
     limit: number = 20
-): Promise<TemplateCommentsResponse> {
-    const endpoint = `/v1/templates/${templateId}/comments`;
+): Promise<PlanCommentsResponse> {
+    const endpoint = `/v1/plans/${planId}/comments`;
     const params: Record<string, string | number> = { limit };
     if (cursor) {
         params.cursor = cursor;
     }
-    const response = await client.get<TemplateCommentsResponse>(PREFIX + endpoint, { params });
+    const response = await client.get<PlanCommentsResponse>(COACHING_PREFIX + endpoint, { params });
     return response.data;
 }
 
+/** @deprecated Use loadPlanComments instead */
+export const loadTemplateComments = loadPlanComments;
+
 /**
- * Delete a comment from a template
+ * Delete a comment from a plan
  */
-export async function deleteTemplateComment(templateId: string, commentId: string): Promise<void> {
-    const endpoint = `/v1/templates/${templateId}/comments/${commentId}`;
-    await client.delete(PREFIX + endpoint);
+export async function deletePlanComment(planId: string, commentId: string): Promise<void> {
+    const endpoint = `/v1/plans/${planId}/comments/${commentId}`;
+    await client.delete(COACHING_PREFIX + endpoint);
 }
+
+/** @deprecated Use deletePlanComment instead */
+export const deleteTemplateComment = deletePlanComment;

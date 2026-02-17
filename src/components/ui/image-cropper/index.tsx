@@ -62,7 +62,7 @@ export async function getCroppedImg(imageSrc: string, pixelCrop: { x: number; y:
 	return new Promise((resolve) => {
 		croppedCanvas.toBlob((file) => {
 			resolve(file!);
-		}, "image/png");
+		}, "image/jpeg", 0.9);
 	});
 }
 

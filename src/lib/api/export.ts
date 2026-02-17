@@ -1,6 +1,6 @@
 import client from "./client";
 
-const PREFIX = "/events";
+const PREFIX = "/coaching";
 
 export type ExportFormat = "csv" | "excel";
 

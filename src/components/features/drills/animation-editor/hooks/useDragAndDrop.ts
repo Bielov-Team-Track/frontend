@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react"
 import type { AnimationKeyframe, EquipmentType, PlayerPosition, EquipmentItem, CourtViewMode } from "../../types"
+import type { ElementRef } from "./useMultiSelect"
 import { getSVGCoordinates } from "../utils/coordinates"
 import { PLAYER_COLORS } from "../constants"
 
@@ -11,6 +12,7 @@ interface UseDragAndDropParams {
 	svgRef: React.RefObject<SVGSVGElement | null>
 	courtViewMode: CourtViewMode
 	isPlaying: boolean
+	selectedElements: ElementRef[]
 	onDragStart?: () => void
 	onBatchStart?: () => void
 	onBatchEnd?: () => void
@@ -24,6 +26,7 @@ export function useDragAndDrop({
 	svgRef,
 	courtViewMode,
 	isPlaying,
+	selectedElements,
 	onDragStart,
 	onBatchStart,
 	onBatchEnd,
@@ -34,9 +37,9 @@ export function useDragAndDrop({
 	const [draggedEquipmentType, setDraggedEquipmentType] = useState<EquipmentType | null>(null)
 	const [draggingPlayerFromToolbox, setDraggingPlayerFromToolbox] = useState(false)
 
-	// Shift+Drag axis constraint refs
-	const dragStartPos = useRef<{ x: number; y: number } | null>(null)
-	const axisLock = useRef<"h" | "v" | null>(null)
+	// Group drag tracking
+	const groupDrag = useRef(false)
+	const lastDragPos = useRef<{ x: number; y: number } | null>(null)
 
 	// Alt+Drag duplication tracking
 	const altDuplicated = useRef(false)
@@ -66,28 +69,33 @@ export function useDragAndDrop({
 			}
 		}
 
-		// Capture start position for axis-lock
-		const player = currentKeyframe.players.find((p) => p.id === playerId)
-		if (player) {
-			dragStartPos.current = { x: player.x, y: player.y }
+		// Check if this element is part of the selection and Shift is held for group drag
+		const isInSelection = selectedElements.some((el) => el.type === "player" && el.id === playerId)
+		if (e.shiftKey && isInSelection && selectedElements.length > 1) {
+			groupDrag.current = true
+			const player = currentKeyframe.players.find((p) => p.id === playerId)
+			if (player) {
+				const coords = getSVGCoordinates(e, svgRef, courtViewMode)
+				lastDragPos.current = coords || { x: player.x, y: player.y }
+			}
+		} else {
+			groupDrag.current = false
+			lastDragPos.current = null
 		}
-		axisLock.current = null
 
 		setDraggingPlayer(playerId)
 		onDragStart?.()
-	}, [isPlaying, onDragStart, onBatchStart, currentKeyframe, currentFrameIndex])
+	}, [isPlaying, onDragStart, onBatchStart, currentKeyframe, currentFrameIndex, selectedElements, courtViewMode])
 
 	const onBallMouseDown = useCallback((e: React.MouseEvent) => {
 		if (isPlaying) return
 		e.preventDefault()
 		onBatchStart?.()
-
-		dragStartPos.current = { x: currentKeyframe.ball.x, y: currentKeyframe.ball.y }
-		axisLock.current = null
-
+		groupDrag.current = false
+		lastDragPos.current = null
 		setDraggingBall(true)
 		onDragStart?.()
-	}, [isPlaying, onDragStart, onBatchStart, currentKeyframe])
+	}, [isPlaying, onDragStart, onBatchStart])
 
 	const onEquipmentMouseDown = useCallback((e: React.MouseEvent, equipmentId: string) => {
 		if (isPlaying) return
@@ -114,42 +122,52 @@ export function useDragAndDrop({
 			}
 		}
 
-		// Capture start position for axis-lock
-		const eq = (currentKeyframe.equipment || []).find((e) => e.id === equipmentId)
-		if (eq) {
-			dragStartPos.current = { x: eq.x, y: eq.y }
+		// Check if this element is part of the selection and Shift is held for group drag
+		const isInSelection = selectedElements.some((el) => el.type === "equipment" && el.id === equipmentId)
+		if (e.shiftKey && isInSelection && selectedElements.length > 1) {
+			groupDrag.current = true
+			const coords = getSVGCoordinates(e, svgRef, courtViewMode)
+			if (coords) lastDragPos.current = coords
+		} else {
+			groupDrag.current = false
+			lastDragPos.current = null
 		}
-		axisLock.current = null
 
 		setDraggingEquipment(equipmentId)
 		onDragStart?.()
-	}, [isPlaying, onDragStart, onBatchStart, currentKeyframe, currentFrameIndex])
+	}, [isPlaying, onDragStart, onBatchStart, currentKeyframe, currentFrameIndex, selectedElements, courtViewMode])
 
 	const onMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
 		if (!draggingPlayer && !draggingBall && !draggingEquipment) return
 
 		const coords = getSVGCoordinates(e, svgRef, courtViewMode)
 		if (!coords) return
-		let { x, y } = coords
+		const { x, y } = coords
 
-		// Shift+Drag: constrain to H/V axis
-		if (e.shiftKey && dragStartPos.current) {
-			const dx = Math.abs(x - dragStartPos.current.x)
-			const dy = Math.abs(y - dragStartPos.current.y)
+		// Group drag: move all selected elements by delta
+		if (groupDrag.current && lastDragPos.current) {
+			const dx = x - lastDragPos.current.x
+			const dy = y - lastDragPos.current.y
+			lastDragPos.current = { x, y }
 
-			// Determine axis after 5px of movement
-			if (!axisLock.current && (dx > 5 || dy > 5)) {
-				axisLock.current = dx > dy ? "h" : "v"
-			}
+			const playerIds = new Set(selectedElements.filter((el) => el.type === "player").map((el) => el.id))
+			const equipmentIds = new Set(selectedElements.filter((el) => el.type === "equipment").map((el) => el.id))
 
-			if (axisLock.current === "h") {
-				y = dragStartPos.current.y
-			} else if (axisLock.current === "v") {
-				x = dragStartPos.current.x
-			}
-		} else {
-			// Reset axis lock when shift released
-			axisLock.current = null
+			setKeyframes((prev) =>
+				prev.map((frame, index) => {
+					if (index !== currentFrameIndex) return frame
+					return {
+						...frame,
+						players: frame.players.map((p) =>
+							playerIds.has(p.id) ? { ...p, x: p.x + dx, y: p.y + dy } : p
+						),
+						equipment: (frame.equipment || []).map((eq) =>
+							equipmentIds.has(eq.id) ? { ...eq, x: eq.x + dx, y: eq.y + dy } : eq
+						),
+					}
+				})
+			)
+			return
 		}
 
 		setKeyframes((prev) =>
@@ -179,14 +197,14 @@ export function useDragAndDrop({
 				return frame
 			})
 		)
-	}, [draggingPlayer, draggingBall, draggingEquipment, currentFrameIndex, courtViewMode])
+	}, [draggingPlayer, draggingBall, draggingEquipment, currentFrameIndex, courtViewMode, selectedElements])
 
 	const onMouseUp = useCallback(() => {
 		setDraggingPlayer(null)
 		setDraggingBall(false)
 		setDraggingEquipment(null)
-		dragStartPos.current = null
-		axisLock.current = null
+		groupDrag.current = false
+		lastDragPos.current = null
 		altDuplicated.current = false
 		onBatchEnd?.()
 	}, [onBatchEnd])

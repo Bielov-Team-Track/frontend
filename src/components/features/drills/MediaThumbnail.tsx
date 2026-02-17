@@ -1,7 +1,7 @@
 "use client";
 
 import { Play, FileText, Film, ImageIcon, ExternalLink, Loader2, RotateCw } from "lucide-react";
-import { isEmbedUrl, parseEmbedUrl } from "./attachments/embedUtils";
+import { isEmbedUrl, parseEmbedUrl } from "@/components/ui/media-preview";
 import type { DrillAttachment } from "@/lib/models/Drill";
 import { formatFileSize } from "@/components/ui/media-preview";
 

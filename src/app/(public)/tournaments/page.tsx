@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, Button, EmptyState, Input } from "@/components";
+import { Badge, Button, EmptyState, Input, Loader } from "@/components";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTournaments } from "@/hooks/useTournaments";
 import { Tournament, TournamentStatus } from "@/lib/models/Tournament";
@@ -13,8 +13,32 @@ import {
 	Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import CreateTournamentModal from "@/components/features/tournaments/CreateTournamentModal";
+
+function useInfiniteScroll(fetchNextPage: () => void, hasNextPage: boolean | undefined, isFetchingNextPage: boolean) {
+	const observerRef = useRef<IntersectionObserver | null>(null);
+
+	const targetRef = useCallback(
+		(node: HTMLDivElement | null) => {
+			if (observerRef.current) observerRef.current.disconnect();
+			if (!node) return;
+
+			observerRef.current = new IntersectionObserver(
+				(entries) => {
+					if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+						fetchNextPage();
+					}
+				},
+				{ rootMargin: "200px" }
+			);
+			observerRef.current.observe(node);
+		},
+		[fetchNextPage, hasNextPage, isFetchingNextPage]
+	);
+
+	return targetRef;
+}
 
 const STATUS_CONFIG: Record<TournamentStatus, { color: "neutral" | "info" | "success" | "warning" | "error"; label: string }> = {
 	[TournamentStatus.Draft]: { color: "neutral", label: "Draft" },
@@ -74,13 +98,16 @@ function TournamentCard({ tournament }: { tournament: Tournament }) {
 }
 
 export default function TournamentsPage() {
-	const { data: tournaments, isLoading, error } = useTournaments();
+	const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useTournaments();
+	const loadMoreRef = useInfiniteScroll(fetchNextPage, hasNextPage, isFetchingNextPage);
 	const { isAuthenticated } = useAuth();
 	const [search, setSearch] = useState("");
 	const [showCreateModal, setShowCreateModal] = useState(false);
 
+	const tournaments = data?.pages.flatMap((page) => page.items ?? []) ?? [];
+
 	const filtered = useMemo(() => {
-		if (!tournaments) return [];
+		if (!tournaments.length) return [];
 		if (!search.trim()) return tournaments;
 		const q = search.toLowerCase();
 		return tournaments.filter(
@@ -168,6 +195,11 @@ export default function TournamentsPage() {
 						))}
 					</div>
 				)}
+			</div>
+
+			{/* Infinite scroll sentinel */}
+			<div ref={loadMoreRef} className="flex justify-center py-8 max-w-7xl mx-auto">
+				{isFetchingNextPage && <Loader />}
 			</div>
 
 			{/* Create Modal */}

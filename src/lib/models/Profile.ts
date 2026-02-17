@@ -122,6 +122,7 @@ export interface UpdateProfileDto {
 	name?: string;
 	surname?: string;
 	imageUrl?: string;
+	imageThumbHash?: string;
 }
 
 export interface CreateOrUpdateUserProfileDto {

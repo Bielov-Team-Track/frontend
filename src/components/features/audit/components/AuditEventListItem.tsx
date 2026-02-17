@@ -13,7 +13,8 @@ const AuditEventItem = async ({ event }: AuditEventItemProps) => {
 		return null;
 	}
 
-	const participants = await loadParticipants(event.id);
+	const participantsResult = await loadParticipants(event.id);
+	const participants = participantsResult.items;
 
 	const isClosed =
 		participants.filter((p) => p.payment?.status !== "completed").length == 0;

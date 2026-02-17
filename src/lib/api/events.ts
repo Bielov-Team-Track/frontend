@@ -1,6 +1,7 @@
 import client from "./client";
 import { CreateEvent, CreateEventSeries, Event, EventFilterRequest, EventSeries } from "../models/Event";
 import { EventParticipant } from "../models/EventParticipant";
+import { CursorPagedResult, PaginatedResponse } from "../models/Pagination";
 import { UploadUrlResponse } from "../models/shared/models";
 import { getParamsFromObject } from "../utils/request";
 
@@ -8,22 +9,26 @@ const PREFIX = "/events";
 
 export async function loadEvents(
 	filter?: EventFilterRequest,
-): Promise<Event[]> {
+	page?: number,
+): Promise<PaginatedResponse<Event>> {
 	const endpoint = "/v1/events";
 
-	const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
+	const params = getParamsFromObject({
+		...filter,
+		...(page ? { page } : {}),
+	} as Record<string, unknown> | undefined);
 
-	return (await client.get<Event[]>(PREFIX + endpoint, { params })).data;
+	return (await client.get<PaginatedResponse<Event>>(PREFIX + endpoint, { params })).data;
 }
 
 export async function loadEventsByFilter(
 	filter?: EventFilterRequest,
-): Promise<Event[]> {
+): Promise<PaginatedResponse<Event>> {
 	const endpoint = "/v1/events";
 
 	const params = getParamsFromObject(filter as Record<string, unknown> | undefined);
 
-	return (await client.get<Event[]>(PREFIX + endpoint, { params })).data;
+	return (await client.get<PaginatedResponse<Event>>(PREFIX + endpoint, { params })).data;
 }
 
 export async function loadEvent(eventId: string): Promise<Event> {
@@ -54,9 +59,15 @@ export async function deleteEvent(eventId: string) {
 // Participants
 export async function loadParticipants(
 	eventId: string,
-): Promise<EventParticipant[]> {
+	cursor?: string,
+	limit: number = 20,
+): Promise<CursorPagedResult<EventParticipant>> {
 	const endpoint = `/v1/events/${eventId}/participants`;
-	return (await client.get<EventParticipant[]>(PREFIX + endpoint)).data;
+	const params: Record<string, string | number> = { limit };
+	if (cursor) {
+		params.cursor = cursor;
+	}
+	return (await client.get<CursorPagedResult<EventParticipant>>(PREFIX + endpoint, { params })).data;
 }
 
 export async function getMyParticipation(
@@ -89,6 +100,11 @@ export async function respondToInvitation(
 
 export async function removeParticipant(eventId: string, userId: string) {
 	const endpoint = `/v1/events/${eventId}/participants/${userId}`;
+	await client.delete(PREFIX + endpoint);
+}
+
+export async function revokeInvitation(eventId: string, userId: string) {
+	const endpoint = `/v1/events/${eventId}/participants/${userId}/invitation`;
 	await client.delete(PREFIX + endpoint);
 }
 

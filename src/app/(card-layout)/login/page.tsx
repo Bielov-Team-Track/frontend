@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Input, Loader } from "@/components/ui";
+import { ApiError } from "@/lib/errors";
 import { useAuth } from "@/providers";
 import { Lock, Mail } from "lucide-react";
 import Link from "next/link";
@@ -20,22 +21,35 @@ function LoginContent() {
 	const credentialsSignIn = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
+		const formData = new FormData(event.currentTarget);
+		const email = (formData.get("email") as string)?.trim();
+		const password = formData.get("password") as string;
+
+		if (!email || !password) {
+			setError(!email ? "Email is required" : "Password is required");
+			return;
+		}
+
 		setIsLoading(true);
 		setError(null);
 
-		const formData = new FormData(event.currentTarget);
-		const email = formData.get("email") as string;
-		const password = formData.get("password") as string;
-
 		try {
-			await login(email, password);
+			const profile = await login(email, password);
 
-			const targetRoute = callback || "/hub/events";
+			const isComplete = !!(profile?.name && profile?.surname);
+			const targetRoute = isComplete ? (callback || "/hub/events") : "/complete-profile-setup";
 
 			router.push(targetRoute);
 		} catch (error: any) {
 			setIsLoading(false);
-			const message = error.response?.data?.message || error.response?.data?.error || "Something went wrong, please try again later!";
+
+			const apiError = ApiError.fromError(error);
+			if (apiError.hasCode('EMAIL_NOT_VERIFIED')) {
+				router.push("/email-verification");
+				return;
+			}
+
+			const message = apiError.detail || error.response?.data?.message || error.response?.data?.error || "Something went wrong, please try again later!";
 			setError(message);
 
 			console.error("Login error:", error);

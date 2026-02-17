@@ -32,6 +32,7 @@ export interface SelectProps<T = any> {
 	fullWidth?: boolean;
 	renderOption?: (option: SelectOption<T>) => React.ReactNode;
 	renderValue?: (option: SelectOption<T>) => React.ReactNode;
+	"data-testid"?: string;
 }
 
 function Select<T = any>({
@@ -53,6 +54,7 @@ function Select<T = any>({
 	name,
 	renderOption,
 	renderValue,
+	"data-testid": testId,
 }: SelectProps<T>) {
 	const generatedId = useId();
 	const id = providedId || generatedId;
@@ -67,7 +69,7 @@ function Select<T = any>({
 	const selectedOption = options.find((opt) => opt.value === value);
 
 	return (
-		<div className={cn("flex flex-col gap-1.5", fullWidth ? "w-full" : "")} data-disabled={disabled}>
+		<div className={cn("flex flex-col gap-1.5", fullWidth ? "w-full" : "")} data-disabled={disabled} data-testid={testId}>
 			{label && (
 				<Label htmlFor={id} className={cn(hasError && "text-destructive")}>
 					{label}

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components";
-import { useTemplateLikeStatus, useLikeTemplate, useUnlikeTemplate } from "@/hooks/useTemplates";
+import { usePlanLikeStatus, useLikePlan, useUnlikePlan } from "@/hooks/useTemplates";
 import { useAuth } from "@/providers";
 import { Heart } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -16,9 +16,9 @@ interface TemplateLikeButtonProps {
 
 export default function TemplateLikeButton({ templateId, initialLikeCount = 0, variant = "default" }: TemplateLikeButtonProps) {
 	const { isAuthenticated } = useAuth();
-	const { data: likeStatus } = useTemplateLikeStatus(templateId, isAuthenticated);
-	const likeTemplate = useLikeTemplate();
-	const unlikeTemplate = useUnlikeTemplate();
+	const { data: likeStatus } = usePlanLikeStatus(templateId, isAuthenticated);
+	const likePlanMutation = useLikePlan();
+	const unlikePlanMutation = useUnlikePlan();
 
 	// Local state for optimistic updates
 	const [isLiked, setIsLiked] = useState(false);
@@ -45,9 +45,9 @@ export default function TemplateLikeButton({ templateId, initialLikeCount = 0, v
 
 		try {
 			if (newIsLiked) {
-				await likeTemplate.mutateAsync(templateId);
+				await likePlanMutation.mutateAsync(templateId);
 			} else {
-				await unlikeTemplate.mutateAsync(templateId);
+				await unlikePlanMutation.mutateAsync(templateId);
 			}
 		} catch (error) {
 			// Revert on error

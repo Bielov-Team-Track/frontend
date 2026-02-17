@@ -92,7 +92,11 @@ export default function EvaluateEventPage() {
 	const { data: event, isLoading: eventLoading, error: eventError } = useEvent(eventId);
 
 	// Fetch event participants
-	const { data: participants = [], isLoading: participantsLoading } = useEventParticipants(eventId);
+	const { data: participantsData, isLoading: participantsLoading } = useEventParticipants(eventId);
+	const participants = useMemo(
+		() => participantsData?.pages.flatMap(p => p.items) ?? [],
+		[participantsData],
+	);
 
 	// Fetch evaluation plan (optional - may not exist)
 	const { data: evaluationPlan, isLoading: planLoading } = useEventEvaluationPlan(eventId, false);

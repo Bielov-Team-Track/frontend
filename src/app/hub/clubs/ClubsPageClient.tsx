@@ -6,23 +6,60 @@ import { ListToolbar, ViewMode } from "@/components/ui/list-toolbar";
 import { getUserClubs } from "@/lib/api/clubs";
 import { Club } from "@/lib/models/Club";
 import { useAuth } from "@/providers";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { MapPin, Plus, Search, Shield, Users } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
+
+const PAGE_SIZE = 20;
+
+function useInfiniteScroll(fetchNextPage: () => void, hasNextPage: boolean | undefined, isFetchingNextPage: boolean) {
+	const observerRef = useRef<IntersectionObserver | null>(null);
+
+	const targetRef = useCallback(
+		(node: HTMLDivElement | null) => {
+			if (observerRef.current) observerRef.current.disconnect();
+			if (!node) return;
+
+			observerRef.current = new IntersectionObserver(
+				(entries) => {
+					if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+						fetchNextPage();
+					}
+				},
+				{ rootMargin: "200px" }
+			);
+			observerRef.current.observe(node);
+		},
+		[fetchNextPage, hasNextPage, isFetchingNextPage]
+	);
+
+	return targetRef;
+}
 
 export default function ClubsPageClient() {
 	const [search, setSearch] = useState("");
 	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 	const { userProfile } = useAuth();
 
-	const { data: clubs = [], isLoading } = useQuery({
-		queryKey: ["my-clubs"],
-		queryFn: () => getUserClubs(userProfile?.id!),
+	const {
+		data,
+		isLoading,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useInfiniteQuery({
+		queryKey: ["my-clubs", userProfile?.id],
+		queryFn: ({ pageParam }) => getUserClubs(userProfile?.id!, pageParam, PAGE_SIZE),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
 		enabled: !!userProfile?.id,
 	});
 
-	const filteredClubs = clubs.filter((club) => club.name.toLowerCase().includes(search.toLowerCase()));
+	const loadMoreRef = useInfiniteScroll(fetchNextPage, hasNextPage, isFetchingNextPage);
+
+	const allClubs = data?.pages.flatMap((page) => page.items ?? []) || [];
+	const filteredClubs = allClubs.filter((club) => club.name.toLowerCase().includes(search.toLowerCase()));
 
 	return (
 		<div className="h-full flex flex-col space-y-6">
@@ -73,6 +110,11 @@ export default function ClubsPageClient() {
 				) : (
 					<ClubListView clubs={filteredClubs} />
 				)}
+
+				{/* Infinite scroll sentinel */}
+				<div ref={loadMoreRef} className="flex justify-center py-4">
+					{isFetchingNextPage && <Loader />}
+				</div>
 			</div>
 		</div>
 	);

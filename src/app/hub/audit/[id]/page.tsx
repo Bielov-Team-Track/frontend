@@ -38,7 +38,7 @@ function AuditPage({ params }: AuditPageProps) {
 
 		const loadData = async () => {
 			try {
-				const [eventData, participantsData] = await Promise.all([
+				const [eventData, participantsResult] = await Promise.all([
 					loadEvent(parameters.id),
 					loadParticipants(parameters.id),
 				]);
@@ -48,8 +48,8 @@ function AuditPage({ params }: AuditPageProps) {
 				}
 
 				setEvent(eventData);
-				setParticipants(participantsData);
-				setPaymentsStore(participantsData); // Initialize the store with participant data
+				setParticipants(participantsResult.items);
+				setPaymentsStore(participantsResult.items); // Initialize the store with participant data
 				setLoading(false);
 
 				// Join the event's payment group

@@ -1,6 +1,6 @@
 "use client";
 
-import { getNotifications, getUnreadCount, markAllAsRead, markAsRead } from "@/lib/api/notifications";
+import { deleteAllNotifications, deleteNotification, getNotifications, getUnreadCount, markAllAsRead, markAsRead } from "@/lib/api/notifications";
 import { NotificationFilters } from "@/lib/models/Notification";
 import { useNotificationStore } from "@/lib/realtime/notificationStore";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -78,6 +78,40 @@ export function useMarkAllAsRead() {
 
 	return useMutation({
 		mutationFn: markAllAsRead,
+		onMutate: () => setUnreadCount(0),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: [NOTIFICATIONS_QUERY_KEY] });
+		},
+		onError: () => {
+			queryClient.invalidateQueries({ queryKey: [NOTIFICATIONS_QUERY_KEY] });
+		},
+	});
+}
+
+export function useDeleteNotification() {
+	const queryClient = useQueryClient();
+	const decrementUnread = useNotificationStore((s) => s.decrementUnread);
+
+	return useMutation({
+		mutationFn: ({ id, wasUnread }: { id: string; wasUnread: boolean }) => deleteNotification(id),
+		onMutate: ({ wasUnread }) => {
+			if (wasUnread) decrementUnread(1);
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: [NOTIFICATIONS_QUERY_KEY] });
+		},
+		onError: (_, { wasUnread }) => {
+			if (wasUnread) queryClient.invalidateQueries({ queryKey: [NOTIFICATIONS_QUERY_KEY] });
+		},
+	});
+}
+
+export function useDeleteAllNotifications() {
+	const queryClient = useQueryClient();
+	const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
+
+	return useMutation({
+		mutationFn: deleteAllNotifications,
 		onMutate: () => setUnreadCount(0),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: [NOTIFICATIONS_QUERY_KEY] });

@@ -16,6 +16,8 @@ const PUBLIC_ROUTES = [
 
 const AUTH_ROUTES = ["/login", "/sign-up", "/forgot-password", "/reset-password"];
 
+const PROFILE_SETUP_ROUTES = ["/complete-profile-setup"];
+
 /**
  * Next.js 16 Proxy - Lightweight routing layer
  *
@@ -33,6 +35,9 @@ export default async function proxy(request: NextRequest) {
 
 	// Check if route is an auth route (login, signup, etc.)
 	const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+
+	// Check if route is the profile setup page
+	const isProfileSetupRoute = PROFILE_SETUP_ROUTES.some((route) => pathname.startsWith(route));
 
 	// Get token cookie (existence check only, no validation)
 	const hasToken = request.cookies.has("token");
@@ -58,7 +63,17 @@ export default async function proxy(request: NextRequest) {
 		// Clear potentially stale cookies
 		response.cookies.delete("token");
 		response.cookies.delete("refreshToken");
+		response.cookies.delete("profileStatus");
 		return response;
+	}
+
+	// Profile completion guard (only when token exists)
+	// If profileStatus cookie is missing (e.g. existing users before this feature),
+	// allow through — AppShell handles the fallback client-side.
+	const profileStatus = request.cookies.get("profileStatus")?.value;
+
+	if (profileStatus === "incomplete" && !isProfileSetupRoute) {
+		return NextResponse.redirect(new URL("/complete-profile-setup", request.url));
 	}
 
 	// Token exists, allow request to proceed

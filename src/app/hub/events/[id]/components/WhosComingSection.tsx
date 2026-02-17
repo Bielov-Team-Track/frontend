@@ -22,7 +22,7 @@ export default function WhosComingSection({ participants, eventId }: WhosComingS
 	}));
 
 	return (
-		<div className="rounded-2xl bg-card border border-border p-6">
+		<div className="rounded-2xl bg-card border border-border p-6" data-testid="whos-coming-section">
 			{/* Header */}
 			<div className="flex items-center justify-between mb-4">
 				<h2 className="text-lg font-bold text-white">Who&apos;s Coming</h2>
@@ -42,7 +42,7 @@ export default function WhosComingSection({ participants, eventId }: WhosComingS
 				// Avatar stack with count
 				<div className="flex items-center gap-3">
 					<AvatarStack items={avatarItems} max={8} size="sm" showCount={false} />
-					<span className="text-sm text-muted-foreground">
+					<span className="text-sm text-muted-foreground" data-testid="whos-coming-count">
 						{avatarItems.length} {avatarItems.length === 1 ? "participant" : "participants"}
 					</span>
 				</div>

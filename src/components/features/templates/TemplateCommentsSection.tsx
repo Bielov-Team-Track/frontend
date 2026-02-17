@@ -2,8 +2,8 @@
 
 import RichCommentEditor from "@/components/features/comments/components/RichCommentEditor";
 import { CommentData, CommentsList } from "@/components/ui/comments";
-import { useCreateTemplateComment, useDeleteTemplateComment, useTemplateComments } from "@/hooks/useTemplates";
-import { TemplateComment } from "@/lib/models/Template";
+import { useCreatePlanComment, useDeletePlanComment, usePlanComments } from "@/hooks/useTemplates";
+import { PlanComment } from "@/lib/models/Template";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers";
 import { Loader2, MessageCircle } from "lucide-react";
@@ -15,8 +15,8 @@ interface TemplateCommentsSectionProps {
 	className?: string;
 }
 
-// Transform TemplateComment to generic CommentData
-function toCommentData(comment: TemplateComment): CommentData {
+// Transform PlanComment to generic CommentData
+function toCommentData(comment: PlanComment): CommentData {
 	return {
 		id: comment.id,
 		content: comment.content,
@@ -52,11 +52,11 @@ export default function TemplateCommentsSection({ templateId, className }: Templ
 		isFetchingNextPage,
 		hasNextPage,
 		fetchNextPage,
-	} = useTemplateComments(templateId);
+	} = usePlanComments(templateId);
 
 	// Mutations
-	const createComment = useCreateTemplateComment();
-	const deleteComment = useDeleteTemplateComment();
+	const createComment = useCreatePlanComment();
+	const deleteComment = useDeletePlanComment();
 
 	// Flatten paginated data
 	const comments = useMemo(() => {
@@ -80,7 +80,7 @@ export default function TemplateCommentsSection({ templateId, className }: Templ
 		if (!plainContent) return;
 
 		await createComment.mutateAsync({
-			templateId,
+			planId: templateId,
 			content: plainContent,
 			parentCommentId: replyingTo?.id || undefined,
 		});
@@ -88,7 +88,7 @@ export default function TemplateCommentsSection({ templateId, className }: Templ
 	};
 
 	const handleDeleteComment = async (commentId: string) => {
-		await deleteComment.mutateAsync({ templateId, commentId });
+		await deleteComment.mutateAsync({ planId: templateId, commentId });
 	};
 
 	const handleReply = (commentId: string) => {

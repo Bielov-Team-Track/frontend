@@ -1,9 +1,10 @@
 "use client";
 
-import { Button, EmojiPicker, RichTextEditor, RichTextEditorRef } from "@/components/ui";
+import { Button, EmbedCard, EmojiPicker, RichTextEditor, RichTextEditorRef } from "@/components/ui";
 import AttachmentsUploader, { UploadedAttachment } from "@/components/ui/attachments-uploader";
 import { useDraft } from "@/hooks/useDraft";
 import { useEventMediaUpload } from "@/hooks/useEventComments";
+import { useUrlEmbedDetection } from "@/hooks/useUrlEmbedDetection";
 import { getEventMentionSuggestions } from "@/lib/api/comments";
 import { Media } from "@/lib/models/shared/models";
 import { cn } from "@/lib/utils";
@@ -109,9 +110,20 @@ export default function RichCommentEditor({
 	const [isFocused, setIsFocused] = useState(autoFocus);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+	const [editorText, setEditorText] = useState("");
+	const { embeds: detectedEmbeds, dismiss: dismissEmbed } = useUrlEmbedDetection(editorText);
 	const uploadMutation = useEventMediaUpload();
 	const editorRef = useRef<RichTextEditorRef>(null);
 	const emojiButtonRef = useRef<HTMLButtonElement>(null);
+
+	const handleContentChange = useCallback(
+		(html: string) => {
+			setContent(html);
+			const plainText = editorRef.current?.getEditor()?.getText() || "";
+			setEditorText(plainText);
+		},
+		[],
+	);
 
 	const handleSubmit = async () => {
 		const trimmedContent = content.replace(/<p><\/p>/g, "").trim();
@@ -321,7 +333,7 @@ export default function RichCommentEditor({
 			<RichTextEditor
 				ref={editorRef}
 				content={content}
-				onChange={setContent}
+				onChange={handleContentChange}
 				placeholder={placeholder}
 				autoFocus={autoFocus || isFocused}
 				fetchMentionSuggestions={eventId ? fetchMentionSuggestions : undefined}
@@ -340,6 +352,23 @@ export default function RichCommentEditor({
 						showEmptyDropzone={false}
 						disableDrop
 					/>
+				</div>
+			)}
+
+			{/* Embed previews */}
+			{detectedEmbeds.length > 0 && (
+				<div className="space-y-1 px-2 pb-1">
+					{detectedEmbeds.map((embed) => (
+						<EmbedCard
+							key={embed.id}
+							url={embed.url}
+							embedInfo={embed.embedInfo}
+							title={embed.title}
+							thumbnailUrl={embed.thumbnailUrl}
+							onDismiss={() => dismissEmbed(embed.id)}
+							variant="compact"
+						/>
+					))}
 				</div>
 			)}
 

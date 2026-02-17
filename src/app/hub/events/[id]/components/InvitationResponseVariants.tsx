@@ -17,7 +17,7 @@ export function InvitationSidebarCard({ event, invitedBy, isSubscriptionCovered,
 	const startDate = new Date(event.startTime);
 
 	return (
-		<div className="rounded-2xl bg-accent/10 border border-accent/30 p-6">
+		<div className="rounded-2xl bg-accent/10 border border-accent/30 p-6" data-testid="invitation-sidebar-card">
 			<div className="flex items-start gap-3 mb-4">
 				<div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center flex-shrink-0">
 					<Calendar size={20} className="text-accent" />
@@ -44,6 +44,7 @@ export function InvitationSidebarCard({ event, invitedBy, isSubscriptionCovered,
 					className="flex-1"
 					leftIcon={<Check size={16} />}
 					onClick={onAccept}
+					data-testid="invitation-accept-button"
 				>
 					Accept
 				</Button>
@@ -53,6 +54,7 @@ export function InvitationSidebarCard({ event, invitedBy, isSubscriptionCovered,
 					className="flex-1"
 					leftIcon={<X size={16} />}
 					onClick={() => onDecline()}
+					data-testid="invitation-decline-button"
 				>
 					Decline
 				</Button>

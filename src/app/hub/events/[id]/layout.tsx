@@ -96,11 +96,12 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 		enabled: !!eventId,
 	});
 
-	const { data: participants = [] } = useQuery({
+	const { data: participantsResult } = useQuery({
 		queryKey: ["event-participants", eventId],
-		queryFn: () => loadParticipants(eventId),
+		queryFn: () => loadParticipants(eventId, undefined, 100),
 		enabled: !!eventId,
 	});
+	const participants = participantsResult?.items ?? [];
 
 	const { data: myParticipation, refetch: refetchMyParticipation } = useQuery({
 		queryKey: ["event-my-participation", eventId],
@@ -189,12 +190,12 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 						<ArrowLeft size={20} />
 					</Link>
 					<div className="flex-1">
-						<h1 className="text-2xl font-bold text-white">{event.name}</h1>
+						<h1 className="text-2xl font-bold text-white" data-testid="event-detail-name">{event.name}</h1>
 					</div>
 
 					{/* Overflow Menu for ALL users */}
 					<div className="relative">
-						<Button variant="ghost" color="neutral" className="p-2" onClick={() => setShowAdminMenu(!showAdminMenu)}>
+						<Button variant="ghost" color="neutral" className="p-2" onClick={() => setShowAdminMenu(!showAdminMenu)} data-testid="event-overflow-menu">
 							<MoreHorizontal size={18} />
 						</Button>
 
@@ -215,11 +216,11 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 									{isAdmin && (
 										<>
 											<div className="border-t border-border my-1" />
-											<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3">
+											<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3" data-testid="edit-event-menu-item">
 												<Edit size={16} className="text-muted" />
 												Edit Event
 											</button>
-											<button className="w-full px-4 py-2.5 text-left text-sm text-warning hover:bg-surface flex items-center gap-3">
+											<button className="w-full px-4 py-2.5 text-left text-sm text-warning hover:bg-surface flex items-center gap-3" data-testid="cancel-event-menu-item">
 												<XCircle size={16} />
 												Cancel Event
 											</button>
@@ -248,16 +249,16 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 						<div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
 							{/* Event type badge */}
 							<div className="flex items-center gap-2 mb-2">
-								<span className="px-2 py-0.5 rounded-lg bg-accent/20 text-accent border border-accent/20 text-xs font-bold uppercase">
+								<span className="px-2 py-0.5 rounded-lg bg-accent/20 text-accent border border-accent/20 text-xs font-bold uppercase" data-testid="event-type-badge">
 									{event.type || "Event"}
 								</span>
 								{event.canceled && (
-									<span className="px-2 py-0.5 rounded-lg bg-destructive/20 text-destructive border border-destructive/30 text-xs font-bold uppercase">
+									<span className="px-2 py-0.5 rounded-lg bg-destructive/20 text-destructive border border-destructive/30 text-xs font-bold uppercase" data-testid="event-canceled-badge">
 										Canceled
 									</span>
 								)}
 								{isFull && !event.canceled && (
-									<span className="px-2 py-0.5 rounded-lg bg-warning/20 text-warning border border-warning/30 text-xs font-bold uppercase">
+									<span className="px-2 py-0.5 rounded-lg bg-warning/20 text-warning border border-warning/30 text-xs font-bold uppercase" data-testid="event-full-badge">
 										Full
 									</span>
 								)}
@@ -296,7 +297,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 						<div className="flex items-center gap-4 text-sm">
 							<div className="flex items-center gap-1.5">
 								<Users size={14} className="text-muted-foreground" />
-								<span className="font-semibold text-white">
+								<span className="font-semibold text-white" data-testid="event-players-count">
 									{totalParticipants}
 									{totalSpots > 0 ? `/${totalSpots}` : ""} Players
 								</span>
@@ -305,23 +306,23 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 								)}
 							</div>
 							<span className="text-muted-foreground">{teams.length} Teams</span>
-							<span className="font-bold text-accent">{event.paymentConfig ? `£${event.paymentConfig.cost}` : "Free"}</span>
+							<span className="font-bold text-accent" data-testid="event-price-display">{event.paymentConfig ? `£${event.paymentConfig.cost}` : "Free"}</span>
 						</div>
 						{/* Right: context-aware CTA - hidden on mobile (StickyBottomBar handles mobile) */}
 						<div className="hidden lg:flex items-center gap-2">
 							{hasInvitation && (
 								<>
-									<Button variant="outline" color="neutral" size="sm" leftIcon={<X size={14} />}>
+									<Button variant="outline" color="neutral" size="sm" leftIcon={<X size={14} />} data-testid="decline-invitation-button">
 										Decline
 									</Button>
-									<Button color="primary" size="sm" leftIcon={<Check size={14} />}>
+									<Button color="primary" size="sm" leftIcon={<Check size={14} />} data-testid="accept-invitation-button">
 										Accept
 									</Button>
 								</>
 							)}
-							{isOpen && !isFull && !hasInvitation && !isParticipant && <Button color="primary" size="sm">Join Event</Button>}
+							{isOpen && !isFull && !hasInvitation && !isParticipant && <Button color="primary" size="sm" data-testid="join-event-button">Join Event</Button>}
 							{isOpen && isFull && !hasInvitation && !isParticipant && (
-								<Button variant="outline" color="primary" size="sm">
+								<Button variant="outline" color="primary" size="sm" data-testid="join-waitlist-button">
 									Join Waitlist
 								</Button>
 							)}
@@ -342,6 +343,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 									<Link
 										key={tab.id}
 										href={getTabHref(tab.id)}
+										data-testid={`event-tab-${tab.id}`}
 										prefetch={true}
 										className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap shrink-0 ${
 											isActive ? "text-accent" : "text-muted hover:text-white"

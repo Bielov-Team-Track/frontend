@@ -1,6 +1,7 @@
 "use client";
 
 import { AuthResponse, login as apiLogin, logout as apiLogout, refreshToken as apiRefreshToken, getCurrentUserProfile } from "@/lib/api/auth";
+import { getCookie, setCookie, deleteCookie } from "@/lib/cookies";
 import { UserProfile } from "@/lib/models/User";
 import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
@@ -9,36 +10,13 @@ interface AuthContextType {
 	isLoading: boolean;
 	isAuthenticated: boolean;
 	isProfileComplete: boolean;
-	login: (email: string, password: string) => Promise<void>;
+	login: (email: string, password: string) => Promise<UserProfile | null>;
 	loginFromTokens: (authResponse: AuthResponse) => Promise<void>;
 	logout: () => Promise<void>;
 	refreshAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Cookie utility functions
-const getCookie = (name: string): string | null => {
-	if (typeof window === "undefined") return null;
-	const row = document.cookie.split("; ").find((row) => row.startsWith(`${name}=`));
-	if (!row) return null;
-	// Use slice(1).join("=") to handle values containing "=" characters (like JWT tokens)
-	return row.split("=").slice(1).join("=") || null;
-};
-
-const setCookie = (name: string, value: string, maxAge: number): void => {
-	if (typeof window === "undefined") return;
-	const isSecure = window.location.protocol === "https:";
-	const secureFlag = isSecure ? "; Secure" : "";
-	document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Lax${secureFlag}`;
-};
-
-const deleteCookie = (name: string): void => {
-	if (typeof window === "undefined") return;
-	const isSecure = window.location.protocol === "https:";
-	const secureFlag = isSecure ? "; Secure" : "";
-	document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax${secureFlag}`;
-};
 
 // Parse JWT to get expiration time
 const getTokenExpiration = (token: string): Date | null => {
@@ -52,6 +30,17 @@ const getTokenExpiration = (token: string): Date | null => {
 	} catch {
 		return null;
 	}
+};
+
+const PROFILE_STATUS_MAX_AGE = 7 * 24 * 60 * 60; // 7 days, matches refresh token
+
+const syncProfileStatusCookie = (profile: UserProfile | null) => {
+	if (!profile) {
+		deleteCookie("profileStatus");
+		return;
+	}
+	const status = profile.name && profile.surname ? "complete" : "incomplete";
+	setCookie("profileStatus", status, PROFILE_STATUS_MAX_AGE);
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -96,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const clearTokens = useCallback(() => {
 		deleteCookie("token");
 		deleteCookie("refreshToken");
+		deleteCookie("profileStatus");
 
 		// Clear refresh timer
 		if (refreshTimerRef.current) {
@@ -122,14 +112,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		return new Date() >= expiration;
 	};
 
-	const login = async (email: string, password: string): Promise<void> => {
+	const login = async (email: string, password: string): Promise<UserProfile | null> => {
 		try {
-			const user = await apiLogin(email, password);
-			saveTokens(user);
+			const authResponse = await apiLogin(email, password);
+			saveTokens(authResponse);
+			const profile = await getCurrentUserProfile();
+			setUserProfile(profile ?? null);
+			syncProfileStatusCookie(profile ?? null);
+			return profile ?? null;
 		} catch (error) {
 			console.error("Login failed:", error);
 			clearTokens();
 			setUserProfile(null);
+			syncProfileStatusCookie(null);
 			throw error;
 		}
 	};
@@ -139,10 +134,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			saveTokens(authResponse);
 			const profile = await getCurrentUserProfile();
 			setUserProfile(profile ?? null);
+			syncProfileStatusCookie(profile ?? null);
 		} catch (error) {
 			console.error("Login from tokens failed:", error);
 			clearTokens();
 			setUserProfile(null);
+			syncProfileStatusCookie(null);
 			throw error;
 		}
 	};
@@ -174,11 +171,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			saveTokens(authResponse);
 			const profile = await getCurrentUserProfile();
 			setUserProfile(profile ?? null);
+			syncProfileStatusCookie(profile ?? null);
 		} catch (error) {
 			console.error("Token refresh failed:", error);
 			console.error("Full error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
 			clearTokens();
 			setUserProfile(null);
+			syncProfileStatusCookie(null);
 
 			// Redirect to login on refresh failure
 			if (typeof window !== "undefined") {
@@ -216,6 +215,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					try {
 						const currentUserProfile = await getCurrentUserProfile();
 						setUserProfile(currentUserProfile ?? null);
+						syncProfileStatusCookie(currentUserProfile ?? null);
 					} catch (error) {
 						// If getting user fails, try refresh
 						await refreshAuth();
@@ -225,6 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				console.error("Auth initialization failed:", error);
 				clearTokens();
 				setUserProfile(null);
+				syncProfileStatusCookie(null);
 			} finally {
 				setIsLoading(false);
 			}

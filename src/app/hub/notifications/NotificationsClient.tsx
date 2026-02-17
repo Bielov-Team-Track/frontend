@@ -3,10 +3,10 @@
 import { Checkbox, Select } from "@/components";
 import { NotificationItem } from "@/components/features/notifications/NotificationItem";
 import { Button } from "@/components/ui/button";
-import { useInfiniteNotifications, useMarkAllAsRead, useMarkAsRead } from "@/hooks/useNotifications";
+import { useDeleteAllNotifications, useDeleteNotification, useInfiniteNotifications, useMarkAllAsRead, useMarkAsRead } from "@/hooks/useNotifications";
 import { NotificationCategory } from "@/lib/models/Notification";
 import { useNotificationStore } from "@/lib/realtime/notificationStore";
-import { Bell, Loader2 } from "lucide-react";
+import { Bell, Loader2, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const CATEGORY_OPTIONS: { value: NotificationCategory | "all"; label: string }[] = [
@@ -34,6 +34,8 @@ export default function NotificationsClient() {
 
 	const { markRead } = useMarkAsRead();
 	const { mutate: markAllAsRead, isPending: isMarkingAll } = useMarkAllAsRead();
+	const { mutate: deleteOne } = useDeleteNotification();
+	const { mutate: deleteAll, isPending: isDeletingAll } = useDeleteAllNotifications();
 	const unreadCount = useNotificationStore((s) => s.unreadCount);
 
 	// Flatten pages into single notifications array
@@ -83,18 +85,36 @@ export default function NotificationsClient() {
 					</p>
 				</div>
 
-				{unreadCount > 0 && (
-					<Button variant="outline" onClick={() => markAllAsRead()} disabled={isMarkingAll}>
-						{isMarkingAll ? (
-							<>
-								<Loader2 className="size-4 animate-spin" />
-								Marking...
-							</>
-						) : (
-							"Mark all as read"
-						)}
-					</Button>
-				)}
+				<div className="flex gap-2">
+					{unreadCount > 0 && (
+						<Button variant="outline" onClick={() => markAllAsRead()} disabled={isMarkingAll}>
+							{isMarkingAll ? (
+								<>
+									<Loader2 className="size-4 animate-spin" />
+									Marking...
+								</>
+							) : (
+								"Mark all as read"
+							)}
+						</Button>
+					)}
+
+					{hasNotifications && (
+						<Button variant="outline" onClick={() => deleteAll()} disabled={isDeletingAll} data-testid="delete-all-notifications">
+							{isDeletingAll ? (
+								<>
+									<Loader2 className="size-4 animate-spin" />
+									Deleting...
+								</>
+							) : (
+								<>
+									<Trash2 className="size-4" />
+									Delete all
+								</>
+							)}
+						</Button>
+					)}
+				</div>
 			</div>
 
 			{/* Filters */}
@@ -136,7 +156,13 @@ export default function NotificationsClient() {
 					<>
 						<div className="divide-y divide-border">
 							{notifications.map((notification) => (
-								<NotificationItem key={notification.id} notification={notification} variant="full" onRead={() => markRead(notification.id)} />
+								<NotificationItem
+									key={notification.id}
+									notification={notification}
+									variant="full"
+									onRead={() => markRead(notification.id)}
+									onDelete={() => deleteOne({ id: notification.id, wasUnread: !notification.isRead })}
+								/>
 							))}
 						</div>
 

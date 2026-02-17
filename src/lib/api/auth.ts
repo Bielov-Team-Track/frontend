@@ -124,16 +124,25 @@ export async function getCurrentUserProfile(): Promise<UserProfile | null> {
 	}
 }
 
-export async function register(
-	email: string,
-	password: string
-): Promise<AuthResponse> {
+export interface RegisterPayload {
+	email: string;
+	password: string;
+	dateOfBirth: string; // ISO format
+	countryCode: string;
+	firstName?: string;
+	lastName?: string;
+}
+
+export interface RegisterResponse {
+	userId: string;
+	ageTier: string;
+	guardianRequired: boolean;
+}
+
+export async function register(payload: RegisterPayload): Promise<RegisterResponse> {
 	const endpoint = "/v1/auth/register";
 
 	return (
-		await client.post<AuthResponse>(AUTH_PREFIX + endpoint, {
-			email,
-			password,
-		})
+		await client.post<RegisterResponse>(AUTH_PREFIX + endpoint, payload)
 	).data;
 }

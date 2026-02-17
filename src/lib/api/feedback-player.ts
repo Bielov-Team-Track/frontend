@@ -8,7 +8,7 @@ import {
 	transformFeedbackListResponseDto,
 } from "../models/Feedback";
 
-const PREFIX = "/events";
+const PREFIX = "/coaching";
 
 /**
  * Get current user's received feedback with pagination

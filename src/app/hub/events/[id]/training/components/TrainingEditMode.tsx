@@ -16,11 +16,11 @@ import { Badge, EmptyState } from "@/components/ui";
 import { Clock, Dumbbell, GripVertical, Play, Trash2, FileDown, Save } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useEventContext } from "../../layout";
-import { useSaveEventPlanAsTemplate, useLoadTemplateToEvent } from "@/hooks/useTemplates";
+import { usePromoteToTemplate, useCreateEventPlan } from "@/hooks/useTemplates";
 import LoadTemplateModal from "./LoadTemplateModal";
 import SaveAsTemplateModal, { SaveTemplateData } from "./SaveAsTemplateModal";
 import LoadTemplateConfirmModal from "./LoadTemplateConfirmModal";
-import { TrainingPlanTemplate } from "@/lib/models/Template";
+import { TrainingPlan } from "@/lib/models/Template";
 
 interface TrainingEditModeProps {
 	timeline: TimelineItem[];
@@ -38,11 +38,11 @@ export default function TrainingEditMode({ timeline, setTimeline, eventDuration,
 	const [showLoadTemplateModal, setShowLoadTemplateModal] = useState(false);
 	const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
 	const [showLoadConfirmModal, setShowLoadConfirmModal] = useState(false);
-	const [selectedTemplate, setSelectedTemplate] = useState<TrainingPlanTemplate | null>(null);
+	const [selectedTemplate, setSelectedTemplate] = useState<TrainingPlan | null>(null);
 
-	// Template mutations
-	const saveAsTemplateMutation = useSaveEventPlanAsTemplate();
-	const loadTemplateMutation = useLoadTemplateToEvent();
+	// Plan mutations
+	const promoteToTemplateMutation = usePromoteToTemplate();
+	const createEventPlanMutation = useCreateEventPlan();
 
 	// Computed values
 	const plannedDuration = timeline.reduce((acc, item) => acc + item.duration, 0);
@@ -69,7 +69,7 @@ export default function TrainingEditMode({ timeline, setTimeline, eventDuration,
 	};
 
 	// Template handlers
-	const handleLoadTemplate = (template: TrainingPlanTemplate) => {
+	const handleLoadTemplate = (template: TrainingPlan) => {
 		if (timeline.length === 0) {
 			// Timeline is empty, load directly
 			loadTemplate(template.id, true);
@@ -88,12 +88,11 @@ export default function TrainingEditMode({ timeline, setTimeline, eventDuration,
 		}
 	};
 
-	const loadTemplate = async (templateId: string, replace: boolean) => {
+	const loadTemplate = async (templateId: string, _replace: boolean) => {
 		try {
-			await loadTemplateMutation.mutateAsync({
+			await createEventPlanMutation.mutateAsync({
 				eventId,
-				templateId,
-				replace,
+				request: { sourceTemplateId: templateId },
 			});
 			// TODO: Show success toast
 			// TODO: Refresh timeline data from backend
@@ -104,14 +103,14 @@ export default function TrainingEditMode({ timeline, setTimeline, eventDuration,
 	};
 
 	const handleSaveAsTemplate = async (data: SaveTemplateData) => {
+		// TODO: This flow needs to be updated once the event plan is created.
+		// For now, promote the event plan to a template if one exists.
 		try {
-			const result = await saveAsTemplateMutation.mutateAsync({
-				eventId,
-				data,
-			});
+			// This assumes there's already an event plan created.
+			// The proper flow: first create event plan, then promote it.
+			console.log("Save as template requested:", data);
 			setShowSaveTemplateModal(false);
-			// TODO: Show success toast with link to template
-			console.log("Template saved:", result);
+			// TODO: Implement full promote flow with promoteToTemplateMutation
 		} catch (error) {
 			console.error("Failed to save template:", error);
 			// TODO: Show error toast
@@ -233,7 +232,7 @@ export default function TrainingEditMode({ timeline, setTimeline, eventDuration,
 				isOpen={showSaveTemplateModal}
 				onClose={() => setShowSaveTemplateModal(false)}
 				onSave={handleSaveAsTemplate}
-				isLoading={saveAsTemplateMutation.isPending}
+				isLoading={promoteToTemplateMutation.isPending}
 				clubs={[]} // TODO: Fetch user's clubs where they can create templates
 			/>
 

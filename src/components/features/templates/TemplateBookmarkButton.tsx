@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components";
-import { useBookmarkTemplate, useUnbookmarkTemplate } from "@/hooks/useTemplates";
+import { useBookmarkPlan, useUnbookmarkPlan } from "@/hooks/useTemplates";
 import { useAuth } from "@/providers";
 import { Bookmark } from "lucide-react";
 import { useState } from "react";
@@ -16,8 +16,8 @@ interface TemplateBookmarkButtonProps {
 
 export default function TemplateBookmarkButton({ templateId, isBookmarked: initialIsBookmarked = false, variant = "default" }: TemplateBookmarkButtonProps) {
 	const { isAuthenticated } = useAuth();
-	const bookmarkTemplate = useBookmarkTemplate();
-	const unbookmarkTemplate = useUnbookmarkTemplate();
+	const bookmarkPlanMutation = useBookmarkPlan();
+	const unbookmarkPlanMutation = useUnbookmarkPlan();
 
 	// Local state for optimistic updates
 	const [isBookmarked, setIsBookmarked] = useState(initialIsBookmarked);
@@ -34,9 +34,9 @@ export default function TemplateBookmarkButton({ templateId, isBookmarked: initi
 
 		try {
 			if (newIsBookmarked) {
-				await bookmarkTemplate.mutateAsync(templateId);
+				await bookmarkPlanMutation.mutateAsync(templateId);
 			} else {
-				await unbookmarkTemplate.mutateAsync(templateId);
+				await unbookmarkPlanMutation.mutateAsync(templateId);
 			}
 		} catch (error) {
 			// Revert on error

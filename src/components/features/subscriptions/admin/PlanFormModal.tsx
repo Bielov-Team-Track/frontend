@@ -93,7 +93,7 @@ export default function PlanFormModal({ open, onClose, clubId, plan }: Props) {
 	const isPending = createMutation.isPending || updateMutation.isPending;
 
 	return (
-		<Modal isOpen={open} onClose={onClose} title={isEdit ? "Edit Plan" : "Create Subscription Plan"}>
+		<Modal isOpen={open} onClose={onClose} title={isEdit ? "Edit Plan" : "Create Subscription Plan"} preventOutsideClose>
 			<form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-4 min-w-100">
 				<Input
 					{...register("name", { required: "Plan name is required" })}

@@ -18,6 +18,7 @@ export interface UserProfile {
 	name: string;
 	surname: string;
 	imageUrl: string;
+	imageThumbHash?: string;
 	dateOfBirth?: Date;
 	// Aliases for backward compatibility
 	firstName?: string;

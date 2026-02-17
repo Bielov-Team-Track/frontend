@@ -14,7 +14,7 @@ export async function getUserClubsServer(userId: string): Promise<Club[]> {
 		return [];
 	}
 
-	const url = `${CLUBS_API_V1}/clubs/users/${userId}/clubs`;
+	const url = `${CLUBS_API_V1}/clubs/users/${userId}/clubs?limit=100`;
 
 	const fetchOptions: RequestInit = {
 		method: "GET",
@@ -29,7 +29,8 @@ export async function getUserClubsServer(userId: string): Promise<Club[]> {
 		const response = await fetch(url, fetchOptions);
 
 		if (response.ok) {
-			return await response.json();
+			const result = await response.json();
+			return result.items ?? result;
 		} else if (response.status === 401 || response.status === 403) {
 			return [];
 		} else {

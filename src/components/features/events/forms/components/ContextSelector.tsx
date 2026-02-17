@@ -77,7 +77,7 @@ const ContextSelector = ({ onSelect, clubs }: ContextSelectorProps) => {
 	};
 
 	return (
-		<div className="flex flex-1 flex-col justify-between h-full animate-in fade-in slide-in-from-right-4 duration-300">
+		<div className="flex flex-1 flex-col justify-between h-full animate-in fade-in slide-in-from-right-4 duration-300" data-testid="context-selector">
 			<div className="space-y-4 sm:space-y-6">
 				<div className="border-b-2 pb-3 sm:pb-4">
 					<h2 className="text-lg sm:text-xl font-bold text-foreground mb-1">Select club, group, or team</h2>
@@ -92,6 +92,7 @@ const ContextSelector = ({ onSelect, clubs }: ContextSelectorProps) => {
 						clearable={true}
 						options={clubOptions}
 						label="Club"
+						data-testid="context-club-select"
 						value={selectedClubId}
 						onChange={(value) => {
 							setSelectedClubId(value);
@@ -135,6 +136,7 @@ const ContextSelector = ({ onSelect, clubs }: ContextSelectorProps) => {
 									disabled={!groupOptions || groupOptions.length == 0}
 									options={groupOptions || []}
 									label="Group"
+									data-testid="context-group-select"
 									placeholder={!groupOptions || groupOptions.length == 0 ? "No groups available" : "Select a group"}
 									value={selectedGroupId}
 									onChange={(value) => setSelectedGroupId(value)}
@@ -159,10 +161,10 @@ const ContextSelector = ({ onSelect, clubs }: ContextSelectorProps) => {
 				</AnimatePresence>
 			</div>
 			<div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 justify-end mt-6">
-				<Button variant={"ghost"} className="w-full sm:w-auto" onClick={() => onSelect(null)}>
+				<Button variant={"ghost"} className="w-full sm:w-auto" onClick={() => onSelect(null)} data-testid="context-skip-button">
 					Skip
 				</Button>
-				<Button disabled={!selectedClubId} className="w-full sm:w-auto" onClick={() => onSelect(getSelectedContext())}>
+				<Button disabled={!selectedClubId} className="w-full sm:w-auto" onClick={() => onSelect(getSelectedContext())} data-testid="context-continue-button">
 					Continue
 				</Button>
 			</div>

@@ -46,11 +46,12 @@ export async function deletePost(postId: string): Promise<void> {
 }
 
 // Media
-export async function getUploadUrl(contentType: string, fileName: string, fileSize: number): Promise<UploadUrlResponse> {
+export async function getUploadUrl(contentType: string, fileName: string, fileSize: number, thumbHash?: string): Promise<UploadUrlResponse> {
 	const response = await client.post<UploadUrlResponse>(`${PREFIX}/media/upload-url`, {
 		contentType,
 		fileName,
 		fileSize,
+		thumbHash,
 	});
 	return response.data;
 }

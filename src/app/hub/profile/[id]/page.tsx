@@ -49,20 +49,20 @@ function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
 				setProfile(profileData as ExtendedProfile);
 
 				// 2. Fetch Events (Organizer)
-				const organized = await loadEventsByFilter({
+				const organizedResponse = await loadEventsByFilter({
 					organizerId: id,
 					sortBy: "startDate",
 					sortOrder: "desc",
 				});
-				setOrganizedEvents(organized || []);
+				setOrganizedEvents(organizedResponse?.items || []);
 
 				// 3. Fetch Events (Participant)
-				const participated = await loadEventsByFilter({
+				const participatedResponse = await loadEventsByFilter({
 					participantId: id,
 					sortBy: "startDate",
 					sortOrder: "desc",
 				});
-				setParticipatedEvents(participated || []);
+				setParticipatedEvents(participatedResponse?.items || []);
 			} catch (error) {
 				console.error("Failed to load profile data", error);
 			} finally {

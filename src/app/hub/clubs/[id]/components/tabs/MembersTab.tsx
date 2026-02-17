@@ -9,19 +9,14 @@ import {
 	getClubRegistrationsPaged,
 	getRegistrationStatusCounts,
 	leaveClub,
+	searchClubMembers,
 	updateClubMember,
 	UpdateClubMemberRequest,
 	updateRegistrationStatus,
 } from "@/lib/api/clubs";
-import { ClubMember, ClubRegistration, ClubRole, RegistrationSortBy, RegistrationStatus } from "@/lib/models/Club";
+import { ClubMember, ClubMembersSortBy, ClubRegistration, ClubRole, RegistrationSortBy, RegistrationStatus } from "@/lib/models/Club";
 import { SortDirection } from "@/lib/models/filteringAndPagination";
-import { cn } from "@/lib/utils";
 
-// Helper to extract role strings from role objects or strings
-function extractRoleStrings(roles: any[] | undefined): string[] {
-	if (!roles) return [];
-	return roles.map((r) => (typeof r === "string" ? r : r?.role)).filter(Boolean);
-}
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
@@ -115,7 +110,7 @@ export default function MembersTab({ members, clubId, currentUserRole, onInvite 
 						exit={{ opacity: 0, y: -10 }}
 						transition={{ duration: 0.15 }}
 						className="h-full">
-						{activeSubTab === "members" && <MembersList members={members} clubId={clubId} currentUserRole={currentUserRole} onInvite={onInvite} />}
+						{activeSubTab === "members" && <MembersList clubId={clubId} currentUserRole={currentUserRole} onInvite={onInvite} />}
 						{activeSubTab === "registrations" && <RegistrationsList clubId={clubId} status={RegistrationStatus.Pending} />}
 						{activeSubTab === "waitlist" && <RegistrationsList clubId={clubId} status={RegistrationStatus.Waitlist} />}
 						{activeSubTab === "declined" && <RegistrationsList clubId={clubId} status={RegistrationStatus.Declined} />}
@@ -128,34 +123,83 @@ export default function MembersTab({ members, clubId, currentUserRole, onInvite 
 
 // --- Members List ---
 
-// Sort options for members
+// Sort options for members (mapped to backend ClubMembersSortBy + SortDirection)
 const MEMBER_SORT_OPTIONS = [
 	{ value: "joined-desc", label: "Newest First", icon: <Clock size={14} /> },
 	{ value: "joined-asc", label: "Oldest First", icon: <Clock size={14} /> },
 	{ value: "name-asc", label: "Name (A-Z)", icon: <ArrowDownAZ size={14} /> },
 ];
 
-// Role filter options
-const ROLE_FILTERS = [
-	{ value: "all", label: "All Roles" },
-	{ value: "Owner", label: "Owner" },
-	{ value: "Admin", label: "Admin" },
-	{ value: "Coach", label: "Coach" },
-	{ value: "Member", label: "Member" },
-];
+// Map frontend sort value to backend params
+function parseMemberSort(sortBy: string): { sortBy: ClubMembersSortBy; sortDirection: SortDirection } {
+	switch (sortBy) {
+		case "name-asc":
+			return { sortBy: ClubMembersSortBy.Name, sortDirection: SortDirection.Ascending };
+		case "joined-asc":
+			return { sortBy: ClubMembersSortBy.JoinDate, sortDirection: SortDirection.Ascending };
+		case "joined-desc":
+		default:
+			return { sortBy: ClubMembersSortBy.JoinDate, sortDirection: SortDirection.Descending };
+	}
+}
 
-function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabProps) {
+// Loading skeleton for member rows
+function MemberRowSkeleton() {
+	return (
+		<tr className="border-b border-border last:border-b-0">
+			<td className="px-4 py-3">
+				<div className="flex items-center gap-3">
+					<SkeletonAvatar size="sm" />
+					<div className="space-y-1.5">
+						<Skeleton height="0.875rem" width="8rem" rounded="md" />
+						<Skeleton height="0.75rem" width="12rem" rounded="md" />
+					</div>
+				</div>
+			</td>
+			<td className="px-4 py-3"><Skeleton height="1.5rem" width="4rem" rounded="lg" /></td>
+			<td className="px-4 py-3"><Skeleton height="0.875rem" width="5rem" rounded="md" /></td>
+			<td className="px-4 py-3"><Skeleton height="0.875rem" width="6rem" rounded="md" /></td>
+			<td className="px-4 py-3"><Skeleton height="1.5rem" width="4rem" rounded="lg" /></td>
+			<td className="px-4 py-3 text-right"><Skeleton height="2rem" width="2rem" rounded="md" /></td>
+		</tr>
+	);
+}
+
+function MembersList({ clubId, currentUserRole, onInvite }: Omit<MembersTabProps, "members">) {
 	const [editingMember, setEditingMember] = useState<ClubMember | null>(null);
 	const [removingMember, setRemovingMember] = useState<ClubMember | null>(null);
 	const [search, setSearch] = useState("");
 	const [sortBy, setSortBy] = useState<string>("joined-desc");
-	const [roleFilter, setRoleFilter] = useState<string>("all");
 
 	const queryClient = useQueryClient();
+
+	// Compute backend sort params
+	const { sortBy: apiSortBy, sortDirection: apiSortDirection } = parseMemberSort(sortBy);
+
+	// Use infinite query with backend search endpoint
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
+		queryKey: ["club-members-search", clubId, search, apiSortBy, apiSortDirection],
+		queryFn: ({ pageParam }) =>
+			searchClubMembers(clubId, {
+				query: search || undefined,
+				sortBy: apiSortBy,
+				sortDirection: apiSortDirection,
+				cursor: pageParam as string | undefined,
+				limit: 20,
+			}),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
+	});
+
+	const loadMoreRef = useInfiniteScroll(fetchNextPage, hasNextPage, isFetchingNextPage);
+
+	const allMembers = data?.pages.flatMap((page) => page.items ?? []).filter((item): item is ClubMember => item != null) || [];
+	const totalCount = data?.pages[0]?.totalCount;
 
 	const updateMutation = useMutation({
 		mutationFn: (data: UpdateClubMemberRequest) => updateClubMember(clubId, editingMember!.userId, data),
 		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["club-members-search", clubId] });
 			queryClient.invalidateQueries({ queryKey: ["club-members", clubId] });
 			setEditingMember(null);
 		},
@@ -164,6 +208,7 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 	const removeMutation = useMutation({
 		mutationFn: (userId: string) => leaveClub(clubId, userId),
 		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["club-members-search", clubId] });
 			queryClient.invalidateQueries({ queryKey: ["club-members", clubId] });
 			setRemovingMember(null);
 		},
@@ -176,65 +221,6 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 		return "this member";
 	};
 
-	const clearFilters = () => {
-		setRoleFilter("all");
-	};
-
-	const activeFilterCount = roleFilter !== "all" ? 1 : 0;
-
-	// Filter and sort members
-	const filteredMembers = members
-		.filter((member) => {
-			// Search filter
-			if (search) {
-				const searchLower = search.toLowerCase();
-				const name = getMemberDisplayName(member).toLowerCase();
-				const email = member.userProfile?.email?.toLowerCase() || "";
-				if (!name.includes(searchLower) && !email.includes(searchLower)) {
-					return false;
-				}
-			}
-			// Role filter
-			if (roleFilter !== "all" && !extractRoleStrings(member.roles).includes(roleFilter)) {
-				return false;
-			}
-			return true;
-		})
-		.sort((a, b) => {
-			switch (sortBy) {
-				case "name-asc":
-					return getMemberDisplayName(a).localeCompare(getMemberDisplayName(b));
-				case "joined-asc":
-					return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
-				case "joined-desc":
-				default:
-					return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
-			}
-		});
-
-	// Filter content for ListToolbar
-	const filterContent = (
-		<div className="space-y-2">
-			<p className="text-xs font-medium text-muted-foreground">Role</p>
-			<div className="flex flex-wrap gap-2">
-				{ROLE_FILTERS.map((filter) => (
-					<button
-						key={filter.value}
-						type="button"
-						onClick={() => setRoleFilter(filter.value)}
-						className={cn(
-							"px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors",
-							roleFilter === filter.value
-								? "bg-foreground/10 text-foreground border-foreground/30"
-								: "bg-card/50 text-muted-foreground border-border hover:bg-card hover:text-foreground hover:border-foreground/20"
-						)}>
-						{filter.label}
-					</button>
-				))}
-			</div>
-		</div>
-	);
-
 	return (
 		<div className="flex flex-col gap-4 h-full">
 			{/* Toolbar */}
@@ -245,49 +231,14 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 				sortOptions={MEMBER_SORT_OPTIONS}
 				sortBy={sortBy}
 				onSortChange={setSortBy}
-				filterContent={filterContent}
-				activeFilterCount={activeFilterCount}
-				onClearFilters={clearFilters}
-				count={filteredMembers.length}
+				count={totalCount ?? allMembers.length}
 				itemLabel="member"
 				showViewToggle={false}
 			/>
 
 			{/* Content Area */}
 			<div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
-			{members.length === 0 ? (
-				<EmptyState
-					icon={UserPlus}
-					title="No members yet"
-					description="Invite members to join your club"
-					action={{
-						label: "Invite Member",
-						onClick: onInvite,
-						icon: Plus,
-					}}
-				/>
-			) : filteredMembers.length === 0 ? (
-				<EmptyState
-					icon={Search}
-					title="No members found"
-					description={search || activeFilterCount > 0 ? "Try adjusting your filters or search terms." : "No members match your criteria."}
-					action={
-						activeFilterCount > 0
-							? {
-									label: "Clear Filters",
-									onClick: clearFilters,
-									icon: RotateCcw,
-								}
-							: search
-								? {
-										label: "Clear Search",
-										onClick: () => setSearch(""),
-										icon: Search,
-									}
-								: undefined
-					}
-				/>
-			) : (
+			{isLoading && allMembers.length === 0 ? (
 				<div className="rounded-xl bg-surface border border-border overflow-hidden">
 					<table className="w-full">
 						<thead>
@@ -301,18 +252,70 @@ function MembersList({ members, clubId, currentUserRole, onInvite }: MembersTabP
 							</tr>
 						</thead>
 						<tbody>
-							{filteredMembers.map((member) => (
-								<MemberRow
-									key={member.userId}
-									member={member}
-									clubId={clubId}
-									currentUserRole={currentUserRole}
-									onEdit={() => setEditingMember(member)}
-									onRemove={() => setRemovingMember(member)}
-								/>
+							{[...Array(5)].map((_, i) => (
+								<MemberRowSkeleton key={i} />
 							))}
 						</tbody>
 					</table>
+				</div>
+			) : allMembers.length === 0 ? (
+				<EmptyState
+					icon={search ? Search : UserPlus}
+					title={search ? "No members found" : "No members yet"}
+					description={search ? "Try adjusting your search terms." : "Invite members to join your club"}
+					action={
+						search
+							? {
+									label: "Clear Search",
+									onClick: () => setSearch(""),
+									icon: Search,
+								}
+							: {
+									label: "Invite Member",
+									onClick: onInvite,
+									icon: Plus,
+								}
+					}
+				/>
+			) : (
+				<div className="pb-4">
+					<div className="rounded-xl bg-surface border border-border overflow-hidden">
+						<table className="w-full">
+							<thead>
+								<tr className="border-b border-border">
+									<th className="text-left text-xs font-medium text-muted px-4 py-3">Member</th>
+									<th className="text-left text-xs font-medium text-muted px-4 py-3">Role</th>
+									<th className="text-left text-xs font-medium text-muted px-4 py-3">Skill Level</th>
+									<th className="text-left text-xs font-medium text-muted px-4 py-3">Joined</th>
+									<th className="text-left text-xs font-medium text-muted px-4 py-3">Status</th>
+									<th className="text-right text-xs font-medium text-muted px-4 py-3">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{allMembers.map((member) => (
+									<MemberRow
+										key={member.userId}
+										member={member}
+										clubId={clubId}
+										currentUserRole={currentUserRole}
+										onEdit={() => setEditingMember(member)}
+										onRemove={() => setRemovingMember(member)}
+									/>
+								))}
+							</tbody>
+						</table>
+					</div>
+
+					{/* Infinite Scroll Trigger */}
+					<div ref={loadMoreRef} className="h-12 flex items-center justify-center">
+						{isFetchingNextPage && (
+							<div className="flex items-center gap-2 text-muted">
+								<Loader2 className="w-5 h-5 animate-spin" />
+								<span className="text-sm">Loading more...</span>
+							</div>
+						)}
+						{!hasNextPage && allMembers.length > 0 && <span className="text-xs text-muted">All members loaded</span>}
+					</div>
 				</div>
 			)}
 			</div>

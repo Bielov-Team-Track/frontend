@@ -137,7 +137,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 
 	return (
 		<>
-			<Modal isOpen={isOpen} onClose={onClose} title="Chat Details" className="max-w-md bg-background border border-border">
+			<Modal data-testid="chat-info-panel" isOpen={isOpen} onClose={onClose} title="Chat Details" className="max-w-md bg-background border border-border">
 				{isAdding ? (
 					<div className="flex flex-col gap-4 h-[400px]">
 						<div className="flex justify-between items-center">
@@ -154,6 +154,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 							/>
 						</div>
 						<Button
+							data-testid="add-selected-button"
 							onClick={handleAddParticipants}
 							fullWidth
 							disabled={selectedUsersToAdd.length === 0 || operationLoading}
@@ -187,7 +188,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 								)}
 							</div>
 							<h2 className="text-xl font-bold text-foreground tracking-tight">{chat.title}</h2>
-							<p className="text-sm text-muted">{chat.participants.length > 2 ? `${participants.length} participants` : "Direct Message"}</p>
+							<p data-testid="participant-count" className="text-sm text-muted">{chat.participants.length > 2 ? `${participants.length} participants` : "Direct Message"}</p>
 						</div>
 
 						{/* Actions Grid */}
@@ -239,7 +240,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 
 								<div className="flex items-center gap-1 shrink-0">
 									{!isSearching && <IconButton icon={Search} tooltip="Search participants" onClick={() => setIsSearching(true)} />}
-									<IconButton icon={UserPlus} tooltip="Add participants" onClick={() => setIsAdding(true)} />
+									<IconButton icon={UserPlus} tooltip="Add participants" onClick={() => setIsAdding(true)} data-testid="add-participant-button" />
 								</div>
 							</div>
 
@@ -254,6 +255,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 									filteredParticipants.map((user) => (
 										<div
 											key={user.id}
+											data-testid="participant-item"
 											className="flex items-center justify-between p-2 rounded-lg hover:bg-surface transition-colors group cursor-pointer"
 											onClick={() => handleParticipantClick(user)}>
 											<div className="flex items-center gap-3">
@@ -270,6 +272,7 @@ const ChatInfoPanel = ({ chat, isOpen, onClose, onChatUpdated }: ChatInfoPanelPr
 
 											{user.id !== currentUser?.id && (
 												<button
+													data-testid="remove-participant-button"
 													onClick={(e) => {
 														e.stopPropagation();
 														handleRemoveParticipant(user.id);

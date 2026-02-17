@@ -96,6 +96,7 @@ export default function PaymentStep() {
 						render={({ field }) => (
 							<RadioCards
 								label="Pricing Model"
+								data-testid="pricing-model-selector"
 								options={pricingModelCards}
 								value={field.value}
 								onChange={field.onChange}
@@ -145,6 +146,7 @@ export default function PaymentStep() {
 										checked={value}
 										onChange={onChange}
 										label="Require payment to join"
+										data-testid="pay-to-join-checkbox"
 										helperText="Participants must pay before they can confirm their spot. Without this, participants join first and can pay later."
 									/>
 								)}
@@ -162,6 +164,7 @@ export default function PaymentStep() {
 											onChange={(val) => field.onChange(val ? parseInt(val, 10) : null)}
 											options={reminderOptions}
 											label="Payment Reminder"
+											data-testid="payment-reminder-select"
 											leftIcon={<Bell size={16} />}
 											helperText="Send a reminder email to unpaid participants before the event"
 										/>
@@ -186,6 +189,7 @@ export default function PaymentStep() {
 								clearable
 								placeholder="Not set"
 								label="Dropout Deadline"
+									data-testid="dropout-deadline-slider"
 								formatValue={(v) => `${v}h`}
 								helperText="Hours before event start when participants can no longer drop out without penalty"
 								error={errors.paymentConfig?.dropoutDeadlineHours?.message as string | undefined}

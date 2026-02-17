@@ -3,6 +3,7 @@
 import { getNotificationLink, Notification } from "@/lib/models/Notification";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { getNotificationIconConfig, NotificationIcon } from "./NotificationIcon";
@@ -12,6 +13,7 @@ interface NotificationItemProps {
 	variant?: "compact" | "full";
 	onRead?: () => void;
 	onClick?: () => void;
+	onDelete?: () => void;
 }
 
 function isHighPriority(notification: Notification): boolean {
@@ -33,7 +35,7 @@ function isHighPriority(notification: Notification): boolean {
 	return false;
 }
 
-export function NotificationItem({ notification, variant = "compact", onRead, onClick }: NotificationItemProps) {
+export function NotificationItem({ notification, variant = "compact", onRead, onClick, onDelete }: NotificationItemProps) {
 	const router = useRouter();
 	const highPriority = isHighPriority(notification);
 	const link = getNotificationLink(notification);
@@ -62,7 +64,7 @@ export function NotificationItem({ notification, variant = "compact", onRead, on
 			type="button"
 			onClick={handleClick}
 			className={cn(
-				"relative flex w-full gap-3 rounded-lg p-3 text-left transition-colors",
+				"group/notification relative flex w-full gap-3 rounded-lg p-3 text-left transition-colors",
 				"hover:bg-surface-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
 				!notification.isRead && "bg-surface/50",
 				variant === "full" && "p-4"
@@ -75,8 +77,16 @@ export function NotificationItem({ notification, variant = "compact", onRead, on
 				)}
 			/>
 
-			{/* Icon */}
-			<NotificationIcon notification={notification} />
+			{/* Icon or Actor Avatar */}
+			{notification.payload?.actorPhotoUrl ? (
+				<img
+					src={notification.payload.actorPhotoUrl as string}
+					alt={notification.payload.actorName as string || ""}
+					className="size-9 shrink-0 rounded-full object-cover"
+				/>
+			) : (
+				<NotificationIcon notification={notification} />
+			)}
 
 			{/* Content */}
 			<div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -88,9 +98,29 @@ export function NotificationItem({ notification, variant = "compact", onRead, on
 				<p className={cn("text-sm text-muted-foreground", variant === "compact" ? "line-clamp-1" : "line-clamp-2")}>{notification.body}</p>
 			</div>
 
-			{/* Unread indicator dot */}
-			{!notification.isRead && (
-				<div className="absolute right-3 top-3">
+			{/* Delete button (full variant) or unread dot */}
+			{variant === "full" && onDelete ? (
+				<button
+					type="button"
+					onClick={(e) => {
+						e.stopPropagation();
+						onDelete();
+					}}
+					className="absolute right-3 top-3 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-muted hover:text-foreground group-hover/notification:opacity-100"
+					data-testid="delete-notification">
+					<X className="size-3.5" />
+				</button>
+			) : (
+				!notification.isRead && (
+					<div className="absolute right-3 top-3">
+						<div className="size-2 rounded-full bg-primary" />
+					</div>
+				)
+			)}
+
+			{/* Unread dot (shown alongside delete button in full variant) */}
+			{variant === "full" && !notification.isRead && (
+				<div className="absolute right-3 bottom-3">
 					<div className="size-2 rounded-full bg-primary" />
 				</div>
 			)}

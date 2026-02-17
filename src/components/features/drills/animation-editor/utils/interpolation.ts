@@ -113,10 +113,12 @@ export function getInterpolatedState(
 		}
 	})
 
-	const interpolatedBall = {
-		x: fromFrame.ball.x + (toFrame.ball.x - fromFrame.ball.x) * easedProgress,
-		y: fromFrame.ball.y + (toFrame.ball.y - fromFrame.ball.y) * easedProgress,
-	}
+	const interpolatedBall = fromFrame.ball && toFrame.ball
+		? {
+			x: fromFrame.ball.x + (toFrame.ball.x - fromFrame.ball.x) * easedProgress,
+			y: fromFrame.ball.y + (toFrame.ball.y - fromFrame.ball.y) * easedProgress,
+		}
+		: fromFrame.ball || toFrame.ball
 
 	// Collect all unique equipment IDs from both frames
 	const allEquipmentIds = new Set([

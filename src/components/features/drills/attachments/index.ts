@@ -18,4 +18,4 @@ export {
 	getProviderDisplayName,
 	type EmbedInfo,
 	type EmbedProvider,
-} from "./embedUtils";
+} from "@/components/ui/media-preview";

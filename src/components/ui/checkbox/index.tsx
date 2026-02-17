@@ -19,6 +19,7 @@ export interface CheckboxProps {
 	id?: string;
 	name?: string;
 	tabIndex?: number;
+	"data-testid"?: string;
 }
 
 function Checkbox({
@@ -34,34 +35,37 @@ function Checkbox({
 	id: providedId,
 	name,
 	tabIndex,
+	"data-testid": testId,
 }: CheckboxProps) {
 	const generatedId = useId();
 	const id = providedId || generatedId;
 	const hasError = Boolean(error);
+	// Ensure checked is always a boolean to prevent uncontrolled-to-controlled switch
+	const controlledChecked = checked ?? false;
 
 	return (
-		<div className="flex flex-col gap-1.5" data-disabled={disabled}>
+		<div className="flex flex-col gap-1.5" data-disabled={disabled} data-testid={testId}>
 			<div className="flex items-start gap-2">
-				<Label
-					htmlFor={id}
-					className={cn(
-						"text-sm leading-none font-medium cursor-pointer",
-						disabled && "cursor-not-allowed opacity-50",
-						hasError && "text-destructive"
-					)}>
-					<CheckboxPrimitive
-						id={id}
-						indeterminate={indeterminate}
-						checked={checked}
-						onCheckedChange={onChange}
-						disabled={disabled}
-						name={name}
-						tabIndex={tabIndex}
-						aria-invalid={hasError}
-						aria-describedby={error ? `${id}-error` : helperText ? `${id}-helper` : undefined}
-						className={cn(hasError && "border-destructive aria-invalid:border-destructive", className)}
-					/>
-					{(label || helperText) && (
+				<CheckboxPrimitive
+					id={id}
+					indeterminate={indeterminate}
+					checked={controlledChecked}
+					onCheckedChange={onChange}
+					disabled={disabled}
+					name={name}
+					tabIndex={tabIndex}
+					aria-invalid={hasError}
+					aria-describedby={error ? `${id}-error` : helperText ? `${id}-helper` : undefined}
+					className={cn("mt-0.5 shrink-0", hasError && "border-destructive aria-invalid:border-destructive", className)}
+				/>
+				{(label || helperText) && (
+					<Label
+						htmlFor={id}
+						className={cn(
+							"text-sm leading-none font-medium cursor-pointer",
+							disabled && "cursor-not-allowed opacity-50",
+							hasError && "text-destructive"
+						)}>
 						<div className="grid gap-1 leading-none">
 							{label && (
 								<div>
@@ -75,8 +79,8 @@ function Checkbox({
 								</p>
 							)}
 						</div>
-					)}
-				</Label>
+					</Label>
+				)}
 			</div>
 
 			{error && (

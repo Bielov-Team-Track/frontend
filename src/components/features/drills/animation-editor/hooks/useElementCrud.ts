@@ -11,12 +11,17 @@ interface UseElementCrudParams {
 	isPlaying: boolean
 }
 
-interface ClipboardEntry {
-	type: "player" | "equipment"
-	id: string
-	x: number
-	y: number
+interface ClipboardPlayer {
+	type: "player"
+	data: PlayerPosition
 }
+
+interface ClipboardEquipment {
+	type: "equipment"
+	data: EquipmentItem
+}
+
+type ClipboardEntry = ClipboardPlayer | ClipboardEquipment
 
 export function useElementCrud({
 	keyframes,
@@ -93,7 +98,6 @@ export function useElementCrud({
 
 	// Delete player from current frame onwards
 	const deletePlayer = useCallback((playerId: string) => {
-		if (currentKeyframe.players.length <= 1) return // Keep at least one player
 		setKeyframes((prev) =>
 			prev.map((frame, index) => {
 				if (index < currentFrameIndex) return frame // Keep in earlier frames
@@ -103,7 +107,7 @@ export function useElementCrud({
 				}
 			})
 		)
-	}, [currentFrameIndex, currentKeyframe])
+	}, [currentFrameIndex])
 
 	// Delete multiple selected elements from current frame onwards
 	const deleteSelected = useCallback((selectedElements: ElementRef[]) => {
@@ -114,12 +118,9 @@ export function useElementCrud({
 		setKeyframes((prev) =>
 			prev.map((frame, index) => {
 				if (index < currentFrameIndex) return frame
-				const remainingPlayers = frame.players.filter((p) => !playerIds.has(p.id))
-				// Keep at least one player
-				const players = remainingPlayers.length > 0 ? remainingPlayers : frame.players
 				return {
 					...frame,
-					players,
+					players: frame.players.filter((p) => !playerIds.has(p.id)),
 					equipment: (frame.equipment || []).filter((eq) => !equipmentIds.has(eq.id)),
 				}
 			})
@@ -166,29 +167,29 @@ export function useElementCrud({
 		)
 	}, [])
 
-	/** Nudge selected elements by dx, dy pixels on current frame. */
-	const nudge = useCallback((selectedElements: ElementRef[], dx: number, dy: number) => {
-		if (selectedElements.length === 0) return
-		const playerIds = new Set(selectedElements.filter((el) => el.type === "player").map((el) => el.id))
-		const equipmentIds = new Set(selectedElements.filter((el) => el.type === "equipment").map((el) => el.id))
-
+	/** Delete ball from current frame onwards. */
+	const deleteBall = useCallback(() => {
 		setKeyframes((prev) =>
 			prev.map((frame, index) => {
-				if (index !== currentFrameIndex) return frame
-				return {
-					...frame,
-					players: frame.players.map((p) =>
-						playerIds.has(p.id) ? { ...p, x: p.x + dx, y: p.y + dy } : p
-					),
-					equipment: (frame.equipment || []).map((eq) =>
-						equipmentIds.has(eq.id) ? { ...eq, x: eq.x + dx, y: eq.y + dy } : eq
-					),
-				}
+				if (index < currentFrameIndex) return frame
+				return { ...frame, ball: undefined }
 			})
 		)
 	}, [currentFrameIndex])
 
-	/** Duplicate selected elements in place with +20,+20 offset, add to current + subsequent frames. */
+	/** Add ball to current frame onwards. */
+	const addBall = useCallback(() => {
+		if (isPlaying) return
+		setKeyframes((prev) =>
+			prev.map((frame, index) => {
+				if (index < currentFrameIndex) return frame
+				if (frame.ball) return frame
+				return { ...frame, ball: { x: COURT_WIDTH / 2, y: COURT_HEIGHT * 0.65 } }
+			})
+		)
+	}, [currentFrameIndex, isPlaying])
+
+	/** Duplicate selected elements in place with staggered offset, add to current + subsequent frames. */
 	const duplicateSelected = useCallback((selectedElements: ElementRef[]) => {
 		if (selectedElements.length === 0) return
 
@@ -197,15 +198,18 @@ export function useElementCrud({
 			const newPlayers: PlayerPosition[] = []
 			const newEquipment: EquipmentItem[] = []
 
+			let offsetIndex = 0
 			for (const ref of selectedElements) {
+				const offset = 20 + offsetIndex * 15
+				offsetIndex++
 				if (ref.type === "player") {
 					const source = currentFrame.players.find((p) => p.id === ref.id)
 					if (source) {
 						newPlayers.push({
 							...source,
 							id: `p${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-							x: source.x + 20,
-							y: source.y + 20,
+							x: source.x + offset,
+							y: source.y + offset,
 							firstFrameIndex: currentFrameIndex,
 						})
 					}
@@ -215,8 +219,8 @@ export function useElementCrud({
 						newEquipment.push({
 							...source,
 							id: `eq-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-							x: source.x + 20,
-							y: source.y + 20,
+							x: source.x + offset,
+							y: source.y + offset,
 							firstFrameIndex: currentFrameIndex,
 						})
 					}
@@ -234,50 +238,61 @@ export function useElementCrud({
 		})
 	}, [currentFrameIndex])
 
-	/** Copy positions of selected elements (or all if none selected) on current frame. */
-	const copyPositions = useCallback((selectedElements: ElementRef[]) => {
+	/** Copy selected elements (or all if none selected) to clipboard. */
+	const copyElements = useCallback((selectedElements: ElementRef[]) => {
 		const entries: ClipboardEntry[] = []
+		const ids = selectedElements.length > 0
+			? new Set(selectedElements.map((el) => el.id))
+			: null
 
-		if (selectedElements.length > 0) {
-			const ids = new Set(selectedElements.map((el) => el.id))
-			for (const p of currentKeyframe.players) {
-				if (ids.has(p.id)) entries.push({ type: "player", id: p.id, x: p.x, y: p.y })
-			}
-			for (const eq of currentKeyframe.equipment || []) {
-				if (ids.has(eq.id)) entries.push({ type: "equipment", id: eq.id, x: eq.x, y: eq.y })
-			}
-		} else {
-			for (const p of currentKeyframe.players) {
-				entries.push({ type: "player", id: p.id, x: p.x, y: p.y })
-			}
-			for (const eq of currentKeyframe.equipment || []) {
-				entries.push({ type: "equipment", id: eq.id, x: eq.x, y: eq.y })
-			}
+		for (const p of currentKeyframe.players) {
+			if (!ids || ids.has(p.id)) entries.push({ type: "player", data: { ...p } })
+		}
+		for (const eq of currentKeyframe.equipment || []) {
+			if (!ids || ids.has(eq.id)) entries.push({ type: "equipment", data: { ...eq } })
 		}
 
 		clipboardRef.current = entries
 	}, [currentKeyframe])
 
-	/** Paste copied positions onto current frame, matching by element ID. */
-	const pastePositions = useCallback(() => {
+	/** Paste copied elements as new duplicates onto current frame + subsequent frames. */
+	const pasteElements = useCallback(() => {
 		const clipboard = clipboardRef.current
 		if (clipboard.length === 0) return
 
-		const posMap = new Map(clipboard.map((e) => [e.id, { x: e.x, y: e.y }]))
+		const newPlayers: PlayerPosition[] = []
+		const newEquipment: EquipmentItem[] = []
+
+		let offsetIndex = 0
+		for (const entry of clipboard) {
+			const offset = 20 + offsetIndex * 15
+			offsetIndex++
+			if (entry.type === "player") {
+				newPlayers.push({
+					...entry.data,
+					id: `p${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+					x: entry.data.x + offset,
+					y: entry.data.y + offset,
+					firstFrameIndex: currentFrameIndex,
+				})
+			} else {
+				newEquipment.push({
+					...entry.data,
+					id: `eq-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+					x: entry.data.x + offset,
+					y: entry.data.y + offset,
+					firstFrameIndex: currentFrameIndex,
+				})
+			}
+		}
 
 		setKeyframes((prev) =>
 			prev.map((frame, index) => {
-				if (index !== currentFrameIndex) return frame
+				if (index < currentFrameIndex) return frame
 				return {
 					...frame,
-					players: frame.players.map((p) => {
-						const pos = posMap.get(p.id)
-						return pos ? { ...p, x: pos.x, y: pos.y } : p
-					}),
-					equipment: (frame.equipment || []).map((eq) => {
-						const pos = posMap.get(eq.id)
-						return pos ? { ...eq, x: pos.x, y: pos.y } : eq
-					}),
+					players: [...frame.players, ...newPlayers.map((p) => ({ ...p }))],
+					equipment: [...(frame.equipment || []), ...newEquipment.map((eq) => ({ ...eq }))],
 				}
 			})
 		)
@@ -292,7 +307,7 @@ export function useElementCrud({
 				return {
 					...frame,
 					players: frame.players.map((p) => ({ ...p, x: 2 * centerX - p.x })),
-					ball: { x: 2 * centerX - frame.ball.x, y: frame.ball.y },
+					ball: frame.ball ? { x: 2 * centerX - frame.ball.x, y: frame.ball.y } : undefined,
 					equipment: (frame.equipment || []).map((eq) => ({ ...eq, x: 2 * centerX - eq.x })),
 				}
 			})
@@ -322,15 +337,16 @@ export function useElementCrud({
 	return {
 		addEquipment,
 		addPlayer,
+		addBall,
 		deleteEquipment,
 		deletePlayer,
+		deleteBall,
 		deleteSelected,
 		updateNote,
 		updateLabel,
-		nudge,
 		duplicateSelected,
-		copyPositions,
-		pastePositions,
+		copyElements,
+		pasteElements,
 		mirrorFormation,
 		swapPlayers,
 	}

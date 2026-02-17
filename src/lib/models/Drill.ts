@@ -405,6 +405,38 @@ export interface DrillFilterRequest {
     limit?: number;
 }
 
+export interface DrillsPagedResponseDto {
+    items: DrillDto[];
+    totalCount: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    hasMore: boolean;
+    hasPrevious: boolean;
+}
+
+export interface DrillsPagedResponse {
+    items: Drill[];
+    totalCount: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    hasMore: boolean;
+    hasPrevious: boolean;
+}
+
+export function transformDrillsPagedResponseDto(dto: DrillsPagedResponseDto): DrillsPagedResponse {
+    return {
+        items: dto.items.map(transformDrillDto),
+        totalCount: dto.totalCount,
+        page: dto.page,
+        pageSize: dto.pageSize,
+        totalPages: dto.totalPages,
+        hasMore: dto.hasMore,
+        hasPrevious: dto.hasPrevious,
+    };
+}
+
 export interface CreateDrillAttachmentRequest {
     fileName: string;
     fileUrl: string;

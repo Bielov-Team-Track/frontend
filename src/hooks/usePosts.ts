@@ -174,8 +174,15 @@ export function useMediaUpload() {
 		mutationFn: async (file: File) => {
 			const fileType = getMimeType(file);
 
-			// 1. Get presigned URL
-			const { mediaId, uploadUrl } = await getUploadUrl(fileType, file.name, file.size);
+			// Generate thumbHash for images
+			let thumbHash: string | undefined;
+			if (fileType.startsWith("image/")) {
+				const { generateThumbHash } = await import("@/lib/utils/thumbhash");
+				thumbHash = await generateThumbHash(file);
+			}
+
+			// 1. Get presigned URL (include thumbHash so backend stores it)
+			const { mediaId, uploadUrl } = await getUploadUrl(fileType, file.name, file.size, thumbHash);
 
 			// 2. Upload to S3
 			await uploadFileToS3(uploadUrl, file, fileType);

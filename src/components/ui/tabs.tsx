@@ -61,7 +61,7 @@ const tabsTriggerVariants = cva(
 		"text-foreground/60 hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground",
 		// Active state
 		"data-active:bg-background data-active:text-foreground data-active:shadow-sm",
-		"dark:data-active:text-foreground dark:data-active:bg-input",
+		"dark:data-active:text-foreground dark:data-active:bg-background dark:data-active:shadow-sm",
 		// Line variant overrides
 		"group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent group-data-[variant=line]/tabs-list:data-active:shadow-none",
 		"dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent",

@@ -91,6 +91,7 @@ export default function ParticipantsPaymentStep() {
 				render={({ field }) => (
 					<RadioCards
 						label="Event Format"
+						data-testid="event-format-selector"
 						options={eventFormatCards}
 						value={field.value}
 						onChange={field.onChange}
@@ -108,6 +109,7 @@ export default function ParticipantsPaymentStep() {
 					render={({ field }) => (
 						<RadioCards
 							label="Registration Unit"
+							data-testid="registration-unit-selector"
 							options={registrationUnitCards}
 							value={field.value}
 							onChange={field.onChange}
@@ -158,7 +160,7 @@ export default function ParticipantsPaymentStep() {
 			/>
 
 			{/* Advanced Section - Collapsible */}
-			<CollapsibleSection label="Registration Settings" defaultOpen={false}>
+			<CollapsibleSection label="Registration Settings" defaultOpen={false} data-testid="registration-settings-section">
 				{/* Registration Type */}
 				<div className="p-3 sm:p-4 rounded-xl bg-surface border border-border">
 					<Controller
@@ -186,6 +188,7 @@ export default function ParticipantsPaymentStep() {
 							<Select
 								value={field.value || ""}
 								onChange={field.onChange}
+								data-testid="casual-play-format-selector"
 								options={[
 									{ value: "list", label: "List Format" },
 									{ value: "openTeams", label: "Open Teams" },

@@ -1,16 +1,21 @@
 "use client";
 
 import { Button, Loader } from "@/components";
-import { getChat, loadConversationsForUser, loadMessagesForChat, markChatAsRead, sendMessage } from "@/lib/api/messages";
+import { getChat, loadConversationsForUser, loadMessagesForChat, markChatAsRead, sendMessage, type CreateEmbedInput } from "@/lib/api/messages";
 import { MESSAGES_API_URL } from "@/lib/constants";
-import { Chat } from "@/lib/models/Messages";
+import { Chat, Message } from "@/lib/models/Messages";
+import { CursorPagedResult } from "@/lib/models/Pagination";
 import { useChatConnectionStore } from "@/lib/realtime/chatsConnectionStore";
+import { setOptimisticMapping, clearOptimisticMap } from "@/lib/realtime/optimisticMessages";
 import signalr from "@/lib/realtime/signalrClient";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/providers";
 import { HubConnectionState } from "@microsoft/signalr";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, ChevronLeft, MessageSquare, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useViewportReadTracker } from "@/hooks/useViewportReadTracker";
 import ChatList from "./components/ChatList";
 import ChatsRealtimeClient from "./components/ChatsRealtimeClient";
 import ChatWindow from "./components/ChatWindow";
@@ -18,38 +23,75 @@ import MessagesPageSkeleton from "./components/MessagesPageSkeleton";
 import NewChat from "./components/NewChat";
 
 const MessagesPage = () => {
+	const { userProfile } = useAuth();
 	const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
 	const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
 	const [sendError, setSendError] = useState<string | null>(null);
+	const [searchQuery, setSearchQuery] = useState("");
+	const debouncedSearch = useDebouncedValue(searchQuery, 300);
 
 	const queryClient = useQueryClient();
 	const { connection, setCurrentChatId } = useChatConnectionStore();
 	const currentChatGroupRef = useRef<string | null>(null);
 
-	// Fetch chats with React Query
+	const PAGE_SIZE = 20;
+	const MESSAGE_PAGE_SIZE = 50;
+
+	// Fetch chats with infinite query
 	const {
-		data: chats = [],
+		data: chatsData,
 		isLoading: chatsLoading,
 		error: chatsError,
 		refetch: refetchChats,
-	} = useQuery({
-		queryKey: ["chats"],
-		queryFn: loadConversationsForUser,
-		staleTime: 1000 * 60 * 5, // 5 minutes
+		fetchNextPage: fetchNextChatsPage,
+		hasNextPage: hasMoreChats,
+		isFetchingNextPage: isFetchingMoreChats,
+	} = useInfiniteQuery({
+		queryKey: ["chats", debouncedSearch || undefined],
+		queryFn: ({ pageParam }) =>
+			loadConversationsForUser({
+				search: debouncedSearch || undefined,
+				cursor: pageParam,
+				limit: PAGE_SIZE,
+			}),
+		initialPageParam: undefined as string | undefined,
+		getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
+		staleTime: 1000 * 60 * 5,
 	});
 
-	// Fetch messages for selected chat with React Query
+	// Flatten all pages into a single chat list
+	const chats = useMemo(() => {
+		if (!chatsData?.pages) return [];
+		return chatsData.pages.flatMap((page) => page.items);
+	}, [chatsData]);
+
+	// Fetch messages for selected chat with infinite query (load older on scroll up)
 	const {
-		data: messages = [],
+		data: messagesData,
 		isLoading: messagesLoading,
 		error: messagesError,
 		refetch: refetchMessages,
-	} = useQuery({
+		fetchNextPage: fetchOlderMessages,
+		hasNextPage: hasOlderMessages,
+		isFetchingNextPage: isFetchingOlderMessages,
+	} = useInfiniteQuery({
 		queryKey: ["messages", selectedChatId],
-		queryFn: () => loadMessagesForChat(selectedChatId!),
+		queryFn: ({ pageParam = 0 }) =>
+			loadMessagesForChat(selectedChatId!, pageParam, MESSAGE_PAGE_SIZE),
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages) => {
+			if (lastPage.length < MESSAGE_PAGE_SIZE) return undefined;
+			return allPages.reduce((total, page) => total + page.length, 0);
+		},
 		enabled: !!selectedChatId,
-		staleTime: 1000 * 60, // 1 minute
+		staleTime: 1000 * 60,
 	});
+
+	// Flatten all message pages into a single list
+	const messages = useMemo(() => {
+		if (!messagesData?.pages) return [];
+		return messagesData.pages.flat();
+	}, [messagesData]);
 
 	const sortedChats = useMemo(() => {
 		return [...chats].sort((a, b) => {
@@ -63,6 +105,77 @@ const MessagesPage = () => {
 		return selectedChatId ? chats.find((chat) => chat.id === selectedChatId) : null;
 	}, [selectedChatId, chats]);
 
+	// Compute lastReadMessageId for the current user from the selected chat's participants
+	const lastReadMessageId = useMemo(() => {
+		if (!selectedChat || !userProfile?.id) return undefined;
+		const myParticipant = selectedChat.participants.find((p) => p.userId === userProfile.id);
+		return myParticipant?.lastReadMessageId;
+	}, [selectedChat, userProfile?.id]);
+
+	// Viewport-based read tracking: mark messages as read when they enter the viewport
+	const handleMarkAsRead = useCallback(
+		async (lastReadMessageId: string) => {
+			if (!selectedChat) return;
+			try {
+				// Use SignalR if connected, fall back to REST
+				if (connection?.state === HubConnectionState.Connected) {
+					await connection.invoke("MarkAsRead", selectedChat.id, lastReadMessageId);
+				} else {
+					await markChatAsRead(selectedChat.id, lastReadMessageId);
+				}
+				// Optimistically update unread count to 0 for the current chat
+				const prevUnread = selectedChat.unreadCount || 0;
+				updateChatInCache(selectedChat.id, (c) => ({ ...c, unreadCount: 0 }));
+				if (prevUnread > 0) {
+					queryClient.setQueryData<number>(["unread-message-count"], (old) =>
+						Math.max(0, (old ?? 0) - prevUnread)
+					);
+				}
+			} catch (e) {
+				console.error("Failed to mark chat as read:", e);
+			}
+		},
+		[selectedChat?.id, connection],
+	);
+
+	// Map messages to chronological order (oldest-first) for viewport read tracking.
+	// The tracker uses array index as the watermark — higher index must = newer message.
+	const trackerMessages = useMemo(() => {
+		return [...messages].reverse().map((m) => ({
+			id: m.id,
+			senderId: m.sender?.id ?? "",
+			sentAt: typeof m.sentAt === "string" ? m.sentAt : new Date(m.sentAt).toISOString(),
+		}));
+	}, [messages]);
+
+	const { observeMessage } = useViewportReadTracker({
+		chatId: selectedChat?.id ?? "",
+		currentUserId: userProfile?.id ?? "",
+		messages: trackerMessages,
+		onMarkAsRead: handleMarkAsRead,
+		enabled: !!selectedChat,
+	});
+
+	// Compute read status map for read receipt checkmarks
+	const readStatusMap = useMemo(() => {
+		if (!selectedChat || !messages?.length) return new Map();
+		const map = new Map<string, { readByCount: number; totalOthers: number }>();
+		const otherParticipants = selectedChat.participants.filter((p) => p.userId !== userProfile?.id);
+		// Build message index map for position comparison
+		const messageIndexMap = new Map(messages.map((m, i) => [m.id, i]));
+
+		for (const message of messages) {
+			const msgIndex = messageIndexMap.get(message.id)!;
+			const readBy = otherParticipants.filter((p) => {
+				if (!p.lastReadMessageId) return false;
+				const readIndex = messageIndexMap.get(p.lastReadMessageId);
+				return readIndex !== undefined && readIndex >= msgIndex;
+			});
+			map.set(message.id, { readByCount: readBy.length, totalOthers: otherParticipants.length });
+		}
+		return map;
+	}, [selectedChat, messages, userProfile?.id]);
+
 	// Cleanup: Leave chat group when component unmounts
 	useEffect(() => {
 		return () => {
@@ -72,6 +185,25 @@ const MessagesPage = () => {
 			}
 		};
 	}, []);
+
+	const updateChatInCache = useCallback(
+		(chatId: string, updater: (chat: Chat) => Chat) => {
+			queryClient.setQueriesData<InfiniteData<CursorPagedResult<Chat>>>(
+				{ queryKey: ["chats"] },
+				(oldData) => {
+					if (!oldData?.pages?.length) return oldData;
+					return {
+						...oldData,
+						pages: oldData.pages.map((page) => ({
+							...page,
+							items: page.items.map((c) => (c.id === chatId ? updater(c) : c)),
+						})),
+					};
+				}
+			);
+		},
+		[queryClient]
+	);
 
 	const selectChat = useCallback(
 		async (chat: Chat) => {
@@ -90,17 +222,6 @@ const MessagesPage = () => {
 
 				setSelectedChatId(chat.id);
 				setCurrentChatId(chat.id);
-
-				// Mark chat as read and update cache
-				try {
-					const updatedChat = await markChatAsRead(chat.id);
-					queryClient.setQueryData(["chats"], (oldChats: Chat[] | undefined) => {
-						if (!oldChats) return oldChats;
-						return oldChats.map((c) => (c.id === chat.id ? { ...c, unreadCount: 0 } : c));
-					});
-				} catch (e) {
-					console.error("Failed to mark chat as read:", e);
-				}
 			} catch (error) {
 				console.error("Failed to select chat:", error);
 				// Still set the chat even if SignalR fails
@@ -108,10 +229,32 @@ const MessagesPage = () => {
 				setCurrentChatId(chat.id);
 			}
 		},
-		[queryClient, setCurrentChatId]
+		[setCurrentChatId]
 	);
 
 	const deselectChat = useCallback(async () => {
+		// Before deselecting, mark the active chat as fully read in the cache.
+		// The user was viewing this chat, so unreadCount should be 0.
+		// This prevents race conditions where server refetch (via ChatUpdated) sets unreadCount > 0.
+		const departingChatId = selectedChatId;
+		if (departingChatId) {
+			queryClient.setQueriesData<InfiniteData<CursorPagedResult<Chat>>>(
+				{ queryKey: ["chats"] },
+				(oldData) => {
+					if (!oldData?.pages) return oldData;
+					return {
+						...oldData,
+						pages: oldData.pages.map((page) => ({
+							...page,
+							items: page.items.map((c) =>
+								c.id === departingChatId ? { ...c, unreadCount: 0 } : c,
+							),
+						})),
+					};
+				}
+			);
+		}
+
 		try {
 			const conn = signalr.getConnection(MESSAGES_API_URL, "messaging");
 			if (conn?.state === HubConnectionState.Connected && currentChatGroupRef.current) {
@@ -123,16 +266,26 @@ const MessagesPage = () => {
 		}
 		setSelectedChatId(null);
 		setCurrentChatId(null);
-	}, [setCurrentChatId]);
+	}, [selectedChatId, setCurrentChatId, queryClient]);
 
 	const handleOnChatCreated = useCallback(
 		(newChat: Chat) => {
-			// Add new chat to cache
-			queryClient.setQueryData(["chats"], (oldChats: Chat[] | undefined) => {
-				if (!oldChats) return [newChat];
-				if (oldChats.some((c) => c.id === newChat.id)) return oldChats;
-				return [newChat, ...oldChats];
-			});
+			// Add new chat to the first page of the infinite cache
+			queryClient.setQueriesData<InfiniteData<CursorPagedResult<Chat>>>(
+				{ queryKey: ["chats"] },
+				(oldData) => {
+					if (!oldData?.pages?.length) return oldData;
+					const firstPage = oldData.pages[0];
+					if (firstPage.items.some((c) => c.id === newChat.id)) return oldData;
+					return {
+						...oldData,
+						pages: [
+							{ ...firstPage, items: [newChat, ...firstPage.items] },
+							...oldData.pages.slice(1),
+						],
+					};
+				}
+			);
 			setIsNewChatModalOpen(false);
 			selectChat(newChat);
 		},
@@ -143,38 +296,176 @@ const MessagesPage = () => {
 		async (chatId: string) => {
 			try {
 				const updatedChat = await getChat(chatId);
-				queryClient.setQueryData(["chats"], (oldChats: Chat[] | undefined) => {
-					if (!oldChats) return oldChats;
-					return oldChats.map((c) => (c.id === chatId ? updatedChat : c));
-				});
+				updateChatInCache(chatId, () => updatedChat);
 			} catch (e) {
 				console.error("Failed to refresh chat:", e);
 			}
 		},
-		[queryClient]
+		[updateChatInCache]
 	);
 
-	const handleSendMessage = useCallback(
-		async (text: string) => {
-			if (!selectedChat) return;
+	type MessagesInfiniteData = InfiniteData<Message[]>;
 
-			setSendError(null);
+	const sendMessageMutation = useMutation({
+		mutationFn: (params: { chatId: string; content: string; mediaIds?: string[]; embeds?: CreateEmbedInput[]; _optimisticId: string }) =>
+			sendMessage(params.chatId, params.content, params.mediaIds, params.embeds),
 
-			try {
-				await sendMessage(selectedChat.id, text);
-				refetchMessages();
-			} catch (error) {
-				console.error("Failed to send message:", error);
-				setSendError("Failed to send message. Please try again.");
+		onMutate: async (params) => {
+			// Cancel outgoing refetches to avoid overwriting optimistic update
+			await queryClient.cancelQueries({ queryKey: ["messages", params.chatId] });
+
+			// Create optimistic message
+			const optimisticMessage: Message = {
+				id: params._optimisticId,
+				_optimisticId: params._optimisticId,
+				_status: "sending",
+				content: params.content,
+				chatId: params.chatId,
+				sender: userProfile!,
+				sentAt: new Date(),
+				isEdited: false,
+				read: true,
+				isDeleted: false,
+				reactions: [],
+				attachments: [],
+				embeds: [],
+			};
+
+			// Insert into first page of cache
+			queryClient.setQueryData<MessagesInfiniteData>(["messages", params.chatId], (oldData) => {
+				if (!oldData?.pages?.length) return oldData;
+				const firstPage = oldData.pages[0];
+				return {
+					...oldData,
+					pages: [[optimisticMessage, ...firstPage], ...oldData.pages.slice(1)],
+				};
+			});
+
+			return { optimisticId: params._optimisticId, chatId: params.chatId };
+		},
+
+		onSuccess: (serverMessage, params, context) => {
+			if (!context || !serverMessage?.id) return;
+
+			// Store mapping so ReceiveMessage handler can dedup
+			setOptimisticMapping(context.optimisticId, serverMessage.id);
+
+			// Check if SignalR already delivered this message (SignalR-first case)
+			const messagesData = queryClient.getQueryData<MessagesInfiniteData>(["messages", context.chatId]);
+			const signalrAlreadyDelivered = messagesData?.pages?.some((page) =>
+				page.some((m) => m.id === serverMessage.id && !m._optimisticId),
+			);
+
+			if (signalrAlreadyDelivered) {
+				// Remove the optimistic message — real one is already there
+				queryClient.setQueryData<MessagesInfiniteData>(["messages", context.chatId], (oldData) => {
+					if (!oldData?.pages) return oldData;
+					return {
+						...oldData,
+						pages: oldData.pages.map((page) => page.filter((m) => m._optimisticId !== context.optimisticId)),
+					};
+				});
 			}
 		},
-		[selectedChat, refetchMessages]
+
+		onError: (_error, params, context) => {
+			if (!context) return;
+
+			// Update the optimistic message to error state (granular, not full rollback)
+			queryClient.setQueryData<MessagesInfiniteData>(["messages", context.chatId], (oldData) => {
+				if (!oldData?.pages) return oldData;
+				return {
+					...oldData,
+					pages: oldData.pages.map((page) =>
+						page.map((m) =>
+							m._optimisticId === context.optimisticId ? { ...m, _status: "error" as const } : m,
+						),
+					),
+				};
+			});
+		},
+	});
+
+	const handleSendMessage = useCallback(
+		async (text: string, mediaIds?: string[], embeds?: CreateEmbedInput[]) => {
+			if (!selectedChat) return;
+			setSendError(null);
+
+			const optimisticId = crypto.randomUUID();
+			sendMessageMutation.mutate({
+				chatId: selectedChat.id,
+				content: text,
+				mediaIds,
+				embeds,
+				_optimisticId: optimisticId,
+			});
+		},
+		[selectedChat, sendMessageMutation],
 	);
+
+	const handleRetryMessage = useCallback(
+		(optimisticId: string) => {
+			if (!selectedChatId) return;
+
+			// Find the error message in cache
+			const messagesData = queryClient.getQueryData<MessagesInfiniteData>(["messages", selectedChatId]);
+			const errorMessage = messagesData?.pages?.flat().find((m) => m._optimisticId === optimisticId);
+			if (!errorMessage) return;
+
+			// Remove the error message from cache
+			queryClient.setQueryData<MessagesInfiniteData>(["messages", selectedChatId], (oldData) => {
+				if (!oldData?.pages) return oldData;
+				return {
+					...oldData,
+					pages: oldData.pages.map((page) => page.filter((m) => m._optimisticId !== optimisticId)),
+				};
+			});
+
+			// Retry with a new optimistic ID
+			const newOptimisticId = crypto.randomUUID();
+			sendMessageMutation.mutate({
+				chatId: selectedChatId,
+				content: errorMessage.content,
+				_optimisticId: newOptimisticId,
+			});
+		},
+		[selectedChatId, queryClient, sendMessageMutation],
+	);
+
+	const handleDismissMessage = useCallback(
+		(optimisticId: string) => {
+			if (!selectedChatId) return;
+			queryClient.setQueryData<MessagesInfiniteData>(["messages", selectedChatId], (oldData) => {
+				if (!oldData?.pages) return oldData;
+				return {
+					...oldData,
+					pages: oldData.pages.map((page) => page.filter((m) => m._optimisticId !== optimisticId)),
+				};
+			});
+		},
+		[selectedChatId, queryClient],
+	);
+
+	// Cleanup error messages and optimistic map on chat switch
+	useEffect(() => {
+		return () => {
+			if (selectedChatId) {
+				queryClient.setQueryData<MessagesInfiniteData>(["messages", selectedChatId], (oldData) => {
+					if (!oldData?.pages) return oldData;
+					return {
+						...oldData,
+						pages: oldData.pages.map((page) => page.filter((m) => m._status !== "error")),
+					};
+				});
+			}
+			clearOptimisticMap();
+		};
+	}, [selectedChatId, queryClient]);
 
 	// Error state for chats
 	if (chatsError) {
 		return (
-			<div className="absolute inset-0 flex flex-col justify-center items-center gap-4">
+			<div data-testid="messages-error" className="absolute inset-0 flex flex-col justify-center items-center gap-4">
 				<div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mb-2">
 					<AlertCircle size={32} className="text-error" />
 				</div>
@@ -195,7 +486,7 @@ const MessagesPage = () => {
 	}
 
 	return (
-		<div className="relative h-full w-full rounded-2xl overflow-hidden shadow-md bg-surface">
+		<div data-testid="messages-page" className="relative h-[calc(100dvh-7rem)] w-full rounded-2xl overflow-hidden shadow-md bg-surface">
 			<ChatsRealtimeClient />
 			<div className="flex h-full min-h-0">
 				{/* Left Panel - Chat List */}
@@ -229,6 +520,12 @@ const MessagesPage = () => {
 								selectedChatId={selectedChat?.id}
 								onSelectChat={selectChat}
 								onCreateChatClick={() => setIsNewChatModalOpen(true)}
+								searchQuery={searchQuery}
+								onSearchChange={setSearchQuery}
+								onLoadMore={fetchNextChatsPage}
+								hasMore={hasMoreChats}
+								isLoadingMore={isFetchingMoreChats}
+								currentUserId={userProfile?.id}
 							/>
 						)}
 					</div>
@@ -261,9 +558,9 @@ const MessagesPage = () => {
 									</Button>
 								</div>
 							) : (
-								<div className="flex flex-col flex-1 min-h-0 h-[calc(100vh-4rem)] bg-background/50 backdrop-blur-xl border-l-0 md:border-l border-border overflow-hidden">
+								<div className="flex flex-col flex-1 min-h-0 bg-background/50 backdrop-blur-xl border-l-0 md:border-l border-border overflow-hidden">
 									{sendError && (
-										<div className="shrink-0 bg-error text-white p-2 text-center text-sm z-10">
+										<div data-testid="send-error" className="shrink-0 bg-error text-white p-2 text-center text-sm z-10">
 											{sendError}
 											<button onClick={() => setSendError(null)} className="ml-2 underline">
 												Dismiss
@@ -274,21 +571,29 @@ const MessagesPage = () => {
 										chat={selectedChat}
 										messages={messages}
 										onSendMessage={handleSendMessage}
+										onRetryMessage={handleRetryMessage}
+										onDismissMessage={handleDismissMessage}
 										onViewChatInfo={() => {}}
 										onChatUpdated={handleChatUpdated}
 										onBack={deselectChat}
+										onLoadOlderMessages={fetchOlderMessages}
+										hasOlderMessages={hasOlderMessages}
+										isLoadingOlderMessages={isFetchingOlderMessages}
+										lastReadMessageId={lastReadMessageId}
+										observeMessage={observeMessage}
+										readStatusMap={readStatusMap}
 									/>
 								</div>
 							)
 						) : (
-							<div className="grid flex-1 min-h-0 place-items-center bg-background/30 backdrop-blur-xl border-l border-border">
+							<div data-testid="no-chat-selected" className="grid flex-1 min-h-0 place-items-center bg-background/30 backdrop-blur-xl border-l border-border">
 								<div className="flex flex-col items-center p-8 text-center">
 									<div className="w-20 h-20 rounded-full bg-hover flex items-center justify-center mb-6 text-muted-foreground">
 										<MessageSquare size={40} className="opacity-50" />
 									</div>
 									<h3 className="text-xl font-bold text-foreground mb-2">Your Messages</h3>
 									<span className="text-muted-foreground max-w-xs">Select a conversation from the list or start a new chat to begin messaging.</span>
-									<Button className="mt-6" onClick={() => setIsNewChatModalOpen(true)} color="accent">
+									<Button data-testid="start-new-chat-button" className="mt-6" onClick={() => setIsNewChatModalOpen(true)} color="accent">
 										Start New Chat
 									</Button>
 								</div>

@@ -54,7 +54,7 @@ export default function AddTeamMemberModal({ isOpen, clubMembers, currentMemberI
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={handleClose} title="Add Player" size="md" preventOutsideClose>
+		<Modal isOpen={isOpen} onClose={handleClose} title="Add Member" size="md" preventOutsideClose>
 			{!selectedUserId ? (
 				<div className="space-y-4">
 					{/* Search */}
@@ -125,7 +125,7 @@ export default function AddTeamMemberModal({ isOpen, clubMembers, currentMemberI
 							Back
 						</Button>
 						<Button variant="default" color="accent" fullWidth onClick={handleSubmit} loading={isLoading}>
-							Add Player
+							Add Member
 						</Button>
 					</div>
 				</div>

@@ -58,7 +58,9 @@ function FrameThumbnails({
 								<circle key={player.id} cx={player.x} cy={player.y} r="12" fill={player.color} />
 							))}
 							{/* Ball */}
-							<circle cx={frame.ball.x} cy={frame.ball.y} r="8" fill="#fef3c7" stroke="#f59e0b" strokeWidth="2" />
+							{frame.ball && (
+								<circle cx={frame.ball.x} cy={frame.ball.y} r="8" fill="#fef3c7" stroke="#f59e0b" strokeWidth="2" />
+							)}
 						</svg>
 						<span className="absolute bottom-0 right-0 bg-gray-800 text-white text-xs px-1 rounded">
 							{index + 1}

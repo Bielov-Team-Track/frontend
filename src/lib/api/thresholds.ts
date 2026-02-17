@@ -10,7 +10,7 @@ import {
 	transformThresholdCheckResultDto,
 } from "../models/Evaluation";
 
-const PREFIX = "/events";
+const PREFIX = "/coaching";
 
 /**
  * Get all thresholds for a club

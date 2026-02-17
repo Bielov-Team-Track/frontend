@@ -91,7 +91,7 @@ const InviteModal = ({ clubId, isOpen, onClose, defaultRequirePlayerProfile = fa
 	const formTemplateOptions = [{ value: "", label: "No form" }, ...(formTemplates?.map((t) => ({ value: t.id, label: t.name })) || [])];
 
 	return (
-		<Modal isOpen={isOpen} onClose={handleClose} title="Invite Member" size="md">
+		<Modal isOpen={isOpen} onClose={handleClose} title="Invite Member" size="md" preventOutsideClose>
 			{generatedLink ? (
 				<div className="flex flex-col gap-4">
 					<p className="text-sm text-muted">Share this link with the person you want to invite:</p>

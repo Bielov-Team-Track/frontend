@@ -4,13 +4,16 @@ import { Button } from "@/components";
 import { ListToolbar } from "@/components/ui/list-toolbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Loader from "@/components/ui/loader";
-import { Event, EventType } from "@/lib/models/Event";
+import { ContextSelection } from "@/components/features/events/forms/components/ContextSelector";
+import { EventType, EventFilterRequest } from "@/lib/models/Event";
+import { useInfiniteEvents } from "@/hooks/useEvents";
 import { useCreateModals } from "@/providers/CreateModalsProvider";
-import { Calendar as CalendarIcon, Clock, Grid, List, MapPin, Plus } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Grid, List, MapPin, Plus, Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 // Lazy load calendar - only loaded when calendar tab is selected
 const EventsCalendar = dynamic(
@@ -45,55 +48,102 @@ const TIME_FILTERS = [
 ] as const;
 type TimeFilterValue = (typeof TIME_FILTERS)[number]["value"];
 
-interface EventsPageClientProps {
-	events: Event[];
-	title?: string;
+/** Compute from/to ISO strings for the selected time period */
+function getDateRange(timeFilter: TimeFilterValue): { from?: string; to?: string } {
+	if (timeFilter === "all") return {};
+
+	const now = new Date();
+	const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+	switch (timeFilter) {
+		case "today": {
+			const endOfDay = new Date(today);
+			endOfDay.setDate(endOfDay.getDate() + 1);
+			endOfDay.setMilliseconds(-1);
+			return { from: today.toISOString(), to: endOfDay.toISOString() };
+		}
+		case "week": {
+			const endOfWeek = new Date(today);
+			endOfWeek.setDate(today.getDate() + (7 - today.getDay()));
+			endOfWeek.setHours(23, 59, 59, 999);
+			return { from: today.toISOString(), to: endOfWeek.toISOString() };
+		}
+		case "month": {
+			const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+			return { from: today.toISOString(), to: endOfMonth.toISOString() };
+		}
+		case "upcoming":
+			return { from: now.toISOString() };
+		default:
+			return {};
+	}
 }
 
-function EventsPageClient({ events, title = "Events" }: EventsPageClientProps) {
+interface EventsPageClientProps {
+	/** Base filter applied to all queries (e.g. organizerId, contextId) */
+	baseFilter?: EventFilterRequest;
+	title?: string;
+	/** Pre-selected context for the create event modal (e.g. when viewing a club's events) */
+	defaultContext?: ContextSelection;
+}
+
+function EventsPageClient({ baseFilter, title = "Events", defaultContext }: EventsPageClientProps) {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedTypes, setSelectedTypes] = useState<EventType[]>([]);
 	const [timeFilter, setTimeFilter] = useState<TimeFilterValue>("all");
 	const { openCreateEvent } = useCreateModals();
 
-	// Filter logic - always sort by date ascending (soonest first)
-	const filteredEvents = events
-		.filter((e) => {
-			// Search filter
-			if (searchQuery && !e.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-				return false;
-			}
-			// Type filter
-			if (selectedTypes.length > 0 && !selectedTypes.includes(e.type)) {
-				return false;
-			}
-			// Time filter
-			if (timeFilter !== "all") {
-				const eventDate = new Date(e.startTime);
-				const now = new Date();
-				const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-				const endOfWeek = new Date(today);
-				endOfWeek.setDate(today.getDate() + (7 - today.getDay()));
-				const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+	const debouncedSearch = useDebouncedValue(searchQuery, 300);
 
-				switch (timeFilter) {
-					case "today":
-						if (eventDate.toDateString() !== today.toDateString()) return false;
-						break;
-					case "week":
-						if (eventDate < today || eventDate > endOfWeek) return false;
-						break;
-					case "month":
-						if (eventDate < today || eventDate > endOfMonth) return false;
-						break;
-					case "upcoming":
-						if (eventDate < now) return false;
-						break;
-				}
+	// Build combined filter for backend API
+	const filter = useMemo<EventFilterRequest>(() => {
+		const dateRange = getDateRange(timeFilter);
+		return {
+			...baseFilter,
+			...dateRange,
+			...(selectedTypes.length === 1 ? { type: selectedTypes[0] } : {}),
+			...(debouncedSearch ? { searchTerm: debouncedSearch } : {}),
+			sortBy: "startDate" as const,
+			sortOrder: "asc" as const,
+		};
+	}, [baseFilter, timeFilter, selectedTypes, debouncedSearch]);
+
+	const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteEvents(filter);
+
+	// Flatten pages into a single array
+	const allEvents = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
+
+	// Total count from the first page's metadata
+	const totalCount = data?.pages[0]?.totalCount ?? 0;
+
+	// Client-side multi-type filter (backend only supports single type)
+	const filteredEvents = useMemo(() => {
+		if (selectedTypes.length <= 1) return allEvents;
+		return allEvents.filter((e) => selectedTypes.includes(e.type));
+	}, [allEvents, selectedTypes]);
+
+	// Intersection observer for infinite scroll
+	const observerRef = useRef<IntersectionObserver | null>(null);
+	const loadMoreRef = useCallback(
+		(node: HTMLDivElement | null) => {
+			if (isFetchingNextPage) return;
+
+			if (observerRef.current) {
+				observerRef.current.disconnect();
 			}
-			return true;
-		})
-		.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+
+			observerRef.current = new IntersectionObserver((entries) => {
+				if (entries[0].isIntersecting && hasNextPage) {
+					fetchNextPage();
+				}
+			});
+
+			if (node) {
+				observerRef.current.observe(node);
+			}
+		},
+		[isFetchingNextPage, hasNextPage, fetchNextPage],
+	);
 
 	const activeFilterCount = selectedTypes.length + (timeFilter !== "all" ? 1 : 0);
 
@@ -158,7 +208,7 @@ function EventsPageClient({ events, title = "Events" }: EventsPageClientProps) {
 			{/* Header Row: Title + Create Button */}
 			<div className="flex items-center justify-between shrink-0">
 				<h2 className="text-lg font-semibold text-foreground">{title}</h2>
-				<Button variant="outline" leftIcon={<Plus size={16} />} onClick={() => openCreateEvent({ source: "events" })}>
+				<Button variant="outline" leftIcon={<Plus size={16} />} onClick={() => openCreateEvent({ source: "events", contextSelection: defaultContext })}>
 					Create Event
 				</Button>
 			</div>
@@ -173,7 +223,7 @@ function EventsPageClient({ events, title = "Events" }: EventsPageClientProps) {
 						filterContent={filterContent}
 						activeFilterCount={activeFilterCount}
 						onClearFilters={clearFilters}
-						count={filteredEvents.length}
+						count={selectedTypes.length > 1 ? filteredEvents.length : totalCount}
 						itemLabel="event"
 						showViewToggle={false}
 					/>
@@ -195,26 +245,46 @@ function EventsPageClient({ events, title = "Events" }: EventsPageClientProps) {
 
 			{/* --- Content Area --- */}
 			<div className="flex-1 min-h-0 overflow-hidden">
-				<TabsContent value="calendar" className="h-full">
-					<EventsCalendar events={filteredEvents} />
-				</TabsContent>
-
-				<TabsContent value="list" className="h-full">
-					<EventListView events={filteredEvents} />
-				</TabsContent>
-
-				<TabsContent value="grid" className="h-full overflow-y-auto scrollbar-thin pr-2">
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-4">
-						{filteredEvents.map((event) => (
-							<EventGridCard key={event.id} event={event} />
-						))}
-						{filteredEvents.length === 0 && (
-							<div className="col-span-full">
-								<EventsListEmptyState />
-							</div>
-						)}
+				{isLoading ? (
+					<div className="h-full flex items-center justify-center">
+						<Loader size="lg" />
 					</div>
-				</TabsContent>
+				) : (
+					<>
+						<TabsContent value="calendar" className="h-full">
+							<EventsCalendar events={filteredEvents} />
+						</TabsContent>
+
+						<TabsContent value="list" className="h-full">
+							<EventListView
+								events={filteredEvents}
+								loadMoreRef={loadMoreRef}
+								hasNextPage={!!hasNextPage}
+								isFetchingNextPage={isFetchingNextPage}
+							/>
+						</TabsContent>
+
+						<TabsContent value="grid" className="h-full overflow-y-auto scrollbar-thin pr-2">
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-4">
+								{filteredEvents.map((event) => (
+									<EventGridCard key={event.id} event={event} />
+								))}
+								{filteredEvents.length === 0 && (
+									<div className="col-span-full">
+										<EventsListEmptyState />
+									</div>
+								)}
+							</div>
+							{/* Load more sentinel for grid view */}
+							<div ref={loadMoreRef} className="h-10" />
+							{isFetchingNextPage && (
+								<div className="flex justify-center py-4">
+									<Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+								</div>
+							)}
+						</TabsContent>
+					</>
+				)}
 			</div>
 		</Tabs>
 	);
@@ -222,7 +292,7 @@ function EventsPageClient({ events, title = "Events" }: EventsPageClientProps) {
 
 // --- Helper Components ---
 
-function EventGridCard({ event }: { event: Event }) {
+function EventGridCard({ event }: { event: import("@/lib/models/Event").Event }) {
 	const date = new Date(event.startTime);
 
 	return (

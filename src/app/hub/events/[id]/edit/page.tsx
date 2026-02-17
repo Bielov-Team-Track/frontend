@@ -40,9 +40,9 @@ type Params = {
 };
 
 export async function generateStaticParams() {
-	const events = await loadEvents();
+	const response = await loadEvents();
 
-	return events.map((event) => ({ id: event.id }));
+	return response.items.map((event) => ({ id: event.id }));
 }
 
 export default EventEditPage;

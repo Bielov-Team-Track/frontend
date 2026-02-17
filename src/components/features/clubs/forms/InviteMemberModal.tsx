@@ -49,7 +49,7 @@ export default function InviteMemberModal({ isOpen, onClose, onInvite, isLoading
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={handleClose} title="Invite Member" size="md">
+		<Modal isOpen={isOpen} onClose={handleClose} title="Invite Member" size="md" preventOutsideClose>
 			<div className="space-y-6">
 				{!selectedUser ? (
 					<div className="space-y-4">

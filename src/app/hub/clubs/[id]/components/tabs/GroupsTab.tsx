@@ -6,17 +6,20 @@ import GroupFormModal from "@/components/features/clubs/forms/GroupFormModal";
 import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
 import EmptyState from "@/components/ui/empty-state";
 import { ListToolbar, ViewMode } from "@/components/ui/list-toolbar";
-import { createGroup, deleteGroup, updateGroup } from "@/lib/api/clubs";
+import { createGroup, deleteGroup, updateGroup, uploadGroupImage } from "@/lib/api/clubs";
 import { ClubMember, CreateGroupRequest, Group, UpdateGroupRequest } from "@/lib/models/Club";
 import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowDownAZ, Clock, Layers, Plus, Search, Users } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowDownAZ, Clock, Layers, Loader2, Plus, Search, Users } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface GroupsTabProps {
 	groups: Group[];
 	clubId: string;
 	clubMembers: ClubMember[];
+	hasNextPage?: boolean;
+	isFetchingNextPage?: boolean;
+	fetchNextPage?: () => void;
 }
 
 type SortOption = "name" | "memberCount" | "createdAt";
@@ -27,7 +30,7 @@ const SORT_OPTIONS = [
 	{ value: "createdAt", label: "Newest First", icon: <Clock size={14} /> },
 ];
 
-export default function GroupsTab({ groups, clubId, clubMembers }: GroupsTabProps) {
+export default function GroupsTab({ groups, clubId, clubMembers, hasNextPage, isFetchingNextPage, fetchNextPage }: GroupsTabProps) {
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [editingGroup, setEditingGroup] = useState<Group | null>(null);
 	const [deletingGroup, setDeletingGroup] = useState<Group | null>(null);
@@ -36,6 +39,7 @@ export default function GroupsTab({ groups, clubId, clubMembers }: GroupsTabProp
 	const [viewMode, setViewMode] = useState<ViewMode>("grid");
 	const [memberCountFilter, setMemberCountFilter] = useState<string>("all");
 	const queryClient = useQueryClient();
+	const sentinelRef = useRef<HTMLDivElement>(null);
 
 	const createMutation = useMutation({
 		mutationFn: createGroup,
@@ -61,6 +65,27 @@ export default function GroupsTab({ groups, clubId, clubMembers }: GroupsTabProp
 		},
 	});
 
+	// Infinite scroll observer
+	useEffect(() => {
+		if (!hasNextPage || isFetchingNextPage || !fetchNextPage) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting) {
+					fetchNextPage();
+				}
+			},
+			{ threshold: 0.1 }
+		);
+
+		const el = sentinelRef.current;
+		if (el) observer.observe(el);
+
+		return () => {
+			if (el) observer.unobserve(el);
+		};
+	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
 	// Filter and sort groups
 	const filteredGroups = useMemo(() => {
 		let result = [...groups];
@@ -75,7 +100,6 @@ export default function GroupsTab({ groups, clubId, clubMembers }: GroupsTabProp
 
 		// Member count filter
 		if (memberCountFilter !== "all") {
-			const memberCount = parseInt(memberCountFilter);
 			if (memberCountFilter === "0") {
 				result = result.filter((group) => (group.members?.length || 0) === 0);
 			} else if (memberCountFilter === "1-5") {
@@ -210,6 +234,13 @@ export default function GroupsTab({ groups, clubId, clubMembers }: GroupsTabProp
 						))}
 					</div>
 				)}
+
+				{/* Infinite scroll sentinel */}
+				{hasNextPage && (
+					<div ref={sentinelRef} className="flex justify-center py-4">
+						{isFetchingNextPage && <Loader2 className="animate-spin text-muted-foreground" size={20} />}
+					</div>
+				)}
 			</div>
 
 			{/* Modals */}
@@ -219,6 +250,10 @@ export default function GroupsTab({ groups, clubId, clubMembers }: GroupsTabProp
 				onClose={() => setShowCreateModal(false)}
 				onSubmit={(data) => createMutation.mutate(data as CreateGroupRequest)}
 				isLoading={createMutation.isPending}
+				onUploadImage={async (image) => {
+					const result = await uploadGroupImage(clubId, image);
+					return result.url;
+				}}
 			/>
 
 			<GroupFormModal
@@ -234,6 +269,10 @@ export default function GroupsTab({ groups, clubId, clubMembers }: GroupsTabProp
 					})
 				}
 				isLoading={updateMutation.isPending}
+				onUploadImage={async (image) => {
+					const result = await uploadGroupImage(clubId, image);
+					return result.url;
+				}}
 			/>
 
 			<DeleteConfirmModal

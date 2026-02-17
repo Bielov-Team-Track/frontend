@@ -59,9 +59,9 @@ const ElementsPanelInner = ({
 								</div>
 								<button
 									onClick={() => onDeletePlayer(player.id)}
-									disabled={isPlaying || players.length <= 1}
+									disabled={isPlaying}
 									className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-muted-foreground/20 text-muted-foreground transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
-									title={players.length <= 1 ? "Cannot delete last player" : "Delete player"}
+									title="Delete player"
 								>
 									<X className="h-3 w-3" />
 								</button>

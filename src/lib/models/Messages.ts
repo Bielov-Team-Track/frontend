@@ -10,10 +10,15 @@ export interface Message {
 	read: boolean;
 	chatId: string;
 	attachments?: Attachment[];
+	embeds?: MessageEmbed[];
 	replyTo?: MessageSummary;
 	forwardedFrom?: MessageSummary;
 	isDeleted: boolean;
 	reactions: ReactionSummary[];
+	/** Client-only: tracks optimistic messages before server confirmation */
+	_optimisticId?: string;
+	/** Client-only: 'sending' while awaiting server, 'error' on failure */
+	_status?: "sending" | "error";
 }
 
 export interface Chat {
@@ -33,15 +38,27 @@ export interface ChatParticipant {
 	role: "Member" | "Admin"; // ADD
 	joinedAt: Date;
 	lastReadAt?: Date;
+	lastReadMessageId?: string;
 	userProfile?: UserProfile;
 }
 
 export interface Attachment {
 	id: string;
 	fileName: string;
-	fileType: string;
+	fileUrl: string;
+	thumbHash?: string;
+	contentType: string;
 	fileSize: number;
-	downloadUrl: string;
+	order: number;
+}
+
+export interface MessageEmbed {
+	id: string;
+	url: string;
+	title?: string;
+	thumbnailUrl?: string;
+	provider: string;
+	embedUrl: string;
 }
 export interface MessageSummary {
 	id: string;
