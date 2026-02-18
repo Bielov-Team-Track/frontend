@@ -3,6 +3,22 @@ import { PaymentMethod, PricingModel, Unit } from "@/lib/models/EventPaymentConf
 import * as yup from "yup";
 import { CasualPlayFormat, RegistrationType } from "../types/registration";
 
+// Match team slot schema (for Match event type)
+const matchTeamSlotSchema = yup
+	.object()
+	.shape({
+		type: yup.string().oneOf(["own", "invited", "manual"]).required(),
+		teamId: yup.string().optional(),
+		name: yup.string().max(100).optional(),
+		contactEmail: yup.string().email().max(254).optional(),
+		color: yup
+			.string()
+			.matches(/^#[0-9a-fA-F]{6}$/)
+			.optional(),
+		status: yup.string().oneOf(["pending", "accepted", "declined"]).optional(),
+	})
+	.nullable();
+
 // Time offset validation schema (for relative registration timing)
 const timeOffsetSchema = yup.object().shape({
 	value: yup.number().min(0, "Value must be positive").required("Value is required"),
@@ -319,6 +335,15 @@ export const eventValidationSchema = yup.object().shape({
 				.transform((v, o) => (o === "" ? null : v)),
 		})
 		.default(undefined),
+	// Match team slots (for Match event type)
+	homeTeamSlot: matchTeamSlotSchema.when("type", {
+		is: EventType.Match,
+		then: (schema) => schema.required("Home team is required"),
+	}),
+	awayTeamSlot: matchTeamSlotSchema.when("type", {
+		is: EventType.Match,
+		then: (schema) => schema.required("Away team is required"),
+	}),
 });
 
 export type EventFormData = yup.InferType<typeof eventValidationSchema>;

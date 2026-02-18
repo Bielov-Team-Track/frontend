@@ -2,6 +2,19 @@ import { CreateEvent, CreateEventSeries, EventFormat, EventType, PlayingSurface,
 import { PricingModel, Unit } from "@/lib/models/EventPaymentConfig";
 import { EventFormData } from "../validation/eventValidationSchema";
 import { ContextSelection } from "../components/ContextSelector";
+import type { MatchTeamSlot } from "../types/registration";
+
+/**
+ * Maps a frontend MatchTeamSlot to the backend TeamDto shape.
+ * Only includes fields the backend currently accepts.
+ */
+function mapTeamSlotToDto(slot: MatchTeamSlot | null) {
+	if (!slot) return undefined;
+	return {
+		...(slot.teamId ? { id: slot.teamId } : {}),
+		name: slot.team?.name || slot.name || "",
+	};
+}
 
 export function transformFormDataToCreateEvent(data: EventFormData, contextSelection?: ContextSelection): CreateEvent {
 	let startTime: Date;
@@ -55,6 +68,12 @@ export function transformFormDataToCreateEvent(data: EventFormData, contextSelec
 		isPublic: !!data.isPublic,
 		contextType: contextSelection?.contextType,
 		contextId: contextSelection?.context.id,
+		...(data.type === EventType.Match && {
+			createMatchRequest: {
+				homeTeam: mapTeamSlotToDto(data.homeTeamSlot as MatchTeamSlot | null),
+				awayTeam: mapTeamSlotToDto(data.awayTeamSlot as MatchTeamSlot | null),
+			},
+		}),
 	};
 }
 
@@ -193,5 +212,7 @@ export function getDefaultFormValues() {
 		registrationOpenTime: null,
 		registrationDeadline: null,
 		casualPlayFormat: undefined,
+		homeTeamSlot: null,
+		awayTeamSlot: null,
 	};
 }

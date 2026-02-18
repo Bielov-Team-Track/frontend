@@ -54,6 +54,8 @@ const FIELD_STEP_MAP: Record<string, number> = {
 	capacity: 3,
 	teamsNumber: 3,
 	casualPlayFormat: 3,
+	homeTeamSlot: 3,
+	awayTeamSlot: 3,
 	isPublic: 3,
 	usePaymentConfig: 4,
 	paymentConfig: 4,

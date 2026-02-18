@@ -1,9 +1,10 @@
-import { Avatar } from "@/components/ui";
+import { Avatar, Badge, Button, Input } from "@/components/ui";
 import { Team } from "@/lib/models/Club";
 import { cn } from "@/lib/utils";
 import { useClub } from "@/providers";
-import { Check, ChevronDown, Clock, Mail, Palette, Users, X } from "lucide-react";
-import { useState } from "react";
+import { Check, Mail, Palette, Pencil, Users, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import * as yup from "yup";
 import type { MatchTeamSlot } from "../../types/registration";
 
 interface TeamSlotCardProps {
@@ -17,35 +18,6 @@ type SelectionMode = "own" | "invite" | "manual" | null;
 
 export function TeamSlotCard({ label, slot, onChange, disabled }: TeamSlotCardProps) {
 	const [mode, setMode] = useState<SelectionMode>((slot?.type as SelectionMode) || null);
-	const [isExpanded, setIsExpanded] = useState(!slot);
-
-	const getStatusIcon = () => {
-		if (!slot) return null;
-		switch (slot.status) {
-			case "accepted":
-				return <Check size={14} className="text-green-400" />;
-			case "pending":
-				return <Clock size={14} className="text-yellow-400" />;
-			case "declined":
-				return <X size={14} className="text-red-400" />;
-			default:
-				return null;
-		}
-	};
-
-	const getStatusText = () => {
-		if (!slot) return null;
-		switch (slot.status) {
-			case "accepted":
-				return "Confirmed";
-			case "pending":
-				return "Pending";
-			case "declined":
-				return "Declined";
-			default:
-				return null;
-		}
-	};
 
 	const handleModeSelect = (newMode: SelectionMode) => {
 		setMode(newMode);
@@ -57,9 +29,9 @@ export function TeamSlotCard({ label, slot, onChange, disabled }: TeamSlotCardPr
 	const handleTeamSelect = (team: Team) => {
 		onChange({
 			type: "own",
+			teamId: team.id,
 			team: team,
 		});
-		setIsExpanded(false);
 	};
 
 	const handleManualSubmit = (name: string, email: string, color: string) => {
@@ -70,120 +42,146 @@ export function TeamSlotCard({ label, slot, onChange, disabled }: TeamSlotCardPr
 			color,
 			status: "pending",
 		});
-		setIsExpanded(false);
 	};
 
 	return (
 		<div
 			className={cn(
-				"rounded-xl border transition-all",
-				slot ? "bg-surface border-border/50" : "bg-surface border-border",
+				"rounded-xl border transition-all bg-surface",
+				slot ? "border-accent shadow-sm" : "border-border",
 				disabled && "opacity-50 pointer-events-none"
 			)}>
 			{/* Header */}
-			<button type="button" onClick={() => setIsExpanded(!isExpanded)} className="w-full p-3 sm:p-4 flex items-center justify-between text-left">
-				<div className="flex items-center gap-2 sm:gap-3">
-					{slot?.color && <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border border-border/50" style={{ backgroundColor: slot.color }} />}
-					<div>
-						<div className="text-xs sm:text-sm font-medium text-foreground">{label}</div>
-						{slot?.team ? (
-							<div className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1 sm:gap-1.5 mt-0.5">
-								{slot.name}
-								{getStatusIcon()}
-								{getStatusText() && (
-									<span
-										className={cn(
-											"text-xs",
-											slot.status === "accepted" && "text-green-400",
-											slot.status === "pending" && "text-yellow-400",
-											slot.status === "declined" && "text-red-400"
-										)}>
-										({getStatusText()})
-									</span>
-								)}
+			<div className="p-3 sm:p-4 flex items-center justify-between border-b border-border/50">
+				<span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+					{label}
+				</span>
+				{!slot ? (
+					<Badge variant="soft" color="neutral" size="xs">Empty</Badge>
+				) : slot.status === "accepted" ? (
+					<Badge variant="soft" color="success" size="xs">Confirmed</Badge>
+				) : slot.status === "pending" ? (
+					<Badge variant="soft" color="warning" size="xs">Invited</Badge>
+				) : slot.status === "declined" ? (
+					<Badge variant="soft" color="error" size="xs">Declined</Badge>
+				) : null}
+			</div>
+
+			{/* Body */}
+			<div className="p-3 sm:p-4">
+				{!slot ? (
+					<>
+						{/* Empty state */}
+						<div className="space-y-3">
+							{/* Mode Selection */}
+							<div className="grid grid-cols-3 gap-1.5 sm:gap-2" aria-label="Team selection mode">
+								<button
+									type="button"
+									aria-pressed={mode === "own"}
+									onClick={() => handleModeSelect("own")}
+									className={cn(
+										"p-1.5 sm:p-2 rounded-lg text-[10px] sm:text-xs font-medium transition-colors",
+										mode === "own"
+											? "bg-accent/20 text-accent border border-accent"
+											: "bg-surface text-muted-foreground border border-border hover:bg-hover"
+									)}>
+									<Users size={12} className="mx-auto mb-0.5 sm:mb-1 sm:w-3.5 sm:h-3.5" />
+									Your Team
+								</button>
+								<button
+									type="button"
+									aria-pressed={mode === "invite"}
+									onClick={() => handleModeSelect("invite")}
+									className={cn(
+										"p-1.5 sm:p-2 rounded-lg text-[10px] sm:text-xs font-medium transition-colors",
+										mode === "invite"
+											? "bg-accent/20 text-accent border border-accent"
+											: "bg-surface text-muted-foreground border border-border hover:bg-hover"
+									)}>
+									<Users size={12} className="mx-auto mb-0.5 sm:mb-1 sm:w-3.5 sm:h-3.5" />
+									Invite
+								</button>
+								<button
+									type="button"
+									aria-pressed={mode === "manual"}
+									onClick={() => handleModeSelect("manual")}
+									className={cn(
+										"p-1.5 sm:p-2 rounded-lg text-[10px] sm:text-xs font-medium transition-colors",
+										mode === "manual"
+											? "bg-accent/20 text-accent border border-accent"
+											: "bg-surface text-muted-foreground border border-border hover:bg-hover"
+									)}>
+									<Mail size={12} className="mx-auto mb-0.5 sm:mb-1 sm:w-3.5 sm:h-3.5" />
+									Manual
+								</button>
 							</div>
-						) : (
-							<div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Not selected</div>
-						)}
-					</div>
-				</div>
-				<ChevronDown size={14} className={cn("text-muted-foreground transition-transform sm:w-4 sm:h-4", isExpanded && "rotate-180")} />
-			</button>
 
-			{/* Expanded Content */}
-			{isExpanded && (
-				<div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-2.5 sm:space-y-3 border-t border-border pt-2.5 sm:pt-3">
-					{/* Mode Selection */}
-					<div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-						<button
-							type="button"
-							onClick={() => handleModeSelect("own")}
-							className={cn(
-								"p-1.5 sm:p-2 rounded-lg text-[10px] sm:text-xs font-medium transition-colors",
-								mode === "own"
-									? "bg-accent/20 text-accent border border-accent"
-									: "bg-surface text-muted-foreground border border-border hover:bg-hover"
-							)}>
-							<Users size={12} className="mx-auto mb-0.5 sm:mb-1 sm:w-3.5 sm:h-3.5" />
-							Your Team
-						</button>
-						<button
-							type="button"
-							onClick={() => handleModeSelect("invite")}
-							className={cn(
-								"p-1.5 sm:p-2 rounded-lg text-[10px] sm:text-xs font-medium transition-colors",
-								mode === "invite"
-									? "bg-accent/20 text-accent border border-accent"
-									: "bg-surface text-muted-foreground border border-border hover:bg-hover"
-							)}>
-							<Users size={12} className="mx-auto mb-0.5 sm:mb-1 sm:w-3.5 sm:h-3.5" />
-							Invite
-						</button>
-						<button
-							type="button"
-							onClick={() => handleModeSelect("manual")}
-							className={cn(
-								"p-1.5 sm:p-2 rounded-lg text-[10px] sm:text-xs font-medium transition-colors",
-								mode === "manual"
-									? "bg-accent/20 text-accent border border-accent"
-									: "bg-surface text-muted-foreground border border-border hover:bg-hover"
-							)}>
-							<Mail size={12} className="mx-auto mb-0.5 sm:mb-1 sm:w-3.5 sm:h-3.5" />
-							Manual
-						</button>
-					</div>
-
-					{/* Mode Content */}
-					{mode === "own" && <OwnTeamSelector selectedId={slot?.teamId} onSelect={handleTeamSelect} />}
-					{mode === "invite" && (
-						<InviteTeamSelector
-							onInvite={(teamId, teamName) => {
-								onChange({
-									type: "invited",
-									teamId,
-									name: teamName,
-									status: "pending",
-								});
-								setIsExpanded(false);
-							}}
-						/>
-					)}
-					{mode === "manual" && <ManualTeamEntry onSubmit={handleManualSubmit} />}
-
-					{/* Clear Button */}
-					{slot && (
-						<button
-							type="button"
-							onClick={() => {
-								onChange(null);
-								setMode(null);
-							}}
-							className="w-full p-1.5 sm:p-2 text-[10px] sm:text-xs text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
-							Clear Selection
-						</button>
-					)}
-				</div>
-			)}
+							{/* Mode Content */}
+							{mode === "own" && <OwnTeamSelector selectedId={slot?.teamId} onSelect={handleTeamSelect} />}
+							{mode === "invite" && (
+								<InviteTeamSelector
+									onInvite={(teamId, teamName) => {
+										onChange({
+											type: "invited",
+											teamId,
+											name: teamName,
+											status: "pending",
+										});
+									}}
+								/>
+							)}
+							{mode === "manual" && <ManualTeamEntry onSubmit={handleManualSubmit} />}
+						</div>
+					</>
+				) : (
+					<>
+						{/* Filled state */}
+						<div className="flex items-center gap-3">
+							<Avatar
+								variant="team"
+								size="md"
+								name={slot.team?.name || slot.name}
+								color={slot.team?.color || slot.color}
+							/>
+							<div className="flex-1 min-w-0">
+								<div className="text-sm font-semibold text-foreground truncate">
+									{slot.team?.name || slot.name}
+								</div>
+								<div className="text-xs text-muted-foreground truncate">
+									{slot.team?.club?.name || slot.contactEmail || "External team"}
+								</div>
+							</div>
+							<div className="flex gap-1.5 shrink-0">
+								<Button
+									type="button"
+									variant="outline"
+									size="icon"
+									onClick={() => {
+										onChange(null);
+										setMode((slot.type as SelectionMode) || "own");
+									}}
+									aria-label="Change team"
+								>
+									<Pencil size={14} className="text-muted-foreground" />
+								</Button>
+								<Button
+									type="button"
+									variant="outline"
+									size="icon"
+									className="group hover:bg-error/10 hover:border-error"
+									onClick={() => {
+										onChange(null);
+										setMode(null);
+									}}
+									aria-label="Remove team"
+								>
+									<X size={14} className="text-muted-foreground group-hover:text-error" />
+								</Button>
+							</div>
+						</div>
+					</>
+				)}
+			</div>
 		</div>
 	);
 }
@@ -193,16 +191,15 @@ export function TeamSlotCard({ label, slot, onChange, disabled }: TeamSlotCardPr
 function OwnTeamSelector({ selectedId, onSelect }: { selectedId?: string; onSelect: (team: Team) => void }) {
 	const clubs = useClub().clubs;
 
-	for (const club of clubs) {
-		for (const team of club.teams ?? []) {
-			team.club = club;
-		}
-	}
-
-	const teams = clubs?.flatMap((c) => c.teams).filter(Boolean);
+	const teams = useMemo(
+		() => clubs.flatMap(club =>
+			(club.teams ?? []).map(team => ({ ...team, club }))
+		),
+		[clubs]
+	);
 
 	if (!teams || teams.length === 0) {
-		return <div className="p-3 sm:p-4 text-center text-muted-foreground text-xs sm:text-sm">You don't have any teams yet.</div>;
+		return <div className="p-3 sm:p-4 text-center text-muted-foreground text-xs sm:text-sm">You don&apos;t have any teams yet.</div>;
 	}
 
 	return (
@@ -246,44 +243,72 @@ function ManualTeamEntry({ onSubmit }: { onSubmit: (name: string, email: string,
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [color, setColor] = useState("#4ECDC4");
+	const [errors, setErrors] = useState<string[]>([]);
+
+	const validateManualEntry = (data: { name: string; contactEmail?: string; color?: string }) => {
+		const errs: string[] = [];
+		if (!data.name?.trim()) errs.push("Team name is required");
+		if (data.name && data.name.length > 100) errs.push("Team name must be 100 characters or less");
+		if (/[\x00-\x1f\x7f]/.test(data.name)) errs.push("Team name contains invalid characters");
+		if (data.contactEmail && /[\x00-\x1f\x7f]/.test(data.contactEmail)) errs.push("Email contains invalid characters");
+		if (data.contactEmail && data.contactEmail.length > 254) errs.push("Email must be 254 characters or less");
+		if (data.contactEmail && !yup.string().email().isValidSync(data.contactEmail)) {
+			errs.push("Invalid email format");
+		}
+		if (data.color && !/^#[0-9a-fA-F]{6}$/.test(data.color)) {
+			errs.push("Color must be a valid hex code (e.g. #FF0000)");
+		}
+		return errs;
+	};
 
 	const handleSubmit = () => {
-		if (name && email) {
+		const validationErrors = validateManualEntry({ name, contactEmail: email, color });
+		setErrors(validationErrors);
+		if (validationErrors.length === 0) {
 			onSubmit(name, email, color);
 		}
 	};
 
 	return (
 		<div className="space-y-2 sm:space-y-3">
-			<input
+			<Input
 				type="text"
+				aria-label="Team name"
 				placeholder="Team name"
 				value={name}
+				maxLength={100}
 				onChange={(e) => setName(e.target.value)}
-				className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 bg-surface border border-border rounded-lg text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-accent"
 			/>
-			<input
+			<Input
 				type="email"
+				aria-label="Contact email"
 				placeholder="Contact email"
 				value={email}
+				maxLength={254}
 				onChange={(e) => setEmail(e.target.value)}
-				className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 bg-surface border border-border rounded-lg text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-accent"
 			/>
 			<div className="flex items-center gap-1.5 sm:gap-2">
 				<Palette size={12} className="text-muted-foreground sm:w-3.5 sm:h-3.5" />
-				<input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-6 h-6 sm:w-8 sm:h-8 rounded cursor-pointer" />
+				<input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-6 h-6 sm:w-8 sm:h-8 rounded cursor-pointer" aria-label="Team color" />
 				<span className="text-[10px] sm:text-xs text-muted-foreground">Team color</span>
 			</div>
-			<button
+
+			{errors.length > 0 && (
+				<div className="space-y-1">
+					{errors.map((err, i) => (
+						<p key={i} className="text-xs text-error">{err}</p>
+					))}
+				</div>
+			)}
+
+			<Button
 				type="button"
 				onClick={handleSubmit}
-				disabled={!name || !email}
-				className={cn(
-					"w-full p-1.5 sm:p-2 rounded-lg text-xs sm:text-sm font-medium transition-colors",
-					name && email ? "bg-accent hover:bg-accent/90 text-white" : "bg-foreground/10 text-muted-foreground cursor-not-allowed"
-				)}>
+				disabled={!name.trim()}
+				className="w-full"
+			>
 				Add Team
-			</button>
+			</Button>
 		</div>
 	);
 }

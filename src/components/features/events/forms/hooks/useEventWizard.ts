@@ -45,6 +45,11 @@ function getParticipantsValidationFields(eventType: EventType): string[] {
 		baseFields.push("casualPlayFormat");
 	}
 
+	// Add match team slots if event type is Match
+	if (eventType === EventType.Match) {
+		baseFields.push("homeTeamSlot", "awayTeamSlot");
+	}
+
 	return baseFields;
 }
 
