@@ -31,7 +31,11 @@ export interface FeedbackDto {
 	recipientUserId: string;
 	coachUserId: string;
 	eventId?: string;
-	comment?: string;
+	clubId?: string;
+	evaluationId?: string;
+	comment?: string; // Phase A backward compat
+	content?: string; // HTML rich text
+	contentPlainText?: string; // stripped text for previews
 	sharedWithPlayer: boolean;
 	improvementPoints: ImprovementPointDto[];
 	praise?: PraiseDto;
@@ -76,7 +80,11 @@ export interface Feedback {
 	recipientUserId: string;
 	coachUserId: string;
 	eventId?: string;
-	comment?: string;
+	clubId?: string;
+	evaluationId?: string;
+	comment?: string; // Phase A backward compat
+	content?: string; // HTML rich text
+	contentPlainText?: string; // stripped text for previews
 	sharedWithPlayer: boolean;
 	improvementPoints: ImprovementPoint[];
 	praise?: Praise;
@@ -112,6 +120,10 @@ export interface FeedbackListResponse {
 	pageSize: number;
 }
 
+export interface CanCreateFeedbackResponse {
+	canCreate: boolean;
+}
+
 // =============================================================================
 // REQUEST DTOs
 // =============================================================================
@@ -119,7 +131,8 @@ export interface FeedbackListResponse {
 export interface CreateFeedbackRequest {
 	recipientUserId: string;
 	eventId?: string;
-	comment?: string;
+	clubId?: string;
+	content?: string;
 	sharedWithPlayer: boolean;
 	improvementPoints?: CreateImprovementPointDto[];
 	praise?: CreatePraiseDto;
@@ -143,7 +156,7 @@ export interface CreatePraiseDto {
 }
 
 export interface UpdateFeedbackRequest {
-	comment?: string;
+	content?: string;
 	sharedWithPlayer?: boolean;
 }
 
@@ -200,7 +213,12 @@ export function transformFeedbackDto(dto: FeedbackDto): Feedback {
 		recipientUserId: dto.recipientUserId,
 		coachUserId: dto.coachUserId,
 		eventId: dto.eventId,
+		clubId: dto.clubId,
+		evaluationId: dto.evaluationId,
+		// Phase A: use content if available, fall back to comment for old backend responses
 		comment: dto.comment,
+		content: dto.content ?? dto.comment,
+		contentPlainText: dto.contentPlainText,
 		sharedWithPlayer: dto.sharedWithPlayer,
 		improvementPoints: dto.improvementPoints?.map(transformImprovementPointDto) || [],
 		praise: dto.praise ? transformPraiseDto(dto.praise) : undefined,
