@@ -5,13 +5,17 @@ import DeleteConfirmModal from "@/components/ui/delete-confirm-modal";
 import { ListToolbar } from "@/components/ui/list-toolbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserSelectorModal } from "@/components/features/users";
+import { FeedbackFormModal } from "@/components/features/feedback";
 import { inviteUsers, removeParticipant, revokeInvitation, updateParticipantStatus } from "@/lib/api/events";
+import { EventType } from "@/lib/models/Event";
 import { InvitedVia } from "@/lib/models/EventParticipant";
 import { UserProfile } from "@/lib/models/User";
 import { cn } from "@/lib/utils";
+import { useCanGiveFeedback } from "@/hooks/useFeedbackCoach";
+import { useAuth } from "@/providers/AuthProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowDownAZ, Clock, CreditCard, MailX, Search, UserMinus, UserPlus, Users, XCircle } from "lucide-react";
+import { ArrowDownAZ, Clock, CreditCard, MailX, MessageSquarePlus, Search, UserMinus, UserPlus, Users, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useEventContext } from "../layout";
 
@@ -81,6 +85,13 @@ const getInvitedViaLabel = (invitedVia: InvitedVia | string): string => {
 	}
 };
 
+const FEEDBACK_ELIGIBLE_EVENT_TYPES: EventType[] = [
+	EventType.TrainingSession,
+	EventType.Evaluation,
+	EventType.Trial,
+	EventType.Match,
+];
+
 const getPaymentLabel = (paymentStatus?: string | null): { label: string; color: string } => {
 	switch (paymentStatus) {
 		case "completed":
@@ -94,6 +105,7 @@ const getPaymentLabel = (paymentStatus?: string | null): { label: string; color:
 
 export default function EventMembersPage() {
 	const { event, eventId, participants, isAdmin } = useEventContext();
+	const { userProfile } = useAuth();
 	const queryClient = useQueryClient();
 
 	const [searchQuery, setSearchQuery] = useState("");
@@ -103,6 +115,26 @@ export default function EventMembersPage() {
 	const [removingParticipant, setRemovingParticipant] = useState<{ id: string; userId: string; name: string } | null>(null);
 	const [decliningParticipant, setDecliningParticipant] = useState<{ userId: string; name: string } | null>(null);
 	const [declineNote, setDeclineNote] = useState("");
+	const [feedbackTarget, setFeedbackTarget] = useState<{
+		userId: string;
+		name: string;
+		avatarUrl?: string;
+	} | null>(null);
+
+	// Feedback authorization: single sentinel check to avoid N API calls per participant.
+	// Pick the first participant who is NOT the current user as the sentinel.
+	const currentUserId = userProfile?.id;
+	const isEligibleEventType = !!event?.type && FEEDBACK_ELIGIBLE_EVENT_TYPES.includes(event.type);
+	const sentinelParticipant = isEligibleEventType
+		? participants.find((p) => p.userId !== currentUserId)
+		: undefined;
+
+	const { data: canCreateResult } = useCanGiveFeedback(
+		sentinelParticipant?.userId,
+		eventId,
+		undefined
+	);
+	const canGiveFeedback = isEligibleEventType && (canCreateResult?.canCreate === true);
 
 	const inviteMutation = useMutation({
 		mutationFn: (userIds: string[]) => inviteUsers(eventId, userIds),
@@ -261,7 +293,7 @@ export default function EventMembersPage() {
 									<th className="text-left text-xs font-medium text-muted px-4 py-3 hidden lg:table-cell">Payment</th>
 								)}
 								<th className="text-left text-xs font-medium text-muted px-4 py-3 hidden lg:table-cell">Source</th>
-								{isAdmin && (
+								{(isAdmin || canGiveFeedback) && (
 									<th className="text-right text-xs font-medium text-muted px-4 py-3">Actions</th>
 								)}
 							</tr>
@@ -344,31 +376,50 @@ export default function EventMembersPage() {
 										</td>
 
 										{/* Actions */}
-										{isAdmin && (
+										{(isAdmin || canGiveFeedback) && (
 											<td className="px-4 py-3 text-right">
-												<DropdownMenu
-											data-testid={`participant-actions-${index}`}
-													items={[
-														...(statusStr === "Invited"
-															? [
-																	{
-																		label: "Revoke Invitation",
-																	"data-testid": "revoke-invitation-action",
-																		icon: <MailX size={16} />,
-																		variant: "destructive" as const,
-																		onClick: () => revokeMutation.mutate(participant.userId),
-																	},
-																]
-															: []),
-														{
-															label: "Remove",
-															"data-testid": "remove-participant-action",
-															icon: <UserMinus size={16} />,
-															variant: "destructive" as const,
-															onClick: () => setRemovingParticipant({ id: participant.id, userId: participant.userId, name }),
-														},
-													]}
-												/>
+												<div className="flex items-center justify-end gap-1">
+													{canGiveFeedback && participant.userId !== currentUserId && (
+														<button
+															type="button"
+															title="Give Feedback"
+															onClick={() => setFeedbackTarget({
+																userId: participant.userId,
+																name,
+																avatarUrl: userProfile.imageUrl,
+															})}
+															className="p-1.5 rounded-lg text-muted-foreground hover:text-accent hover:bg-accent/10 transition-colors"
+															data-testid={`give-feedback-${index}`}
+														>
+															<MessageSquarePlus size={16} />
+														</button>
+													)}
+													{isAdmin && (
+														<DropdownMenu
+															data-testid={`participant-actions-${index}`}
+															items={[
+																...(statusStr === "Invited"
+																	? [
+																			{
+																				label: "Revoke Invitation",
+																				"data-testid": "revoke-invitation-action",
+																				icon: <MailX size={16} />,
+																				variant: "destructive" as const,
+																				onClick: () => revokeMutation.mutate(participant.userId),
+																			},
+																		]
+																	: []),
+																{
+																	label: "Remove",
+																	"data-testid": "remove-participant-action",
+																	icon: <UserMinus size={16} />,
+																	variant: "destructive" as const,
+																	onClick: () => setRemovingParticipant({ id: participant.id, userId: participant.userId, name }),
+																},
+															]}
+														/>
+													)}
+												</div>
 											</td>
 										)}
 									</tr>
@@ -468,6 +519,19 @@ export default function EventMembersPage() {
 				isLoading={removeMutation.isPending}
 				confirmText="Remove"
 			/>
+
+			{/* Give Feedback Modal */}
+			{feedbackTarget && (
+				<FeedbackFormModal
+					isOpen={!!feedbackTarget}
+					onClose={() => setFeedbackTarget(null)}
+					recipientUserId={feedbackTarget.userId}
+					recipientName={feedbackTarget.name}
+					recipientAvatarUrl={feedbackTarget.avatarUrl}
+					eventId={eventId}
+					eventName={event?.name}
+				/>
+			)}
 		</div>
 	);
 }
