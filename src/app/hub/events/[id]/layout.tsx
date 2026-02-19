@@ -42,7 +42,7 @@ export function useEventContext() {
 	return context;
 }
 
-type TabType = "overview" | "teams" | "members" | "discussion" | "training" | "payments" | "settings";
+type TabType = "overview" | "teams" | "members" | "discussion" | "training" | "evaluation" | "payments" | "settings";
 
 interface TabConfig {
 	id: TabType;
@@ -50,6 +50,7 @@ interface TabConfig {
 	icon: typeof Calendar;
 	href: string;
 	trainingOnly?: boolean;
+	evaluationOnly?: boolean;
 	teamsOnly?: boolean;
 }
 
@@ -59,6 +60,7 @@ const TABS: TabConfig[] = [
 	{ id: "members", label: "Members", icon: Users, href: "/members" },
 	{ id: "discussion", label: "Discussion", icon: MessageCircle, href: "/discussion" },
 	{ id: "training", label: "Training Plan", icon: ClipboardList, href: "/training", trainingOnly: true },
+	{ id: "evaluation", label: "Evaluation", icon: ClipboardList, href: "/evaluation-session/setup", evaluationOnly: true },
 	{ id: "payments", label: "Payments", icon: CreditCard, href: "/payments" },
 	{ id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];
@@ -78,6 +80,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 		if (pathname.includes("/members")) return "members";
 		if (pathname.includes("/discussion")) return "discussion";
 		if (pathname.includes("/training")) return "training";
+		if (pathname.includes("/evaluation-session")) return "evaluation";
 		if (pathname.includes("/payments")) return "payments";
 		return "overview";
 	};
@@ -334,6 +337,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 						<div className="flex gap-1 px-6">
 							{TABS.filter((tab) => {
 								if (tab.trainingOnly && event.type !== EventType.TrainingSession) return false;
+								if (tab.evaluationOnly && event.type !== EventType.Evaluation && event.type !== EventType.Trial) return false;
 								if (tab.teamsOnly && event.registrationUnit === Unit.Individual) return false;
 								return true;
 							}).map((tab) => {
