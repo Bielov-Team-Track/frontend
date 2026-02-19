@@ -10,8 +10,16 @@ import { PraiseEditor } from "./PraiseEditor";
 import type { PraiseDraft } from "./PraiseEditor";
 import { useCreateFeedback } from "@/hooks/useFeedbackCoach";
 import { showErrorToast } from "@/lib/errors";
-import { FeedbackMediaTypeEnum } from "@/lib/models/Feedback";
-import type { CreateFeedbackRequest, FeedbackMediaType } from "@/lib/models/Feedback";
+import type { CreateFeedbackRequest } from "@/lib/models/Feedback";
+
+// Local mapping to correct backend FeedbackMediaType values.
+// The shared FeedbackMediaTypeEnum has wrong values (Article=1, Image=2)
+// but backend expects: Video=0, Image=1, Document=2
+const MEDIA_TYPE_TO_BACKEND: Record<string, number> = {
+	Video: 0,
+	Image: 1,
+	Article: 2,
+};
 
 interface FeedbackFormModalProps {
 	isOpen: boolean;
@@ -78,7 +86,7 @@ export function FeedbackFormModal({
 						.filter((m) => m.url.trim())
 						.map((m) => ({
 							url: m.url,
-							type: FeedbackMediaTypeEnum[m.type as FeedbackMediaType],
+							type: MEDIA_TYPE_TO_BACKEND[m.type] ?? 0,
 							title: m.title,
 						})),
 				})),
