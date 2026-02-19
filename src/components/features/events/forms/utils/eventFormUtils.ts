@@ -190,7 +190,7 @@ export function getDefaultFormValues() {
 		name: "",
 		courtsNumber: 1,
 		type: EventType.CasualPlay,
-		eventFormat: EventFormat.TeamsWithPositions,
+		eventFormat: EventFormat.List,
 		registrationUnit: Unit.Individual,
 		surface: PlayingSurface.Indoor,
 		isPublic: false,

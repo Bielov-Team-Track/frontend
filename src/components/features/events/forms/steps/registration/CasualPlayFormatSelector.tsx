@@ -1,4 +1,5 @@
 import { RadioCards } from "@/components/ui";
+import { EventFormat } from "@/lib/models/Event";
 import { LayoutGrid, List, Users } from "lucide-react";
 import { Controller } from "react-hook-form";
 import { useEventFormContext } from "../../context/EventFormContext";
@@ -25,10 +26,17 @@ const formatCards = [
 	},
 ];
 
+const casualPlayToEventFormat: Record<CasualPlayFormat, EventFormat> = {
+	list: EventFormat.List,
+	openTeams: EventFormat.OpenTeams,
+	teamsWithPositions: EventFormat.TeamsWithPositions,
+};
+
 export function CasualPlayFormatSelector() {
 	const { form } = useEventFormContext();
 	const {
 		control,
+		setValue,
 		formState: { errors },
 	} = form;
 
@@ -41,7 +49,10 @@ export function CasualPlayFormatSelector() {
 					label="Event Format"
 					options={formatCards}
 					value={field.value}
-					onChange={field.onChange}
+					onChange={(value: string) => {
+						field.onChange(value);
+						setValue("eventFormat", casualPlayToEventFormat[value as CasualPlayFormat]);
+					}}
 					error={errors.casualPlayFormat?.message}
 					columns={3}
 				/>

@@ -8,7 +8,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { EventType, PlayingSurface, RecurrencePattern, RecurrencePatternOptions } from "@/lib/models/Event";
+import { EventFormat, EventType, PlayingSurface, RecurrencePattern, RecurrencePatternOptions } from "@/lib/models/Event";
 import { cn } from "@/lib/utils";
 import { Calendar, CalendarRange, Clock, Dumbbell, Gamepad2, PartyPopper, Repeat, Trees, Trophy, Warehouse, Waves } from "lucide-react";
 import { Controller } from "react-hook-form";
@@ -83,6 +83,7 @@ export default function BasicsStep() {
 		control,
 		formState: { errors },
 		watch,
+		setValue,
 	} = form;
 
 	const values = watch();
@@ -142,7 +143,15 @@ export default function BasicsStep() {
 							label="Event Type"
 							options={eventTypeCards}
 							value={field.value}
-							onChange={field.onChange}
+							onChange={(value: string) => {
+								field.onChange(value);
+								// Sync eventFormat: Social/Training always use List
+								if (value === EventType.Social || value === EventType.TrainingSession) {
+									setValue("eventFormat", EventFormat.List);
+								} else if (value === EventType.Match) {
+									setValue("eventFormat", EventFormat.TeamsWithPositions);
+								}
+							}}
 							error={errors.type?.message as string | undefined}
 							columns={2}
 							data-testid="event-type-selector"

@@ -16,6 +16,7 @@ export function NavigationButtons() {
 	const errorSteps = hasErrors ? getErrorSteps(errors as Record<string, unknown>) : [];
 
 	const onInvalid = (fieldErrors: FieldErrors) => {
+		console.warn("[EventForm] Submission validation failed:", fieldErrors);
 		const firstStep = getFirstErrorStep(fieldErrors as Record<string, unknown>);
 		if (firstStep && firstStep !== wizard.currentStep) {
 			goToStep(firstStep);

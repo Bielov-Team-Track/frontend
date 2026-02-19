@@ -108,6 +108,10 @@ export function useEventWizard({ trigger, watch }: UseEventWizardProps) {
 
 		const isValid = await trigger(fieldsToValidate);
 
+		if (!isValid) {
+			console.warn("[EventWizard] Step", currentStep, "validation failed. Fields:", fieldsToValidate);
+		}
+
 		if (isValid && currentStep < TOTAL_STEPS) {
 			const newStep = currentStep + 1;
 			setCurrentStep(newStep);
