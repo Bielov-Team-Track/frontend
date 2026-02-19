@@ -2,6 +2,7 @@
 
 import { Avatar, Button } from "@/components";
 import { BadgeDisplay } from "@/components/features/feedback/BadgeDisplay";
+import { FeedbackFormModal } from "@/components/features/feedback/FeedbackFormModal";
 import { SubscriptionBadge } from "@/components/features/subscriptions/SubscriptionBadge";
 import { getClubMembers, getGroupsByClub, getTeamsByClub } from "@/lib/api/clubs";
 import { getFullUserProfile } from "@/lib/api/user";
@@ -10,7 +11,8 @@ import { FullProfileDto, getDominantHandLabel, getSkillLevelLabel, getVolleyball
 import { Subscription } from "@/lib/models/Subscription";
 import { useQuery } from "@tanstack/react-query";
 import { useClubSubscriptions } from "@/hooks/useSubscriptions";
-import { ArrowLeft, Calendar, Dumbbell, History, Layers, Mail, Medal, Trophy, User, Users } from "lucide-react";
+import { useCanGiveFeedback } from "@/hooks/useFeedbackCoach";
+import { ArrowLeft, Calendar, Dumbbell, History, Layers, Mail, Medal, MessageSquarePlus, Trophy, User, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -36,6 +38,7 @@ const TABS = [
 
 export default function ClubMemberDetailClient({ clubId, memberId, clubName }: Props) {
 	const [activeTab, setActiveTab] = useState<TabType>("overview");
+	const [showFeedbackForm, setShowFeedbackForm] = useState(false);
 
 	// Queries
 	const { data: profile, isLoading: profileLoading } = useQuery({
@@ -59,6 +62,9 @@ export default function ClubMemberDetailClient({ clubId, memberId, clubName }: P
 	});
 
 	const { data: clubSubscriptions = [] } = useClubSubscriptions(clubId);
+
+	const { data: canCreateData } = useCanGiveFeedback(memberId, undefined, clubId);
+	const canGiveFeedback = canCreateData?.canCreate ?? false;
 
 	const clubMember = members.find((m) => m.userId === memberId);
 	const memberSubscription = clubSubscriptions.find((s: Subscription) => s.userId === memberId);
@@ -101,6 +107,8 @@ export default function ClubMemberDetailClient({ clubId, memberId, clubName }: P
 				onTabChange={setActiveTab}
 				teamsCount={userTeams.length}
 				groupsCount={userGroups.length}
+				canGiveFeedback={canGiveFeedback}
+				onGiveFeedback={() => setShowFeedbackForm(true)}
 			/>
 
 			{/* Tab Content */}
@@ -109,6 +117,17 @@ export default function ClubMemberDetailClient({ clubId, memberId, clubName }: P
 				{activeTab === "history" && <HistoryTab history={profile.historyEntries || []} />}
 				{activeTab === "teams" && <TeamsGroupsTab teams={userTeams} groups={userGroups} />}
 			</div>
+
+			{/* Feedback Modal */}
+			<FeedbackFormModal
+				isOpen={showFeedbackForm}
+				onClose={() => setShowFeedbackForm(false)}
+				recipientUserId={memberId}
+				recipientName={`${profile.userProfile?.name} ${profile.userProfile?.surname}`}
+				recipientAvatarUrl={profile.userProfile?.imageUrl}
+				clubId={clubId}
+				clubName={clubName}
+			/>
 		</div>
 	);
 }
@@ -154,9 +173,11 @@ interface MemberBannerCardProps {
 	onTabChange: (tab: TabType) => void;
 	teamsCount: number;
 	groupsCount: number;
+	canGiveFeedback: boolean;
+	onGiveFeedback: () => void;
 }
 
-function MemberBannerCard({ profile, clubMember, subscription, activeTab, onTabChange, teamsCount, groupsCount }: MemberBannerCardProps) {
+function MemberBannerCard({ profile, clubMember, subscription, activeTab, onTabChange, teamsCount, groupsCount, canGiveFeedback, onGiveFeedback }: MemberBannerCardProps) {
 	return (
 		<div className="rounded-2xl overflow-hidden border border-border bg-surface">
 			{/* Banner Area */}
@@ -199,6 +220,18 @@ function MemberBannerCard({ profile, clubMember, subscription, activeTab, onTabC
 						)}
 					</div>
 				</div>
+
+				{/* Actions */}
+				{canGiveFeedback && (
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={onGiveFeedback}
+					>
+						<MessageSquarePlus size={14} className="mr-1.5" />
+						Give Feedback
+					</Button>
+				)}
 
 				{/* Quick Stats */}
 				<div className="flex gap-6">
