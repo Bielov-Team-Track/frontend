@@ -89,8 +89,10 @@ export function FeedbackCard({ feedback, viewMode, onClick }: FeedbackCardProps)
 			</div>
 
 			{/* Comment Preview */}
-			{feedback.comment && (
-				<p className="text-sm text-muted-foreground line-clamp-3">{feedback.comment}</p>
+			{(feedback.contentPlainText || feedback.comment) && (
+				<p className="text-sm text-muted-foreground line-clamp-3">
+					{feedback.contentPlainText || feedback.comment}
+				</p>
 			)}
 
 			{/* Footer Meta */}

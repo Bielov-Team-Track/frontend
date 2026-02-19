@@ -3,6 +3,7 @@
 import { Avatar, Modal } from "@/components";
 import { BadgeType, BADGE_METADATA } from "@/lib/models/Evaluation";
 import { Feedback } from "@/lib/models/Feedback";
+import { sanitizeHtmlWithSafeLinks } from "@/lib/utils/sanitize";
 import { Award, Dumbbell, ExternalLink } from "lucide-react";
 
 interface FeedbackDetailModalProps {
@@ -34,9 +35,16 @@ export function FeedbackDetailModal({ feedback, isOpen, onClose }: FeedbackDetai
 				</div>
 
 				{/* Comment */}
-				{feedback.comment && (
+				{(feedback.content || feedback.comment) && (
 					<div className="rounded-lg bg-muted/50 p-4">
-						<p className="text-sm text-foreground whitespace-pre-wrap">{feedback.comment}</p>
+						{feedback.content ? (
+							<div
+								className="prose prose-sm max-w-none text-foreground"
+								dangerouslySetInnerHTML={{ __html: sanitizeHtmlWithSafeLinks(feedback.content) }}
+							/>
+						) : (
+							<p className="text-sm text-foreground whitespace-pre-wrap">{feedback.comment}</p>
+						)}
 					</div>
 				)}
 
