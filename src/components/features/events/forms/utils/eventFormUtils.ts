@@ -211,7 +211,7 @@ export function getDefaultFormValues() {
 		registrationType: "open" as const,
 		registrationOpenTime: null,
 		registrationDeadline: null,
-		casualPlayFormat: undefined,
+		casualPlayFormat: "list" as const,
 		homeTeamSlot: null,
 		awayTeamSlot: null,
 	};
