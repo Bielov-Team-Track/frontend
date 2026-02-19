@@ -1,0 +1,49 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Restrict default permissions - each job declares only what it needs
+permissions: {}
+
+jobs:
+  # Build and test only (PRs) - read-only permissions
+  build-and-test:
+    if: github.event_name == 'pull_request'
+    uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
+    with:
+      push-docker-image: false
+    permissions:
+      contents: read
+
+  # Build and push image (main branch only)
+  build-push:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
+    with:
+      push-docker-image: true
+    permissions:
+      contents: read
+      packages: write
+
+  deploy-staging:
+    needs: build-push
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    uses: Bielov-Team-Track/devops/.github/workflows/deploy-service.yml@main
+    with:
+      service-name: frontend
+      environment: staging
+      health-check-path: /api/health
+    secrets:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_FINGERPRINT: ${{ secrets.SSH_FINGERPRINT }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    permissions:
+      contents: read
+      actions: read
