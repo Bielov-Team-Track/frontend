@@ -7,6 +7,7 @@ export { MatchTeamSlots } from "./MatchTeamSlots";
 export { CasualPlayFormatSelector } from "./CasualPlayFormatSelector";
 export { CasualPlayTeamSlots } from "./CasualPlayTeamSlots";
 export { CasualPlayRegistration } from "./CasualPlayRegistration";
+export { CasualPlayTeamConfig } from "./CasualPlayTeamConfig";
 export { InviteesSummaryCard } from "./InviteesSummaryCard";
 export { CommonRegistrationSettings } from "./CommonRegistrationSettings";
 
