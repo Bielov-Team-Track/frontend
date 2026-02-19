@@ -1,5 +1,4 @@
-import { Input } from "@/components/ui";
-import { Users } from "lucide-react";
+import { Slider } from "@/components/ui";
 import { Controller } from "react-hook-form";
 import { useEventFormContext } from "../../context/EventFormContext";
 
@@ -11,18 +10,20 @@ export function CapacityField() {
 		<Controller
 			name="capacity"
 			control={control}
-			render={({ field: { value, ...field } }) => (
-				<Input
-					{...field}
-					value={value ?? ""}
-					type="number"
+			render={({ field: { value, onChange } }) => (
+				<Slider
 					label="Maximum Participants"
-					leftIcon={<Users size={16} />}
+					value={value ?? null}
+					onValueChange={(val) => onChange(val)}
+					min={1}
+					max={100}
+					step={1}
+					clearable
+					editable
+					placeholder="Unlimited"
+					helperText="Slide to set a limit, or leave as unlimited"
 					error={errors.capacity?.message}
-					min="1"
-					helperText="Leave empty for unlimited participants"
 					optional
-					data-testid="capacity-input"
 				/>
 			)}
 		/>
