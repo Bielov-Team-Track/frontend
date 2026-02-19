@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
 	Card,
@@ -22,6 +23,7 @@ import {
 	TrendingUp,
 	Users,
 	ClipboardList,
+	MessageSquarePlus,
 } from "lucide-react";
 import { useCoachDashboard } from "@/hooks/useDashboard";
 
@@ -139,7 +141,7 @@ export default function CoachDashboardPage() {
 					<CardDescription>Common tasks and shortcuts</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+					<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 						<Button variant="default" className="justify-start h-auto py-4">
 							<div className="flex items-center gap-3 w-full">
 								<ClipboardList className="w-5 h-5" />
@@ -148,6 +150,17 @@ export default function CoachDashboardPage() {
 									<p className="text-xs opacity-80">Start a new player assessment</p>
 								</div>
 							</div>
+						</Button>
+						<Button variant="outline" className="justify-start h-auto py-4" asChild>
+							<Link href="/hub/coach/feedback">
+								<div className="flex items-center gap-3 w-full">
+									<MessageSquarePlus className="w-5 h-5" />
+									<div className="text-left">
+										<p className="font-semibold">My Feedback</p>
+										<p className="text-xs opacity-80">Manage feedback history</p>
+									</div>
+								</div>
+							</Link>
 						</Button>
 						<Button variant="outline" className="justify-start h-auto py-4">
 							<div className="flex items-center gap-3 w-full">
