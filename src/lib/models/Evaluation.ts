@@ -464,6 +464,175 @@ export const BADGE_METADATA: Record<BadgeType, BadgeMetadata> = {
 };
 
 // =============================================================================
+// EVALUATION SESSIONS - Matching Coaching.Application.DTOs.Evaluation
+// =============================================================================
+
+export type EvaluationSessionStatus = 'Draft' | 'Running' | 'Paused' | 'Completed';
+export type EvaluationScoreStatus = 'Pending' | 'Scored';
+export type EvaluationOutcome = 'Pending' | 'Pass' | 'Fail';
+
+export interface EvaluationSessionDto {
+	id: string;
+	clubId: string;
+	eventId: string | null;
+	coachUserId: string;
+	evaluationPlanId: string | null;
+	title: string;
+	description: string | null;
+	status: EvaluationSessionStatus;
+	shareFeedback: boolean;
+	shareMetrics: boolean;
+	startedAt: string | null;
+	pausedAt: string | null;
+	completedAt: string | null;
+	evaluationPlan: EvaluationPlanDto | null;
+	participants: EvaluationParticipantDto[];
+	groups: EvaluationGroupDto[];
+	createdAt: string | null;
+	updatedAt: string | null;
+}
+
+export interface EvaluationParticipantDto {
+	id: string;
+	sessionId: string;
+	playerId: string;
+	playerName: string | null;
+	avatarUrl: string | null;
+}
+
+export interface EvaluationGroupDto {
+	id: string;
+	sessionId: string;
+	name: string;
+	evaluatorUserId: string | null;
+	order: number;
+	players: GroupPlayerDto[];
+}
+
+export interface GroupPlayerDto {
+	id: string;
+	playerId: string;
+}
+
+export interface PlayerExerciseScoreDto {
+	id: string;
+	sessionId: string;
+	playerId: string;
+	exerciseId: string;
+	evaluatorUserId: string | null;
+	status: EvaluationScoreStatus;
+	scoredAt: string | null;
+	metricScores: MetricScoreValueDto[];
+}
+
+export interface MetricScoreValueDto {
+	metricId: string;
+	value: number;
+	notes: string | null;
+}
+
+export interface SubmitExerciseScoresRequest {
+	playerId: string;
+	exerciseId: string;
+	scores: MetricScoreValueDto[];
+}
+
+export interface SessionProgressDto {
+	sessionId: string;
+	status: EvaluationSessionStatus;
+	totalPlayers: number;
+	totalExercises: number;
+	totalScored: number;
+	totalPossible: number;
+	overallProgress: number;
+	groups: GroupProgressDto[];
+}
+
+export interface GroupProgressDto {
+	groupId: string;
+	groupName: string;
+	evaluatorUserId: string | null;
+	evaluatorName: string | null;
+	currentExerciseName: string | null;
+	playersScored: number;
+	totalPlayers: number;
+	exercisesCompleted: number;
+	totalExercises: number;
+}
+
+export interface CreateEvaluationSessionRequest {
+	clubId: string;
+	eventId?: string;
+	evaluationPlanId?: string;
+	title: string;
+	description?: string;
+}
+
+export interface UpdateEvaluationSessionRequest {
+	title?: string;
+	description?: string;
+	evaluationPlanId?: string;
+	status?: EvaluationSessionStatus;
+}
+
+export interface UpdateSharingRequest {
+	shareFeedback?: boolean;
+	shareMetrics?: boolean;
+}
+
+export interface UpdatePlayerSharingRequest {
+	sharedWithPlayer: boolean;
+}
+
+export interface CreateGroupRequest {
+	name: string;
+	evaluatorUserId?: string;
+}
+
+export interface UpdateGroupRequest {
+	name?: string;
+	evaluatorUserId?: string;
+}
+
+export interface AutoSplitGroupsRequest {
+	numberOfGroups: number;
+}
+
+export interface AssignPlayerToGroupRequest {
+	playerId: string;
+}
+
+export interface MovePlayerRequest {
+	playerId: string;
+	targetGroupId: string;
+}
+
+export interface AddParticipantsRequest {
+	playerIds: string[];
+}
+
+export interface EvaluationSession {
+	id: string;
+	clubId: string;
+	eventId: string | null;
+	coachUserId: string;
+	evaluationPlanId: string | null;
+	title: string;
+	description: string | null;
+	status: EvaluationSessionStatus;
+	shareFeedback: boolean;
+	shareMetrics: boolean;
+	startedAt: Date | null;
+	pausedAt: Date | null;
+	completedAt: Date | null;
+	evaluationPlan: EvaluationPlan | null;
+	participants: EvaluationParticipantDto[];
+	groups: EvaluationGroupDto[];
+	createdAt: Date | null;
+	updatedAt: Date | null;
+}
+
+// =============================================================================
 // TRANSFORM FUNCTIONS
 // =============================================================================
 
@@ -522,6 +691,18 @@ export function transformBadgeStatsDto(dto: BadgeStatsDto): BadgeStats {
 	return {
 		...dto,
 		latestBadge: dto.latestBadge ? transformPlayerBadgeDto(dto.latestBadge) : undefined,
+	};
+}
+
+export function transformEvaluationSessionDto(dto: EvaluationSessionDto): EvaluationSession {
+	return {
+		...dto,
+		evaluationPlan: dto.evaluationPlan ? transformEvaluationPlanDto(dto.evaluationPlan) : null,
+		startedAt: dto.startedAt ? new Date(dto.startedAt) : null,
+		pausedAt: dto.pausedAt ? new Date(dto.pausedAt) : null,
+		completedAt: dto.completedAt ? new Date(dto.completedAt) : null,
+		createdAt: dto.createdAt ? new Date(dto.createdAt) : null,
+		updatedAt: dto.updatedAt ? new Date(dto.updatedAt) : null,
 	};
 }
 

@@ -7,6 +7,7 @@ export const PROFILES_API_URL = process.env.NEXT_PUBLIC_PROFILES_API_URL || `${A
 export const CLUBS_API_URL = process.env.NEXT_PUBLIC_CLUBS_API_URL || `${API_BASE_URL}clubs`;
 export const NOTIFICATIONS_API_URL = process.env.NEXT_PUBLIC_NOTIFICATIONS_API_URL || `${API_BASE_URL}notifications`;
 export const PAYMENTS_API_URL = process.env.NEXT_PUBLIC_PAYMENTS_API_URL || `${API_BASE_URL}payments`;
+export const COACHING_API_URL = process.env.NEXT_PUBLIC_COACHING_API_URL || `${API_BASE_URL}coaching`;
 
 // WebSocket URL
 export const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || `ws://localhost:8000/ws`;
