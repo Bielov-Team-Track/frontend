@@ -29,7 +29,11 @@ export const FeedbackMediaTypeFromEnum: Record<number, FeedbackMediaType> = {
 export interface FeedbackDto {
 	id: string;
 	recipientUserId: string;
+	recipientName?: string;
+	recipientImageUrl?: string;
 	coachUserId: string;
+	coachName?: string;
+	coachImageUrl?: string;
 	eventId?: string;
 	clubId?: string;
 	evaluationId?: string;
@@ -78,7 +82,11 @@ export interface FeedbackListResponseDto {
 export interface Feedback {
 	id: string;
 	recipientUserId: string;
+	recipientName?: string;
+	recipientImageUrl?: string;
 	coachUserId: string;
+	coachName?: string;
+	coachImageUrl?: string;
 	eventId?: string;
 	clubId?: string;
 	evaluationId?: string;
@@ -211,7 +219,11 @@ export function transformFeedbackDto(dto: FeedbackDto): Feedback {
 	return {
 		id: dto.id,
 		recipientUserId: dto.recipientUserId,
+		recipientName: dto.recipientName,
+		recipientImageUrl: dto.recipientImageUrl,
 		coachUserId: dto.coachUserId,
+		coachName: dto.coachName,
+		coachImageUrl: dto.coachImageUrl,
 		eventId: dto.eventId,
 		clubId: dto.clubId,
 		evaluationId: dto.evaluationId,
