@@ -173,6 +173,8 @@ interface SortableDrillCardProps {
   onRemove: () => void;
   onViewDetails: () => void;
   onDurationClick: (event: React.MouseEvent) => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
   isOverlay?: boolean;
 }
 
@@ -182,6 +184,8 @@ const SortableDrillCard: React.FC<SortableDrillCardProps> = ({
   onRemove,
   onViewDetails,
   onDurationClick,
+  onMoveUp,
+  onMoveDown,
   isOverlay = false,
 }) => {
   const {
@@ -260,6 +264,16 @@ const SortableDrillCard: React.FC<SortableDrillCardProps> = ({
 
         {/* Actions */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {onMoveUp && (
+            <button onClick={onMoveUp} className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:text-foreground">
+              <ChevronUp size={14} />
+            </button>
+          )}
+          {onMoveDown && (
+            <button onClick={onMoveDown} className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:text-foreground">
+              <ChevronDown size={14} />
+            </button>
+          )}
           <button onClick={onViewDetails} className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-subtle text-muted hover:text-foreground">
             <Eye size={14} />
           </button>
@@ -459,6 +473,19 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
       time += item.duration;
     }
     return time;
+  };
+
+  // Move item up or down within its section in the timeline
+  const handleMoveItem = (instanceId: string, direction: 'up' | 'down') => {
+    const currentIndex = timeline.findIndex(item => item.instanceId === instanceId);
+    if (currentIndex === -1) return;
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex < 0 || newIndex >= timeline.length) return;
+    // Restrict moves to within the same section
+    if (timeline[currentIndex].sectionId !== timeline[newIndex].sectionId) return;
+    const newTimeline = [...timeline];
+    [newTimeline[currentIndex], newTimeline[newIndex]] = [newTimeline[newIndex], newTimeline[currentIndex]];
+    onTimelineChange(newTimeline);
   };
 
   // Section handlers
@@ -748,6 +775,22 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
                             onRemove={() => handleRemoveDrill(item.instanceId)}
                             onViewDetails={() => onViewDrillDetails(item.drill)}
                             onDurationClick={(e) => handleDurationClick(item.instanceId, item.duration, item.notes, e)}
+                            onMoveUp={
+                              (() => {
+                                const idx = timeline.indexOf(item);
+                                return idx > 0 && timeline[idx - 1].sectionId === item.sectionId
+                                  ? () => handleMoveItem(item.instanceId, 'up')
+                                  : undefined;
+                              })()
+                            }
+                            onMoveDown={
+                              (() => {
+                                const idx = timeline.indexOf(item);
+                                return idx < timeline.length - 1 && timeline[idx + 1].sectionId === item.sectionId
+                                  ? () => handleMoveItem(item.instanceId, 'down')
+                                  : undefined;
+                              })()
+                            }
                           />
                         ))}
                       </SortableContext>
@@ -769,6 +812,22 @@ export const TimelineBuilderPanel: React.FC<TimelineBuilderPanelProps> = ({
                       onRemove={() => handleRemoveDrill(item.instanceId)}
                       onViewDetails={() => onViewDrillDetails(item.drill)}
                       onDurationClick={(e) => handleDurationClick(item.instanceId, item.duration, item.notes, e)}
+                      onMoveUp={
+                        (() => {
+                          const idx = timeline.indexOf(item);
+                          return idx > 0 && timeline[idx - 1].sectionId === item.sectionId
+                            ? () => handleMoveItem(item.instanceId, 'up')
+                            : undefined;
+                        })()
+                      }
+                      onMoveDown={
+                        (() => {
+                          const idx = timeline.indexOf(item);
+                          return idx < timeline.length - 1 && timeline[idx + 1].sectionId === item.sectionId
+                            ? () => handleMoveItem(item.instanceId, 'down')
+                            : undefined;
+                        })()
+                      }
                     />
                   ))}
                 </SortableContext>
