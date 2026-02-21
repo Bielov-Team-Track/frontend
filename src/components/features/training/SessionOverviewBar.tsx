@@ -609,6 +609,29 @@ export const SessionOverviewBar: React.FC<SessionOverviewBarProps> = ({
 				)}
 				</div>
 
+				{/* Section Spans Above Bar */}
+				{sections.length > 0 && (
+					<div className="relative h-5 hidden lg:block mb-1">
+					{sectionSpans.map((span) => (
+						<div
+							key={span.section.id}
+							className="absolute top-0 h-full flex items-center overflow-hidden rounded-[4px]"
+							style={{
+								left: `${span.leftPct}%`,
+								width: `${span.widthPct}%`,
+								background: `${span.section.color}20`,
+								borderLeft: `2px solid ${span.section.color}`,
+							}}>
+							<span
+								className="text-[9px] font-semibold whitespace-nowrap overflow-hidden text-ellipsis px-1 tracking-wide uppercase"
+								style={{ color: span.section.color }}>
+								{span.section.name}
+							</span>
+						</div>
+						))}
+					</div>
+				)}
+
 				{/* Horizontal Timeline Bar */}
 				<div className="relative hidden lg:block">
 				<DndContext
@@ -704,28 +727,6 @@ export const SessionOverviewBar: React.FC<SessionOverviewBarProps> = ({
 					</div>
 				</div>
 
-				{/* Section Spans Below Bar */}
-				{sections.length > 0 && (
-					<div className="relative h-5 hidden lg:block">
-					{sectionSpans.map((span) => (
-						<div
-							key={span.section.id}
-							className="absolute top-0 h-full flex items-center overflow-hidden rounded-[4px]"
-							style={{
-								left: `${span.leftPct}%`,
-								width: `${span.widthPct}%`,
-								background: `${span.section.color}20`,
-								borderLeft: `2px solid ${span.section.color}`,
-							}}>
-							<span
-								className="text-[9px] font-semibold whitespace-nowrap overflow-hidden text-ellipsis px-1 tracking-wide uppercase"
-								style={{ color: span.section.color }}>
-								{span.section.name}
-							</span>
-						</div>
-						))}
-					</div>
-				)}
 
 				{/* Duration Slider with Quick Presets */}
 				<div className="hidden lg:block">
