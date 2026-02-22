@@ -155,6 +155,7 @@ export const getNavigationItems = (
 		icon: GraduationCap,
 		visible: (s) => s?.isCoach ?? false,
 		subItems: [
+			{ name: "My Feedback", href: "/hub/coaching/feedback", icon: MessageSquare },
 			{
 				name: "Training",
 				href: "/hub/coaching/training",

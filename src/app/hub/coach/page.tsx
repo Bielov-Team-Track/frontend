@@ -152,7 +152,7 @@ export default function CoachDashboardPage() {
 							</div>
 						</Button>
 						<Button variant="outline" className="justify-start h-auto py-4" asChild>
-							<Link href="/hub/coach/feedback">
+							<Link href="/hub/coaching/feedback">
 								<div className="flex items-center gap-3 w-full">
 									<MessageSquarePlus className="w-5 h-5" />
 									<div className="text-left">
