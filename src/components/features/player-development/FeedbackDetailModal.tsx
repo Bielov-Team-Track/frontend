@@ -10,9 +10,10 @@ interface FeedbackDetailModalProps {
 	feedback: Feedback | null;
 	isOpen: boolean;
 	onClose: () => void;
+	perspective?: "player" | "coach";
 }
 
-export function FeedbackDetailModal({ feedback, isOpen, onClose }: FeedbackDetailModalProps) {
+export function FeedbackDetailModal({ feedback, isOpen, onClose, perspective = "player" }: FeedbackDetailModalProps) {
 	if (!feedback) return null;
 
 	const formattedDate = feedback.createdAt?.toLocaleDateString();
@@ -20,15 +21,22 @@ export function FeedbackDetailModal({ feedback, isOpen, onClose }: FeedbackDetai
 		? BADGE_METADATA[feedback.praise.badgeType as BadgeType]
 		: null;
 
+	const displayName = perspective === "player"
+		? (feedback.coachName || `User ${feedback.coachUserId.slice(0, 8)}`)
+		: (feedback.recipientName || `User ${feedback.recipientUserId.slice(0, 8)}`);
+	const displayImageUrl = perspective === "player"
+		? feedback.coachImageUrl
+		: feedback.recipientImageUrl;
+
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} size="lg">
 			<div className="space-y-6">
 				{/* Header */}
 				<div className="flex items-center gap-3">
-					<Avatar name={feedback.coachUserId} size="lg" />
+					<Avatar name={displayName} src={displayImageUrl} size="lg" variant="user" />
 					<div>
 						<h2 className="text-xl font-bold text-foreground">
-							Coach {feedback.coachUserId.slice(0, 8)}
+							{displayName}
 						</h2>
 						<p className="text-sm text-muted-foreground">{formattedDate}</p>
 					</div>

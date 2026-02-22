@@ -178,6 +178,7 @@ export default function CoachingFeedbackPage() {
 				feedback={selectedFeedback}
 				isOpen={!!selectedFeedback}
 				onClose={() => setSelectedFeedback(null)}
+				perspective="coach"
 			/>
 
 			{/* New Feedback: Player Selector -> Form Modal */}
