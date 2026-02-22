@@ -10,9 +10,10 @@ interface FeedbackCardProps {
 	feedback: Feedback;
 	viewMode: ViewMode;
 	onClick: () => void;
+	perspective?: "player" | "coach";
 }
 
-export function FeedbackCard({ feedback, viewMode, onClick }: FeedbackCardProps) {
+export function FeedbackCard({ feedback, viewMode, onClick, perspective = "player" }: FeedbackCardProps) {
 	const totalDrills = feedback.improvementPoints.reduce(
 		(sum, point) => sum + (point.attachedDrills?.length || 0),
 		0
@@ -23,6 +24,15 @@ export function FeedbackCard({ feedback, viewMode, onClick }: FeedbackCardProps)
 	const formattedDate = feedback.createdAt?.toLocaleDateString();
 	const eventLabel = feedback.eventId ? "Event Feedback" : "General Feedback";
 
+	// In player perspective, show coach info. In coach perspective, show recipient info.
+	const displayName = perspective === "player"
+		? (feedback.coachName || `User ${feedback.coachUserId.slice(0, 8)}`)
+		: (feedback.recipientName || `User ${feedback.recipientUserId.slice(0, 8)}`);
+
+	const displayImageUrl = perspective === "player"
+		? feedback.coachImageUrl
+		: feedback.recipientImageUrl;
+
 	const badgeName = feedback.praise?.badgeType
 		? BADGE_METADATA[feedback.praise.badgeType as BadgeType]?.name
 		: null;
@@ -32,11 +42,11 @@ export function FeedbackCard({ feedback, viewMode, onClick }: FeedbackCardProps)
 			<button
 				onClick={onClick}
 				className="w-full flex items-center gap-4 p-4 rounded-xl bg-surface/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all text-left">
-				<Avatar name={feedback.coachUserId} size="sm" />
+				<Avatar name={displayName} src={displayImageUrl} size="sm" variant="user" />
 
 				<div className="flex-1 min-w-0 flex items-center gap-4">
 					<div className="flex-1 min-w-0">
-						<h3 className="font-medium text-foreground truncate">Coach {feedback.coachUserId.slice(0, 8)}</h3>
+						<h3 className="font-medium text-foreground truncate">{displayName}</h3>
 						<p className="text-sm text-muted-foreground">{eventLabel}</p>
 					</div>
 
@@ -68,9 +78,9 @@ export function FeedbackCard({ feedback, viewMode, onClick }: FeedbackCardProps)
 			className="w-full text-left rounded-xl bg-surface/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all p-5 space-y-4">
 			{/* Header */}
 			<div className="flex items-start justify-between gap-3">
-				<Avatar name={feedback.coachUserId} size="md" />
+				<Avatar name={displayName} src={displayImageUrl} size="md" variant="user" />
 				<div className="flex-1 min-w-0">
-					<h3 className="font-semibold text-foreground">Coach {feedback.coachUserId.slice(0, 8)}</h3>
+					<h3 className="font-semibold text-foreground">{displayName}</h3>
 					<p className="text-sm text-muted-foreground">{formattedDate}</p>
 				</div>
 				{badgeName && (
