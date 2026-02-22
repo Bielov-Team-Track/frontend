@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { feedbackCoachApi } from "@/lib/api/feedback-coach";
 import { feedbackKeys } from "@/hooks/useFeedback";
 import type { CreateFeedbackRequest, UpdateFeedbackRequest } from "@/lib/models/Feedback";
@@ -82,6 +82,22 @@ export function useShareFeedback() {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: coachFeedbackKeys.all });
 			queryClient.invalidateQueries({ queryKey: feedbackKeys.all });
+		},
+	});
+}
+
+const PAGE_SIZE = 12;
+
+export function useMyGivenFeedbackInfinite(pageSize: number = PAGE_SIZE) {
+	return useInfiniteQuery({
+		queryKey: ["feedback-coach", "given", "infinite", pageSize],
+		queryFn: async ({ pageParam }) => {
+			return feedbackCoachApi.getMyGivenFeedback(pageParam, pageSize);
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, allPages) => {
+			const totalLoaded = allPages.reduce((sum, p) => sum + p.items.length, 0);
+			return totalLoaded < lastPage.totalCount ? allPages.length + 1 : undefined;
 		},
 	});
 }
