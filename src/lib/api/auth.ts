@@ -38,6 +38,14 @@ export async function login(
 	).data;
 }
 
+export async function impersonateUser(userId: string): Promise<AuthResponse> {
+	const endpoint = "/v1/auth/impersonate";
+
+	return (
+		await client.post<AuthResponse>(AUTH_PREFIX + endpoint, { userId })
+	).data;
+}
+
 export async function refreshToken(
 	refreshTokenValue: string
 ): Promise<AuthResponse> {
