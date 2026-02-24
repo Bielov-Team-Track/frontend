@@ -286,7 +286,7 @@ export interface UserSearchRequest extends SortRequest, CursorRequest, QueryRequ
 
 export async function searchUsers(request: UserSearchRequest): Promise<CursorPagedResult<UserProfile>> {
 	const params = new URLSearchParams();
-	if (request.query) params.append("Query", encodeURIComponent(request.query.trim()));
+	if (request.query) params.append("Query", request.query.trim());
 	if (request.teamId) params.append("TeamId", request.teamId);
 	if (request.groupId) params.append("GroupId", request.groupId);
 	if (request.sortBy) params.append("SortBy", request.sortBy);
