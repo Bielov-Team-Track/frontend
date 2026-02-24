@@ -1,6 +1,7 @@
 import { ThemeScript } from "@/components/ui/theme-script";
 import { AuthProvider, QueryProvider, ThemeProvider } from "@/providers";
 import { FeedbackButton } from "@/components/features/feedback";
+import { DevImpersonator } from "@/components/features/dev/DevImpersonator";
 import { inter } from "@/lib/fonts";
 import { Toaster } from "sonner";
 import type { Metadata } from "next";
@@ -21,6 +22,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 						<QueryProvider>
 							{children}
 							<FeedbackButton />
+							<DevImpersonator />
 							<Toaster position="top-center" richColors />
 						</QueryProvider>
 					</AuthProvider>
