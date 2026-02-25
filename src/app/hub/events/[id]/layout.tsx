@@ -1,21 +1,25 @@
 "use client";
 
 import { Button } from "@/components";
+import { Modal } from "@/components/ui";
 import { getMyParticipation, loadEvent, loadParticipants } from "@/lib/api/events";
 import { loadTeams } from "@/lib/api/teams";
-import { Event, EventType } from "@/lib/models/Event";
+import { Event, EventFormat, EventType } from "@/lib/models/Event";
 import { Unit } from "@/lib/models/EventPaymentConfig";
 import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { Team } from "@/lib/models/Team";
 import { useQuery } from "@tanstack/react-query";
-import { format, formatDistanceToNow } from "date-fns";
-import { ArrowLeft, Calendar, Check, Clock, ClipboardList, CreditCard, Edit, MapPin, MessageCircle, MoreHorizontal, Settings, Share2, Trash2, Users, X, XCircle } from "lucide-react";
+import { isPast } from "date-fns";
+import { ArrowLeft, Calendar, ClipboardList, CreditCard, Edit, MessageCircle, MoreHorizontal, Settings, Share2, Trash2, Users, XCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { createContext, useContext, useMemo, useState } from "react";
+import EventActionRow from "./components/EventActionRow";
 import EventContextBadge from "./components/EventContextBadge";
-import EventOrganizers from "./components/EventOrganizers";
+import EventInfoRows from "./components/EventInfoRows";
+import ParticipationStatusChips from "./components/ParticipationStatusChips";
+import { useEventActions } from "./hooks/useEventActions";
 
 // Context to share event data with child pages
 interface EventContextValue {
@@ -57,12 +61,10 @@ interface TabConfig {
 const TABS: TabConfig[] = [
 	{ id: "overview", label: "Overview", icon: Calendar, href: "" },
 	{ id: "teams", label: "Teams", icon: Users, href: "/teams", teamsOnly: true },
-	{ id: "members", label: "Members", icon: Users, href: "/members" },
-	{ id: "discussion", label: "Discussion", icon: MessageCircle, href: "/discussion" },
+	{ id: "members", label: "Participants", icon: Users, href: "/members" },
 	{ id: "training", label: "Training Plan", icon: ClipboardList, href: "/training", trainingOnly: true },
 	{ id: "evaluation", label: "Evaluation", icon: ClipboardList, href: "/evaluation-session/setup", evaluationOnly: true },
 	{ id: "payments", label: "Payments", icon: CreditCard, href: "/payments" },
-	{ id: "settings", label: "Settings", icon: Settings, href: "/settings" },
 ];
 
 export default function EventPrototypeLayout({ children }: { children: React.ReactNode }) {
@@ -139,7 +141,26 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 	const isFull = totalSpots > 0 && totalParticipants >= totalSpots;
 	// API may return status as string or enum value
 	const hasInvitation = myParticipation?.status === ParticipationStatus.Invited;
-	const isParticipant = myParticipation?.status === ParticipationStatus.Accepted;
+
+	const {
+		handleAcceptInvitation,
+		handleDeclineInvitation,
+		handleConfirmDecline,
+		handleCloseDeclineModal,
+		handleJoin,
+		handleJoinWaitlist,
+		showDeclineModal: showLayoutDeclineModal,
+		declineNote: layoutDeclineNote,
+		setDeclineNote: setLayoutDeclineNote,
+	} = useEventActions({
+		eventId,
+		onSuccess: () => refetchMyParticipation(),
+	});
+
+	const isParticipant =
+		myParticipation?.status === ParticipationStatus.Accepted ||
+		myParticipation?.status === ParticipationStatus.Attended;
+	const isWaitlisted = myParticipation?.status === ParticipationStatus.Waitlisted;
 
 	// Memoize context value to prevent unnecessary re-renders of consumers
 	// Must be before early returns to maintain hook order
@@ -219,6 +240,14 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 									{isAdmin && (
 										<>
 											<div className="border-t border-border my-1" />
+											<Link
+												href={`/hub/events/${eventId}/settings`}
+												className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3"
+												onClick={() => setShowAdminMenu(false)}
+											>
+												<Settings size={16} className="text-muted" />
+												Settings
+											</Link>
 											<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3" data-testid="edit-event-menu-item">
 												<Edit size={16} className="text-muted" />
 												Edit Event
@@ -239,106 +268,75 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 					</div>
 				</div>
 
-				{/* Event Banner with Overlaid Content */}
+				{/* Event Header Card */}
 				<div className="rounded-2xl overflow-hidden border border-border bg-surface">
-					{/* Banner with gradient overlay */}
-					<div className="h-48 md:h-56 relative bg-gradient-to-r from-accent/20 to-secondary/20 overflow-hidden">
+					{/* Slim Hero */}
+					<div className="h-[130px] lg:h-[150px] relative bg-gradient-to-r from-accent/20 to-secondary/20 overflow-hidden">
 						{event.imageUrl && !bannerError && (
-							<>
-								<Image src={event.imageUrl} alt="" fill className="object-cover" onError={() => setBannerError(true)} />
-							</>
+							<Image src={event.imageUrl} alt="" fill className="object-cover" onError={() => setBannerError(true)} />
 						)}
-						<div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-[var(--card)]/40 to-transparent" />
-						<div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
-							{/* Event type badge */}
-							<div className="flex items-center gap-2 mb-2">
-								<span className="px-2 py-0.5 rounded-lg bg-accent/20 text-accent border border-accent/20 text-xs font-bold uppercase" data-testid="event-type-badge">
+						<div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-[var(--card)]/60 to-transparent" />
+						<div className="absolute bottom-0 left-0 right-0 p-4 lg:p-5">
+							{/* Badges */}
+							<div className="flex items-center gap-2 mb-1.5 flex-wrap">
+								<span className="px-2 py-0.5 rounded-lg bg-accent/20 text-accent border border-accent/20 text-[10px] font-bold uppercase" data-testid="event-type-badge">
 									{event.type || "Event"}
 								</span>
 								{event.canceled && (
-									<span className="px-2 py-0.5 rounded-lg bg-destructive/20 text-destructive border border-destructive/30 text-xs font-bold uppercase" data-testid="event-canceled-badge">
+									<span className="px-2 py-0.5 rounded-lg bg-destructive/20 text-destructive border border-destructive/30 text-[10px] font-bold uppercase" data-testid="event-canceled-badge">
 										Canceled
 									</span>
 								)}
 								{isFull && !event.canceled && (
-									<span className="px-2 py-0.5 rounded-lg bg-warning/20 text-warning border border-warning/30 text-xs font-bold uppercase" data-testid="event-full-badge">
+									<span className="px-2 py-0.5 rounded-lg bg-destructive/20 text-destructive border border-destructive/30 text-[10px] font-bold uppercase" data-testid="event-full-badge">
 										Full
 									</span>
 								)}
-								<EventContextBadge contextId={event.contextId} contextType={event.contextType} />
-							</div>
-							{/* Event name */}
-							<h2 className="text-xl md:text-2xl font-bold text-white mb-2">{event.name}</h2>
-							{/* Date & time */}
-							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-								<span className="flex items-center gap-1.5">
-									<Calendar size={14} className="text-accent" />
-									<span className="text-white font-medium">{format(startDate, "EEE, MMM d")}</span>
-									<span className="text-warning font-semibold">· {formatDistanceToNow(startDate, { addSuffix: true })}</span>
-								</span>
-								<span className="flex items-center gap-1.5">
-									<Clock size={14} className="text-accent" />
-									{format(startDate, "HH:mm")} - {format(new Date(event.endTime), "HH:mm")}
-								</span>
-							</div>
-							{/* Location & host */}
-							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground mt-1.5">
-								{event.location?.address && (
-									<span className="flex items-center gap-1.5">
-										<MapPin size={14} className="text-accent" />
-										<span className="text-white">{event.location.address}</span>
+								{isPast(startDate) && !event.canceled && (
+									<span className="px-2 py-0.5 rounded-lg bg-warning/20 text-warning border border-warning/30 text-[10px] font-bold uppercase">
+										Started
 									</span>
 								)}
-								<EventOrganizers participants={participants} />
 							</div>
+							{/* Title */}
+							<h2 className="text-lg lg:text-xl font-bold text-white mb-0.5" data-testid="event-hero-title">{event.name}</h2>
+							{/* Club context as subtitle */}
+							<EventContextBadge contextId={event.contextId} contextType={event.contextType} compact />
 						</div>
 					</div>
 
-					{/* Stats Bar with context-aware CTA */}
-					<div className="px-5 py-3 flex items-center justify-between border-t border-border">
-						{/* Left: stats */}
-						<div className="flex items-center gap-4 text-sm">
-							<div className="flex items-center gap-1.5">
-								<Users size={14} className="text-muted-foreground" />
-								<span className="font-semibold text-white" data-testid="event-players-count">
-									{totalParticipants}
-									{totalSpots > 0 ? `/${totalSpots}` : ""} Players
-								</span>
-								{totalSpots > 0 && totalParticipants < totalSpots && (
-									<span className="text-xs text-green-500 font-medium">({totalSpots - totalParticipants} spots left)</span>
-								)}
-							</div>
-							<span className="text-muted-foreground">{teams.length} Teams</span>
-							<span className="font-bold text-accent" data-testid="event-price-display">{event.paymentConfig ? `£${event.paymentConfig.cost}` : "Free"}</span>
+					{/* Info Rows */}
+					<EventInfoRows event={event} participants={participants} />
+
+					{/* Combined Status + Action Bar */}
+					<div className="flex flex-col lg:flex-row lg:items-center border-t border-border bg-primary/[0.02]">
+						{/* Status chips — padding lives inside ParticipationStatusChips so that when it returns null no empty space renders */}
+						<div className="lg:flex-1">
+							<ParticipationStatusChips participants={participants} />
 						</div>
-						{/* Right: context-aware CTA - hidden on mobile (StickyBottomBar handles mobile) */}
-						<div className="hidden lg:flex items-center gap-2">
-							{hasInvitation && (
-								<>
-									<Button variant="outline" color="neutral" size="sm" leftIcon={<X size={14} />} data-testid="decline-invitation-button">
-										Decline
-									</Button>
-									<Button color="primary" size="sm" leftIcon={<Check size={14} />} data-testid="accept-invitation-button">
-										Accept
-									</Button>
-								</>
-							)}
-							{isOpen && !isFull && !hasInvitation && !isParticipant && <Button color="primary" size="sm" data-testid="join-event-button">Join Event</Button>}
-							{isOpen && isFull && !hasInvitation && !isParticipant && (
-								<Button variant="outline" color="primary" size="sm" data-testid="join-waitlist-button">
-									Join Waitlist
-								</Button>
-							)}
-						</div>
+						{/* Action row */}
+						<EventActionRow
+							paymentConfig={event.paymentConfig}
+							isOpen={isOpen}
+							isFull={isFull}
+							hasInvitation={hasInvitation}
+							isParticipant={isParticipant}
+							isWaitlisted={isWaitlisted}
+							canceled={event.canceled ?? false}
+							onAccept={handleAcceptInvitation}
+							onDecline={() => handleDeclineInvitation()}
+							onJoin={handleJoin}
+							onJoinWaitlist={handleJoinWaitlist}
+						/>
 					</div>
 
 					{/* Tabs */}
-					<div className="border-t border-border overflow-x-auto">
-						<div className="flex gap-1 px-6">
+					<div className="border-t border-border overflow-x-auto" role="tablist">
+						<div className="flex gap-1 px-5 lg:px-6">
 							{TABS.filter((tab) => {
 								if (tab.trainingOnly && event.type !== EventType.TrainingSession) return false;
 								if (tab.evaluationOnly && event.type !== EventType.Evaluation && event.type !== EventType.Trial) return false;
-								if (tab.teamsOnly && event.registrationUnit === Unit.Individual) return false;
+								if (tab.teamsOnly && (event.registrationUnit === Unit.Individual || event.eventFormat === EventFormat.List)) return false;
 								return true;
 							}).map((tab) => {
 								const count = getTabCount(tab.id);
@@ -347,6 +345,8 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 									<Link
 										key={tab.id}
 										href={getTabHref(tab.id)}
+										role="tab"
+										aria-selected={isActive}
 										data-testid={`event-tab-${tab.id}`}
 										prefetch={true}
 										className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap shrink-0 ${
@@ -361,6 +361,31 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 						</div>
 					</div>
 				</div>
+
+				{/* Decline Invitation Modal (for desktop Decline button in EventActionRow) */}
+				<Modal
+					isOpen={showLayoutDeclineModal}
+					onClose={handleCloseDeclineModal}
+					title="Decline Invitation"
+					data-testid="layout-decline-invitation-modal"
+					description="Let the organizers know why you can't make it (optional)."
+					size="sm">
+					<textarea
+						value={layoutDeclineNote}
+						onChange={(e) => setLayoutDeclineNote(e.target.value)}
+						placeholder="Add a note..."
+						data-testid="layout-decline-note-input"
+						className="w-full h-24 px-4 py-3 rounded-xl bg-background border border-border text-white placeholder:text-muted/50 focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none"
+					/>
+					<div className="flex justify-end gap-3 mt-4">
+						<Button variant="ghost" color="neutral" onClick={handleCloseDeclineModal}>
+							Cancel
+						</Button>
+						<Button variant="destructive" onClick={handleConfirmDecline} data-testid="layout-confirm-decline-button">
+							Decline Invitation
+						</Button>
+					</div>
+				</Modal>
 
 				{/* Tab Content */}
 				<div className="min-h-100 pb-20 lg:pb-0">{children}</div>
