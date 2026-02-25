@@ -3,15 +3,18 @@
 import { SettingsAlert, SettingsCard, SettingsHeader } from "@/components/layout/settings-layout";
 import { Input, Select, TextArea } from "@/components/ui";
 import { updateTeam } from "@/lib/api/clubs";
-import { SkillLevel, UpdateTeamRequest } from "@/lib/models/Club";
+import { SkillLevel, UpdateTeamRequest, Visibility } from "@/lib/models/Club";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTeamContext } from "../../layout";
+
+type VisibilityOption = "default" | "Public" | "Private";
 
 interface FormValues {
 	name: string;
 	description: string;
 	skillLevel: string;
+	visibilityOption: VisibilityOption;
 }
 
 const skillLevelOptions = [
@@ -20,7 +23,7 @@ const skillLevelOptions = [
 ];
 
 export default function TeamGeneralSettingsPage() {
-	const { team } = useTeamContext();
+	const { team, permissions } = useTeamContext();
 	const queryClient = useQueryClient();
 
 	const {
@@ -33,6 +36,7 @@ export default function TeamGeneralSettingsPage() {
 					name: team.name,
 					description: team.description || "",
 					skillLevel: team.skillLevel || "",
+					visibilityOption: team.visibility ? (team.visibility as VisibilityOption) : "default",
 			  }
 			: undefined,
 	});
@@ -44,6 +48,13 @@ export default function TeamGeneralSettingsPage() {
 				description: data.description.trim() || undefined,
 				skillLevel: data.skillLevel || undefined,
 			};
+			if (permissions.canChangeVisibility) {
+				if (data.visibilityOption === "default") {
+					request.resetVisibilityToDefault = true;
+				} else {
+					request.visibility = data.visibilityOption as Visibility;
+				}
+			}
 			return updateTeam(team!.id, request);
 		},
 		onSuccess: () => {
@@ -87,11 +98,24 @@ export default function TeamGeneralSettingsPage() {
 
 			<SettingsCard title="Team Level">
 				<Select
-					{...register("skillLevel")}
+					{...(register("skillLevel") as any)}
 					label="Skill Level"
 					options={skillLevelOptions}
 				/>
 			</SettingsCard>
+
+			{permissions.canChangeVisibility && (
+				<SettingsCard title="Visibility">
+					<p className="text-sm text-muted mb-3">Control who can see this team within the club.</p>
+					<select
+						{...register("visibilityOption")}
+						className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-foreground focus:outline-hidden focus:border-accent">
+						<option value="default">Use club default</option>
+						<option value="Public">Public — visible to all club members</option>
+						<option value="Private">Private — visible to team members only</option>
+					</select>
+				</SettingsCard>
+			)}
 		</form>
 	);
 }

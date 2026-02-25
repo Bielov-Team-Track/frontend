@@ -264,6 +264,7 @@ export interface CreateTeamRequest {
 	description?: string;
 	logoUrl?: string;
 	skillLevel?: string;
+	visibility?: Visibility;
 }
 
 export interface UpdateTeamRequest {
@@ -271,6 +272,8 @@ export interface UpdateTeamRequest {
 	description?: string;
 	logoUrl?: string;
 	skillLevel?: string;
+	visibility?: Visibility;
+	resetVisibilityToDefault?: boolean;
 }
 
 export interface RestrictedGroupMember {
@@ -320,6 +323,7 @@ export interface CreateGroupRequest {
 	color?: string;
 	logoUrl?: string;
 	skillLevel?: string;
+	visibility?: Visibility;
 }
 
 export interface UpdateGroupRequest {
@@ -328,6 +332,8 @@ export interface UpdateGroupRequest {
 	color?: string;
 	logoUrl?: string;
 	skillLevel?: string;
+	visibility?: Visibility;
+	resetVisibilityToDefault?: boolean;
 }
 // Invitation types
 export enum InvitationStatus {
@@ -551,6 +557,8 @@ export interface UpdateClubSettingsRequest {
 	pendingMessage?: string;
 	waitlistMessage?: string;
 	declinedMessage?: string;
+	defaultTeamVisibility?: Visibility;
+	defaultGroupVisibility?: Visibility;
 }
 
 // Invitation preview (public endpoint response)

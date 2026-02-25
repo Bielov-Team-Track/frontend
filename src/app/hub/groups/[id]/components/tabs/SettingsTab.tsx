@@ -2,7 +2,8 @@
 
 import { Button, ColorPicker, DEFAULT_PRESET_COLORS, Input, Select, TextArea } from "@/components";
 import { deleteGroup, updateGroup } from "@/lib/api/clubs";
-import { Group, SkillLevel, UpdateGroupRequest } from "@/lib/models/Club";
+import { Group, SkillLevel, UpdateGroupRequest, Visibility } from "@/lib/models/Club";
+import { GroupPermissions } from "@/hooks/useGroupPermissions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Save } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -11,9 +12,10 @@ import { useState } from "react";
 interface SettingsTabProps {
 	group: Group;
 	clubId: string;
+	permissions?: GroupPermissions;
 }
 
-export default function SettingsTab({ group, clubId }: SettingsTabProps) {
+export default function SettingsTab({ group, clubId, permissions }: SettingsTabProps) {
 	const queryClient = useQueryClient();
 	const router = useRouter();
 
@@ -39,7 +41,7 @@ export default function SettingsTab({ group, clubId }: SettingsTabProps) {
 			{/* General Settings */}
 			<div className="space-y-6">
 				<h3 className="text-lg font-bold text-white">Group Settings</h3>
-				<GroupSettingsForm group={group} onSubmit={(data) => updateMutation.mutate(data)} isLoading={updateMutation.isPending} />
+				<GroupSettingsForm group={group} onSubmit={(data) => updateMutation.mutate(data)} isLoading={updateMutation.isPending} canChangeVisibility={permissions?.canChangeVisibility ?? false} />
 			</div>
 
 			{/* Danger Zone */}
@@ -61,22 +63,33 @@ export default function SettingsTab({ group, clubId }: SettingsTabProps) {
 	);
 }
 
-function GroupSettingsForm({ group, onSubmit, isLoading }: { group: Group; onSubmit: (data: UpdateGroupRequest) => void; isLoading: boolean }) {
+type VisibilityOption = "default" | "Public" | "Private";
+
+function GroupSettingsForm({ group, onSubmit, isLoading, canChangeVisibility }: { group: Group; onSubmit: (data: UpdateGroupRequest) => void; isLoading: boolean; canChangeVisibility: boolean }) {
 	const [name, setName] = useState(group.name);
 	const [description, setDescription] = useState(group.description || "");
 	const [color, setColor] = useState(group.color);
 	const [skillLevel, setSkillLevel] = useState<string>(group.skillLevel || "");
+	const [visibilityOption, setVisibilityOption] = useState<VisibilityOption>(group.visibility ? (group.visibility as VisibilityOption) : "default");
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!name.trim()) return;
 
-		onSubmit({
+		const request: UpdateGroupRequest = {
 			name: name.trim(),
 			description: description.trim() || undefined,
 			color,
 			skillLevel: skillLevel || undefined,
-		});
+		};
+		if (canChangeVisibility) {
+			if (visibilityOption === "default") {
+				request.resetVisibilityToDefault = true;
+			} else {
+				request.visibility = visibilityOption as Visibility;
+			}
+		}
+		onSubmit(request);
 	};
 
 	return (
@@ -101,6 +114,20 @@ function GroupSettingsForm({ group, onSubmit, isLoading }: { group: Group; onSub
 					/>
 
 					<ColorPicker label="Color Theme" value={color} onChange={setColor} presetColors={DEFAULT_PRESET_COLORS} />
+
+					{canChangeVisibility && (
+						<div>
+							<label className="block text-sm font-medium text-foreground mb-2">Visibility</label>
+							<select
+								value={visibilityOption}
+								onChange={(e) => setVisibilityOption(e.target.value as VisibilityOption)}
+								className="w-full px-4 py-3 rounded-xl bg-input border border-border text-foreground focus:outline-hidden focus:border-accent">
+								<option value="default">Use club default</option>
+								<option value="Public">Public — visible to all club members</option>
+								<option value="Private">Private — members only</option>
+							</select>
+						</div>
+					)}
 				</div>
 			</div>
 			<div className="flex justify-end pt-4 border-t border-border">

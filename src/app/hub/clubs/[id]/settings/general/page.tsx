@@ -4,12 +4,12 @@ import SocialLinksEditor from "@/components/features/clubs/settings/SocialLinksE
 import { VenueForm, VenueFormData, VenueList } from "@/components/features/venues";
 import { SettingsAlert, SettingsCard, SettingsHeader } from "@/components/layout/settings-layout";
 import { Button, EmptyState, ImageCropper, Input, Loader, Modal, TextArea } from "@/components/ui";
-import { createVenue, deleteVenue, getClub, updateClub, updateClubSocialLinks, uploadClubImage } from "@/lib/api/clubs";
-import { SocialPlatform } from "@/lib/models/Club";
+import { createVenue, deleteVenue, getClub, updateClub, updateClubSettings, uploadClubImage } from "@/lib/api/clubs";
+import { SocialPlatform, Visibility } from "@/lib/models/Club";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Building, Camera, ImageIcon, Plus, Shield } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 interface FormValues {
@@ -33,6 +33,20 @@ export default function ClubGeneralSettingsPage() {
 	});
 
 	const [addVenueModalOpen, setAddVenueModalOpen] = useState(false);
+
+	// Visibility defaults (managed via ClubSettings)
+	const [defaultTeamVisibility, setDefaultTeamVisibility] = useState<Visibility>(club?.settings?.defaultTeamVisibility ?? "Public");
+	const [defaultGroupVisibility, setDefaultGroupVisibility] = useState<Visibility>(club?.settings?.defaultGroupVisibility ?? "Private");
+	const [visibilityDirty, setVisibilityDirty] = useState(false);
+
+	// Sync visibility state when club data loads
+	useEffect(() => {
+		if (club?.settings) {
+			setDefaultTeamVisibility(club.settings.defaultTeamVisibility);
+			setDefaultGroupVisibility(club.settings.defaultGroupVisibility);
+			setVisibilityDirty(false);
+		}
+	}, [club?.settings]);
 
 	// Image state
 	const [logoBlob, setLogoBlob] = useState<Blob | null>(null);
@@ -89,12 +103,6 @@ export default function ClubGeneralSettingsPage() {
 				bannerThumbHash = result.thumbHash;
 			}
 
-			// Update social links
-			await updateClubSocialLinks(
-				club.id,
-				data.socialLinks.map((l, i) => ({ ...l, orderIndex: i }))
-			);
-
 			return updateClub(club.id, {
 				name: data.name,
 				description: data.description || undefined,
@@ -112,6 +120,18 @@ export default function ClubGeneralSettingsPage() {
 			queryClient.invalidateQueries({ queryKey: ["club", clubId] });
 			setLogoBlob(null);
 			setBannerBlob(null);
+		},
+	});
+
+	const visibilityMutation = useMutation({
+		mutationFn: () =>
+			updateClubSettings(clubId, {
+				defaultTeamVisibility,
+				defaultGroupVisibility,
+			}),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["club", clubId] });
+			setVisibilityDirty(false);
 		},
 	});
 
@@ -295,6 +315,53 @@ export default function ClubGeneralSettingsPage() {
 						<p className="text-xs text-muted">Anyone can find the club through the search or public link</p>
 					</div>
 				</div>
+			</SettingsCard>
+
+			{/* Default Visibility for Teams & Groups */}
+			<SettingsCard title="Default Visibility">
+				<p className="text-sm text-muted mb-4">
+					Set the default visibility for new teams and groups. Individual teams/groups can override this.
+				</p>
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					<div>
+						<label className="block text-sm font-medium text-foreground mb-2">Default Team Visibility</label>
+						<select
+							value={defaultTeamVisibility}
+							onChange={(e) => {
+								setDefaultTeamVisibility(e.target.value as Visibility);
+								setVisibilityDirty(true);
+							}}
+							className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-foreground focus:outline-hidden focus:border-accent">
+							<option value="Public">Public — visible to all club members</option>
+							<option value="Private">Private — visible to team members only</option>
+						</select>
+					</div>
+					<div>
+						<label className="block text-sm font-medium text-foreground mb-2">Default Group Visibility</label>
+						<select
+							value={defaultGroupVisibility}
+							onChange={(e) => {
+								setDefaultGroupVisibility(e.target.value as Visibility);
+								setVisibilityDirty(true);
+							}}
+							className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-foreground focus:outline-hidden focus:border-accent">
+							<option value="Public">Public — visible to all club members</option>
+							<option value="Private">Private — members only</option>
+						</select>
+					</div>
+				</div>
+				{visibilityDirty && (
+					<div className="flex justify-end mt-4">
+						<Button
+							type="button"
+							variant="default"
+							color="accent"
+							onClick={() => visibilityMutation.mutate()}
+							loading={visibilityMutation.isPending}>
+							Save Visibility Defaults
+						</Button>
+					</div>
+				)}
 			</SettingsCard>
 
 			{/* Image Cropper Modal */}
