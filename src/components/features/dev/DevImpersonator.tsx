@@ -14,9 +14,21 @@ import signalRManager from "@/lib/realtime/signalrClient";
 const ADMIN_EMAIL = "denys.bielov@gmail.com";
 const ADMIN_REFRESH_TOKEN_KEY = "dev_impersonation_admin_refresh_token";
 
+function getEmailFromJwt(): string | null {
+	const token = getCookie("token");
+	if (!token) return null;
+	try {
+		const payload = JSON.parse(atob(token.split(".")[1]));
+		return payload.email ?? null;
+	} catch {
+		return null;
+	}
+}
+
 export function DevImpersonator() {
 	const { userProfile, loginFromTokens } = useAuth();
 	const queryClient = useQueryClient();
+	const [mounted, setMounted] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState("");
 	const [results, setResults] = useState<UserProfile[]>([]);
@@ -25,13 +37,15 @@ export function DevImpersonator() {
 	const panelRef = useRef<HTMLDivElement>(null);
 	const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
+	useEffect(() => setMounted(true), []);
+
 	const isEnabled =
+		mounted &&
 		process.env.NEXT_PUBLIC_ENABLE_IMPERSONATION === "true" &&
-		userProfile?.email === ADMIN_EMAIL;
+		getEmailFromJwt() === ADMIN_EMAIL;
 
 	const hasStoredOriginal =
-		typeof window !== "undefined" &&
-		!!sessionStorage.getItem(ADMIN_REFRESH_TOKEN_KEY);
+		mounted && !!sessionStorage.getItem(ADMIN_REFRESH_TOKEN_KEY);
 
 	const isCurrentlyImpersonating =
 		process.env.NEXT_PUBLIC_ENABLE_IMPERSONATION === "true" &&
