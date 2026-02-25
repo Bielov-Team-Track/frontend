@@ -46,8 +46,38 @@ export default function StickyBottomBar({
 	// Check if user is already a participant (includes past events where user attended)
 	const isParticipant = myParticipation?.status === ParticipationStatus.Accepted || myParticipation?.status === ParticipationStatus.Attended;
 
-	// Don't render if user is already a participant, event is full, or event is closed
-	if (isParticipant || (isFull && !hasInvitation) || (!isOpen && !hasInvitation)) {
+	// Don't render if event is full (and no invitation), or event is closed (and no invitation/participation)
+	if ((isFull && !hasInvitation && !isParticipant) || (!isOpen && !hasInvitation && !isParticipant)) {
+		return null;
+	}
+
+	// Variant 0: Already accepted — show joined status with option to decline
+	if (isParticipant && isOpen) {
+		return (
+			<div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]" data-testid="sticky-bottom-bar">
+				<div className="flex items-center gap-3">
+					<div className="flex-1 min-w-0 pl-1">
+						<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-info/10 text-info border border-info/20">
+							<Check className="size-3.5" />
+							Joined
+						</span>
+					</div>
+					<Button
+						variant="outline"
+						color="error"
+						size="sm"
+						onClick={onDecline}
+						leftIcon={<X className="size-3.5" />}
+						data-testid="sticky-withdraw-button">
+						Decline
+					</Button>
+				</div>
+			</div>
+		);
+	}
+
+	// Don't render for participants when event is not open
+	if (isParticipant) {
 		return null;
 	}
 

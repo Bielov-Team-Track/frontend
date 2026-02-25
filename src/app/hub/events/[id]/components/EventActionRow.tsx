@@ -49,12 +49,27 @@ export default function EventActionRow({
 
 			<div className="flex-1" />
 
-			{/* Joined badge — always visible as status indicator on all screen sizes */}
+			{/* Joined badge + Decline option — shown when user has accepted/attended */}
 			{showJoinedBadge && (
-				<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-info/10 text-info border border-info/20">
-					<Check size={12} />
-					Joined
-				</span>
+				<>
+					<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-info/10 text-info border border-info/20">
+						<Check size={12} />
+						Joined
+					</span>
+					{isOpen && !canceled && (
+						<Button
+							variant="ghost"
+							color="error"
+							size="sm"
+							leftIcon={<X size={14} />}
+							onClick={onDecline}
+							aria-label="Change decision — decline"
+							data-testid="desktop-withdraw-button"
+						>
+							Decline
+						</Button>
+					)}
+				</>
 			)}
 
 			{/* Waitlisted badge — shown when user is already on the waitlist */}
