@@ -1,14 +1,16 @@
 "use client";
 
 import { getClub, getClubMembers, getTeam } from "@/lib/api/clubs";
-import { ClubMember, Team } from "@/lib/models/Club";
-import { Club } from "@/lib/models/Club";
+import { Club, ClubMember, Team, Visibility } from "@/lib/models/Club";
 import { useQuery } from "@tanstack/react-query";
 import { ScrollableTabBar } from "@/components";
-import { ArrowLeft, Calendar, LayoutGrid, MessageSquare, Settings, Users } from "lucide-react";
+import { ArrowLeft, Calendar, Info, LayoutGrid, Lock, MessageSquare, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
+import { useAuth } from "@/providers/AuthProvider";
+import { useRoleSummary } from "@/hooks/useRoleSummary";
+import { useTeamPermissions, TeamPermissions } from "@/hooks/useTeamPermissions";
 
 // Context to share team data with child pages
 interface TeamContextValue {
@@ -17,6 +19,8 @@ interface TeamContextValue {
 	club: Club | undefined;
 	clubMembers: ClubMember[];
 	isLoading: boolean;
+	permissions: TeamPermissions;
+	effectiveVisibility: Visibility;
 }
 
 const TeamContext = createContext<TeamContextValue | null>(null);
@@ -31,7 +35,7 @@ export function useTeamContext() {
 
 type TabType = "events" | "posts" | "members" | "roster" | "settings";
 
-const TABS: { id: TabType; label: string; icon: typeof Calendar; showCount?: boolean }[] = [
+const ALL_TABS: { id: TabType; label: string; icon: typeof Calendar; showCount?: boolean }[] = [
 	{ id: "events", label: "Events", icon: Calendar },
 	{ id: "posts", label: "Posts", icon: MessageSquare },
 	{ id: "members", label: "Members", icon: Users, showCount: true },
@@ -45,6 +49,9 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 	const teamId = params.id as string;
 
 	const [logoError, setLogoError] = useState(false);
+
+	const { userProfile } = useAuth();
+	const { data: roleSummary } = useRoleSummary(!!userProfile);
 
 	// Determine active tab from pathname
 	const getActiveTab = (): TabType => {
@@ -74,6 +81,36 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 		queryFn: () => getClubMembers(team!.clubId),
 		enabled: !!team?.clubId,
 	});
+
+	// Resolve roles for permission computation
+	const teamRoles = useMemo(
+		() => roleSummary?.teams.find((t) => t.teamId === teamId)?.roles ?? [],
+		[roleSummary, teamId]
+	);
+
+	const clubRoles = useMemo(
+		() => (team?.clubId ? (roleSummary?.clubs.find((c) => c.clubId === team.clubId)?.roles ?? []) : []),
+		[roleSummary, team?.clubId]
+	);
+
+	// A user is a team member if they appear in the role summary teams list for this team
+	const isTeamMember = useMemo(
+		() => roleSummary?.teams.some((t) => t.teamId === teamId) ?? false,
+		[roleSummary, teamId]
+	);
+
+	const effectiveVisibility: Visibility = team?.effectiveVisibility ?? "Public";
+
+	const permissions = useTeamPermissions(teamRoles, clubRoles, isTeamMember, effectiveVisibility);
+
+	// Filter tabs based on permissions
+	const visibleTabs = useMemo(() => {
+		if (permissions.canViewFullContent) {
+			return ALL_TABS.filter((tab) => tab.id !== "settings" || permissions.canEditTeam);
+		}
+		// Restricted view: only members tab
+		return ALL_TABS.filter((tab) => tab.id === "members");
+	}, [permissions]);
 
 	// Get tab href
 	const getTabHref = (tabId: TabType): string => {
@@ -111,6 +148,8 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 				club,
 				clubMembers,
 				isLoading: teamLoading,
+				permissions,
+				effectiveVisibility,
 			}}>
 			<div className="space-y-6">
 				{/* Header */}
@@ -122,6 +161,12 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 						<div className="flex items-center gap-3">
 							<h1 className="text-2xl font-bold text-foreground">{team.name}</h1>
 							{team.skillLevel && <span className="px-2 py-0.5 rounded text-xs font-medium bg-hover text-muted">{team.skillLevel}</span>}
+							{effectiveVisibility === "Private" && (
+								<span className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-hover text-muted">
+									<Lock size={10} />
+									Private
+								</span>
+							)}
 						</div>
 						<div className="flex items-center gap-2 text-sm text-muted">
 							<span>Team</span>
@@ -132,6 +177,14 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 						</div>
 					</div>
 				</div>
+
+				{/* Private team banner for restricted users */}
+				{!permissions.canViewFullContent && effectiveVisibility === "Private" && (
+					<div className="flex items-start gap-3 px-4 py-3 rounded-xl border border-border bg-surface text-sm text-muted">
+						<Info size={16} className="mt-0.5 shrink-0 text-accent" />
+						<span>This team is private. Join to access posts, events, and more.</span>
+					</div>
+				)}
 
 				{/* Team Banner/Info */}
 				<div className="rounded-2xl overflow-hidden border border-border bg-surface">
@@ -161,7 +214,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 						{/* Quick Stats */}
 						<div className="flex gap-6">
 							<div className="text-center">
-								<div className="text-2xl font-bold text-foreground">{team.members?.length || 0}</div>
+								<div className="text-2xl font-bold text-foreground">{team.memberCount ?? team.members?.length ?? 0}</div>
 								<div className="text-xs text-muted">Players</div>
 							</div>
 						</div>
@@ -169,8 +222,8 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
 
 					{/* Tabs */}
 					<ScrollableTabBar>
-						{TABS.map((tab) => {
-							const count = tab.showCount ? team.members?.length || 0 : undefined;
+						{visibleTabs.map((tab) => {
+							const count = tab.showCount ? (team.memberCount ?? team.members?.length ?? 0) : undefined;
 							const isActive = activeTab === tab.id;
 							return (
 								<Link
