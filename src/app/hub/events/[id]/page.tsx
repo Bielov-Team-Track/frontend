@@ -4,7 +4,8 @@ import { Button } from "@/components";
 import EventCommentsSection from "@/components/features/comments/components/EventCommentsSection";
 import { Modal } from "@/components/ui";
 import { EventType } from "@/lib/models/Event";
-import { ClipboardCheck, CreditCard, MapPin } from "lucide-react";
+import { isPast } from "date-fns";
+import { CalendarOff, ClipboardCheck, CreditCard, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { InvitationSidebarCard } from "./components/InvitationResponseVariants";
@@ -64,8 +65,18 @@ export default function EventOverviewPage() {
 	// Check if this is a Trial or Evaluation event
 	const isTrialOrEvaluation = event.type === EventType.Trial || event.type === EventType.Evaluation;
 
+	const eventHasPassed = isPast(new Date(event.startTime));
+
 	return (
 		<>
+			{/* Past event notice */}
+			{eventHasPassed && (
+				<div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-warning/10 border border-warning/20 text-warning text-sm">
+					<CalendarOff size={18} className="shrink-0" />
+					This event has passed.
+				</div>
+			)}
+
 			{/*
 				Grid layout with CSS-based responsive positioning:
 				- Mobile: sidebar appears first (order-1), main content second (order-2)
