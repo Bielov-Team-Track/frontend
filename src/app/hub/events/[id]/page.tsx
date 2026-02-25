@@ -3,16 +3,14 @@
 import { Button } from "@/components";
 import EventCommentsSection from "@/components/features/comments/components/EventCommentsSection";
 import { Modal } from "@/components/ui";
-import { respondToInvitation } from "@/lib/api/events";
 import { EventType } from "@/lib/models/Event";
-import { useMutation } from "@tanstack/react-query";
 import { ClipboardCheck, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useCallback, useState } from "react";
 import { InvitationSidebarCard } from "./components/InvitationResponseVariants";
 import StickyBottomBar from "./components/StickyBottomBar";
 import WhosComingSection from "./components/WhosComingSection";
+import { useEventActions } from "./hooks/useEventActions";
 import { useEventContext } from "./layout";
 
 // Lazy load Map component - it's below the fold and heavy
@@ -26,41 +24,20 @@ const Map = dynamic(() => import("@/components/features/locations").then((mod) =
 // =============================================================================
 export default function EventOverviewPage() {
 	const { event, teams, hasInvitation, myParticipation, refetchMyParticipation, isAdmin, participants, eventId, isOpen, isFull } = useEventContext();
-	const [showDeclineModal, setShowDeclineModal] = useState(false);
-	const [declineNote, setDeclineNote] = useState("");
 
-	const respondMutation = useMutation({
-		mutationFn: ({ accept, note }: { accept: boolean; note?: string }) =>
-			respondToInvitation(event!.id!, accept, note),
-		onSuccess: () => {
-			refetchMyParticipation();
-		},
-		onError: (error) => {
-			console.error("Failed to respond to invitation:", error);
-		},
+	const {
+		handleAcceptInvitation,
+		handleDeclineInvitation,
+		handleConfirmDecline,
+		handleCloseDeclineModal: handleCloseModal,
+		handleJoin,
+		showDeclineModal,
+		declineNote,
+		setDeclineNote,
+	} = useEventActions({
+		eventId: event?.id ?? eventId,
+		onSuccess: refetchMyParticipation,
 	});
-
-	const handleAcceptInvitation = useCallback(() => {
-		respondMutation.mutate({ accept: true });
-	}, [respondMutation]);
-
-	const handleDeclineInvitation = useCallback((note?: string) => {
-		if (note !== undefined) {
-			// Direct decline with note
-			respondMutation.mutate({ accept: false, note });
-		} else {
-			// Show modal for note input
-			setShowDeclineModal(true);
-		}
-	}, [respondMutation]);
-
-	const handleConfirmDecline = useCallback(() => {
-		respondMutation.mutate({ accept: false, note: declineNote || undefined });
-		setShowDeclineModal(false);
-		setDeclineNote("");
-	}, [declineNote, respondMutation]);
-
-	const handleCloseModal = useCallback(() => setShowDeclineModal(false), []);
 
 	// Get the inviter's name from the participation record
 	const inviterName = myParticipation?.invitedByUser
@@ -185,6 +162,7 @@ export default function EventOverviewPage() {
 			hasInvitation={hasInvitation}
 			onAccept={handleAcceptInvitation}
 			onDecline={() => handleDeclineInvitation()}
+			onJoin={handleJoin}
 		/>
 
 		{/* Decline Invitation Modal */}
