@@ -6,8 +6,6 @@ interface ParticipationStatusChipsProps {
 	participants: EventParticipant[];
 }
 
-const RESOLVED_STATUSES = new Set([ParticipationStatus.Accepted, ParticipationStatus.Attended]);
-
 const statusConfig = [
 	{
 		status: ParticipationStatus.Invited,
@@ -52,10 +50,6 @@ export default function ParticipationStatusChips({ participants }: Participation
 		.filter((item) => item.count > 0);
 
 	if (counts.length === 0) return null;
-
-	// Hide chips when only "resolved" statuses (Accepted, Attended) are present.
-	const allResolved = counts.every((item) => RESOLVED_STATUSES.has(item.status));
-	if (allResolved) return null;
 
 	return (
 		<div className="flex items-center gap-2 flex-wrap px-5 py-2.5 lg:py-0" aria-label="Participation status summary" data-testid="participation-status-chips">
