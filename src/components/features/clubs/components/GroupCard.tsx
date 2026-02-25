@@ -2,7 +2,7 @@
 
 import { Avatar } from "@/components/ui";
 import { Group } from "@/lib/models/Club";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Lock, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 interface GroupCardProps {
@@ -21,7 +21,15 @@ export default function GroupCard({ group, onEdit, onDelete }: GroupCardProps) {
 			<div className="flex items-center gap-3 mb-3">
 				<Avatar size={"md"} variant="group" color={groupColor} />
 				<div className="flex-1 min-w-0">
-					<h4 className="font-bold text-foreground truncate">{group.name}</h4>
+					<div className="flex items-center gap-1.5">
+						<h4 className="font-bold text-foreground truncate">{group.name}</h4>
+						{group.effectiveVisibility === "Private" && (
+							<span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-hover text-muted-foreground shrink-0">
+								<Lock size={8} />
+								Private
+							</span>
+						)}
+					</div>
 					{group.skillLevel && <span className="text-xs text-muted-foreground">{group.skillLevel}</span>}
 				</div>
 				{(onEdit || onDelete) && (

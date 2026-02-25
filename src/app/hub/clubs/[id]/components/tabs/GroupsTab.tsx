@@ -10,7 +10,7 @@ import { createGroup, deleteGroup, updateGroup, uploadGroupImage } from "@/lib/a
 import { ClubMember, CreateGroupRequest, Group, UpdateGroupRequest } from "@/lib/models/Club";
 import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowDownAZ, Clock, Layers, Loader2, Plus, Search, Users } from "lucide-react";
+import { ArrowDownAZ, Clock, Layers, Loader2, Lock, Plus, Search, Users } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 interface GroupsTabProps {
@@ -20,6 +20,7 @@ interface GroupsTabProps {
 	hasNextPage?: boolean;
 	isFetchingNextPage?: boolean;
 	fetchNextPage?: () => void;
+	canManage?: boolean;
 }
 
 type SortOption = "name" | "memberCount" | "createdAt";
@@ -30,7 +31,7 @@ const SORT_OPTIONS = [
 	{ value: "createdAt", label: "Newest First", icon: <Clock size={14} /> },
 ];
 
-export default function GroupsTab({ groups, clubId, clubMembers, hasNextPage, isFetchingNextPage, fetchNextPage }: GroupsTabProps) {
+export default function GroupsTab({ groups, clubId, clubMembers, hasNextPage, isFetchingNextPage, fetchNextPage, canManage = false }: GroupsTabProps) {
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [editingGroup, setEditingGroup] = useState<Group | null>(null);
 	const [deletingGroup, setDeletingGroup] = useState<Group | null>(null);
@@ -173,9 +174,11 @@ export default function GroupsTab({ groups, clubId, clubMembers, hasNextPage, is
 			{/* Header Row: Title + Create Button */}
 			<div className="flex items-center justify-between shrink-0">
 				<h2 className="text-lg font-semibold text-foreground">Groups</h2>
-				<Button variant="outline" leftIcon={<Plus size={16} />} onClick={() => setShowCreateModal(true)}>
-					Create Group
-				</Button>
+				{canManage && (
+					<Button variant="outline" leftIcon={<Plus size={16} />} onClick={() => setShowCreateModal(true)}>
+						Create Group
+					</Button>
+				)}
 			</div>
 
 			{/* Toolbar with collapsible search/filters */}
@@ -201,12 +204,12 @@ export default function GroupsTab({ groups, clubId, clubMembers, hasNextPage, is
 					<EmptyState
 						icon={Layers}
 						title="No groups yet"
-						description="Create groups to organize members for events and activities"
-						action={{
+						description={canManage ? "Create groups to organize members for events and activities" : "No groups have been created yet"}
+						action={canManage ? {
 							label: "Create Group",
 							onClick: () => setShowCreateModal(true),
 							icon: Plus,
-						}}
+						} : undefined}
 					/>
 				) : filteredGroups.length === 0 ? (
 					<EmptyState
@@ -224,13 +227,18 @@ export default function GroupsTab({ groups, clubId, clubMembers, hasNextPage, is
 				) : viewMode === "grid" ? (
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
 						{filteredGroups.map((group) => (
-							<GroupCard key={group.id} group={group} onEdit={() => setEditingGroup(group)} onDelete={() => setDeletingGroup(group)} />
+							<GroupCard
+								key={group.id}
+								group={group}
+								onEdit={canManage ? () => setEditingGroup(group) : undefined}
+								onDelete={canManage ? () => setDeletingGroup(group) : undefined}
+							/>
 						))}
 					</div>
 				) : (
 					<div className="space-y-2 pb-4">
 						{filteredGroups.map((group) => (
-							<GroupListItem key={group.id} group={group} onEdit={() => setEditingGroup(group)} onDelete={() => setDeletingGroup(group)} />
+							<GroupListItem key={group.id} group={group} canManage={canManage} onEdit={() => setEditingGroup(group)} onDelete={() => setDeletingGroup(group)} />
 						))}
 					</div>
 				)}
@@ -288,7 +296,7 @@ export default function GroupsTab({ groups, clubId, clubMembers, hasNextPage, is
 }
 
 // List view item for groups
-function GroupListItem({ group, onEdit, onDelete }: { group: Group; onEdit: () => void; onDelete: () => void }) {
+function GroupListItem({ group, canManage, onEdit, onDelete }: { group: Group; canManage?: boolean; onEdit: () => void; onDelete: () => void }) {
 	return (
 		<div className="flex items-center justify-between p-4 rounded-xl bg-surface border border-border hover:border-border hover:bg-hover transition-all group">
 			<div className="flex items-center gap-3 min-w-0">
@@ -298,20 +306,30 @@ function GroupListItem({ group, onEdit, onDelete }: { group: Group; onEdit: () =
 					<Layers size={18} className="text-white" />
 				</div>
 				<div className="min-w-0">
-					<h4 className="font-medium text-white truncate">{group.name}</h4>
+					<div className="flex items-center gap-1.5">
+						<h4 className="font-medium text-white truncate">{group.name}</h4>
+						{group.effectiveVisibility === "Private" && (
+							<span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-hover text-muted-foreground shrink-0">
+								<Lock size={8} />
+								Private
+							</span>
+						)}
+					</div>
 					<p className="text-xs text-muted-foreground">
 						{group.members?.length || 0} member{(group.members?.length || 0) !== 1 ? "s" : ""}
 					</p>
 				</div>
 			</div>
-			<div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-				<Button variant="ghost" size="sm" onClick={onEdit}>
-					Edit
-				</Button>
-				<Button variant="ghost" size="sm" color="error" onClick={onDelete}>
-					Delete
-				</Button>
-			</div>
+			{canManage && (
+				<div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+					<Button variant="ghost" size="sm" onClick={onEdit}>
+						Edit
+					</Button>
+					<Button variant="ghost" size="sm" color="error" onClick={onDelete}>
+						Delete
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 }

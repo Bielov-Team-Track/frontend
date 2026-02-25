@@ -10,7 +10,7 @@ import { createTeam, deleteTeam, updateTeam } from "@/lib/api/clubs";
 import { ClubMember, CreateTeamRequest, Team, UpdateTeamRequest } from "@/lib/models/Club";
 import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowDownAZ, Clock, Loader2, Plus, Search, Users } from "lucide-react";
+import { ArrowDownAZ, Clock, Loader2, Lock, Plus, Search, Users } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 interface TeamsTabProps {
@@ -20,6 +20,7 @@ interface TeamsTabProps {
 	hasNextPage?: boolean;
 	isFetchingNextPage?: boolean;
 	fetchNextPage?: () => void;
+	canManage?: boolean;
 }
 
 type SortOption = "name" | "memberCount" | "createdAt";
@@ -30,7 +31,7 @@ const SORT_OPTIONS = [
 	{ value: "createdAt", label: "Newest First", icon: <Clock size={14} /> },
 ];
 
-export default function TeamsTab({ teams, clubId, clubMembers, hasNextPage, isFetchingNextPage, fetchNextPage }: TeamsTabProps) {
+export default function TeamsTab({ teams, clubId, clubMembers, hasNextPage, isFetchingNextPage, fetchNextPage, canManage = false }: TeamsTabProps) {
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [editingTeam, setEditingTeam] = useState<Team | null>(null);
 	const [deletingTeam, setDeletingTeam] = useState<Team | null>(null);
@@ -173,9 +174,11 @@ export default function TeamsTab({ teams, clubId, clubMembers, hasNextPage, isFe
 			{/* Header Row: Title + Create Button */}
 			<div className="flex items-center justify-between shrink-0">
 				<h2 className="text-lg font-semibold text-foreground">Teams</h2>
-				<Button variant="outline" leftIcon={<Plus size={16} />} onClick={() => setShowCreateModal(true)}>
-					Create Team
-				</Button>
+				{canManage && (
+					<Button variant="outline" leftIcon={<Plus size={16} />} onClick={() => setShowCreateModal(true)}>
+						Create Team
+					</Button>
+				)}
 			</div>
 
 			{/* Toolbar with collapsible search/filters */}
@@ -201,12 +204,12 @@ export default function TeamsTab({ teams, clubId, clubMembers, hasNextPage, isFe
 					<EmptyState
 						icon={Users}
 						title="No teams yet"
-						description="Create your first team to organize players"
-						action={{
+						description={canManage ? "Create your first team to organize players" : "No teams have been created yet"}
+						action={canManage ? {
 							label: "Create Team",
 							onClick: () => setShowCreateModal(true),
 							icon: Plus,
-						}}
+						} : undefined}
 					/>
 				) : filteredTeams.length === 0 ? (
 					<EmptyState
@@ -224,13 +227,18 @@ export default function TeamsTab({ teams, clubId, clubMembers, hasNextPage, isFe
 				) : viewMode === "grid" ? (
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
 						{filteredTeams.map((team) => (
-							<TeamCard key={team.id} team={team} onEdit={() => setEditingTeam(team)} onDelete={() => setDeletingTeam(team)} />
+							<TeamCard
+								key={team.id}
+								team={team}
+								onEdit={canManage ? () => setEditingTeam(team) : undefined}
+								onDelete={canManage ? () => setDeletingTeam(team) : undefined}
+							/>
 						))}
 					</div>
 				) : (
 					<div className="space-y-2 pb-4">
 						{filteredTeams.map((team) => (
-							<TeamListItem key={team.id} team={team} onEdit={() => setEditingTeam(team)} onDelete={() => setDeletingTeam(team)} />
+							<TeamListItem key={team.id} team={team} canManage={canManage} onEdit={() => setEditingTeam(team)} onDelete={() => setDeletingTeam(team)} />
 						))}
 					</div>
 				)}
@@ -280,7 +288,7 @@ export default function TeamsTab({ teams, clubId, clubMembers, hasNextPage, isFe
 }
 
 // List view item for teams
-function TeamListItem({ team, onEdit, onDelete }: { team: Team; onEdit: () => void; onDelete: () => void }) {
+function TeamListItem({ team, canManage, onEdit, onDelete }: { team: Team; canManage?: boolean; onEdit: () => void; onDelete: () => void }) {
 	return (
 		<div className="flex items-center justify-between p-4 rounded-xl bg-surface border border-border hover:border-border hover:bg-hover transition-all group">
 			<div className="flex items-center gap-3 min-w-0">
@@ -288,20 +296,30 @@ function TeamListItem({ team, onEdit, onDelete }: { team: Team; onEdit: () => vo
 					<Users size={18} className="text-accent" />
 				</div>
 				<div className="min-w-0">
-					<h4 className="font-medium text-white truncate">{team.name}</h4>
+					<div className="flex items-center gap-1.5">
+						<h4 className="font-medium text-white truncate">{team.name}</h4>
+						{team.effectiveVisibility === "Private" && (
+							<span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-hover text-muted-foreground shrink-0">
+								<Lock size={8} />
+								Private
+							</span>
+						)}
+					</div>
 					<p className="text-xs text-muted-foreground">
 						{team.members?.length || 0} member{(team.members?.length || 0) !== 1 ? "s" : ""}
 					</p>
 				</div>
 			</div>
-			<div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-				<Button variant="ghost" size="sm" onClick={onEdit}>
-					Edit
-				</Button>
-				<Button variant="ghost" size="sm" color="error" onClick={onDelete}>
-					Delete
-				</Button>
-			</div>
+			{canManage && (
+				<div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+					<Button variant="ghost" size="sm" onClick={onEdit}>
+						Edit
+					</Button>
+					<Button variant="ghost" size="sm" color="error" onClick={onDelete}>
+						Delete
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 }

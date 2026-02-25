@@ -1,7 +1,7 @@
 "use client";
 
 import { Team } from "@/lib/models/Club";
-import { Edit, Trash2, Users } from "lucide-react";
+import { Edit, Lock, Trash2, Users } from "lucide-react";
 import Link from "next/link";
 
 interface TeamCardProps {
@@ -25,7 +25,15 @@ export default function TeamCard({ team, onEdit, onDelete }: TeamCardProps) {
 					)}
 				</div>
 				<div className="flex-1 min-w-0">
-					<h4 className="font-bold text-foreground truncate">{team.name}</h4>
+					<div className="flex items-center gap-1.5">
+						<h4 className="font-bold text-foreground truncate">{team.name}</h4>
+						{team.effectiveVisibility === "Private" && (
+							<span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-hover text-muted-foreground shrink-0">
+								<Lock size={8} />
+								Private
+							</span>
+						)}
+					</div>
 					{team.skillLevel && <span className="text-xs text-muted-foreground">{team.skillLevel}</span>}
 				</div>
 				{(onEdit || onDelete) && (
