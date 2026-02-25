@@ -2,12 +2,12 @@ import { UserProfile } from "./User";
 import { Payment } from "./Payment";
 
 export enum ParticipationStatus {
-	Invited = 0,
-	Waitlisted = 2,
-	Accepted = 3,
-	Declined = 4,
-	Attended = 5,
-	NoShow = 6,
+	Invited = "Invited",
+	Waitlisted = "Waitlisted",
+	Accepted = "Accepted",
+	Declined = "Declined",
+	Attended = "Attended",
+	NoShow = "NoShow",
 }
 
 export enum InvitedVia {
