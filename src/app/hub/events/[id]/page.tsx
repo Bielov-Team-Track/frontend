@@ -134,6 +134,24 @@ export default function EventOverviewPage() {
 						<InvitationSidebarCard event={event} invitedBy={inviterName} onAccept={handleAcceptInvitation} onDecline={handleDeclineInvitation} />
 					)}
 
+					{/* Payment Card - only shown when event has a cost */}
+					{event.paymentConfig && event.paymentConfig.cost > 0 && (
+						<div className="hidden lg:block rounded-2xl bg-surface border border-border overflow-hidden">
+							<div className="p-4 border-b border-border flex justify-between items-center">
+								<h3 className="text-sm font-bold text-white flex items-center gap-2">
+									<CreditCard size={16} className="text-accent" />
+									Payment
+								</h3>
+							</div>
+							<div className="p-4">
+								<div className="flex items-baseline gap-1.5">
+									<span className="text-2xl font-bold text-primary">{"\u00A3"}{event.paymentConfig.cost}</span>
+									<span className="text-xs text-muted">per person</span>
+								</div>
+							</div>
+						</div>
+					)}
+
 					{/* Location Card - hidden on mobile */}
 					<div className="hidden lg:block rounded-2xl bg-surface border border-border overflow-hidden">
 						<div className="p-4 border-b border-border flex justify-between items-center">
@@ -163,24 +181,6 @@ export default function EventOverviewPage() {
 						</div>
 						{event.location?.address && <div className="p-3 text-xs text-muted bg-background/50">{event.location.address}</div>}
 					</div>
-
-					{/* Payment Card - only shown when event has a cost */}
-					{event.paymentConfig && event.paymentConfig.cost > 0 && (
-						<div className="hidden lg:block rounded-2xl bg-surface border border-border overflow-hidden">
-							<div className="p-4 border-b border-border flex justify-between items-center">
-								<h3 className="text-sm font-bold text-white flex items-center gap-2">
-									<CreditCard size={16} className="text-accent" />
-									Payment
-								</h3>
-							</div>
-							<div className="p-4">
-								<div className="flex items-baseline gap-1.5">
-									<span className="text-2xl font-bold text-primary">{"\u00A3"}{event.paymentConfig.cost}</span>
-									<span className="text-xs text-muted">per person</span>
-								</div>
-							</div>
-						</div>
-					)}
 				</div>
 			</div>
 
