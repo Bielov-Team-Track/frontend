@@ -16,6 +16,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowDownAZ, Clock, CreditCard, MailX, MessageSquarePlus, Search, UserMinus, UserPlus, Users, XCircle } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useEventContext } from "../layout";
 
@@ -107,9 +108,13 @@ export default function EventMembersPage() {
 	const { event, eventId, participants, isAdmin } = useEventContext();
 	const { userProfile } = useAuth();
 	const queryClient = useQueryClient();
+	const searchParams = useSearchParams();
 
+	const initialStatus = searchParams.get("status") as StatusFilter | null;
 	const [searchQuery, setSearchQuery] = useState("");
-	const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+	const [statusFilter, setStatusFilter] = useState<StatusFilter>(
+		initialStatus && ALL_STATUSES.some((s) => s.value === initialStatus) ? initialStatus : "all"
+	);
 	const [sortBy, setSortBy] = useState("joined-desc");
 	const [showInviteModal, setShowInviteModal] = useState(false);
 	const [removingParticipant, setRemovingParticipant] = useState<{ id: string; userId: string; name: string } | null>(null);
@@ -255,7 +260,7 @@ export default function EventMembersPage() {
 		<div className="space-y-6">
 			{/* Header */}
 			<div className="flex items-center justify-between">
-				<h2 className="text-lg font-semibold text-foreground">Members</h2>
+				<h2 className="text-lg font-semibold text-foreground">Participants</h2>
 				{isAdmin && (
 					<Button variant="outline" leftIcon={<UserPlus size={16} />} onClick={() => setShowInviteModal(true)} data-testid="invite-members-button">
 						Invite
@@ -402,7 +407,6 @@ export default function EventMembersPage() {
 																	? [
 																			{
 																				label: "Revoke Invitation",
-																				"data-testid": "revoke-invitation-action",
 																				icon: <MailX size={16} />,
 																				variant: "destructive" as const,
 																				onClick: () => revokeMutation.mutate(participant.userId),
@@ -411,7 +415,6 @@ export default function EventMembersPage() {
 																	: []),
 																{
 																	label: "Remove",
-																	"data-testid": "remove-participant-action",
 																	icon: <UserMinus size={16} />,
 																	variant: "destructive" as const,
 																	onClick: () => setRemovingParticipant({ id: participant.id, userId: participant.userId, name }),

@@ -316,7 +316,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 					<div className="flex flex-col lg:flex-row lg:items-center border-t border-border bg-primary/[0.02]">
 						{/* Status chips — padding lives inside ParticipationStatusChips so that when it returns null no empty space renders */}
 						<div className="lg:flex-1">
-							<ParticipationStatusChips participants={participants} />
+							<ParticipationStatusChips participants={participants} eventId={eventId} isPrivate={event.isPrivate ?? false} />
 						</div>
 						{/* Action row */}
 						<EventActionRow
