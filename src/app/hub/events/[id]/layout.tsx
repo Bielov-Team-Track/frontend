@@ -277,12 +277,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 										Full
 									</span>
 								)}
-								{isPast(startDate) && !event.canceled && (
-									<span className="px-2 py-0.5 rounded-lg bg-warning/20 text-warning border border-warning/30 text-[10px] font-bold uppercase">
-										Started
-									</span>
-								)}
-							</div>
+								</div>
 							{/* Title */}
 							<h2 className="text-lg lg:text-xl font-bold text-white mb-0.5" data-testid="event-hero-title">{event.name}</h2>
 							{/* Club context as subtitle */}
