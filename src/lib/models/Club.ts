@@ -1,6 +1,8 @@
 import { SortDirection } from "./Pagination";
 import { UserProfile } from "./User";
 
+export type Visibility = "Public" | "Private";
+
 export interface Club {
 	id: string;
 	name: string;
@@ -184,6 +186,13 @@ export interface UpdateVenueRequest {
 	howToGetThereInstructions?: string;
 }
 
+export interface RestrictedTeamMember {
+	userId: string;
+	name: string;
+	surname?: string;
+	avatarUrl?: string;
+}
+
 // Team models
 export interface Team {
 	id: string;
@@ -199,6 +208,11 @@ export interface Team {
 	members?: TeamMember[];
 	createdAt?: Date;
 	updatedAt?: Date;
+	visibility?: Visibility;
+	effectiveVisibility: Visibility;
+	isRestricted: boolean;
+	memberCount: number;
+	restrictedMembers?: RestrictedTeamMember[];
 }
 
 export enum VolleyballPosition {
@@ -207,6 +221,7 @@ export enum VolleyballPosition {
 	OppositeHitter = "OppositeHitter",
 	MiddleBlocker = "MiddleBlocker",
 	Libero = "Libero",
+	DefensiveSpecialist = "DefensiveSpecialist",
 }
 
 export interface TeamMember {
@@ -258,6 +273,13 @@ export interface UpdateTeamRequest {
 	skillLevel?: string;
 }
 
+export interface RestrictedGroupMember {
+	userId: string;
+	name: string;
+	surname?: string;
+	avatarUrl?: string;
+}
+
 // Group models
 export interface Group {
 	id: string;
@@ -273,6 +295,11 @@ export interface Group {
 	members?: GroupMember[];
 	createdAt?: Date;
 	updatedAt?: Date;
+	visibility?: Visibility;
+	effectiveVisibility: Visibility;
+	isRestricted: boolean;
+	memberCount: number;
+	restrictedMembers?: RestrictedGroupMember[];
 }
 
 export interface GroupMember {
@@ -509,6 +536,8 @@ export interface ClubSettings {
 	pendingMessage?: string;
 	waitlistMessage?: string;
 	declinedMessage?: string;
+	defaultTeamVisibility: Visibility;
+	defaultGroupVisibility: Visibility;
 }
 
 export interface UpdateClubSettingsRequest {
