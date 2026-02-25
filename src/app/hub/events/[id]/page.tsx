@@ -10,6 +10,7 @@ import Link from "next/link";
 import { InvitationSidebarCard } from "./components/InvitationResponseVariants";
 import StickyBottomBar from "./components/StickyBottomBar";
 import WhosComingSection from "./components/WhosComingSection";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEventActions } from "./hooks/useEventActions";
 import { useEventContext } from "./layout";
 
@@ -24,6 +25,7 @@ const Map = dynamic(() => import("@/components/features/locations").then((mod) =
 // =============================================================================
 export default function EventOverviewPage() {
 	const { event, teams, hasInvitation, myParticipation, refetchMyParticipation, isAdmin, participants, eventId, isOpen, isFull } = useEventContext();
+	const queryClient = useQueryClient();
 
 	const {
 		handleAcceptInvitation,
@@ -36,7 +38,10 @@ export default function EventOverviewPage() {
 		setDeclineNote,
 	} = useEventActions({
 		eventId: event?.id ?? eventId,
-		onSuccess: refetchMyParticipation,
+		onSuccess: () => {
+			refetchMyParticipation();
+			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
+		},
 	});
 
 	// Get the inviter's name from the participation record

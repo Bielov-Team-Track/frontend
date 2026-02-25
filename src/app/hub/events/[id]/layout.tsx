@@ -8,7 +8,7 @@ import { Event, EventFormat, EventType } from "@/lib/models/Event";
 import { Unit } from "@/lib/models/EventPaymentConfig";
 import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { Team } from "@/lib/models/Team";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isPast } from "date-fns";
 import { ArrowLeft, Calendar, ClipboardList, CreditCard, Edit, MessageCircle, MoreHorizontal, Settings, Share2, Trash2, Users, XCircle } from "lucide-react";
 import Image from "next/image";
@@ -70,6 +70,7 @@ const TABS: TabConfig[] = [
 export default function EventPrototypeLayout({ children }: { children: React.ReactNode }) {
 	const params = useParams();
 	const pathname = usePathname();
+	const queryClient = useQueryClient();
 	const eventId = params.id as string;
 
 	const [bannerError, setBannerError] = useState(false);
@@ -154,7 +155,10 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 		setDeclineNote: setLayoutDeclineNote,
 	} = useEventActions({
 		eventId,
-		onSuccess: () => refetchMyParticipation(),
+		onSuccess: () => {
+			refetchMyParticipation();
+			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
+		},
 	});
 
 	const isParticipant =
@@ -280,7 +284,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 							{/* Badges */}
 							<div className="flex items-center gap-2 mb-1.5 flex-wrap">
 								<span className="px-2 py-0.5 rounded-lg bg-accent/20 text-accent border border-accent/20 text-[10px] font-bold uppercase" data-testid="event-type-badge">
-									{event.type || "Event"}
+									{(event.type || "Event").replace(/([a-z])([A-Z])/g, "$1 $2")}
 								</span>
 								{event.canceled && (
 									<span className="px-2 py-0.5 rounded-lg bg-destructive/20 text-destructive border border-destructive/30 text-[10px] font-bold uppercase" data-testid="event-canceled-badge">

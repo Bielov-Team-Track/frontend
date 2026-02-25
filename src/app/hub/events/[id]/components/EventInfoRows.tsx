@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar } from "@/components";
 import { Event } from "@/lib/models/Event";
 import { EventParticipant } from "@/lib/models/EventParticipant";
@@ -35,9 +37,14 @@ export default function EventInfoRows({ event, participants }: EventInfoRowsProp
 
 	// Use location.name if available; fall back to splitting address by comma
 	const venueName = event.location?.name || event.location?.address?.split(",")[0]?.trim() || "Unknown venue";
-	const venueAddress = event.location?.name
+	const rawAddress = event.location?.name
 		? event.location.address || ""
 		: (event.location?.address?.split(",").slice(1).join(", ").trim() || "");
+	// Strip repeated venue name from the start of the address (e.g., "Venue, Venue, Street..." → "Street...")
+	let venueAddress = rawAddress;
+	while (venueAddress.startsWith(venueName)) {
+		venueAddress = venueAddress.slice(venueName.length).replace(/^[,\s]+/, "");
+	}
 
 	return (
 		<div className="flex flex-col lg:flex-row lg:border-b lg:border-border">

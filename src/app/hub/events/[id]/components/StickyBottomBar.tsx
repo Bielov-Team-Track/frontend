@@ -43,8 +43,8 @@ export default function StickyBottomBar({
 		? "Covered by subscription"
 		: event.paymentConfig ? `£${event.paymentConfig.cost}` : "Free";
 
-	// Check if user is already a participant
-	const isParticipant = myParticipation?.status === ParticipationStatus.Accepted;
+	// Check if user is already a participant (includes past events where user attended)
+	const isParticipant = myParticipation?.status === ParticipationStatus.Accepted || myParticipation?.status === ParticipationStatus.Attended;
 
 	// Don't render if user is already a participant, event is full, or event is closed
 	if (isParticipant || (isFull && !hasInvitation) || (!isOpen && !hasInvitation)) {
