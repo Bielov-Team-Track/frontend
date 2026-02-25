@@ -10,6 +10,7 @@ import Link from "next/link";
 interface EventContextBadgeProps {
 	contextId?: string;
 	contextType?: ContextType;
+	compact?: boolean;
 }
 
 const contextConfig = {
@@ -43,7 +44,7 @@ const contextConfig = {
 	},
 };
 
-export default function EventContextBadge({ contextId, contextType }: EventContextBadgeProps) {
+export default function EventContextBadge({ contextId, contextType, compact }: EventContextBadgeProps) {
 	// Normalize contextType to lowercase for comparison
 	const normalizedType = contextType?.toLowerCase();
 
@@ -91,11 +92,27 @@ export default function EventContextBadge({ contextId, contextType }: EventConte
 	const parentClub = normalizedContextType === "team" ? team?.club : normalizedContextType === "group" ? group?.club : undefined;
 
 	if (!contextData) {
-		// Loading state - show skeleton
+		if (compact) {
+			return (
+				<div className="flex items-center gap-1.5 animate-pulse">
+					<div className="w-3 h-3 rounded bg-hover" />
+					<div className="h-3 w-16 rounded bg-hover" />
+				</div>
+			);
+		}
 		return (
 			<div className="flex items-center gap-2 animate-pulse">
 				<div className="w-6 h-6 rounded-md bg-hover" />
 				<div className="h-4 w-20 rounded bg-hover" />
+			</div>
+		);
+	}
+
+	if (compact) {
+		return (
+			<div className="flex items-center gap-1.5 text-xs text-muted">
+				<Icon size={12} />
+				<span>{contextData.name}</span>
 			</div>
 		);
 	}
