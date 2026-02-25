@@ -4,13 +4,14 @@ import { Button } from "@/components";
 import EventCommentsSection from "@/components/features/comments/components/EventCommentsSection";
 import { Modal } from "@/components/ui";
 import { EventType } from "@/lib/models/Event";
-import { ClipboardCheck, MapPin } from "lucide-react";
+import { ClipboardCheck, CreditCard, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { InvitationSidebarCard } from "./components/InvitationResponseVariants";
 import StickyBottomBar from "./components/StickyBottomBar";
 import WhosComingSection from "./components/WhosComingSection";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateParticipantStatus } from "@/lib/api/events";
 import { useEventActions } from "./hooks/useEventActions";
 import { useEventContext } from "./layout";
 
@@ -38,6 +39,15 @@ export default function EventOverviewPage() {
 		setDeclineNote,
 	} = useEventActions({
 		eventId: event?.id ?? eventId,
+		onSuccess: () => {
+			refetchMyParticipation();
+			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
+		},
+	});
+
+	// Withdraw (decline after already accepted) — uses PATCH status endpoint
+	const withdrawMutation = useMutation({
+		mutationFn: () => updateParticipantStatus(eventId, myParticipation!.userId, "Declined"),
 		onSuccess: () => {
 			refetchMyParticipation();
 			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
@@ -153,6 +163,24 @@ export default function EventOverviewPage() {
 						</div>
 						{event.location?.address && <div className="p-3 text-xs text-muted bg-background/50">{event.location.address}</div>}
 					</div>
+
+					{/* Payment Card - only shown when event has a cost */}
+					{event.paymentConfig && event.paymentConfig.cost > 0 && (
+						<div className="hidden lg:block rounded-2xl bg-surface border border-border overflow-hidden">
+							<div className="p-4 border-b border-border flex justify-between items-center">
+								<h3 className="text-sm font-bold text-white flex items-center gap-2">
+									<CreditCard size={16} className="text-accent" />
+									Payment
+								</h3>
+							</div>
+							<div className="p-4">
+								<div className="flex items-baseline gap-1.5">
+									<span className="text-2xl font-bold text-primary">{"\u00A3"}{event.paymentConfig.cost}</span>
+									<span className="text-xs text-muted">per person</span>
+								</div>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 
@@ -167,6 +195,7 @@ export default function EventOverviewPage() {
 			hasInvitation={hasInvitation}
 			onAccept={handleAcceptInvitation}
 			onDecline={() => handleDeclineInvitation()}
+			onWithdraw={() => withdrawMutation.mutate()}
 			onJoin={handleJoin}
 		/>
 

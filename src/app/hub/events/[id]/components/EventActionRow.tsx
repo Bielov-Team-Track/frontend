@@ -1,11 +1,9 @@
 "use client";
 
 import { Button } from "@/components";
-import { EventPaymentConfig } from "@/lib/models/EventPaymentConfig";
 import { Check, Clock, X } from "lucide-react";
 
 interface EventActionRowProps {
-	paymentConfig: EventPaymentConfig | undefined;
 	isOpen: boolean;
 	isFull: boolean;
 	hasInvitation: boolean;
@@ -14,12 +12,12 @@ interface EventActionRowProps {
 	canceled: boolean;
 	onAccept?: () => void;
 	onDecline?: () => void;
+	onWithdraw?: () => void;
 	onJoin?: () => void;
 	onJoinWaitlist?: () => void;
 }
 
 export default function EventActionRow({
-	paymentConfig,
 	isOpen,
 	isFull,
 	hasInvitation,
@@ -28,41 +26,28 @@ export default function EventActionRow({
 	canceled,
 	onAccept,
 	onDecline,
+	onWithdraw,
 	onJoin,
 	onJoinWaitlist,
 }: EventActionRowProps) {
-	const showJoinedBadge = isParticipant && !hasInvitation;
+	const showAcceptedBadge = isParticipant && !hasInvitation;
 
 	return (
 		<div className="flex items-center gap-3 px-5 py-2.5 border-t border-border lg:border-t-0 lg:border-l lg:py-2.5">
-			{/* Price */}
-			<div data-testid="event-price-display">
-				{paymentConfig && paymentConfig.cost > 0 ? (
-					<div className="flex items-center gap-1.5 lg:flex-row">
-						<span className="text-base font-bold text-primary">{"\u00A3"}{paymentConfig.cost}</span>
-						<span className="text-[10px] text-muted leading-tight">per person</span>
-					</div>
-				) : (
-					<div className="text-base font-semibold text-success">Free</div>
-				)}
-			</div>
-
-			<div className="flex-1" />
-
-			{/* Joined badge + Decline option — shown when user has accepted/attended */}
-			{showJoinedBadge && (
+			{/* Accepted badge + Withdraw option — shown when user has accepted/attended */}
+			{showAcceptedBadge && (
 				<>
 					<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-success text-white">
 						<Check size={12} />
 						Accepted
 					</span>
-					{isOpen && !canceled && (
+					{!canceled && (
 						<Button
 							variant="ghost"
 							color="error"
 							size="sm"
 							leftIcon={<X size={14} />}
-							onClick={onDecline}
+							onClick={onWithdraw}
 							aria-label="Change decision — decline"
 							data-testid="desktop-withdraw-button"
 						>

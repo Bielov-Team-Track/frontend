@@ -1,14 +1,13 @@
 "use client";
-
 import { Button } from "@/components";
 import { Modal } from "@/components/ui";
-import { getMyParticipation, loadEvent, loadParticipants } from "@/lib/api/events";
+import { getMyParticipation, loadEvent, loadParticipants, updateParticipantStatus } from "@/lib/api/events";
 import { loadTeams } from "@/lib/api/teams";
 import { Event, EventFormat, EventType } from "@/lib/models/Event";
 import { Unit } from "@/lib/models/EventPaymentConfig";
 import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { Team } from "@/lib/models/Team";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isPast } from "date-fns";
 import { ArrowLeft, Calendar, ClipboardList, CreditCard, Edit, MessageCircle, MoreHorizontal, Settings, Share2, Trash2, Users, XCircle } from "lucide-react";
 import Image from "next/image";
@@ -20,7 +19,6 @@ import EventContextBadge from "./components/EventContextBadge";
 import EventInfoRows from "./components/EventInfoRows";
 import ParticipationStatusChips from "./components/ParticipationStatusChips";
 import { useEventActions } from "./hooks/useEventActions";
-
 // Context to share event data with child pages
 interface EventContextValue {
 	eventId: string;
@@ -35,9 +33,7 @@ interface EventContextValue {
 	hasInvitation: boolean;
 	refetchMyParticipation: () => void;
 }
-
 const EventContext = createContext<EventContextValue | null>(null);
-
 export function useEventContext() {
 	const context = useContext(EventContext);
 	if (!context) {
@@ -45,9 +41,7 @@ export function useEventContext() {
 	}
 	return context;
 }
-
 type TabType = "overview" | "teams" | "members" | "discussion" | "training" | "evaluation" | "payments" | "settings";
-
 interface TabConfig {
 	id: TabType;
 	label: string;
@@ -57,7 +51,6 @@ interface TabConfig {
 	evaluationOnly?: boolean;
 	teamsOnly?: boolean;
 }
-
 const TABS: TabConfig[] = [
 	{ id: "overview", label: "Overview", icon: Calendar, href: "" },
 	{ id: "teams", label: "Teams", icon: Users, href: "/teams", teamsOnly: true },
@@ -66,16 +59,13 @@ const TABS: TabConfig[] = [
 	{ id: "evaluation", label: "Evaluation", icon: ClipboardList, href: "/evaluation-session/setup", evaluationOnly: true },
 	{ id: "payments", label: "Payments", icon: CreditCard, href: "/payments" },
 ];
-
 export default function EventPrototypeLayout({ children }: { children: React.ReactNode }) {
 	const params = useParams();
 	const pathname = usePathname();
 	const queryClient = useQueryClient();
 	const eventId = params.id as string;
-
 	const [bannerError, setBannerError] = useState(false);
 	const [showAdminMenu, setShowAdminMenu] = useState(false);
-
 	// Determine active tab from pathname
 	const getActiveTab = (): TabType => {
 		if (pathname.includes("/settings")) return "settings";
@@ -87,34 +77,28 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 		if (pathname.includes("/payments")) return "payments";
 		return "overview";
 	};
-
 	const activeTab = getActiveTab();
-
 	// Queries
 	const { data: event, isLoading: eventLoading } = useQuery({
 		queryKey: ["event", eventId],
 		queryFn: () => loadEvent(eventId),
 	});
-
 	const { data: teams = [] } = useQuery({
 		queryKey: ["event-teams", eventId],
 		queryFn: () => loadTeams(eventId),
 		enabled: !!eventId,
 	});
-
 	const { data: participantsResult } = useQuery({
 		queryKey: ["event-participants", eventId],
 		queryFn: () => loadParticipants(eventId, undefined, 100),
 		enabled: !!eventId,
 	});
 	const participants = participantsResult?.items ?? [];
-
 	const { data: myParticipation, refetch: refetchMyParticipation } = useQuery({
 		queryKey: ["event-my-participation", eventId],
 		queryFn: () => getMyParticipation(eventId),
 		enabled: !!eventId,
 	});
-
 	// Get tab counts
 	const getTabCount = (tabId: TabType): number | undefined => {
 		switch (tabId) {
@@ -126,14 +110,12 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 				return undefined;
 		}
 	};
-
 	// Get tab href
 	const getTabHref = (tabId: TabType): string => {
 		const base = `/hub/events/${eventId}`;
 		const tab = TABS.find((t) => t.id === tabId);
 		return `${base}${tab?.href || ""}`;
 	};
-
 	// Calculate event state
 	const totalParticipants = participants.length;
 	const totalSpots = teams.reduce((sum, t) => sum + (t.positions?.length || 0), 0);
@@ -142,7 +124,6 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 	const isFull = totalSpots > 0 && totalParticipants >= totalSpots;
 	// API may return status as string or enum value
 	const hasInvitation = myParticipation?.status === ParticipationStatus.Invited;
-
 	const {
 		handleAcceptInvitation,
 		handleDeclineInvitation,
@@ -160,12 +141,18 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
 		},
 	});
-
 	const isParticipant =
 		myParticipation?.status === ParticipationStatus.Accepted ||
 		myParticipation?.status === ParticipationStatus.Attended;
 	const isWaitlisted = myParticipation?.status === ParticipationStatus.Waitlisted;
-
+	// Withdraw (decline after already accepted) — uses PATCH status endpoint
+	const withdrawMutation = useMutation({
+		mutationFn: () => updateParticipantStatus(eventId, myParticipation!.userId, "Declined"),
+		onSuccess: () => {
+			refetchMyParticipation();
+			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
+		},
+	});
 	// Memoize context value to prevent unnecessary re-renders of consumers
 	// Must be before early returns to maintain hook order
 	const contextValue = useMemo(
@@ -184,7 +171,6 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 		}),
 		[eventId, event, teams, participants, myParticipation, eventLoading, isAdmin, isOpen, isFull, hasInvitation, refetchMyParticipation]
 	);
-
 	// Loading state
 	if (eventLoading) {
 		return (
@@ -193,7 +179,6 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 			</div>
 		);
 	}
-
 	// Not found state
 	if (!event) {
 		return (
@@ -206,9 +191,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 			</div>
 		);
 	}
-
 	const startDate = new Date(event.startTime);
-
 	return (
 		<EventContext.Provider value={contextValue}>
 			<div className="space-y-6">
@@ -220,13 +203,11 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 					<div className="flex-1">
 						<h1 className="text-2xl font-bold text-white" data-testid="event-detail-name">{event.name}</h1>
 					</div>
-
 					{/* Overflow Menu for ALL users */}
 					<div className="relative">
 						<Button variant="ghost" color="neutral" className="p-2" onClick={() => setShowAdminMenu(!showAdminMenu)} data-testid="event-overflow-menu">
 							<MoreHorizontal size={18} />
 						</Button>
-
 						{showAdminMenu && (
 							<>
 								<div className="fixed inset-0 z-40" onClick={() => setShowAdminMenu(false)} />
@@ -271,7 +252,6 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 						)}
 					</div>
 				</div>
-
 				{/* Event Header Card */}
 				<div className="rounded-2xl overflow-hidden border border-border bg-surface">
 					{/* Slim Hero */}
@@ -308,10 +288,8 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 							<EventContextBadge contextId={event.contextId} contextType={event.contextType} compact />
 						</div>
 					</div>
-
 					{/* Info Rows */}
 					<EventInfoRows event={event} participants={participants} />
-
 					{/* Combined Status + Action Bar */}
 					<div className="flex flex-col lg:flex-row lg:items-center border-t border-border bg-primary/[0.02]">
 						{/* Status chips — padding lives inside ParticipationStatusChips so that when it returns null no empty space renders */}
@@ -320,7 +298,6 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 						</div>
 						{/* Action row */}
 						<EventActionRow
-							paymentConfig={event.paymentConfig}
 							isOpen={isOpen}
 							isFull={isFull}
 							hasInvitation={hasInvitation}
@@ -329,11 +306,11 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 							canceled={event.canceled ?? false}
 							onAccept={handleAcceptInvitation}
 							onDecline={() => handleDeclineInvitation()}
+							onWithdraw={() => withdrawMutation.mutate()}
 							onJoin={handleJoin}
 							onJoinWaitlist={handleJoinWaitlist}
 						/>
 					</div>
-
 					{/* Tabs */}
 					<div className="border-t border-border overflow-x-auto" role="tablist">
 						<div className="flex gap-1 px-5 lg:px-6">
@@ -365,7 +342,6 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 						</div>
 					</div>
 				</div>
-
 				{/* Decline Invitation Modal (for desktop Decline button in EventActionRow) */}
 				<Modal
 					isOpen={showLayoutDeclineModal}
@@ -390,7 +366,6 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 						</Button>
 					</div>
 				</Modal>
-
 				{/* Tab Content */}
 				<div className="min-h-100 pb-20 lg:pb-0">{children}</div>
 			</div>

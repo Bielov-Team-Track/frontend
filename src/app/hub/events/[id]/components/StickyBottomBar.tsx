@@ -17,6 +17,7 @@ interface StickyBottomBarProps {
 	isSubscriptionCovered?: boolean;
 	onAccept: () => void;
 	onDecline: () => void;
+	onWithdraw?: () => void;
 	onJoin?: () => void;
 }
 
@@ -31,6 +32,7 @@ export default function StickyBottomBar({
 	isSubscriptionCovered,
 	onAccept,
 	onDecline,
+	onWithdraw,
 	onJoin,
 }: StickyBottomBarProps) {
 	// Calculate spots
@@ -66,7 +68,7 @@ export default function StickyBottomBar({
 						variant="outline"
 						color="error"
 						size="sm"
-						onClick={onDecline}
+						onClick={onWithdraw}
 						leftIcon={<X className="size-3.5" />}
 						data-testid="sticky-withdraw-button">
 						Decline
