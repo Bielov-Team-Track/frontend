@@ -59,7 +59,7 @@ export default function StickyBottomBar({
 					<div className="flex-1 min-w-0 pl-1">
 						<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-info/10 text-info border border-info/20">
 							<Check className="size-3.5" />
-							Joined
+							Accepted
 						</span>
 					</div>
 					<Button

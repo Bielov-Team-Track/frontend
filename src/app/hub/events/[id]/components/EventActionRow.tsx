@@ -54,7 +54,7 @@ export default function EventActionRow({
 				<>
 					<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-info/10 text-info border border-info/20">
 						<Check size={12} />
-						Joined
+						Accepted
 					</span>
 					{isOpen && !canceled && (
 						<Button
