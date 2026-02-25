@@ -52,7 +52,7 @@ export default function EventActionRow({
 			{/* Joined badge + Decline option — shown when user has accepted/attended */}
 			{showJoinedBadge && (
 				<>
-					<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-info/10 text-info border border-info/20">
+					<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-success text-white">
 						<Check size={12} />
 						Accepted
 					</span>

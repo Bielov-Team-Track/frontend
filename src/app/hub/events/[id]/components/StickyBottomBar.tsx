@@ -57,7 +57,7 @@ export default function StickyBottomBar({
 			<div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]" data-testid="sticky-bottom-bar">
 				<div className="flex items-center gap-3">
 					<div className="flex-1 min-w-0 pl-1">
-						<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-info/10 text-info border border-info/20">
+						<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-success text-white">
 							<Check className="size-3.5" />
 							Accepted
 						</span>
