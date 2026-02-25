@@ -18,6 +18,7 @@ interface StickyBottomBarProps {
 	onAccept: () => void;
 	onDecline: () => void;
 	onWithdraw?: () => void;
+	onReaccept?: () => void;
 	onJoin?: () => void;
 }
 
@@ -33,6 +34,7 @@ export default function StickyBottomBar({
 	onAccept,
 	onDecline,
 	onWithdraw,
+	onReaccept,
 	onJoin,
 }: StickyBottomBarProps) {
 	// Calculate spots
@@ -45,42 +47,50 @@ export default function StickyBottomBar({
 		? "Covered by subscription"
 		: event.paymentConfig ? `£${event.paymentConfig.cost}` : "Free";
 
-	// Check if user is already a participant (includes past events where user attended)
+	// Check participation states
 	const isParticipant = myParticipation?.status === ParticipationStatus.Accepted || myParticipation?.status === ParticipationStatus.Attended;
+	const isDeclined = myParticipation?.status === ParticipationStatus.Declined;
+	const hasResponded = (isParticipant || isDeclined) && !hasInvitation;
 
-	// Don't render if event is full (and no invitation), or event is closed (and no invitation/participation)
-	if ((isFull && !hasInvitation && !isParticipant) || (!isOpen && !hasInvitation && !isParticipant)) {
+	// Don't render if event is full (and no invitation/response), or event is closed (and no invitation/response)
+	if ((isFull && !hasInvitation && !hasResponded) || (!isOpen && !hasInvitation && !hasResponded)) {
 		return null;
 	}
 
-	// Variant 0: Already accepted — show joined status with option to decline
-	if (isParticipant && isOpen) {
+	// Variant 0: User has responded (accepted or declined) — show toggle buttons
+	if (hasResponded) {
 		return (
 			<div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]" data-testid="sticky-bottom-bar">
-				<div className="flex items-center gap-3">
-					<div className="flex-1 min-w-0 pl-1">
-						<span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-success text-white">
-							<Check className="size-3.5" />
-							Accepted
-						</span>
-					</div>
-					<Button
-						variant="outline"
-						color="error"
-						size="sm"
-						onClick={onWithdraw}
-						leftIcon={<X className="size-3.5" />}
-						data-testid="sticky-withdraw-button">
-						Decline
-					</Button>
+				<div className="flex items-center justify-center gap-3">
+					<button
+						onClick={isDeclined ? onReaccept : undefined}
+						disabled={isParticipant}
+						className={`inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full transition-colors ${
+							isParticipant
+								? "bg-success text-white"
+								: "bg-success/10 text-success border border-success/20 hover:bg-success/20"
+						}`}
+						data-testid="sticky-accept-toggle"
+					>
+						<Check className="size-3.5" />
+						Accepted
+					</button>
+					<button
+						onClick={isParticipant ? onWithdraw : undefined}
+						disabled={isDeclined}
+						className={`inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full transition-colors ${
+							isDeclined
+								? "bg-error text-white"
+								: "bg-error/10 text-error border border-error/20 hover:bg-error/20"
+						}`}
+						data-testid="sticky-decline-toggle"
+					>
+						<X className="size-3.5" />
+						Declined
+					</button>
 				</div>
 			</div>
 		);
-	}
-
-	// Don't render for participants when event is not open
-	if (isParticipant) {
-		return null;
 	}
 
 	// Variant 1: Invited state

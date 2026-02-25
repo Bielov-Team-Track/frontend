@@ -45,9 +45,9 @@ export default function EventOverviewPage() {
 		},
 	});
 
-	// Withdraw (decline after already accepted) — uses PATCH status endpoint
-	const withdrawMutation = useMutation({
-		mutationFn: () => updateParticipantStatus(eventId, myParticipation!.userId, "Declined"),
+	// Change participation status — uses PATCH status endpoint
+	const changeStatusMutation = useMutation({
+		mutationFn: (status: string) => updateParticipantStatus(eventId, myParticipation!.userId, status),
 		onSuccess: () => {
 			refetchMyParticipation();
 			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
@@ -195,7 +195,8 @@ export default function EventOverviewPage() {
 			hasInvitation={hasInvitation}
 			onAccept={handleAcceptInvitation}
 			onDecline={() => handleDeclineInvitation()}
-			onWithdraw={() => withdrawMutation.mutate()}
+			onWithdraw={() => changeStatusMutation.mutate("Declined")}
+			onReaccept={() => changeStatusMutation.mutate("Accepted")}
 			onJoin={handleJoin}
 		/>
 

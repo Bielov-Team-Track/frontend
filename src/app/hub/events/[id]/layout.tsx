@@ -144,10 +144,11 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 	const isParticipant =
 		myParticipation?.status === ParticipationStatus.Accepted ||
 		myParticipation?.status === ParticipationStatus.Attended;
+	const isDeclined = myParticipation?.status === ParticipationStatus.Declined;
 	const isWaitlisted = myParticipation?.status === ParticipationStatus.Waitlisted;
-	// Withdraw (decline after already accepted) — uses PATCH status endpoint
-	const withdrawMutation = useMutation({
-		mutationFn: () => updateParticipantStatus(eventId, myParticipation!.userId, "Declined"),
+	// Change participation status — uses PATCH status endpoint
+	const changeStatusMutation = useMutation({
+		mutationFn: (status: string) => updateParticipantStatus(eventId, myParticipation!.userId, status),
 		onSuccess: () => {
 			refetchMyParticipation();
 			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
@@ -302,12 +303,14 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 							isFull={isFull}
 							hasInvitation={hasInvitation}
 							isParticipant={isParticipant}
+							isDeclined={isDeclined}
 							isWaitlisted={isWaitlisted}
 							canceled={event.canceled ?? false}
 							onAccept={handleAcceptInvitation}
 							onDecline={() => handleDeclineInvitation()}
-							onWithdraw={() => withdrawMutation.mutate()}
+							onWithdraw={() => changeStatusMutation.mutate("Declined")}
 							onJoin={handleJoin}
+							onReaccept={() => changeStatusMutation.mutate("Accepted")}
 							onJoinWaitlist={handleJoinWaitlist}
 						/>
 					</div>
