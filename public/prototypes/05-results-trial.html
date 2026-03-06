@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>Trial Results - Player View</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg-base: #121A1B;
+    --bg-subtle: #1E292B;
+    --bg-surface: #243335;
+    --bg-raised: #2C383A;
+    --bg-overlay: #344345;
+    --text-primary: #F0F0F0;
+    --text-secondary: #A0ABAB;
+    --text-muted: #6B7B7D;
+    --border: #3A4A4C;
+    --primary: #FF7D00;
+    --secondary: #29757A;
+    --success: #4A7A45;
+    --error: #BE3F23;
+    --info: #2E5A88;
+    --warning: #D99100;
+  }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    line-height: 1.5;
+    width: 390px;
+    min-height: 844px;
+    margin: 0 auto;
+    padding-bottom: 64px;
+  }
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .back-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--bg-raised);
+    border: none;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .top-title { font-size: 16px; font-weight: 600; }
+
+  /* Pass Banner */
+  .outcome-banner {
+    padding: 32px 16px;
+    text-align: center;
+  }
+  .outcome-banner.pass {
+    background: linear-gradient(180deg, rgba(74, 122, 69, 0.15) 0%, var(--bg-base) 100%);
+  }
+  .outcome-banner.no-pass {
+    background: linear-gradient(180deg, rgba(160, 171, 171, 0.08) 0%, var(--bg-base) 100%);
+  }
+  .outcome-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 36px;
+  }
+  .outcome-icon.pass {
+    background: rgba(74, 122, 69, 0.2);
+    border: 3px solid var(--success);
+  }
+  .outcome-icon.no-pass {
+    background: rgba(160, 171, 171, 0.1);
+    border: 3px solid var(--text-muted);
+  }
+  .outcome-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .outcome-title.pass { color: #7BBF74; }
+  .outcome-title.no-pass { color: var(--text-secondary); }
+  .outcome-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  /* Club & Event Info */
+  .event-info-card {
+    margin: 0 16px;
+    padding: 16px;
+    background: var(--bg-surface);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .club-logo {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .event-info-name { font-size: 15px; font-weight: 600; }
+  .event-info-meta { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+  .content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .section-card {
+    background: rgba(36, 51, 53, 0.8);
+    border-radius: 14px;
+    padding: 20px 16px;
+    backdrop-filter: blur(8px);
+  }
+  .section-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  /* Coach Notes */
+  .coach-notes {
+    padding: 16px;
+    background: var(--bg-raised);
+    border-radius: 10px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .coach-notes-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .coach-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .coach-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Feedback */
+  .feedback-card {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: var(--bg-raised);
+    border-radius: 10px;
+  }
+  .feedback-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .feedback-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .feedback-author-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .improvement-points {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .improvement-point {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .improvement-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Divider between variants */
+  .variant-divider {
+    margin: 40px 16px;
+    padding: 20px;
+    background: var(--bg-overlay);
+    border-radius: 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ===== BOTTOM APP NAV ===== */
+  .bottom-app-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 390px;
+    height: 64px;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 30;
+  }
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    flex: 1;
+    padding: 8px 0;
+  }
+  .bottom-nav-icon {
+    font-size: 20px;
+    color: var(--text-muted);
+  }
+  .bottom-nav-item.active .bottom-nav-icon {
+    color: var(--primary);
+  }
+  .bottom-nav-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+  .bottom-nav-item.active .bottom-nav-label {
+    color: var(--primary);
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== VARIANT 1: PASS ===== -->
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <button class="back-btn">←</button>
+  <div class="top-title">Trial Results</div>
+</div>
+
+<!-- Pass Banner -->
+<div class="outcome-banner pass">
+  <div class="outcome-icon pass">✓</div>
+  <div class="outcome-title pass">Congratulations!</div>
+  <div class="outcome-subtitle">You passed the trial</div>
+</div>
+
+<!-- Event Info -->
+<div class="event-info-card">
+  <div class="club-logo">VS</div>
+  <div>
+    <div class="event-info-name">U16 Boys Tryouts</div>
+    <div class="event-info-meta">Volleyball Spike Club · Feb 22, 2026</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Coach Message -->
+  <div class="section-card">
+    <div class="section-title">Coach Message</div>
+    <div class="coach-notes">
+      <div class="coach-notes-author">
+        <div class="coach-avatar">DB</div>
+        <div class="coach-name">Denys Bielov</div>
+      </div>
+      Welcome to the team! You showed strong fundamentals, especially in serving and defense. We're excited to have you join the U16 squad. Training starts next Monday at 17:00.
+    </div>
+  </div>
+
+  <!-- Feedback -->
+  <div class="section-card">
+    <div class="section-title">Feedback</div>
+    <div class="feedback-card">
+      <div class="feedback-avatar">DB</div>
+      <div>
+        <div class="feedback-author-name">Denys Bielov</div>
+        <div class="feedback-text">Your ball control and court awareness are impressive for your age group. Keep working on the areas below and you'll continue to improve rapidly.</div>
+        <div class="improvement-points">
+          <div class="improvement-point">
+            <div class="improvement-dot"></div>
+            Continue developing attack approach
+          </div>
+          <div class="improvement-point">
+            <div class="improvement-dot"></div>
+            Work on blocking read and reaction time
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== DIVIDER ===== -->
+<div class="variant-divider">— Variant: Not Selected —</div>
+
+<!-- ===== VARIANT 2: NO PASS ===== -->
+
+<!-- Top Bar (duplicate for second variant) -->
+<div class="top-bar">
+  <button class="back-btn">←</button>
+  <div class="top-title">Trial Results</div>
+</div>
+
+<!-- No Pass Banner -->
+<div class="outcome-banner no-pass">
+  <div class="outcome-icon no-pass">—</div>
+  <div class="outcome-title no-pass">Trial Result</div>
+  <div class="outcome-subtitle">Not selected at this time</div>
+</div>
+
+<!-- Event Info -->
+<div class="event-info-card">
+  <div class="club-logo">VS</div>
+  <div>
+    <div class="event-info-name">U16 Boys Tryouts</div>
+    <div class="event-info-meta">Volleyball Spike Club · Feb 22, 2026</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Coach Message -->
+  <div class="section-card">
+    <div class="section-title">Coach Message</div>
+    <div class="coach-notes">
+      <div class="coach-notes-author">
+        <div class="coach-avatar">DB</div>
+        <div class="coach-name">Denys Bielov</div>
+      </div>
+      Thank you for participating in the tryouts. While we couldn't offer a spot this time, your effort was noticed. We encourage you to keep practicing and try again next season. You're always welcome at our open training sessions.
+    </div>
+  </div>
+
+  <!-- Feedback -->
+  <div class="section-card">
+    <div class="section-title">Feedback</div>
+    <div class="feedback-card">
+      <div class="feedback-avatar">DB</div>
+      <div>
+        <div class="feedback-author-name">Denys Bielov</div>
+        <div class="feedback-text">You have good energy and hustle on the court. Focus on the fundamentals below and you'll be in a much stronger position next time.</div>
+        <div class="improvement-points">
+          <div class="improvement-point">
+            <div class="improvement-dot"></div>
+            Work on passing platform angle consistency
+          </div>
+          <div class="improvement-point">
+            <div class="improvement-dot"></div>
+            Practice serve receive positioning
+          </div>
+          <div class="improvement-point">
+            <div class="improvement-dot"></div>
+            Join open trainings to build game experience
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom App Nav (shared, fixed to viewport) -->
+<div class="bottom-app-nav">
+  <div class="bottom-nav-item">
+    <div class="bottom-nav-icon">🏠</div>
+    <div class="bottom-nav-label">Dashboard</div>
+  </div>
+  <div class="bottom-nav-item">
+    <div class="bottom-nav-icon">📅</div>
+    <div class="bottom-nav-label">Events</div>
+  </div>
+  <div class="bottom-nav-item">
+    <div class="bottom-nav-icon">💬</div>
+    <div class="bottom-nav-label">Messages</div>
+  </div>
+  <div class="bottom-nav-item active">
+    <div class="bottom-nav-icon">👤</div>
+    <div class="bottom-nav-label">Player</div>
+  </div>
+  <div class="bottom-nav-item">
+    <div class="bottom-nav-icon">⚙️</div>
+    <div class="bottom-nav-label">Settings</div>
+  </div>
+</div>
+
+</body>
+</html>

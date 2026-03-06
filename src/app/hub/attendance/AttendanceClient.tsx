@@ -6,7 +6,7 @@ import { AttendanceStatus, PaymentStatus, TimeRange } from "@/lib/models/Attenda
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Calendar, CheckCircle, DollarSign, Search, TrendingDown, Users, XCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react";
 import AttendanceFilters from "./components/AttendanceFilters";
 import AttendanceTable from "./components/AttendanceTable";
 import TimeRangeSelector from "./components/TimeRangeSelector";
@@ -76,7 +76,7 @@ function StatCard({
 	);
 }
 
-export default function AttendanceClient({ userId }: AttendanceClientProps) {
+function AttendanceClientContent({ userId }: AttendanceClientProps) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const queryClient = useQueryClient();
@@ -369,5 +369,13 @@ export default function AttendanceClient({ userId }: AttendanceClientProps) {
 				) : null}
 			</div>
 		</div>
+	);
+}
+
+export default function AttendanceClient({ userId }: AttendanceClientProps) {
+	return (
+		<Suspense fallback={<Loader />}>
+			<AttendanceClientContent userId={userId} />
+		</Suspense>
 	);
 }

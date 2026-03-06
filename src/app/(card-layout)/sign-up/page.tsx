@@ -4,7 +4,7 @@ import { Button, Input, Loader, Select } from "@/components/ui";
 import { register, RegisterPayload } from "@/lib/api/auth";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AxiosError } from "axios";
-import { Calendar, Lock, Mail, Globe, User, AlertCircle, Info } from "lucide-react";
+import { Calendar, Lock, Mail, Globe, AlertCircle, Info } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -15,8 +15,6 @@ import { COUNTRIES, getAgeTier, AgeTier } from "@/lib/utils/ageTier";
 interface SignUpFormInputs {
 	dateOfBirth: string;
 	countryCode: string;
-	firstName: string;
-	lastName: string;
 	email: string;
 	password: string;
 	confirmPassword: string;
@@ -31,24 +29,6 @@ const schema = yup.object().shape({
 			return new Date(value) <= new Date();
 		}),
 	countryCode: yup.string().required("Country is required"),
-	firstName: yup.string().when(["dateOfBirth", "countryCode"], {
-		is: (dob: string, country: string) => {
-			if (!dob || !country) return false;
-			const tier = getAgeTier(new Date(dob), country);
-			return tier !== "Under13";
-		},
-		then: (schema) => schema.required("First name is required").min(2, "Must be at least 2 characters"),
-		otherwise: (schema) => schema.optional(),
-	}),
-	lastName: yup.string().when(["dateOfBirth", "countryCode"], {
-		is: (dob: string, country: string) => {
-			if (!dob || !country) return false;
-			const tier = getAgeTier(new Date(dob), country);
-			return tier !== "Under13";
-		},
-		then: (schema) => schema.required("Last name is required").min(2, "Must be at least 2 characters"),
-		otherwise: (schema) => schema.optional(),
-	}),
 	email: yup.string().when(["dateOfBirth", "countryCode"], {
 		is: (dob: string, country: string) => {
 			if (!dob || !country) return false;
@@ -120,8 +100,6 @@ function SignUpPage() {
 				password: data.password,
 				dateOfBirth: data.dateOfBirth,
 				countryCode: data.countryCode,
-				firstName: data.firstName,
-				lastName: data.lastName,
 			};
 
 			await register(payload);
@@ -246,46 +224,6 @@ function SignUpPage() {
 				{/* Remaining Fields - Only shown when age tier is calculated and not Under13 */}
 				{showRemainingFields && (
 					<>
-						<Controller
-							name="firstName"
-							control={control}
-							render={({ field }) => (
-								<Input
-									{...field}
-									type="text"
-									label="First Name"
-									placeholder="Enter your first name"
-									leftIcon={<User size={16} />}
-									error={errors.firstName?.message}
-									required
-									onChange={(e) => {
-										field.onChange(e);
-										setError("");
-									}}
-								/>
-							)}
-						/>
-
-						<Controller
-							name="lastName"
-							control={control}
-							render={({ field }) => (
-								<Input
-									{...field}
-									type="text"
-									label="Last Name"
-									placeholder="Enter your last name"
-									leftIcon={<User size={16} />}
-									error={errors.lastName?.message}
-									required
-									onChange={(e) => {
-										field.onChange(e);
-										setError("");
-									}}
-								/>
-							)}
-						/>
-
 						<Controller
 							name="email"
 							control={control}

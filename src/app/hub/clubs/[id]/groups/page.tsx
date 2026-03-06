@@ -4,7 +4,7 @@ import { GroupsTab } from "../components/tabs";
 import { useClubContext } from "../layout";
 
 export default function ClubGroupsPage() {
-	const { clubId, groups, members, groupsQuery } = useClubContext();
+	const { clubId, groups, members, groupsQuery, permissions } = useClubContext();
 
 	return (
 		<GroupsTab
@@ -14,6 +14,7 @@ export default function ClubGroupsPage() {
 			hasNextPage={groupsQuery.hasNextPage}
 			isFetchingNextPage={groupsQuery.isFetchingNextPage}
 			fetchNextPage={groupsQuery.fetchNextPage}
+			canManage={permissions.canManageGroups}
 		/>
 	);
 }

@@ -4,7 +4,7 @@ import { Button } from "@/components";
 import { Event } from "@/lib/models/Event";
 import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { Team } from "@/lib/models/Team";
-import { Check, X } from "lucide-react";
+import { Check, CreditCard, MessageCircle, X } from "lucide-react";
 
 interface StickyBottomBarProps {
 	event: Event;
@@ -20,6 +20,7 @@ interface StickyBottomBarProps {
 	onWithdraw?: () => void;
 	onReaccept?: () => void;
 	onJoin?: () => void;
+	onMessageOrganizers?: () => void;
 }
 
 export default function StickyBottomBar({
@@ -36,6 +37,7 @@ export default function StickyBottomBar({
 	onWithdraw,
 	onReaccept,
 	onJoin,
+	onMessageOrganizers,
 }: StickyBottomBarProps) {
 	// Calculate spots
 	const totalSpots = teams.reduce((sum, t) => sum + (t.positions?.length || 0), 0);
@@ -62,36 +64,35 @@ export default function StickyBottomBar({
 		return (
 			<div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]" data-testid="sticky-bottom-bar">
 				<div className="flex items-center justify-center gap-3">
-					<button
+					<Button
+						size="sm"
+						variant={isParticipant ? "default" : "outline"}
+						leftIcon={<Check className="size-3.5" />}
 						onClick={isDeclined ? onReaccept : undefined}
 						disabled={isParticipant}
-						className={`inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full transition-colors ${
-							isParticipant
-								? "bg-success text-white"
-								: "bg-success/10 text-success border border-success/20 hover:bg-success/20"
-						}`}
+						className={isParticipant ? "bg-success text-white border-success hover:bg-success/90 disabled:opacity-100" : "border-success/30 text-success hover:bg-success/10"}
 						data-testid="sticky-accept-toggle"
 					>
-						<Check className="size-3.5" />
-						Accepted
-					</button>
-					<button
+						{isParticipant ? "Accepted" : "Accept"}
+					</Button>
+					<Button
+						size="sm"
+						variant={isDeclined ? "default" : "outline"}
+						leftIcon={<X className="size-3.5" />}
 						onClick={isParticipant ? onWithdraw : undefined}
 						disabled={isDeclined}
-						className={`inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full transition-colors ${
-							isDeclined
-								? "bg-error text-white"
-								: "bg-error/10 text-error border border-error/20 hover:bg-error/20"
-						}`}
+						className={isDeclined ? "bg-error text-white border-error hover:bg-error/90 disabled:opacity-100" : "border-error/30 text-error hover:bg-error/10"}
 						data-testid="sticky-decline-toggle"
 					>
-						<X className="size-3.5" />
-						Declined
-					</button>
+						Decline
+					</Button>
 				</div>
 			</div>
 		);
 	}
+
+	// Derived: pay-to-join gate
+	const payToJoin = !!event.paymentConfig?.payToJoin;
 
 	// Variant 1: Invited state
 	if (hasInvitation) {
@@ -120,9 +121,9 @@ export default function StickyBottomBar({
 						variant="default"
 						size="sm"
 						onClick={onAccept}
-						leftIcon={<Check className="size-3.5" />}
+						leftIcon={payToJoin ? <CreditCard className="size-3.5" /> : <Check className="size-3.5" />}
 						data-testid="sticky-accept-button">
-						Accept
+						{payToJoin ? "Pay & Accept" : "Accept"}
 					</Button>
 				</div>
 			</div>
@@ -139,14 +140,26 @@ export default function StickyBottomBar({
 							{spotsLeft} spots left · <span className={isSubscriptionCovered && hasCost ? "text-emerald-500" : ""}>{costDisplay}</span>
 						</div>
 					</div>
-					<Button
-						variant="default"
-						size="sm"
-						onClick={onJoin}
-						className="min-w-[100px]"
-						data-testid="sticky-join-button">
-						Join Event
-					</Button>
+					{event.isPrivate ? (
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={onMessageOrganizers}
+							leftIcon={<MessageCircle className="size-3.5" />}
+							data-testid="sticky-message-organizers-button">
+							Message Organizers
+						</Button>
+					) : (
+						<Button
+							variant="default"
+							size="sm"
+							onClick={onJoin}
+							leftIcon={payToJoin ? <CreditCard className="size-3.5" /> : undefined}
+							className="min-w-[100px]"
+							data-testid="sticky-join-button">
+							{payToJoin ? "Pay & Join" : "Join Event"}
+						</Button>
+					)}
 				</div>
 			</div>
 		);

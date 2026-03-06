@@ -10,13 +10,14 @@ interface EventsDisplayProps {
 	contextName?: string;
 	/** Full context object for pre-selecting in create modal */
 	context?: Club | Group | Team;
+	canCreate?: boolean;
 }
 
 /**
  * Shared component for displaying events filtered by context (club, team, or group).
  * Delegates fetching and filtering to EventsPageClient via baseFilter.
  */
-export default function EventsDisplay({ contextType, contextId, context }: EventsDisplayProps) {
+export default function EventsDisplay({ contextType, contextId, context, canCreate }: EventsDisplayProps) {
 	const getTitle = () => {
 		switch (contextType) {
 			case "club":
@@ -35,6 +36,7 @@ export default function EventsDisplay({ contextType, contextId, context }: Event
 			baseFilter={{ contextId, contextType }}
 			title={getTitle()}
 			defaultContext={context ? { context, contextType } : undefined}
+			canCreate={canCreate}
 		/>
 	);
 }

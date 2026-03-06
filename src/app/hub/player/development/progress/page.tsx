@@ -1,3 +1,5 @@
+"use client";
+
 import { EmptyState } from "@/components";
 import { TrendingUp } from "lucide-react";
 

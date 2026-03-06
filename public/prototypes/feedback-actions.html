@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback - Action-Oriented</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        primary: '#FF7D00',
+        secondary: '#29757A',
+        success: '#4A7A45',
+        error: '#BE3F23',
+        info: '#2E5A88',
+        warning: '#D99100',
+        base: { light: '#F5F5F5', dark: '#121A1B' },
+        subtle: { light: '#EBEBEB', dark: '#1E292B' },
+        surface: { light: '#FFFFFF', dark: '#243335' },
+        raised: { light: '#F0F0F0', dark: '#2C383A' },
+        overlay: { light: '#FFFFFF', dark: '#344345' },
+      },
+      fontFamily: {
+        sans: ['Instrument Sans', 'system-ui', 'sans-serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Instrument Sans', system-ui, sans-serif; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #29757A40; border-radius: 3px; }
+
+  .glass-card {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .slide-in {
+    animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+  }
+
+  /* Focus area card interaction */
+  .focus-card {
+    transition: all 0.2s ease;
+  }
+  .focus-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+  .dark .focus-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+
+  /* Drill button hover */
+  .drill-btn {
+    transition: all 0.2s ease;
+  }
+  .drill-btn:hover {
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(255, 125, 0, 0.2);
+  }
+
+  /* Badge grid animation */
+  .badge-cell {
+    transition: all 0.2s ease;
+  }
+  .badge-cell:hover {
+    transform: scale(1.1);
+  }
+
+  /* Expand for feedback list */
+  .fb-expand {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+  }
+  .fb-expand.open {
+    grid-template-rows: 1fr;
+  }
+  .fb-expand-inner {
+    overflow: hidden;
+  }
+
+  /* Progress indicator */
+  .progress-ring {
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Skill color coding */
+  .skill-serve { --skill-color: #FF7D00; }
+  .skill-defense { --skill-color: #29757A; }
+  .skill-attack { --skill-color: #BE3F23; }
+  .skill-setting { --skill-color: #2E5A88; }
+  .skill-blocking { --skill-color: #D99100; }
+  .skill-communication { --skill-color: #4A7A45; }
+</style>
+</head>
+<body class="bg-base-light dark:bg-base-dark text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+
+<!-- Top Bar -->
+<header class="sticky top-0 z-50 glass-card bg-base-light/80 dark:bg-base-dark/80 border-b border-gray-200/20 dark:border-white/5">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button onclick="history.back()" class="p-1.5 rounded-lg hover:bg-subtle-light dark:hover:bg-subtle-dark transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 class="text-lg font-semibold">Feedback</h1>
+    </div>
+    <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-subtle-light dark:hover:bg-subtle-dark transition-colors">
+      <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="max-w-3xl mx-auto px-4 sm:px-6 pb-20">
+
+  <!-- Section: Your Focus Areas -->
+  <section class="py-5 slide-in" style="animation-delay: 0.05s">
+    <div class="flex items-center justify-between mb-1">
+      <h2 class="text-base font-bold">Your Focus Areas</h2>
+      <span class="text-xs text-gray-500 dark:text-gray-400">Based on 12 feedback entries</span>
+    </div>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Top areas your coaches want you to work on, with drills to help.</p>
+
+    <div class="space-y-3">
+
+      <!-- Focus Area 1: Serve -->
+      <div class="focus-card glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm overflow-hidden">
+        <div class="p-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="text-sm font-bold text-primary">Serve Technique</h3>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] text-gray-500 bg-subtle-light dark:bg-subtle-dark px-2 py-0.5 rounded-full">3 coaches</span>
+                  <span class="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full font-semibold">5 points</span>
+                </div>
+              </div>
+              <div class="space-y-1.5 mt-2">
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Jump serve toss placement and topspin consistency</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Float serve zone targeting variety</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Beach serve adjustment for wind conditions</p>
+                </div>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <a href="#" class="drill-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  Topspin Serve Progression
+                </a>
+                <a href="#" class="drill-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  Beach Serve Variations
+                </a>
+                <a href="#" class="drill-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  Serve Receive Under Pressure
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Focus Area 2: Defense -->
+      <div class="focus-card glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm overflow-hidden">
+        <div class="p-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="text-sm font-bold text-secondary">Defensive Positioning</h3>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] text-gray-500 bg-subtle-light dark:bg-subtle-dark px-2 py-0.5 rounded-full">2 coaches</span>
+                  <span class="text-[10px] text-secondary bg-secondary/10 px-2 py-0.5 rounded-full font-semibold">4 points</span>
+                </div>
+              </div>
+              <div class="space-y-1.5 mt-2">
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-secondary mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Platform angle on zone 5 passes - face zone 3</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-secondary mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Move feet first before reaching for the ball</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-secondary mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Smart positioning over spectacular dives</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-secondary mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Faster transition from defense to attack position</p>
+                </div>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <a href="#" class="drill-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/10 text-secondary text-xs font-semibold">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  Platform Passing Drill
+                </a>
+                <a href="#" class="drill-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/10 text-secondary text-xs font-semibold">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  Footwork & Dig Drill
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Focus Area 3: Communication -->
+      <div class="focus-card glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm overflow-hidden">
+        <div class="p-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="text-sm font-bold text-success">Court Communication</h3>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] text-gray-500 bg-subtle-light dark:bg-subtle-dark px-2 py-0.5 rounded-full">2 coaches</span>
+                  <span class="text-[10px] text-success bg-success/10 px-2 py-0.5 rounded-full font-semibold">2 points</span>
+                </div>
+              </div>
+              <div class="space-y-1.5 mt-2">
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-success mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Call the ball louder and earlier on cross-court attacks</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-success mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Read the block and communicate options to hitters</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Focus Area 4: Attack -->
+      <div class="focus-card glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm overflow-hidden">
+        <div class="p-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-error/10 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="text-sm font-bold text-error">Attack Variety</h3>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] text-gray-500 bg-subtle-light dark:bg-subtle-dark px-2 py-0.5 rounded-full">2 coaches</span>
+                  <span class="text-[10px] text-error bg-error/10 px-2 py-0.5 rounded-full font-semibold">3 points</span>
+                </div>
+              </div>
+              <div class="space-y-1.5 mt-2">
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-error mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Back-row attack positioning and approach timing</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-error mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Develop cut shots and pokeys for beach 2v2</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <div class="w-1 h-1 rounded-full bg-error mt-2 flex-shrink-0"></div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Incorporate more back-row sets when middle is blocked</p>
+                </div>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <a href="#" class="drill-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error/10 text-error text-xs font-semibold">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  Back-Row Approach Drill
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Section: Praise & Recognition -->
+  <section class="pb-5 slide-in" style="animation-delay: 0.15s">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-base font-bold">Praise & Recognition</h2>
+      <span class="text-xs text-gray-500 dark:text-gray-400">8 badges earned</span>
+    </div>
+
+    <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm p-4">
+      <div class="grid grid-cols-4 sm:grid-cols-8 gap-2">
+        <div class="badge-cell text-center" title="Star Player x2">
+          <div class="w-11 h-11 mx-auto rounded-xl bg-primary/10 flex items-center justify-center text-xl mb-1">&#11088;</div>
+          <span class="text-[10px] font-semibold text-primary">x2</span>
+        </div>
+        <div class="badge-cell text-center" title="Most Improved x1">
+          <div class="w-11 h-11 mx-auto rounded-xl bg-success/10 flex items-center justify-center text-xl mb-1">&#128200;</div>
+          <span class="text-[10px] font-semibold text-success">x1</span>
+        </div>
+        <div class="badge-cell text-center" title="Team Player x2">
+          <div class="w-11 h-11 mx-auto rounded-xl bg-secondary/10 flex items-center justify-center text-xl mb-1">&#129309;</div>
+          <span class="text-[10px] font-semibold text-secondary">x2</span>
+        </div>
+        <div class="badge-cell text-center" title="Maximum Effort x1">
+          <div class="w-11 h-11 mx-auto rounded-xl bg-warning/10 flex items-center justify-center text-xl mb-1">&#128170;</div>
+          <span class="text-[10px] font-semibold text-warning">x1</span>
+        </div>
+        <div class="badge-cell text-center" title="Breakthrough x1">
+          <div class="w-11 h-11 mx-auto rounded-xl bg-info/10 flex items-center justify-center text-xl mb-1">&#128640;</div>
+          <span class="text-[10px] font-semibold text-info">x1</span>
+        </div>
+        <div class="badge-cell text-center opacity-25" title="Skill - Not earned">
+          <div class="w-11 h-11 mx-auto rounded-xl bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-xl mb-1 grayscale">&#127919;</div>
+          <span class="text-[10px] text-gray-400">-</span>
+        </div>
+        <div class="badge-cell text-center opacity-25" title="Leadership - Not earned">
+          <div class="w-11 h-11 mx-auto rounded-xl bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-xl mb-1 grayscale">&#128081;</div>
+          <span class="text-[10px] text-gray-400">-</span>
+        </div>
+        <div class="badge-cell text-center opacity-25" title="Consistency - Not earned">
+          <div class="w-11 h-11 mx-auto rounded-xl bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-xl mb-1 grayscale">&#128260;</div>
+          <span class="text-[10px] text-gray-400">-</span>
+        </div>
+      </div>
+
+      <!-- Latest praise -->
+      <div class="mt-4 pt-3 border-t border-gray-200/20 dark:border-white/5">
+        <div class="flex items-center gap-2 text-xs text-gray-500 mb-2 font-medium">Latest praise</div>
+        <div class="flex items-start gap-2">
+          <span class="text-lg">&#129309;</span>
+          <div>
+            <span class="text-sm font-medium">Team Player</span>
+            <span class="text-xs text-gray-500 ml-1">from Coach Smith &bull; Jan 28</span>
+            <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">"Excellent court communication and always supporting teammates through tough rallies."</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section: All Feedback -->
+  <section class="pb-8 slide-in" style="animation-delay: 0.2s">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-base font-bold">All Feedback</h2>
+      <span class="text-xs text-gray-500 dark:text-gray-400">12 total</span>
+    </div>
+
+    <div class="space-y-2">
+      <!-- Feedback Row 1 -->
+      <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm overflow-hidden">
+        <button class="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-subtle-light/30 dark:hover:bg-subtle-dark/30 transition-colors" onclick="toggleFeedback(this)">
+          <div class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-xs font-bold text-secondary flex-shrink-0">MS</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium">Coach Smith</span>
+              <span class="text-xs text-gray-500">Jan 28</span>
+              <span class="text-sm">&#129309;</span>
+            </div>
+            <p class="text-xs text-gray-500 truncate">Beach Tournament Finals</p>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-[10px] text-secondary bg-secondary/10 px-1.5 py-0.5 rounded font-medium">2 pts</span>
+            <svg class="w-4 h-4 text-gray-400 transition-transform fb-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </button>
+        <div class="fb-expand">
+          <div class="fb-expand-inner">
+            <div class="px-4 pb-4 pt-1 border-t border-gray-200/20 dark:border-white/5">
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mb-3">"Great improvement on your serve consistency this tournament. Your float serve was particularly effective in the second set. Keep working on the jump serve power."</p>
+              <div class="space-y-1.5">
+                <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span class="text-secondary font-bold">1.</span>
+                  <span>Work on back-row attack positioning</span>
+                </div>
+                <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span class="text-secondary font-bold">2.</span>
+                  <span>Improve communication on defense</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Row 2 -->
+      <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm overflow-hidden">
+        <button class="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-subtle-light/30 dark:hover:bg-subtle-dark/30 transition-colors" onclick="toggleFeedback(this)">
+          <div class="w-8 h-8 rounded-full bg-info/20 flex items-center justify-center text-xs font-bold text-info flex-shrink-0">JL</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium">Coach Lee</span>
+              <span class="text-xs text-gray-500">Jan 21</span>
+            </div>
+            <p class="text-xs text-gray-500 truncate">Club Practice Session</p>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-[10px] text-secondary bg-secondary/10 px-1.5 py-0.5 rounded font-medium">3 pts</span>
+            <svg class="w-4 h-4 text-gray-400 transition-transform fb-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </button>
+        <div class="fb-expand">
+          <div class="fb-expand-inner">
+            <div class="px-4 pb-4 pt-1 border-t border-gray-200/20 dark:border-white/5">
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mb-3">"Your defensive reads are getting better but you need to work on your platform angle when passing from zone 5."</p>
+              <div class="space-y-1.5">
+                <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span class="text-secondary font-bold">1.</span>
+                  <span>Fix platform angle on zone 5 passes</span>
+                </div>
+                <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span class="text-secondary font-bold">2.</span>
+                  <span>Move feet first before reaching for the ball</span>
+                </div>
+                <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span class="text-secondary font-bold">3.</span>
+                  <span>Faster defense-to-attack transition</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Row 3 -->
+      <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm overflow-hidden">
+        <button class="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-subtle-light/30 dark:hover:bg-subtle-dark/30 transition-colors" onclick="toggleFeedback(this)">
+          <div class="w-8 h-8 rounded-full bg-warning/20 flex items-center justify-center text-xs font-bold text-warning flex-shrink-0">SK</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium">Coach Kim</span>
+              <span class="text-xs text-gray-500">Jan 15</span>
+              <span class="text-sm">&#11088;</span>
+            </div>
+            <p class="text-xs text-gray-500 truncate">Indoor League Match</p>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-[10px] text-secondary bg-secondary/10 px-1.5 py-0.5 rounded font-medium">1 pt</span>
+            <svg class="w-4 h-4 text-gray-400 transition-transform fb-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </button>
+        <div class="fb-expand">
+          <div class="fb-expand-inner">
+            <div class="px-4 pb-4 pt-1 border-t border-gray-200/20 dark:border-white/5">
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mb-3">"Outstanding performance tonight. Your setting decisions were on point, especially the quick sets to the middle."</p>
+              <div class="space-y-1.5">
+                <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span class="text-secondary font-bold">1.</span>
+                  <span>Incorporate more back-row sets when middle is blocked</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Row 4 -->
+      <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm overflow-hidden">
+        <button class="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-subtle-light/30 dark:hover:bg-subtle-dark/30 transition-colors" onclick="toggleFeedback(this)">
+          <div class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-xs font-bold text-secondary flex-shrink-0">MS</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium">Coach Smith</span>
+              <span class="text-xs text-gray-500">Jan 8</span>
+            </div>
+            <p class="text-xs text-gray-500 truncate">Pre-Season Training Camp</p>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-[10px] text-secondary bg-secondary/10 px-1.5 py-0.5 rounded font-medium">2 pts</span>
+            <svg class="w-4 h-4 text-gray-400 transition-transform fb-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </button>
+        <div class="fb-expand">
+          <div class="fb-expand-inner">
+            <div class="px-4 pb-4 pt-1 border-t border-gray-200/20 dark:border-white/5">
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mb-3">"Good intensity at camp. Blocking timing improved. Need more consistency in serve receive."</p>
+              <div class="space-y-1.5">
+                <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span class="text-secondary font-bold">1.</span>
+                  <span>Serve receive consistency on hard-driven serves</span>
+                </div>
+                <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span class="text-secondary font-bold">2.</span>
+                  <span>Watch setter before committing to a block</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Row 5 -->
+      <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm overflow-hidden">
+        <button class="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-subtle-light/30 dark:hover:bg-subtle-dark/30 transition-colors" onclick="toggleFeedback(this)">
+          <div class="w-8 h-8 rounded-full bg-info/20 flex items-center justify-center text-xs font-bold text-info flex-shrink-0">JL</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium">Coach Lee</span>
+              <span class="text-xs text-gray-500">Dec 18</span>
+              <span class="text-sm">&#128170;</span>
+            </div>
+            <p class="text-xs text-gray-500 truncate">End-of-Season Tournament</p>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-[10px] text-secondary bg-secondary/10 px-1.5 py-0.5 rounded font-medium">2 pts</span>
+            <svg class="w-4 h-4 text-gray-400 transition-transform fb-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </button>
+        <div class="fb-expand">
+          <div class="fb-expand-inner">
+            <div class="px-4 pb-4 pt-1 border-t border-gray-200/20 dark:border-white/5">
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mb-3">"Incredible effort in the semifinals. You dove for every ball and kept rallies alive."</p>
+              <div class="space-y-1.5">
+                <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span class="text-secondary font-bold">1.</span>
+                  <span>Channel energy into smarter positioning</span>
+                </div>
+                <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span class="text-secondary font-bold">2.</span>
+                  <span>Pace yourself better in long matches</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Row 6 -->
+      <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm overflow-hidden">
+        <button class="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-subtle-light/30 dark:hover:bg-subtle-dark/30 transition-colors" onclick="toggleFeedback(this)">
+          <div class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-xs font-bold text-secondary flex-shrink-0">MS</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium">Coach Smith</span>
+              <span class="text-xs text-gray-500">Dec 10</span>
+              <span class="text-sm">&#128640;</span>
+            </div>
+            <p class="text-xs text-gray-500 truncate">Weekly Practice</p>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-[10px] text-secondary bg-secondary/10 px-1.5 py-0.5 rounded font-medium">1 pt</span>
+            <svg class="w-4 h-4 text-gray-400 transition-transform fb-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </button>
+        <div class="fb-expand">
+          <div class="fb-expand-inner">
+            <div class="px-4 pb-4 pt-1 border-t border-gray-200/20 dark:border-white/5">
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mb-3">"Breakthrough in your jump serve today. Toss placement was consistent and you got that topspin working."</p>
+              <div class="space-y-1.5">
+                <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  <span class="text-secondary font-bold">1.</span>
+                  <span>Add more target zones - don't just go cross-court</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Load More -->
+      <div class="text-center pt-2">
+        <button class="text-xs text-secondary hover:text-primary font-medium transition-colors">Load earlier feedback &darr;</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+function toggleTheme() {
+  document.documentElement.classList.toggle('dark');
+}
+
+function toggleFeedback(btn) {
+  const card = btn.closest('.glass-card');
+  const content = card.querySelector('.fb-expand');
+  const chevron = card.querySelector('.fb-chevron');
+  const isOpen = content.classList.contains('open');
+
+  content.classList.toggle('open');
+  chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+// Stagger animations
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.slide-in').forEach((el, i) => {
+    el.style.animationDelay = `${0.05 + i * 0.08}s`;
+  });
+});
+</script>
+</body>
+</html>

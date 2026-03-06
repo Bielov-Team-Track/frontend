@@ -75,7 +75,7 @@ export interface DrillAuthor {
 export interface Drill {
 	id: string;
 	name: string;
-	duration: number;
+	duration?: number;
 	category: DrillCategory;
 	intensity: DrillIntensity;
 	skills: DrillSkill[];
@@ -95,6 +95,10 @@ export interface Drill {
 	clubName?: string;
 	clubLogoUrl?: string;
 	author?: DrillAuthor;
+	visibility?: string | number;
+	createdByUserId?: string;
+	createdAt?: string | Date;
+	attachments?: unknown[];
 }
 
 export interface TimelineItem extends Drill {

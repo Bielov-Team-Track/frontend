@@ -98,7 +98,7 @@ async function uploadToLinear(
     const putRes = await fetch(uploadUrl, {
       method: "PUT",
       headers: putHeaders,
-      body: data,
+      body: new Uint8Array(data),
     });
 
     if (!putRes.ok) {
@@ -209,8 +209,10 @@ ${description}`;
 
   // Collect labels
   const labelIds: string[] = [];
-  if (LINEAR_LABELS["beta-feedback"]) labelIds.push(LINEAR_LABELS["beta-feedback"]);
-  if (LINEAR_LABELS[categoryConfig.label]) labelIds.push(LINEAR_LABELS[categoryConfig.label]);
+  const betaLabel = LINEAR_LABELS["beta-feedback"];
+  if (betaLabel) labelIds.push(betaLabel);
+  const catLabel = LINEAR_LABELS[categoryConfig.label];
+  if (catLabel) labelIds.push(catLabel);
 
   // Add user-selected labels
   if (labels && labels.length > 0) {

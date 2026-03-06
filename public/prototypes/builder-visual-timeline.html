@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bielov Builder - Visual Timeline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: { base: '#121A1B', surface: '#243335', raised: '#2C383A' },
+                        border: { default: '#2C383A', strong: '#3A4A4D' },
+                        brand: { primary: '#FF7D00', secondary: '#29757A' },
+                        cat: {
+                            warmup: '#29757A',
+                            technical: '#2E5A88',
+                            tactical: '#FF7D00',
+                            game: '#D99100',
+                            conditioning: '#BE3F23',
+                            cooldown: '#4A7A45'
+                        }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #121A1B; color: #F5F5F5; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        /* Timeline styling */
+        .timeline-track { background-image: linear-gradient(to right, #2C383A 1px, transparent 1px); background-size: 40px 100%; }
+        .timeline-block:hover { filter: brightness(1.1); z-index: 10; transform: scaleY(1.05); }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header & Controls -->
+    <header class="h-16 bg-bg-surface border-b border-border-default flex items-center justify-between px-6 shrink-0 z-30 shadow-lg">
+        <div class="flex items-center gap-6">
+            <h1 class="text-xl font-bold text-white tracking-tight">Timeline Editor</h1>
+            <div class="h-6 w-px bg-border-default"></div>
+            <div class="flex items-center gap-3">
+                 <input type="text" value="High Intensity Tuesday" class="bg-transparent border-b border-transparent hover:border-border-strong focus:border-brand-secondary focus:outline-none text-sm w-48 transition-colors">
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+             <div class="flex flex-col items-end">
+                <span class="text-[10px] uppercase text-gray-500 font-bold tracking-wider">Time Budget</span>
+                <div class="flex items-baseline gap-1">
+                    <span id="current-time" class="font-mono text-lg font-bold text-brand-primary">0</span>
+                    <span class="text-gray-500 text-sm">/</span>
+                    <span class="text-gray-400 text-sm">90 min</span>
+                </div>
+            </div>
+            <button class="bg-white text-bg-base hover:bg-gray-200 px-4 py-2 rounded-full font-bold text-sm transition-colors">
+                Publish Plan
+            </button>
+        </div>
+    </header>
+
+    <!-- Visual Timeline Area -->
+    <div class="h-64 bg-bg-base border-b-2 border-border-strong relative shrink-0 flex flex-col">
+        <!-- Time Ruler -->
+        <div class="h-8 border-b border-border-default flex items-end px-4 select-none relative overflow-hidden">
+            <div id="ruler-container" class="flex w-full absolute bottom-0 text-[10px] text-gray-500 font-mono">
+                <!-- Marks injected JS -->
+            </div>
+        </div>
+        
+        <!-- Tracks -->
+        <div class="flex-1 overflow-x-auto overflow-y-hidden relative timeline-track scrollbar-hide px-4" id="timeline-scroll-area">
+            <div id="timeline-strip" class="h-full flex items-center py-4 gap-1 min-w-full w-max">
+                <!-- Drop Zone / Sortable container -->
+                <div id="timeline-sortable" class="flex h-32 items-center gap-0.5 bg-bg-subtle/30 rounded-lg p-2 min-w-[800px] border border-dashed border-border-default/50 transition-colors">
+                    <!-- Blocks go here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legend/Filter overlay -->
+        <div class="absolute bottom-4 left-6 flex gap-2 pointer-events-none">
+            <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-bg-base/80 backdrop-blur rounded border border-border-default text-xs text-gray-400 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-cat-warmup"></span> Warmup
+            </span>
+             <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-bg-base/80 backdrop-blur rounded border border-border-default text-xs text-gray-400 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-cat-technical"></span> Tech
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-bg-base/80 backdrop-blur rounded border border-border-default text-xs text-gray-400 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-cat-game"></span> Game
+            </span>
+        </div>
+    </div>
+
+    <!-- Bottom: Library (Drawer style) -->
+    <div class="flex-1 bg-bg-subtle flex flex-col min-h-0">
+        <div class="px-6 py-3 border-b border-border-default flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-gray-300">Drill Library</h2>
+             <div class="flex gap-2">
+                <button class="text-xs bg-bg-raised hover:bg-bg-surface px-3 py-1.5 rounded text-gray-300 border border-border-default transition-colors">Filter</button>
+                <input type="text" placeholder="Search..." class="bg-bg-base border border-border-default rounded px-3 py-1.5 text-xs text-white w-48 focus:border-brand-secondary focus:outline-none">
+             </div>
+        </div>
+        
+        <div id="library-grid" class="p-6 overflow-y-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            <!-- Library Cards -->
+        </div>
+    </div>
+
+    <!-- Drill Edit Modal (Simple overlay) -->
+    <div id="edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-bg-surface border border-border-strong p-6 rounded-2xl w-96 shadow-2xl transform transition-all scale-100">
+            <div class="flex justify-between items-start mb-4">
+                <h3 id="modal-title" class="text-lg font-bold text-white">Drill Name</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-white">✕</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase text-gray-500 font-bold mb-1">Duration (min)</label>
+                    <input type="number" id="modal-duration" class="w-full bg-bg-base border border-border-default rounded px-3 py-2 text-white focus:border-brand-primary outline-none">
+                </div>
+                <div class="flex justify-between pt-2">
+                    <button onclick="deleteCurrentDrill()" class="text-status-error text-sm hover:underline">Remove from plan</button>
+                    <button onclick="saveModal()" class="bg-brand-primary text-white px-4 py-2 rounded-lg text-sm font-bold">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logic -->
+    <script>
+        const drills = [
+           { id: 'd1', name: 'Dynamic Stretching', duration: 10, category: 'Warmup' },
+           { id: 'd2', name: 'Pepper Drill', duration: 8, category: 'Warmup' },
+           { id: 'd3', name: 'Serve Receive Lines', duration: 15, category: 'Technical' },
+           { id: 'd4', name: 'Setting Accuracy', duration: 12, category: 'Technical' },
+           { id: 'd5', name: 'Attacking Approach', duration: 15, category: 'Technical' },
+           { id: 'd6', name: 'Block & Recover', duration: 12, category: 'Technical' },
+           { id: 'd7', name: '6v6 Controlled', duration: 20, category: 'Tactical' },
+           { id: 'd8', name: 'Transition Offense', duration: 15, category: 'Tactical' },
+           { id: 'd9', name: 'King of the Court', duration: 20, category: 'Game' },
+           { id: 'd10', name: 'Suicide Sprints', duration: 8, category: 'Conditioning' },
+           { id: 'd11', name: 'Cool Down Stretch', duration: 10, category: 'Cooldown' },
+           { id: 'd12', name: 'Jump Serve Practice', duration: 12, category: 'Technical' },
+       ];
+
+       const colors = {
+           'Warmup': 'bg-cat-warmup',
+           'Technical': 'bg-cat-technical',
+           'Tactical': 'bg-cat-tactical',
+           'Game': 'bg-cat-game',
+           'Conditioning': 'bg-cat-conditioning',
+           'Cooldown': 'bg-cat-cooldown'
+       };
+
+       let plan = [];
+       let currentEditId = null;
+
+       // Render Library
+       const libraryGrid = document.getElementById('library-grid');
+       drills.forEach(drill => {
+           const el = document.createElement('div');
+           el.className = 'bg-bg-base border border-border-default hover:border-border-strong p-4 rounded-xl cursor-grab active:cursor-grabbing transition-all hover:-translate-y-1 shadow-sm';
+           el.dataset.id = drill.id;
+           el.innerHTML = `
+               <div class="flex items-center justify-between mb-2">
+                   <div class="w-2 h-2 rounded-full ${colors[drill.category]}"></div>
+                   <span class="text-xs font-mono text-gray-500">${drill.duration}m</span>
+               </div>
+               <h4 class="font-bold text-sm text-gray-200 leading-tight">${drill.name}</h4>
+               <div class="mt-2 text-[10px] text-gray-500 uppercase tracking-wider">${drill.category}</div>
+           `;
+           libraryGrid.appendChild(el);
+       });
+
+       // Render Ruler
+       const ruler = document.getElementById('ruler-container');
+       for(let i=0; i<=150; i+=10) {
+           const mark = document.createElement('div');
+           mark.style.left = (i * 4) + 'px'; // 4px per minute scale
+           mark.className = 'absolute bottom-0 border-l border-gray-700 h-2 pl-1';
+           if(i%30 === 0) {
+               mark.className = 'absolute bottom-0 border-l border-gray-500 h-4 pl-1';
+               mark.innerText = i + 'm';
+           }
+           ruler.appendChild(mark);
+       }
+
+       // Setup Sortable
+       
+       // Library source
+       Sortable.create(libraryGrid, {
+           group: { name: 'timeline', pull: 'clone', put: false },
+           sort: false,
+           animation: 150
+       });
+
+       // Timeline destination
+       const timelineSortable = Sortable.create(document.getElementById('timeline-sortable'), {
+           group: 'timeline',
+           animation: 150,
+           direction: 'horizontal',
+           onAdd: function(evt) {
+               const drillId = evt.item.dataset.id;
+               const drill = drills.find(d => d.id === drillId);
+               evt.item.remove(); // Remove the default clone
+
+               const newItem = {
+                   instanceId: 'inst_' + Date.now(),
+                   drillId: drill.id,
+                   duration: drill.duration
+               };
+               
+               plan.splice(evt.newIndex, 0, newItem);
+               renderTimelineBlocks();
+           },
+           onUpdate: function(evt) {
+               const item = plan.splice(evt.oldIndex, 1)[0];
+               plan.splice(evt.newIndex, 0, item);
+               renderTimelineBlocks();
+           }
+       });
+
+       function renderTimelineBlocks() {
+           const container = document.getElementById('timeline-sortable');
+           container.innerHTML = '';
+           let totalTime = 0;
+
+           plan.forEach(item => {
+               const drill = drills.find(d => d.id === item.drillId);
+               totalTime += item.duration;
+
+               const block = document.createElement('div');
+               // 4px per minute width
+               const width = item.duration * 4; 
+               
+               block.className = `timeline-block h-24 rounded-md ${colors[drill.category]} border border-white/10 shadow-lg cursor-pointer relative flex flex-col justify-center px-2 overflow-hidden transition-transform`;
+               block.style.width = width + 'px';
+               block.onclick = () => openEdit(item.instanceId);
+               
+               // Block Content
+               block.innerHTML = `
+                    <div class="font-bold text-white text-xs truncate drop-shadow-md">${drill.name}</div>
+                    <div class="text-[10px] text-white/80 font-mono mt-1">${item.duration}m</div>
+               `;
+               
+               container.appendChild(block);
+           });
+           
+           document.getElementById('current-time').innerText = totalTime;
+       }
+
+       // Modal Logic
+       function openEdit(instanceId) {
+           const item = plan.find(i => i.instanceId === instanceId);
+           const drill = drills.find(d => d.id === item.drillId);
+           currentEditId = instanceId;
+           
+           document.getElementById('modal-title').innerText = drill.name;
+           document.getElementById('modal-duration').value = item.duration;
+           document.getElementById('edit-modal').classList.remove('hidden');
+       }
+
+       function closeModal() {
+           document.getElementById('edit-modal').classList.add('hidden');
+       }
+
+       function saveModal() {
+           const newDuration = parseInt(document.getElementById('modal-duration').value);
+           const item = plan.find(i => i.instanceId === currentEditId);
+           if(item) {
+               item.duration = newDuration;
+               renderTimelineBlocks();
+           }
+           closeModal();
+       }
+       
+       function deleteCurrentDrill() {
+           plan = plan.filter(i => i.instanceId !== currentEditId);
+           renderTimelineBlocks();
+           closeModal();
+       }
+
+    </script>
+</body>
+</html>

@@ -143,9 +143,9 @@ export default function DrillDetailModal({
 				</div>
 
 				{/* Animations */}
-				{drill.animations?.length > 0 && (
-					<MediaStrip title="Animations" count={drill.animations.length} canEdit={false}>
-						{drill.animations.map((anim, i) => (
+				{(drill.animations?.length ?? 0) > 0 && (
+					<MediaStrip title="Animations" count={drill.animations!.length} canEdit={false}>
+						{drill.animations!.map((anim, i) => (
 							<AnimationThumbnail
 								key={i}
 								animation={anim}

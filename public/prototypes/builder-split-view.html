@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bielov Builder - Split View</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: {
+                            base: '#121A1B',
+                            subtle: '#1E292B',
+                            surface: '#243335',
+                            raised: '#2C383A',
+                            overlay: '#344345',
+                        },
+                        border: {
+                            default: '#2C383A',
+                            strong: '#3A4A4D'
+                        },
+                        brand: {
+                            primary: '#FF7D00', // Orange
+                            secondary: '#29757A', // Teal
+                        },
+                        status: {
+                            success: '#4A7A45',
+                            error: '#BE3F23',
+                            warning: '#D99100',
+                            info: '#2E5A88'
+                        },
+                        cat: {
+                            warmup: '#29757A',
+                            technical: '#2E5A88',
+                            tactical: '#FF7D00',
+                            game: '#D99100',
+                            conditioning: '#BE3F23',
+                            cooldown: '#4A7A45'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #121A1B; color: #F5F5F5; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .drill-card:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .ghost-card { background: #2C383A; border: 2px dashed #3A4A4D; opacity: 0.5; }
+        .drag-handle { cursor: grab; }
+        .drag-handle:active { cursor: grabbing; }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Navigation -->
+    <header class="h-16 bg-bg-subtle border-b border-border-default flex items-center justify-between px-6 shrink-0 z-20 relative">
+        <div class="flex items-center gap-4">
+            <div class="h-8 w-8 bg-brand-primary rounded flex items-center justify-center text-white font-bold">B</div>
+            <h1 class="text-lg font-semibold text-white">Training Plan Builder</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="text-right">
+                <div class="text-xs text-gray-400">Total Duration</div>
+                <div class="font-mono font-bold text-xl" id="total-time-display">0m</div>
+            </div>
+            <div class="h-8 w-px bg-border-default"></div>
+            <button onclick="savePlan()" class="bg-brand-primary hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                Save Template
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- Left Sidebar: Drill Library -->
+        <aside class="w-80 bg-bg-subtle border-r border-border-default flex flex-col shrink-0 z-10">
+            <div class="p-4 border-b border-border-default">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Drill Library</h2>
+                <div class="relative">
+                    <input type="text" id="search-drills" placeholder="Search drills..." 
+                        class="w-full bg-bg-base border border-border-strong rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-secondary placeholder-gray-600">
+                    <svg class="w-4 h-4 absolute right-3 top-2.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <div class="flex gap-2 mt-3 overflow-x-auto pb-1 scrollbar-hide" id="category-filters">
+                    <!-- Filters injected via JS -->
+                </div>
+            </div>
+            
+            <div id="drill-library" class="flex-1 overflow-y-auto p-4 space-y-3">
+                <!-- Drills injected via JS -->
+            </div>
+        </aside>
+
+        <!-- Center: Canvas / Timeline -->
+        <main class="flex-1 bg-bg-base flex flex-col min-w-0 relative">
+            <!-- Plan Header/Settings -->
+            <div class="p-6 pb-2">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1 max-w-2xl">
+                        <input type="text" value="Tuesday Night Advanced" 
+                            class="bg-transparent text-3xl font-bold text-white w-full focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 rounded px-2 -ml-2 mb-2" />
+                        <div class="flex items-center gap-4 text-sm text-gray-400 px-1">
+                            <div class="flex items-center gap-2">
+                                <span>Target:</span>
+                                <input type="number" value="90" id="target-duration" class="w-12 bg-bg-raised border border-border-strong rounded px-1 py-0.5 text-center text-white">
+                                <span>min</span>
+                            </div>
+                            <span class="text-border-strong">|</span>
+                            <div class="flex items-center gap-2">
+                                <span>Focus:</span>
+                                <span class="bg-cat-technical/20 text-cat-technical px-2 py-0.5 rounded text-xs border border-cat-technical/30">Technical</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline Drop Zone -->
+            <div class="flex-1 overflow-y-auto p-6">
+                
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden h-64 border-2 border-dashed border-border-strong rounded-xl flex flex-col items-center justify-center text-gray-500">
+                    <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <p>Drag drills here from the library</p>
+                </div>
+
+                <!-- Timeline List -->
+                <div id="plan-timeline" class="space-y-0 relative min-h-[200px] pb-32">
+                    <!-- Timeline items injected here -->
+                </div>
+            </div>
+
+            <!-- Floating Action Button (Mobile only, hidden on desktop) -->
+            <button class="md:hidden absolute bottom-6 right-6 w-14 h-14 bg-brand-primary rounded-full shadow-lg flex items-center justify-center text-white z-50">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            </button>
+        </main>
+        
+        <!-- Right Panel: Drill Details (Contextual) -->
+        <aside class="w-72 bg-bg-surface border-l border-border-default hidden xl:flex flex-col shrink-0">
+            <div class="p-6">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Drill Details</h3>
+                <div id="drill-detail-view" class="text-center text-gray-500 py-10">
+                    <p>Select a drill on the timeline to view details.</p>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- DATA & LOGIC -->
+    <script>
+        // --- DATA ---
+        const drills = [
+            { id: 'd1', name: 'Dynamic Stretching', duration: 10, category: 'Warmup', intensity: 'Low', image: '🧘' },
+            { id: 'd2', name: 'Pepper Drill', duration: 8, category: 'Warmup', intensity: 'Low', image: '🏐' },
+            { id: 'd3', name: 'Serve Receive Lines', duration: 15, category: 'Technical', intensity: 'Medium', image: '🛡️' },
+            { id: 'd4', name: 'Setting Accuracy', duration: 12, category: 'Technical', intensity: 'Medium', image: '🎯' },
+            { id: 'd5', name: 'Attacking Approach', duration: 15, category: 'Technical', intensity: 'High', image: '⚡' },
+            { id: 'd6', name: 'Block & Recover', duration: 12, category: 'Technical', intensity: 'High', image: '✋' },
+            { id: 'd7', name: '6v6 Controlled', duration: 20, category: 'Tactical', intensity: 'Medium', image: '🎮' },
+            { id: 'd8', name: 'Transition Offense', duration: 15, category: 'Tactical', intensity: 'High', image: '🔄' },
+            { id: 'd9', name: 'King of the Court', duration: 20, category: 'Game', intensity: 'High', image: '👑' },
+            { id: 'd10', name: 'Suicide Sprints', duration: 8, category: 'Conditioning', intensity: 'High', image: '🏃' },
+            { id: 'd11', name: 'Cool Down Stretch', duration: 10, category: 'Cooldown', intensity: 'Low', image: '🧊' },
+            { id: 'd12', name: 'Jump Serve Practice', duration: 12, category: 'Technical', intensity: 'High', image: '🚀' },
+        ];
+
+        const colors = {
+            'Warmup': 'bg-cat-warmup',
+            'Technical': 'bg-cat-technical',
+            'Tactical': 'bg-cat-tactical',
+            'Game': 'bg-cat-game',
+            'Conditioning': 'bg-cat-conditioning',
+            'Cooldown': 'bg-cat-cooldown',
+            'Low': 'bg-status-success',
+            'Medium': 'bg-status-warning',
+            'High': 'bg-status-error'
+        };
+
+        const textColors = {
+            'Warmup': 'text-cat-warmup',
+            'Technical': 'text-cat-technical',
+            'Tactical': 'text-cat-tactical',
+            'Game': 'text-cat-game',
+            'Conditioning': 'text-cat-conditioning',
+            'Cooldown': 'text-cat-cooldown'
+        };
+
+        let plan = []; // Array of { instanceId, drillId, duration }
+
+        // --- DOM ELEMENTS ---
+        const libraryEl = document.getElementById('drill-library');
+        const timelineEl = document.getElementById('plan-timeline');
+        const emptyStateEl = document.getElementById('empty-state');
+        const totalTimeDisplay = document.getElementById('total-time-display');
+        const detailView = document.getElementById('drill-detail-view');
+
+        // --- RENDER FUNCTIONS ---
+
+        function renderLibrary(filterText = '') {
+            libraryEl.innerHTML = '';
+            drills.filter(d => d.name.toLowerCase().includes(filterText.toLowerCase())).forEach(drill => {
+                const el = document.createElement('div');
+                el.className = 'drill-card bg-bg-surface p-3 rounded-lg border border-border-default cursor-grab flex items-center gap-3 select-none transition-all';
+                el.dataset.id = drill.id;
+                
+                // Color strip
+                const colorClass = colors[drill.category] || 'bg-gray-500';
+                
+                el.innerHTML = `
+                    <div class="w-1.5 self-stretch rounded-full ${colorClass}"></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between mb-0.5">
+                            <h4 class="font-medium text-sm text-white truncate">${drill.name}</h4>
+                            <span class="text-xs font-mono text-gray-400">${drill.duration}m</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-[10px] uppercase tracking-wide text-gray-500">${drill.category}</span>
+                            <span class="text-[10px] text-gray-600">•</span>
+                            <span class="text-[10px] text-gray-500">${drill.intensity}</span>
+                        </div>
+                    </div>
+                `;
+                libraryEl.appendChild(el);
+            });
+        }
+
+        function renderTimeline() {
+            timelineEl.innerHTML = '';
+            
+            if (plan.length === 0) {
+                emptyStateEl.classList.remove('hidden');
+                totalTimeDisplay.textContent = '0m';
+                totalTimeDisplay.classList.remove('text-brand-primary');
+                return;
+            }
+            emptyStateEl.classList.add('hidden');
+
+            let accumulatedTime = 0;
+            
+            plan.forEach((item, index) => {
+                const drill = drills.find(d => d.id === item.drillId);
+                if (!drill) return;
+
+                const startTime = accumulatedTime;
+                accumulatedTime += item.duration;
+                const endTime = accumulatedTime;
+
+                const el = document.createElement('div');
+                el.className = 'timeline-item bg-bg-surface border border-border-default rounded-lg p-0 mb-3 flex group relative overflow-hidden transition-all hover:border-border-strong';
+                el.dataset.instanceId = item.instanceId;
+                
+                const catColor = colors[drill.category];
+                const catText = textColors[drill.category];
+
+                el.innerHTML = `
+                    <!-- Drag Handle -->
+                    <div class="drag-handle w-6 bg-bg-raised border-r border-border-default flex items-center justify-center cursor-grab hover:bg-bg-subtle transition-colors">
+                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                    </div>
+
+                    <!-- Time Marker -->
+                    <div class="w-16 flex flex-col items-center justify-center border-r border-border-default bg-bg-subtle/50 pt-2 pb-2">
+                        <div class="text-xs text-gray-500 font-mono">${formatTime(startTime)}</div>
+                        <div class="h-4 w-px bg-border-default my-1"></div>
+                        <div class="text-xs text-gray-600 font-mono">${formatTime(endTime)}</div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 p-3 flex items-center gap-4 cursor-pointer" onclick="selectDrill('${item.instanceId}')">
+                        <div class="h-10 w-10 rounded-full bg-bg-base border border-border-default flex items-center justify-center text-xl shadow-sm">
+                            ${drill.image}
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium text-white">${drill.name}</h4>
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="${catText} font-medium">${drill.category}</span>
+                                <span class="text-gray-600">•</span>
+                                <span class="text-gray-500">${drill.intensity}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Inline Edit Duration -->
+                        <div class="flex items-center gap-2 bg-bg-base rounded px-2 py-1 border border-transparent hover:border-border-strong transition-colors group-focus-within:border-brand-secondary">
+                            <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <input type="number" value="${item.duration}" 
+                                class="w-8 bg-transparent text-sm text-right font-mono text-white focus:outline-none"
+                                onchange="updateDuration('${item.instanceId}', this.value)"
+                                onclick="event.stopPropagation()">
+                            <span class="text-xs text-gray-500">m</span>
+                        </div>
+
+                        <!-- Remove Action -->
+                        <button onclick="removeDrill('${item.instanceId}', event)" class="opacity-0 group-hover:opacity-100 p-2 text-gray-500 hover:text-status-error transition-all rounded hover:bg-bg-base ml-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Progress Bar (Visual flair) -->
+                    <div class="absolute bottom-0 left-0 h-0.5 ${catColor}" style="width: 100%; opacity: 0.8;"></div>
+                `;
+                timelineEl.appendChild(el);
+            });
+
+            updateBudget(accumulatedTime);
+        }
+
+        // --- LOGIC HELPERS ---
+
+        function formatTime(minutes) {
+            const h = Math.floor(minutes / 60);
+            const m = minutes % 60;
+            if (h > 0) return `${h}:${m.toString().padStart(2, '0')}`;
+            return `0:${m.toString().padStart(2, '0')}`;
+        }
+
+        function updateBudget(total) {
+            totalTimeDisplay.textContent = `${total}m`;
+            const target = parseInt(document.getElementById('target-duration').value) || 90;
+            
+            if (total > target) totalTimeDisplay.classList.add('text-status-error');
+            else if (total === target) totalTimeDisplay.classList.add('text-status-success');
+            else totalTimeDisplay.classList.remove('text-status-error', 'text-status-success');
+        }
+
+        function selectDrill(instanceId) {
+            const item = plan.find(i => i.instanceId === instanceId);
+            const drill = drills.find(d => d.id === item.drillId);
+            
+            detailView.innerHTML = `
+                <div class="text-center mb-6">
+                    <div class="text-4xl mb-3">${drill.image}</div>
+                    <h2 class="text-xl font-bold text-white mb-1">${drill.name}</h2>
+                    <span class="inline-block px-2 py-0.5 rounded text-xs border ${textColors[drill.category]} border-current opacity-80">${drill.category}</span>
+                </div>
+                <div class="space-y-4 text-left">
+                    <div>
+                        <label class="text-xs text-gray-500 uppercase font-semibold">Intensity</label>
+                        <div class="mt-1 flex gap-1">
+                            <div class="h-2 flex-1 rounded-sm ${drill.intensity === 'Low' || drill.intensity === 'Medium' || drill.intensity === 'High' ? colors['Low'] : 'bg-gray-700'}"></div>
+                            <div class="h-2 flex-1 rounded-sm ${drill.intensity === 'Medium' || drill.intensity === 'High' ? colors['Medium'] : 'bg-gray-700 opacity-20'}"></div>
+                            <div class="h-2 flex-1 rounded-sm ${drill.intensity === 'High' ? colors['High'] : 'bg-gray-700 opacity-20'}"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 uppercase font-semibold">Description</label>
+                        <p class="text-sm text-gray-300 mt-1 leading-relaxed">
+                            Focus on high-quality repetitions. Ensure players are maintaining proper form throughout the duration.
+                        </p>
+                    </div>
+                     <div>
+                        <label class="text-xs text-gray-500 uppercase font-semibold">Coaching Points</label>
+                        <ul class="text-sm text-gray-300 mt-1 list-disc list-inside space-y-1">
+                            <li>Keep eyes on the ball</li>
+                            <li>Quick footwork</li>
+                            <li>Communicate loudly</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.updateDuration = (instanceId, newDuration) => {
+            const item = plan.find(i => i.instanceId === instanceId);
+            if (item) {
+                item.duration = parseInt(newDuration);
+                renderTimeline();
+            }
+        };
+
+        window.removeDrill = (instanceId, e) => {
+            e.stopPropagation();
+            plan = plan.filter(i => i.instanceId !== instanceId);
+            renderTimeline();
+            if (plan.length === 0) detailView.innerHTML = '<p class="text-gray-500 py-10">Select a drill on the timeline to view details.</p>';
+        };
+
+        window.savePlan = () => {
+            alert(`Plan saved with ${plan.length} drills! Total time: ${document.getElementById('total-time-display').textContent}`);
+        }
+
+        // --- DRAG AND DROP SETUP ---
+
+        // 1. Sortable for Library (Clone mode)
+        Sortable.create(libraryEl, {
+            group: {
+                name: 'shared',
+                pull: 'clone',
+                put: false // Do not allow items to be dropped back into the library
+            },
+            sort: false, // Disable sorting within library
+            animation: 150,
+            ghostClass: 'ghost-card',
+            onStart: function (evt) {
+                // visual feedback
+            }
+        });
+
+        // 2. Sortable for Timeline
+        Sortable.create(timelineEl, {
+            group: 'shared',
+            animation: 150,
+            handle: '.drag-handle',
+            ghostClass: 'ghost-card',
+            onAdd: function (evt) {
+                // When dropped from library
+                const drillId = evt.item.dataset.id;
+                const drill = drills.find(d => d.id === drillId);
+                
+                // Remove the cloned DOM element created by Sortable
+                evt.item.remove();
+                
+                // Add to internal state at correct index
+                const newIndex = evt.newIndex;
+                const newItem = {
+                    instanceId: 'inst_' + Date.now(),
+                    drillId: drill.id,
+                    duration: drill.duration
+                };
+                
+                plan.splice(newIndex, 0, newItem);
+                renderTimeline();
+                selectDrill(newItem.instanceId);
+            },
+            onUpdate: function (evt) {
+                // Reorder internal state
+                const item = plan.splice(evt.oldIndex, 1)[0];
+                plan.splice(evt.newIndex, 0, item);
+                renderTimeline();
+            }
+        });
+
+        // --- INITIALIZATION ---
+        renderLibrary();
+        
+        // Search listener
+        document.getElementById('search-drills').addEventListener('input', (e) => {
+            renderLibrary(e.target.value);
+        });
+
+    </script>
+</body>
+</html>

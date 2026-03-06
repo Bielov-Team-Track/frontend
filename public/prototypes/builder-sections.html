@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bielov Builder - Section Board</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: { base: '#121A1B', surface: '#243335', raised: '#2C383A', column: '#1A2426' },
+                        border: { default: '#2C383A', strong: '#3A4A4D' },
+                        brand: { primary: '#FF7D00', secondary: '#29757A' },
+                        cat: {
+                            warmup: '#29757A',
+                            technical: '#2E5A88',
+                            tactical: '#FF7D00',
+                            game: '#D99100',
+                            conditioning: '#BE3F23',
+                            cooldown: '#4A7A45'
+                        }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #121A1B; color: #F5F5F5; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #121A1B; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #2C383A; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #3A4A4D; }
+
+        .ghost-card { opacity: 0.4; background: #2C383A; border: 1px dashed #666; }
+        .chosen-card { opacity: 1; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Navbar -->
+    <nav class="h-16 bg-bg-surface border-b border-border-default flex items-center px-6 justify-between shrink-0">
+        <div class="flex items-center gap-4">
+            <div class="bg-gradient-to-br from-brand-primary to-orange-600 w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white shadow-lg">B</div>
+            <span class="font-bold text-lg tracking-tight">Board Builder</span>
+        </div>
+        <div class="flex gap-4 items-center">
+            <div class="bg-bg-raised px-4 py-1.5 rounded-full flex gap-3 text-sm border border-border-default">
+                <span class="text-gray-400">Total:</span>
+                <span id="total-time" class="font-bold text-white">0m</span>
+            </div>
+            <button class="bg-brand-primary hover:bg-orange-600 text-white px-5 py-2 rounded-lg font-medium transition shadow-lg shadow-orange-900/20">Save</button>
+        </div>
+    </nav>
+
+    <!-- Main Board Area -->
+    <div class="flex-1 overflow-x-auto overflow-y-hidden custom-scroll p-6">
+        <div class="flex h-full gap-6 min-w-max">
+            
+            <!-- Column 1: Library (Source) -->
+            <div class="w-80 flex flex-col h-full bg-bg-surface border border-border-default rounded-xl shadow-2xl shrink-0">
+                <div class="p-4 border-b border-border-default bg-bg-raised/50 rounded-t-xl">
+                    <h2 class="font-bold text-white flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        Library
+                    </h2>
+                    <input type="text" placeholder="Search..." class="mt-3 w-full bg-bg-base border border-border-default rounded px-3 py-2 text-sm focus:border-brand-secondary outline-none text-white placeholder-gray-600">
+                </div>
+                <div id="library-list" class="flex-1 overflow-y-auto p-3 space-y-3 custom-scroll">
+                    <!-- Drills injected here -->
+                </div>
+            </div>
+
+            <!-- Separator -->
+            <div class="w-px bg-border-default h-full mx-2"></div>
+
+            <!-- Column 2: Warm Up -->
+            <div class="w-80 flex flex-col h-full bg-bg-column/50 border border-border-default rounded-xl shrink-0">
+                <div class="p-4 border-b border-cat-warmup/30 bg-cat-warmup/10 rounded-t-xl flex justify-between items-center">
+                    <h2 class="font-bold text-cat-warmup uppercase tracking-wider text-sm">Warm Up</h2>
+                    <span class="text-xs bg-bg-base px-2 py-1 rounded text-gray-400 font-mono section-time" id="time-warmup">0m</span>
+                </div>
+                <div id="col-warmup" class="flex-1 overflow-y-auto p-3 space-y-3 custom-scroll sortable-target" data-section="warmup"></div>
+            </div>
+
+            <!-- Column 3: Main Phase -->
+            <div class="w-80 flex flex-col h-full bg-bg-column/50 border border-border-default rounded-xl shrink-0">
+                <div class="p-4 border-b border-cat-technical/30 bg-cat-technical/10 rounded-t-xl flex justify-between items-center">
+                    <h2 class="font-bold text-cat-technical uppercase tracking-wider text-sm">Main Phase</h2>
+                    <span class="text-xs bg-bg-base px-2 py-1 rounded text-gray-400 font-mono section-time" id="time-main">0m</span>
+                </div>
+                <div id="col-main" class="flex-1 overflow-y-auto p-3 space-y-3 custom-scroll sortable-target" data-section="main"></div>
+            </div>
+
+             <!-- Column 4: Game / Tactical -->
+             <div class="w-80 flex flex-col h-full bg-bg-column/50 border border-border-default rounded-xl shrink-0">
+                <div class="p-4 border-b border-cat-game/30 bg-cat-game/10 rounded-t-xl flex justify-between items-center">
+                    <h2 class="font-bold text-cat-game uppercase tracking-wider text-sm">Game / Tact</h2>
+                    <span class="text-xs bg-bg-base px-2 py-1 rounded text-gray-400 font-mono section-time" id="time-game">0m</span>
+                </div>
+                <div id="col-game" class="flex-1 overflow-y-auto p-3 space-y-3 custom-scroll sortable-target" data-section="game"></div>
+            </div>
+
+            <!-- Column 5: Cool Down -->
+            <div class="w-80 flex flex-col h-full bg-bg-column/50 border border-border-default rounded-xl shrink-0">
+                <div class="p-4 border-b border-cat-cooldown/30 bg-cat-cooldown/10 rounded-t-xl flex justify-between items-center">
+                    <h2 class="font-bold text-cat-cooldown uppercase tracking-wider text-sm">Cool Down</h2>
+                    <span class="text-xs bg-bg-base px-2 py-1 rounded text-gray-400 font-mono section-time" id="time-cool">0m</span>
+                </div>
+                <div id="col-cool" class="flex-1 overflow-y-auto p-3 space-y-3 custom-scroll sortable-target" data-section="cool"></div>
+            </div>
+
+             <!-- Add Section Button -->
+             <button class="w-12 h-full rounded-xl border-2 border-dashed border-border-default flex items-center justify-center text-gray-600 hover:text-white hover:border-brand-primary transition-colors shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const drills = [
+           { id: 'd1', name: 'Dynamic Stretching', duration: 10, category: 'Warmup', intensity: 'Low' },
+           { id: 'd2', name: 'Pepper Drill', duration: 8, category: 'Warmup', intensity: 'Low' },
+           { id: 'd3', name: 'Serve Receive Lines', duration: 15, category: 'Technical', intensity: 'Medium' },
+           { id: 'd4', name: 'Setting Accuracy', duration: 12, category: 'Technical', intensity: 'Medium' },
+           { id: 'd5', name: 'Attacking Approach', duration: 15, category: 'Technical', intensity: 'High' },
+           { id: 'd6', name: 'Block & Recover', duration: 12, category: 'Technical', intensity: 'High' },
+           { id: 'd7', name: '6v6 Controlled', duration: 20, category: 'Tactical', intensity: 'Medium' },
+           { id: 'd8', name: 'Transition Offense', duration: 15, category: 'Tactical', intensity: 'High' },
+           { id: 'd9', name: 'King of the Court', duration: 20, category: 'Game', intensity: 'High' },
+           { id: 'd10', name: 'Suicide Sprints', duration: 8, category: 'Conditioning', intensity: 'High' },
+           { id: 'd11', name: 'Cool Down Stretch', duration: 10, category: 'Cooldown', intensity: 'Low' },
+           { id: 'd12', name: 'Jump Serve Practice', duration: 12, category: 'Technical', intensity: 'High' },
+       ];
+
+       const intensityColors = {
+           'Low': 'bg-status-success',
+           'Medium': 'bg-status-warning',
+           'High': 'bg-status-error'
+       };
+
+       // State for each column
+       const sections = {
+           warmup: [],
+           main: [],
+           game: [],
+           cool: []
+       };
+
+       // --- Render Library ---
+       const libraryList = document.getElementById('library-list');
+       
+       function createCard(drill, isLibrary = true) {
+           const div = document.createElement('div');
+           div.className = `bg-bg-surface p-3 rounded-lg border border-border-default shadow-sm ${isLibrary ? 'cursor-grab hover:border-gray-500' : 'cursor-grab group relative'}`;
+           div.dataset.id = drill.id;
+           if(!isLibrary) div.dataset.duration = drill.duration; // Store current duration on DOM for easy calculation
+
+           div.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-bold ${intensityColors[drill.intensity]} px-1.5 py-0.5 rounded text-bg-base">${drill.intensity}</span>
+                    ${!isLibrary ? `
+                        <input type="number" value="${drill.duration}" 
+                        class="w-10 bg-bg-base border border-border-default rounded text-xs text-center text-white focus:border-brand-primary outline-none duration-input"
+                        onchange="updateTime(this)">
+                    ` : `<span class="text-xs font-mono text-gray-400">${drill.duration}m</span>`}
+                </div>
+                <h4 class="text-sm font-medium text-white mb-1 leading-tight">${drill.name}</h4>
+                <div class="text-[10px] text-gray-500 uppercase">${drill.category}</div>
+                ${!isLibrary ? `<button onclick="this.parentElement.remove(); recalcTotal();" class="absolute -top-2 -right-2 bg-bg-raised rounded-full p-1 text-gray-400 hover:text-red-500 shadow border border-border-default opacity-0 group-hover:opacity-100 transition-opacity">✕</button>` : ''}
+           `;
+           return div;
+       }
+
+       drills.forEach(drill => {
+           libraryList.appendChild(createCard(drill, true));
+       });
+
+       // --- Sortable Setup ---
+       
+       // Source
+       Sortable.create(libraryList, {
+           group: { name: 'board', pull: 'clone', put: false },
+           sort: false,
+           animation: 150,
+           ghostClass: 'ghost-card'
+       });
+
+       // Targets
+       document.querySelectorAll('.sortable-target').forEach(col => {
+           Sortable.create(col, {
+               group: 'board',
+               animation: 150,
+               ghostClass: 'ghost-card',
+               onAdd: function(evt) {
+                   const drillId = evt.item.dataset.id;
+                   const drill = drills.find(d => d.id === drillId);
+                   
+                   // Replace the clone with a proper instance card
+                   const newCard = createCard(drill, false);
+                   evt.item.replaceWith(newCard);
+                   
+                   recalcTotal();
+               },
+               onRemove: function() {
+                   recalcTotal();
+               }
+           });
+       });
+
+       // --- Logic ---
+       window.updateTime = (input) => {
+           const card = input.parentElement.parentElement; // Input -> Div -> Card
+           card.dataset.duration = input.value;
+           recalcTotal();
+       };
+
+       function recalcTotal() {
+           let total = 0;
+           
+           // Iterate over each section column to calculate sub-totals
+           ['warmup', 'main', 'game', 'cool'].forEach(sec => {
+               const col = document.getElementById('col-' + sec);
+               let secTotal = 0;
+               col.querySelectorAll('[data-duration]').forEach(el => {
+                   secTotal += parseInt(el.dataset.duration) || 0;
+               });
+               document.getElementById('time-' + sec).innerText = secTotal + 'm';
+               total += secTotal;
+           });
+
+           document.getElementById('total-time').innerText = total + 'm';
+       }
+
+    </script>
+</body>
+</html>

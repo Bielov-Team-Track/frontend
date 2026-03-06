@@ -1,3 +1,5 @@
+"use client";
+
 import { EmptyState } from "@/components";
 import { BarChart } from "lucide-react";
 

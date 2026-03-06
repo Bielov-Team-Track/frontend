@@ -4,7 +4,7 @@ import { TeamsTab } from "../components/tabs";
 import { useClubContext } from "../layout";
 
 export default function ClubTeamsPage() {
-	const { clubId, teams, members, teamsQuery } = useClubContext();
+	const { clubId, teams, members, teamsQuery, permissions } = useClubContext();
 
 	return (
 		<TeamsTab
@@ -14,6 +14,7 @@ export default function ClubTeamsPage() {
 			hasNextPage={teamsQuery.hasNextPage}
 			isFetchingNextPage={teamsQuery.isFetchingNextPage}
 			fetchNextPage={teamsQuery.fetchNextPage}
+			canManage={permissions.canManageTeams}
 		/>
 	);
 }

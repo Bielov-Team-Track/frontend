@@ -27,7 +27,7 @@ export default function TrainingViewMode({ timeline, onExitToEdit }: TrainingVie
 
 	const currentDrill = timeline[currentIndex];
 	const nextDrill = timeline[currentIndex + 1];
-	const drillDuration = currentDrill ? currentDrill.duration * 60 : 0;
+	const drillDuration = currentDrill ? (currentDrill.duration ?? 0) * 60 : 0;
 	const remaining = Math.max(0, drillDuration - elapsed);
 
 	// Initialize audio
@@ -139,8 +139,8 @@ export default function TrainingViewMode({ timeline, onExitToEdit }: TrainingVie
 		);
 	}
 
-	const progress = timeline.reduce((acc, _, i) => acc + (i < currentIndex ? timeline[i].duration * 60 : 0), 0) + elapsed;
-	const total = timeline.reduce((acc, d) => acc + d.duration * 60, 0);
+	const progress = timeline.reduce((acc, _, i) => acc + (i < currentIndex ? (timeline[i]?.duration ?? 0) * 60 : 0), 0) + elapsed;
+	const total = timeline.reduce((acc, d) => acc + (d.duration ?? 0) * 60, 0);
 	const progressPercent = total > 0 ? (progress / total) * 100 : 0;
 
 	return (

@@ -12,7 +12,7 @@ import { EventParticipant } from "@/lib/models/EventParticipant";
 import AuditParticipantList from "@/components/features/audit/components/AuditParticipantList";
 import { Loader } from "@/components/ui";
 import AuditTeamsList from "@/components/features/audit/components/AuditTeamsList";
-import { EVENTS_API_URL } from "@/lib/constants";
+import { PAYMENTS_API_URL } from "@/lib/constants";
 
 type AuditPageProps = {
 	params: Promise<{
@@ -56,7 +56,7 @@ function AuditPage({ params }: AuditPageProps) {
 				if (token) {
 					try {
 						const connection = await signalr.start({
-							baseUrl: EVENTS_API_URL,
+							baseUrl: PAYMENTS_API_URL,
 							hub: "payments",
 							token,
 						});

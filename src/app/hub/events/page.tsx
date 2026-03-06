@@ -8,7 +8,7 @@ async function EventsPage() {
 		redirect("/login");
 	}
 
-	return <EventsPageClient baseFilter={{ organizerId: userProfile.id! }} title="Your Events" />;
+	return <EventsPageClient baseFilter={{ participantId: userProfile.id! }} title="Your Events" />;
 }
 
 export default EventsPage;

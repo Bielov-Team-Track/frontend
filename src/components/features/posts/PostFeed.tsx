@@ -17,6 +17,7 @@ interface PostFeedProps {
 	contextType: ContextType;
 	contextId: string;
 	contextName: string;
+	isAdmin?: boolean;
 }
 
 type SortOption = "newest" | "oldest";
@@ -26,7 +27,7 @@ const SORT_OPTIONS = [
 	{ value: "oldest", label: "Oldest First", icon: <Calendar size={14} /> },
 ];
 
-export default function PostFeed({ contextType, contextId, contextName }: PostFeedProps) {
+export default function PostFeed({ contextType, contextId, contextName, isAdmin = false }: PostFeedProps) {
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [editingPost, setEditingPost] = useState<Post | null>(null);
 	const [search, setSearch] = useState("");
@@ -286,7 +287,7 @@ export default function PostFeed({ contextType, contextId, contextName }: PostFe
 							onUnpin={handleUnpin}
 							onHide={handleHide}
 							onRestore={handleRestore}
-							isAdmin={true} // TODO: Check actual admin status from context
+							isAdmin={isAdmin}
 						/>
 					))}
 

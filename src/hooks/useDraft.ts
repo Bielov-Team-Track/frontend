@@ -18,7 +18,7 @@ function buildKey(segments: string[]): string {
  */
 export function useDraft<T>(segments: string[], initialValue: T) {
 	const key = buildKey(segments);
-	const timerRef = useRef<ReturnType<typeof setTimeout>>();
+	const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
 	const [value, setValue] = useState<T>(() => {
 		if (typeof window === "undefined") return initialValue;

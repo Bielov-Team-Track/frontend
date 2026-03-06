@@ -1,19 +1,20 @@
 "use client";
 import { Button } from "@/components";
 import { Modal } from "@/components/ui";
-import { getMyParticipation, loadEvent, loadParticipants, updateParticipantStatus } from "@/lib/api/events";
+import { getMyParticipation, loadEvent, loadParticipants, respondToInvitation } from "@/lib/api/events";
+import { createChat } from "@/lib/api/messages";
 import { loadTeams } from "@/lib/api/teams";
 import { Event, EventFormat, EventType } from "@/lib/models/Event";
 import { Unit } from "@/lib/models/EventPaymentConfig";
 import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { Team } from "@/lib/models/Team";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { isPast } from "date-fns";
 import { ArrowLeft, Calendar, ClipboardList, CreditCard, Edit, MessageCircle, MoreHorizontal, Settings, Share2, Trash2, Users, XCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
-import { createContext, useContext, useMemo, useState } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import EventPaymentForm from "@/components/features/events/components/EventPaymentForm";
 import EventActionRow from "./components/EventActionRow";
 import EventContextBadge from "./components/EventContextBadge";
 import EventInfoRows from "./components/EventInfoRows";
@@ -50,6 +51,7 @@ interface TabConfig {
 	trainingOnly?: boolean;
 	evaluationOnly?: boolean;
 	teamsOnly?: boolean;
+	hasCost?: boolean;
 }
 const TABS: TabConfig[] = [
 	{ id: "overview", label: "Overview", icon: Calendar, href: "" },
@@ -57,15 +59,17 @@ const TABS: TabConfig[] = [
 	{ id: "members", label: "Participants", icon: Users, href: "/members" },
 	{ id: "training", label: "Training Plan", icon: ClipboardList, href: "/training", trainingOnly: true },
 	{ id: "evaluation", label: "Evaluation", icon: ClipboardList, href: "/evaluation-session/setup", evaluationOnly: true },
-	{ id: "payments", label: "Payments", icon: CreditCard, href: "/payments" },
+	{ id: "payments", label: "Payments", icon: CreditCard, href: "/payments", hasCost: true },
 ];
 export default function EventPrototypeLayout({ children }: { children: React.ReactNode }) {
 	const params = useParams();
 	const pathname = usePathname();
+	const router = useRouter();
 	const queryClient = useQueryClient();
 	const eventId = params.id as string;
 	const [bannerError, setBannerError] = useState(false);
 	const [showAdminMenu, setShowAdminMenu] = useState(false);
+	const [showPaymentModal, setShowPaymentModal] = useState(false);
 	// Determine active tab from pathname
 	const getActiveTab = (): TabType => {
 		if (pathname.includes("/settings")) return "settings";
@@ -136,6 +140,8 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 		setDeclineNote: setLayoutDeclineNote,
 	} = useEventActions({
 		eventId,
+		payToJoin: !!event?.paymentConfig?.payToJoin,
+		onPaymentRequired: () => setShowPaymentModal(true),
 		onSuccess: () => {
 			refetchMyParticipation();
 			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
@@ -146,14 +152,26 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 		myParticipation?.status === ParticipationStatus.Attended;
 	const isDeclined = myParticipation?.status === ParticipationStatus.Declined;
 	const isWaitlisted = myParticipation?.status === ParticipationStatus.Waitlisted;
-	// Change participation status — uses PATCH status endpoint
-	const changeStatusMutation = useMutation({
-		mutationFn: (status: string) => updateParticipantStatus(eventId, myParticipation!.userId, status),
+	// Respond mutation — uses POST /respond endpoint to change own status (Declined or Accepted)
+	const respondMutation = useMutation({
+		mutationFn: (accept: boolean) => respondToInvitation(eventId, accept),
 		onSuccess: () => {
 			refetchMyParticipation();
 			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
 		},
 	});
+	// Message organizers — create a chat with event organizers and navigate to it
+	const handleMessageOrganizers = useCallback(async () => {
+		const organizers = participants.filter((p) => p.role === "Organizer" || p.role === "Admin" || p.role === "Owner");
+		if (organizers.length === 0) return;
+		try {
+			const chat = await createChat(organizers.map((o) => o.userProfile));
+			router.push(`/hub/messages/${chat.id}`);
+		} catch {
+			// Fallback: navigate to messages page
+			router.push("/hub/messages");
+		}
+	}, [participants, router]);
 	// Memoize context value to prevent unnecessary re-renders of consumers
 	// Must be before early returns to maintain hook order
 	const contextValue = useMemo(
@@ -296,6 +314,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 						<EventActionRow
 							isOpen={isOpen}
 							isFull={isFull}
+							isPrivate={event.isPrivate ?? false}
 							hasInvitation={hasInvitation}
 							isParticipant={isParticipant}
 							isDeclined={isDeclined}
@@ -303,10 +322,11 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 							canceled={event.canceled ?? false}
 							onAccept={handleAcceptInvitation}
 							onDecline={() => handleDeclineInvitation()}
-							onWithdraw={() => changeStatusMutation.mutate("Declined")}
+							onWithdraw={() => respondMutation.mutate(false)}
 							onJoin={handleJoin}
-							onReaccept={() => changeStatusMutation.mutate("Accepted")}
+							onReaccept={handleAcceptInvitation}
 							onJoinWaitlist={handleJoinWaitlist}
+							onMessageOrganizers={handleMessageOrganizers}
 						/>
 					</div>
 					{/* Tabs */}
@@ -316,6 +336,7 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 								if (tab.trainingOnly && event.type !== EventType.TrainingSession) return false;
 								if (tab.evaluationOnly && event.type !== EventType.Evaluation && event.type !== EventType.Trial) return false;
 								if (tab.teamsOnly && (event.registrationUnit === Unit.Individual || event.eventFormat === EventFormat.List)) return false;
+								if (tab.hasCost && !(event.paymentConfig && event.paymentConfig.cost > 0)) return false;
 								return true;
 							}).map((tab) => {
 								const count = getTabCount(tab.id);
@@ -364,6 +385,32 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 						</Button>
 					</div>
 				</Modal>
+				{/* Payment Modal — embedded Stripe Payment Element (desktop) */}
+				{event.paymentConfig?.payToJoin && (
+					<Modal
+						isOpen={showPaymentModal}
+						onClose={() => setShowPaymentModal(false)}
+						title="Complete Payment"
+						description="Enter your card details to secure your spot."
+						size="md"
+						preventOutsideClose
+						data-testid="layout-event-payment-modal"
+					>
+						<EventPaymentForm
+							eventId={event.id}
+							eventName={event.name}
+							cost={event.paymentConfig?.cost ?? 0}
+							currency={event.paymentConfig?.currency || "£"}
+							onSuccess={() => {
+								setShowPaymentModal(false);
+								refetchMyParticipation();
+								queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
+								queryClient.invalidateQueries({ queryKey: ["event-my-participation", eventId] });
+							}}
+							onCancel={() => setShowPaymentModal(false)}
+						/>
+					</Modal>
+				)}
 				{/* Tab Content */}
 				<div className="min-h-100 pb-20 lg:pb-0">{children}</div>
 			</div>

@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Season Strength & Skills - Training Plan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #121A1B;
+            color: #F5F5F5;
+            line-height: 1.6;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Header Section */
+        .header {
+            background: rgba(36, 51, 53, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid #344345;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF7D00, #29757A);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px;
+            color: #FFF;
+            flex-shrink: 0;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .header-info h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .author-name {
+            font-size: 14px;
+            color: #A0A0A0;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-public {
+            background: rgba(41, 117, 122, 0.2);
+            color: #3DBCC4;
+            border: 1px solid rgba(61, 188, 196, 0.3);
+        }
+
+        .badge-difficulty {
+            background: rgba(255, 125, 0, 0.2);
+            color: #FF7D00;
+            border: 1px solid rgba(255, 125, 0, 0.3);
+        }
+
+        .description-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #A0A0A0;
+            margin: 16px 0;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #344345;
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+            color: #A0A0A0;
+            margin-bottom: 16px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Social Interactions Row */
+        .social-interactions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid #344345;
+        }
+
+        .interaction-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: transparent;
+            border: 1px solid #344345;
+            border-radius: 20px;
+            color: #A0A0A0;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .interaction-btn:hover {
+            background: rgba(52, 67, 69, 0.3);
+            border-color: #FF7D00;
+            color: #F5F5F5;
+        }
+
+        .interaction-btn.active {
+            border-color: #FF7D00;
+            color: #FF7D00;
+        }
+
+        .interaction-btn.liked {
+            border-color: #BE3F23;
+            color: #BE3F23;
+        }
+
+        .interaction-btn.saved {
+            border-color: #29757A;
+            color: #3DBCC4;
+        }
+
+        .interaction-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .interaction-btn.liked svg {
+            fill: #BE3F23;
+        }
+
+        .interaction-btn.saved svg {
+            fill: #3DBCC4;
+        }
+
+        .share-btn {
+            margin-left: auto;
+        }
+
+        /* Timeline Section */
+        .timeline-section {
+            background: rgba(36, 51, 53, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid #344345;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .view-switcher {
+            display: flex;
+            gap: 4px;
+            background: #1E292B;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .view-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: #A0A0A0;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .view-btn:hover {
+            color: #F5F5F5;
+        }
+
+        .view-btn.active {
+            background: #344345;
+            color: #F5F5F5;
+        }
+
+        /* Section Bands */
+        .section-bands {
+            position: relative;
+            height: 22px;
+            margin-bottom: 4px;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .section-band {
+            position: absolute;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #FFF;
+            border-radius: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Timeline Bar */
+        .timeline-bar-container {
+            position: relative;
+            height: 32px;
+            background: #1E292B;
+            border-radius: 0 0 6px 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .timeline-bar {
+            display: flex;
+            height: 100%;
+            position: relative;
+        }
+
+        .timeline-segment {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-right: 1px solid rgba(18, 26, 27, 0.5);
+        }
+
+        .timeline-segment:hover {
+            filter: brightness(1.2);
+            z-index: 10;
+        }
+
+        .timeline-segment:last-child {
+            border-right: none;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: #2C383A;
+            border: 1px solid #344345;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .timeline-segment:hover .tooltip {
+            opacity: 1;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #2C383A;
+        }
+
+        /* Time Markers */
+        .time-markers {
+            display: flex;
+            position: relative;
+            height: 24px;
+            margin-bottom: 16px;
+        }
+
+        .time-marker {
+            position: absolute;
+            font-size: 11px;
+            color: #666666;
+            transform: translateX(-50%);
+        }
+
+        .time-marker::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 4px;
+            background: #666666;
+        }
+
+        /* Filter Pills */
+        .filter-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .filter-pill {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid;
+        }
+
+        .filter-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .timeline-summary {
+            font-size: 13px;
+            color: #A0A0A0;
+        }
+
+        /* Drills Area: drills + side panel */
+        .drills-area {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .drills-side {
+            position: sticky;
+            top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .drills-side-card {
+            background: rgba(36, 51, 53, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid #344345;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Drills Section with Vertical Timeline */
+        .drills-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            min-width: 0;
+        }
+
+        .section-group {
+            display: flex;
+            gap: 24px;
+            position: relative;
+        }
+
+        .vertical-timeline {
+            width: 80px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .vertical-timeline-line {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #29757A;
+        }
+
+        .vertical-timeline-line.technical {
+            background: #2E5A88;
+        }
+
+        .vertical-timeline-line.cooldown {
+            background: #4A7A45;
+        }
+
+        .timeline-marker-vertical {
+            position: relative;
+            margin-bottom: 16px;
+            padding-left: 36px;
+            height: 200px;
+        }
+
+        .timeline-marker-vertical.last {
+            height: 150px;
+        }
+
+        .timeline-time {
+            font-size: 14px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            color: #A0A0A0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 16px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid #121A1B;
+        }
+
+        .section-content {
+            flex: 1;
+        }
+
+        .section-header {
+            padding: 16px 20px;
+            border-left: 4px solid;
+            background: rgba(28, 39, 41, 0.5);
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .section-header:hover {
+            background: rgba(28, 39, 41, 0.8);
+        }
+
+        .section-header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .section-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .section-meta {
+            font-size: 13px;
+            color: #A0A0A0;
+        }
+
+        .section-toggle {
+            color: #A0A0A0;
+            transition: transform 0.3s;
+        }
+
+        .section-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .section-drills {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: all 0.3s;
+        }
+
+        .section-drills.collapsed {
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .drill-card {
+            background: rgba(36, 51, 53, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid #344345;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .drill-card:hover {
+            background: rgba(52, 67, 69, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .drill-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .drill-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .category-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #FFF;
+        }
+
+        .intensity-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid;
+        }
+
+        .duration-text {
+            font-size: 13px;
+            color: #A0A0A0;
+        }
+
+        .drill-skills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .skill-tag {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            background: rgba(160, 160, 160, 0.1);
+            color: #A0A0A0;
+            border: 1px solid rgba(160, 160, 160, 0.2);
+        }
+
+        /* Comments Section */
+        .comments-section {
+            background: rgba(36, 51, 53, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid #344345;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .comments-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .comment-input-container {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #344345;
+        }
+
+        .comment-input {
+            width: 100%;
+            background: #1E292B;
+            border: 1px solid #344345;
+            border-radius: 8px;
+            padding: 12px;
+            color: #F5F5F5;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            margin-bottom: 12px;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: #FF7D00;
+        }
+
+        .comment-input::placeholder {
+            color: #666666;
+        }
+
+        .comment-submit {
+            padding: 10px 20px;
+            background: #FF7D00;
+            border: none;
+            border-radius: 8px;
+            color: #FFF;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .comment-submit:hover {
+            background: #E67100;
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .comment {
+            display: flex;
+            gap: 12px;
+        }
+
+        .comment.reply {
+            margin-left: 44px;
+            padding-left: 12px;
+            border-left: 2px solid #344345;
+        }
+
+        .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #29757A, #2E5A88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: #FFF;
+            flex-shrink: 0;
+        }
+
+        .comment-avatar.author {
+            background: linear-gradient(135deg, #FF7D00, #D99100);
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .comment-author {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .author-badge {
+            padding: 2px 8px;
+            background: rgba(255, 125, 0, 0.2);
+            border: 1px solid rgba(255, 125, 0, 0.3);
+            border-radius: 10px;
+            font-size: 11px;
+            color: #FF7D00;
+            font-weight: 600;
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: #666666;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #A0A0A0;
+            margin-bottom: 8px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .comment-action {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: #666666;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .comment-action:hover {
+            color: #F5F5F5;
+        }
+
+        .comment-action svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .side-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #A0A0A0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .distribution-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .distribution-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .distribution-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .distribution-bar {
+            height: 6px;
+            background: #1E292B;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .distribution-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .action-btn-primary {
+            background: #FF7D00;
+            color: #FFF;
+        }
+
+        .action-btn-primary:hover {
+            background: #E67100;
+        }
+
+        .action-btn-secondary {
+            background: transparent;
+            color: #A0A0A0;
+            border: 1px solid #344345;
+        }
+
+        .action-btn-secondary:hover {
+            background: rgba(52, 67, 69, 0.3);
+            color: #F5F5F5;
+        }
+
+        /* Category Colors */
+        .cat-warmup { background: #29757A; }
+        .cat-technical { background: #2E5A88; }
+        .cat-tactical { background: #FF7D00; }
+        .cat-game { background: #D99100; }
+        .cat-conditioning { background: #BE3F23; }
+        .cat-cooldown { background: #4A7A45; }
+
+        .pill-warmup { background: rgba(41, 117, 122, 0.2); color: #3DBCC4; border-color: rgba(61, 188, 196, 0.3); }
+        .pill-technical { background: rgba(46, 90, 136, 0.2); color: #5B9BD5; border-color: rgba(91, 155, 213, 0.3); }
+        .pill-tactical { background: rgba(255, 125, 0, 0.2); color: #FF9533; border-color: rgba(255, 149, 51, 0.3); }
+        .pill-game { background: rgba(217, 145, 0, 0.2); color: #FFBC33; border-color: rgba(255, 188, 51, 0.3); }
+        .pill-conditioning { background: rgba(190, 63, 35, 0.2); color: #E85A3D; border-color: rgba(232, 90, 61, 0.3); }
+        .pill-cooldown { background: rgba(74, 122, 69, 0.2); color: #6ABF62; border-color: rgba(106, 191, 98, 0.3); }
+
+        /* Intensity Colors */
+        .int-low { background: rgba(74, 122, 69, 0.2); color: #4A7A45; border-color: #4A7A45; }
+        .int-medium { background: rgba(217, 145, 0, 0.2); color: #D99100; border-color: #D99100; }
+        .int-high { background: rgba(190, 63, 35, 0.2); color: #BE3F23; border-color: #BE3F23; }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .header-top {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .view-switcher {
+                flex-wrap: wrap;
+            }
+
+            .section-group {
+                flex-direction: column;
+            }
+
+            .vertical-timeline {
+                display: none;
+            }
+
+            .comment.reply {
+                margin-left: 24px;
+            }
+
+            .drills-area {
+                grid-template-columns: 1fr;
+            }
+
+            .drills-side {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <div class="header-left">
+                    <div class="author-avatar">CD</div>
+                    <div class="header-info">
+                        <h1>Pre-Season Strength & Skills</h1>
+                        <div class="author-name">by Coach Denys</div>
+                    </div>
+                </div>
+                <div class="header-badges">
+                    <span class="badge badge-public">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                        Public
+                    </span>
+                    <span class="badge badge-difficulty">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        Intermediate
+                    </span>
+                </div>
+            </div>
+
+            <p class="description-text">
+                A comprehensive 90-minute session designed for intermediate players. Focuses on serving, attacking, and defensive transitions with proper warmup and cooldown.
+            </p>
+
+            <div class="header-meta">
+                <div class="meta-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    90 minutes
+                </div>
+                <div class="meta-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    12 drills
+                </div>
+                <div class="meta-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    </svg>
+                    3 sections
+                </div>
+            </div>
+
+            <div class="social-interactions">
+                <button class="interaction-btn" id="likeBtn" onclick="toggleLike()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <span id="likeCount">24 likes</span>
+                </button>
+                <button class="interaction-btn" id="saveBtn" onclick="toggleSave()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span id="saveText">Save</span>
+                </button>
+                <button class="interaction-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    8 comments
+                </button>
+                <button class="interaction-btn share-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                    Share
+                </button>
+            </div>
+        </div>
+
+        <!-- Timeline Section -->
+        <div class="timeline-section">
+            <div class="timeline-header">
+                <h2 class="timeline-title">Session Timeline</h2>
+                <div class="view-switcher">
+                    <button class="view-btn active" data-view="categories">Categories</button>
+                    <button class="view-btn" data-view="intensity">Intensity</button>
+                    <button class="view-btn" data-view="skills">Skills</button>
+                </div>
+            </div>
+
+            <!-- Section Bands -->
+            <div class="section-bands" id="sectionBands">
+                <div class="section-band cat-warmup" style="left: 0%; width: 22.22%;">Warmup</div>
+                <div class="section-band cat-technical" style="left: 22.22%; width: 50%;">Core Skills</div>
+                <div class="section-band cat-cooldown" style="left: 72.22%; width: 27.78%;">Cooldown</div>
+            </div>
+
+            <!-- Timeline Bar -->
+            <div class="timeline-bar-container">
+                <div class="timeline-bar" id="timelineBar"></div>
+            </div>
+
+            <!-- Time Markers -->
+            <div class="time-markers" id="timeMarkers"></div>
+
+            <!-- Filter Pills -->
+            <div class="filter-pills" id="filterPills"></div>
+
+            <div class="timeline-summary">90m total · 3 sections · 12 drills</div>
+        </div>
+
+        <!-- Drills + Side Panel -->
+        <div class="drills-area">
+
+        <!-- Drills Section with Vertical Timeline -->
+        <div class="drills-section">
+            <!-- Section 1: Warmup -->
+            <div class="section-group">
+                <div class="vertical-timeline">
+                    <div class="vertical-timeline-line"></div>
+                    <div class="timeline-marker-vertical">
+                        <div class="timeline-dot" style="background: #4A7A45;"></div>
+                        <div class="timeline-time">0:00</div>
+                    </div>
+                    <div class="timeline-marker-vertical">
+                        <div class="timeline-dot" style="background: #4A7A45;"></div>
+                        <div class="timeline-time">8:00</div>
+                    </div>
+                    <div class="timeline-marker-vertical last">
+                        <div class="timeline-dot" style="background: #D99100;"></div>
+                        <div class="timeline-time">15:00</div>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="section-header" style="border-left-color: #29757A;" onclick="toggleSection(this)">
+                        <div class="section-header-left">
+                            <div class="section-name">Warmup</div>
+                            <div class="section-meta">3 drills · 20 minutes</div>
+                        </div>
+                        <div class="section-toggle">▼</div>
+                    </div>
+                    <div class="section-drills">
+                        <div class="drill-card">
+                            <div class="drill-title">Dynamic Stretching</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-warmup">Warmup</span>
+                                <span class="intensity-badge int-low">Low</span>
+                                <span class="duration-text">8 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Flexibility</span>
+                            </div>
+                        </div>
+                        <div class="drill-card">
+                            <div class="drill-title">Light Jogging with Ball</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-warmup">Warmup</span>
+                                <span class="intensity-badge int-low">Low</span>
+                                <span class="duration-text">7 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Ball Control</span>
+                            </div>
+                        </div>
+                        <div class="drill-card">
+                            <div class="drill-title">Pepper Drill</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-technical">Technical</span>
+                                <span class="intensity-badge int-medium">Medium</span>
+                                <span class="duration-text">5 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Passing</span>
+                                <span class="skill-tag">Setting</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Core Skills -->
+            <div class="section-group">
+                <div class="vertical-timeline">
+                    <div class="vertical-timeline-line technical"></div>
+                    <div class="timeline-marker-vertical">
+                        <div class="timeline-dot" style="background: #D99100;"></div>
+                        <div class="timeline-time">20:00</div>
+                    </div>
+                    <div class="timeline-marker-vertical">
+                        <div class="timeline-dot" style="background: #BE3F23;"></div>
+                        <div class="timeline-time">30:00</div>
+                    </div>
+                    <div class="timeline-marker-vertical">
+                        <div class="timeline-dot" style="background: #BE3F23;"></div>
+                        <div class="timeline-time">38:00</div>
+                    </div>
+                    <div class="timeline-marker-vertical">
+                        <div class="timeline-dot" style="background: #BE3F23;"></div>
+                        <div class="timeline-time">46:00</div>
+                    </div>
+                    <div class="timeline-marker-vertical">
+                        <div class="timeline-dot" style="background: #D99100;"></div>
+                        <div class="timeline-time">53:00</div>
+                    </div>
+                    <div class="timeline-marker-vertical last">
+                        <div class="timeline-dot" style="background: #D99100;"></div>
+                        <div class="timeline-time">60:00</div>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="section-header" style="border-left-color: #2E5A88;" onclick="toggleSection(this)">
+                        <div class="section-header-left">
+                            <div class="section-name">Core Skills</div>
+                            <div class="section-meta">6 drills · 45 minutes</div>
+                        </div>
+                        <div class="section-toggle">▼</div>
+                    </div>
+                    <div class="section-drills">
+                        <div class="drill-card">
+                            <div class="drill-title">Serve Receive Formation</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-technical">Technical</span>
+                                <span class="intensity-badge int-medium">Medium</span>
+                                <span class="duration-text">10 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Passing</span>
+                                <span class="skill-tag">Positioning</span>
+                            </div>
+                        </div>
+                        <div class="drill-card">
+                            <div class="drill-title">Float Serve Practice</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-technical">Technical</span>
+                                <span class="intensity-badge int-high">High</span>
+                                <span class="duration-text">8 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Serving</span>
+                            </div>
+                        </div>
+                        <div class="drill-card">
+                            <div class="drill-title">Quick Attack Combo</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-tactical">Tactical</span>
+                                <span class="intensity-badge int-high">High</span>
+                                <span class="duration-text">8 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Attacking</span>
+                                <span class="skill-tag">Setting</span>
+                            </div>
+                        </div>
+                        <div class="drill-card">
+                            <div class="drill-title">Block-Transition Drill</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-tactical">Tactical</span>
+                                <span class="intensity-badge int-high">High</span>
+                                <span class="duration-text">7 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Blocking</span>
+                                <span class="skill-tag">Transition</span>
+                            </div>
+                        </div>
+                        <div class="drill-card">
+                            <div class="drill-title">Defensive Rotation</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-tactical">Tactical</span>
+                                <span class="intensity-badge int-medium">Medium</span>
+                                <span class="duration-text">7 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Defense</span>
+                                <span class="skill-tag">Positioning</span>
+                            </div>
+                        </div>
+                        <div class="drill-card">
+                            <div class="drill-title">Free Ball Side-out</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-game">Game</span>
+                                <span class="intensity-badge int-medium">Medium</span>
+                                <span class="duration-text">5 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Teamwork</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Cooldown -->
+            <div class="section-group">
+                <div class="vertical-timeline">
+                    <div class="vertical-timeline-line cooldown"></div>
+                    <div class="timeline-marker-vertical">
+                        <div class="timeline-dot" style="background: #D99100;"></div>
+                        <div class="timeline-time">65:00</div>
+                    </div>
+                    <div class="timeline-marker-vertical">
+                        <div class="timeline-dot" style="background: #4A7A45;"></div>
+                        <div class="timeline-time">80:00</div>
+                    </div>
+                    <div class="timeline-marker-vertical last">
+                        <div class="timeline-dot" style="background: #4A7A45;"></div>
+                        <div class="timeline-time">85:00</div>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="section-header" style="border-left-color: #4A7A45;" onclick="toggleSection(this)">
+                        <div class="section-header-left">
+                            <div class="section-name">Cooldown</div>
+                            <div class="section-meta">3 drills · 25 minutes</div>
+                        </div>
+                        <div class="section-toggle">▼</div>
+                    </div>
+                    <div class="section-drills">
+                        <div class="drill-card">
+                            <div class="drill-title">6v6 Controlled Scrimmage</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-game">Game</span>
+                                <span class="intensity-badge int-medium">Medium</span>
+                                <span class="duration-text">15 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Teamwork</span>
+                                <span class="skill-tag">Game Play</span>
+                            </div>
+                        </div>
+                        <div class="drill-card">
+                            <div class="drill-title">Static Stretching</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-cooldown">Cooldown</span>
+                                <span class="intensity-badge int-low">Low</span>
+                                <span class="duration-text">5 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Flexibility</span>
+                            </div>
+                        </div>
+                        <div class="drill-card">
+                            <div class="drill-title">Team Debrief</div>
+                            <div class="drill-badges">
+                                <span class="category-badge cat-cooldown">Cooldown</span>
+                                <span class="intensity-badge int-low">Low</span>
+                                <span class="duration-text">5 min</span>
+                            </div>
+                            <div class="drill-skills">
+                                <span class="skill-tag">Communication</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side Panel -->
+        <div class="drills-side">
+            <div class="drills-side-card">
+                <div class="side-section-title">Categories</div>
+                <div class="distribution-bars">
+                    <div class="distribution-item">
+                        <div class="distribution-label">
+                            <span style="color: #3DBCC4;">Warmup</span>
+                            <span>15m</span>
+                        </div>
+                        <div class="distribution-bar">
+                            <div class="distribution-fill cat-warmup" style="width: 16.7%;"></div>
+                        </div>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-label">
+                            <span style="color: #5B9BD5;">Technical</span>
+                            <span>23m</span>
+                        </div>
+                        <div class="distribution-bar">
+                            <div class="distribution-fill cat-technical" style="width: 25.6%;"></div>
+                        </div>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-label">
+                            <span style="color: #FF9533;">Tactical</span>
+                            <span>22m</span>
+                        </div>
+                        <div class="distribution-bar">
+                            <div class="distribution-fill cat-tactical" style="width: 24.4%;"></div>
+                        </div>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-label">
+                            <span style="color: #FFBC33;">Game</span>
+                            <span>20m</span>
+                        </div>
+                        <div class="distribution-bar">
+                            <div class="distribution-fill cat-game" style="width: 22.2%;"></div>
+                        </div>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-label">
+                            <span style="color: #6ABF62;">Cooldown</span>
+                            <span>10m</span>
+                        </div>
+                        <div class="distribution-bar">
+                            <div class="distribution-fill cat-cooldown" style="width: 11.1%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="drills-side-card">
+                <div class="side-section-title">Intensity</div>
+                <div class="distribution-bars">
+                    <div class="distribution-item">
+                        <div class="distribution-label">
+                            <span style="color: #4A7A45;">Low</span>
+                            <span>25m</span>
+                        </div>
+                        <div class="distribution-bar">
+                            <div class="distribution-fill" style="width: 27.8%; background: #4A7A45;"></div>
+                        </div>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-label">
+                            <span style="color: #D99100;">Medium</span>
+                            <span>42m</span>
+                        </div>
+                        <div class="distribution-bar">
+                            <div class="distribution-fill" style="width: 46.7%; background: #D99100;"></div>
+                        </div>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-label">
+                            <span style="color: #BE3F23;">High</span>
+                            <span>23m</span>
+                        </div>
+                        <div class="distribution-bar">
+                            <div class="distribution-fill" style="width: 25.6%; background: #BE3F23;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="drills-side-card">
+                <div class="side-section-title">Skills Covered</div>
+                <div class="skills-list">
+                    <span class="skill-tag">Flexibility</span>
+                    <span class="skill-tag">Ball Control</span>
+                    <span class="skill-tag">Passing</span>
+                    <span class="skill-tag">Setting</span>
+                    <span class="skill-tag">Positioning</span>
+                    <span class="skill-tag">Serving</span>
+                    <span class="skill-tag">Attacking</span>
+                    <span class="skill-tag">Blocking</span>
+                    <span class="skill-tag">Transition</span>
+                    <span class="skill-tag">Defense</span>
+                    <span class="skill-tag">Teamwork</span>
+                    <span class="skill-tag">Game Play</span>
+                    <span class="skill-tag">Communication</span>
+                </div>
+            </div>
+
+            <div class="drills-side-card">
+                <div class="side-section-title">Actions</div>
+                <div class="action-buttons" style="flex-direction: column;">
+                    <button class="action-btn action-btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Edit Plan
+                    </button>
+                    <button class="action-btn action-btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Duplicate
+                    </button>
+                    <button class="action-btn action-btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        </div> <!-- /drills-area -->
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h2 class="comments-header">Comments (8)</h2>
+
+            <div class="comment-input-container">
+                <textarea class="comment-input" placeholder="Add a comment..."></textarea>
+                <button class="comment-submit">Submit</button>
+            </div>
+
+            <div class="comments-list">
+                <div class="comment">
+                    <div class="comment-avatar">CM</div>
+                    <div class="comment-content">
+                        <div class="comment-header">
+                            <span class="comment-author">Coach Maria</span>
+                            <span class="comment-time">2 days ago</span>
+                        </div>
+                        <div class="comment-text">
+                            Great progression from warmup to core drills. I'd add more serve receive reps though.
+                        </div>
+                        <div class="comment-actions">
+                            <div class="comment-action">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                                3 likes
+                            </div>
+                            <div class="comment-action">Reply</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comment reply">
+                    <div class="comment-avatar author">CD</div>
+                    <div class="comment-content">
+                        <div class="comment-header">
+                            <span class="comment-author">Coach Denys</span>
+                            <span class="author-badge">AUTHOR</span>
+                            <span class="comment-time">2 days ago</span>
+                        </div>
+                        <div class="comment-text">
+                            Thanks for the feedback! I'm working on a v2 with more serve receive focus.
+                        </div>
+                        <div class="comment-actions">
+                            <div class="comment-action">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                                2 likes
+                            </div>
+                            <div class="comment-action">Reply</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comment">
+                    <div class="comment-avatar">AP</div>
+                    <div class="comment-content">
+                        <div class="comment-header">
+                            <span class="comment-author">Alex P.</span>
+                            <span class="comment-time">5 days ago</span>
+                        </div>
+                        <div class="comment-text">
+                            Used this for our U18 team last week. The block-transition drill was especially effective.
+                        </div>
+                        <div class="comment-actions">
+                            <div class="comment-action">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                                7 likes
+                            </div>
+                            <div class="comment-action">Reply</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comment">
+                    <div class="comment-avatar">SK</div>
+                    <div class="comment-content">
+                        <div class="comment-header">
+                            <span class="comment-author">Sarah K.</span>
+                            <span class="comment-time">1 week ago</span>
+                        </div>
+                        <div class="comment-text">
+                            How do you handle the transition between the tactical and game sections?
+                        </div>
+                        <div class="comment-actions">
+                            <div class="comment-action">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                                1 like
+                            </div>
+                            <div class="comment-action">Reply</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Drill data
+        const drills = [
+            { name: 'Dynamic Stretching', category: 'Warmup', intensity: 'Low', duration: 8, skills: ['Flexibility'] },
+            { name: 'Light Jogging with Ball', category: 'Warmup', intensity: 'Low', duration: 7, skills: ['Ball Control'] },
+            { name: 'Pepper Drill', category: 'Technical', intensity: 'Medium', duration: 5, skills: ['Passing', 'Setting'] },
+            { name: 'Serve Receive Formation', category: 'Technical', intensity: 'Medium', duration: 10, skills: ['Passing', 'Positioning'] },
+            { name: 'Float Serve Practice', category: 'Technical', intensity: 'High', duration: 8, skills: ['Serving'] },
+            { name: 'Quick Attack Combo', category: 'Tactical', intensity: 'High', duration: 8, skills: ['Attacking', 'Setting'] },
+            { name: 'Block-Transition Drill', category: 'Tactical', intensity: 'High', duration: 7, skills: ['Blocking', 'Transition'] },
+            { name: 'Defensive Rotation', category: 'Tactical', intensity: 'Medium', duration: 7, skills: ['Defense', 'Positioning'] },
+            { name: 'Free Ball Side-out', category: 'Game', intensity: 'Medium', duration: 5, skills: ['Teamwork'] },
+            { name: '6v6 Controlled Scrimmage', category: 'Game', intensity: 'Medium', duration: 15, skills: ['Teamwork', 'Game Play'] },
+            { name: 'Static Stretching', category: 'Cooldown', intensity: 'Low', duration: 5, skills: ['Flexibility'] },
+            { name: 'Team Debrief', category: 'Cooldown', intensity: 'Low', duration: 5, skills: ['Communication'] }
+        ];
+
+        const totalDuration = 90;
+
+        // Category colors
+        const categoryColors = {
+            'Warmup': '#29757A',
+            'Technical': '#2E5A88',
+            'Tactical': '#FF7D00',
+            'Game': '#D99100',
+            'Conditioning': '#BE3F23',
+            'Cooldown': '#4A7A45'
+        };
+
+        // Intensity colors
+        const intensityColors = {
+            'Low': '#4A7A45',
+            'Medium': '#D99100',
+            'High': '#BE3F23'
+        };
+
+        // Skill colors (vibrant palette)
+        const skillColors = {
+            'Flexibility': '#6ABF62',
+            'Ball Control': '#3DBCC4',
+            'Passing': '#5B9BD5',
+            'Setting': '#9B86FC',
+            'Positioning': '#FFB84D',
+            'Serving': '#FF7D00',
+            'Attacking': '#E85A3D',
+            'Blocking': '#BE3F23',
+            'Transition': '#29757A',
+            'Defense': '#2E5A88',
+            'Teamwork': '#D99100',
+            'Game Play': '#FFBC33',
+            'Communication': '#4A7A45'
+        };
+
+        let currentView = 'categories';
+        let likeCount = 24;
+        let isLiked = false;
+        let isSaved = false;
+
+        // Social interactions
+        function toggleLike() {
+            const btn = document.getElementById('likeBtn');
+            const countEl = document.getElementById('likeCount');
+
+            if (isLiked) {
+                likeCount--;
+                btn.classList.remove('liked');
+            } else {
+                likeCount++;
+                btn.classList.add('liked');
+            }
+
+            isLiked = !isLiked;
+            countEl.textContent = `${likeCount} likes`;
+        }
+
+        function toggleSave() {
+            const btn = document.getElementById('saveBtn');
+            const textEl = document.getElementById('saveText');
+
+            if (isSaved) {
+                btn.classList.remove('saved');
+                textEl.textContent = 'Save';
+            } else {
+                btn.classList.add('saved');
+                textEl.textContent = 'Saved';
+            }
+
+            isSaved = !isSaved;
+        }
+
+        // Render timeline
+        function renderTimeline(view) {
+            const timelineBar = document.getElementById('timelineBar');
+            timelineBar.innerHTML = '';
+
+            let cumulativeTime = 0;
+            drills.forEach((drill, index) => {
+                const segment = document.createElement('div');
+                segment.className = 'timeline-segment';
+                segment.style.width = `${(drill.duration / totalDuration) * 100}%`;
+
+                let color;
+                if (view === 'categories') {
+                    color = categoryColors[drill.category];
+                } else if (view === 'intensity') {
+                    color = intensityColors[drill.intensity];
+                } else if (view === 'skills') {
+                    // Use first skill's color
+                    color = skillColors[drill.skills[0]] || '#666666';
+                }
+                segment.style.background = color;
+
+                // Tooltip
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = `${drill.name} (${drill.duration}m)`;
+                segment.appendChild(tooltip);
+
+                timelineBar.appendChild(segment);
+                cumulativeTime += drill.duration;
+            });
+        }
+
+        // Render time markers
+        function renderTimeMarkers() {
+            const timeMarkers = document.getElementById('timeMarkers');
+            timeMarkers.innerHTML = '';
+
+            for (let i = 0; i <= 90; i += 15) {
+                const marker = document.createElement('div');
+                marker.className = 'time-marker';
+                marker.textContent = `${i}m`;
+                marker.style.left = `${(i / totalDuration) * 100}%`;
+                timeMarkers.appendChild(marker);
+            }
+        }
+
+        // Render filter pills
+        function renderFilterPills(view) {
+            const filterPills = document.getElementById('filterPills');
+            filterPills.innerHTML = '';
+
+            if (view === 'categories') {
+                const categoryCounts = {};
+                drills.forEach(drill => {
+                    categoryCounts[drill.category] = (categoryCounts[drill.category] || 0) + drill.duration;
+                });
+
+                Object.entries(categoryCounts).forEach(([category, duration]) => {
+                    const pill = document.createElement('div');
+                    pill.className = `filter-pill pill-${category.toLowerCase()}`;
+                    pill.innerHTML = `
+                        <div class="filter-dot" style="background: ${categoryColors[category]};"></div>
+                        ${category} (${duration}m)
+                    `;
+                    filterPills.appendChild(pill);
+                });
+            } else if (view === 'intensity') {
+                const intensityCounts = {};
+                drills.forEach(drill => {
+                    intensityCounts[drill.intensity] = (intensityCounts[drill.intensity] || 0) + drill.duration;
+                });
+
+                Object.entries(intensityCounts).forEach(([intensity, duration]) => {
+                    const pill = document.createElement('div');
+                    pill.className = `filter-pill int-${intensity.toLowerCase()}`;
+                    pill.innerHTML = `
+                        <div class="filter-dot" style="background: ${intensityColors[intensity]};"></div>
+                        ${intensity} (${duration}m)
+                    `;
+                    filterPills.appendChild(pill);
+                });
+            } else if (view === 'skills') {
+                const skillCounts = {};
+                drills.forEach(drill => {
+                    drill.skills.forEach(skill => {
+                        skillCounts[skill] = (skillCounts[skill] || 0) + drill.duration;
+                    });
+                });
+
+                // Show top 6 skills
+                const sortedSkills = Object.entries(skillCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 6);
+
+                sortedSkills.forEach(([skill, duration]) => {
+                    const pill = document.createElement('div');
+                    pill.className = 'filter-pill';
+                    pill.style.background = `rgba(160, 160, 160, 0.1)`;
+                    pill.style.color = skillColors[skill] || '#A0A0A0';
+                    pill.style.borderColor = `${skillColors[skill]}40` || 'rgba(160, 160, 160, 0.2)';
+                    pill.innerHTML = `
+                        <div class="filter-dot" style="background: ${skillColors[skill]};"></div>
+                        ${skill} (${duration}m)
+                    `;
+                    filterPills.appendChild(pill);
+                });
+            }
+        }
+
+        // View switcher
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentView = this.dataset.view;
+                renderTimeline(currentView);
+                renderFilterPills(currentView);
+            });
+        });
+
+        // Toggle section collapse
+        function toggleSection(header) {
+            const toggle = header.querySelector('.section-toggle');
+            const drills = header.nextElementSibling;
+
+            toggle.classList.toggle('collapsed');
+            drills.classList.toggle('collapsed');
+        }
+
+        // Initialize
+        renderTimeline('categories');
+        renderTimeMarkers();
+        renderFilterPills('categories');
+    </script>
+</body>
+</html>

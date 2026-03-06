@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spike — Event Page Redesign Mockup</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        bg: '#09090b',
+        surface: '#131316',
+        raised: '#1a1a1f',
+        hover: '#222228',
+        border: '#27272a',
+        muted: '#71717a',
+        accent: '#f97316',
+        accentDim: 'rgba(249,115,22,0.15)',
+        success: '#22c55e',
+        successDim: 'rgba(34,197,94,0.15)',
+        warning: '#eab308',
+        warningDim: 'rgba(234,179,8,0.15)',
+        info: '#3b82f6',
+        infoDim: 'rgba(59,130,246,0.15)',
+      },
+      fontFamily: {
+        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+      },
+    }
+  }
+}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: #050506; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* View toggle */
+  .view-btn { transition: all 0.2s; }
+  .view-btn.active { background: #f97316; color: white; }
+  .view-btn:not(.active) { background: #1a1a1f; color: #71717a; }
+  .view-btn:not(.active):hover { background: #222228; color: white; }
+
+  /* Phone frame */
+  .phone-frame {
+    width: 390px;
+    height: 844px;
+    border-radius: 40px;
+    border: 3px solid #333;
+    overflow: hidden;
+    position: relative;
+    background: #09090b;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 25px 80px rgba(0,0,0,0.6);
+  }
+  .phone-frame .phone-content {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .phone-frame .phone-content::-webkit-scrollbar { display: none; }
+
+  /* Desktop frame */
+  .desktop-frame {
+    width: 100%;
+    max-width: 900px;
+    border-radius: 12px;
+    border: 1px solid #27272a;
+    overflow: hidden;
+    background: #09090b;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+  }
+  .desktop-frame .desktop-content {
+    max-height: 700px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .desktop-frame .desktop-content::-webkit-scrollbar { width: 6px; }
+  .desktop-frame .desktop-content::-webkit-scrollbar-track { background: transparent; }
+  .desktop-frame .desktop-content::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+  /* Annotation callouts */
+  .callout {
+    position: absolute;
+    background: #f97316;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 50;
+    pointer-events: none;
+    letter-spacing: 0.02em;
+  }
+  .callout::after {
+    content: '';
+    position: absolute;
+    width: 0; height: 0;
+  }
+  .callout.left::after {
+    right: -6px; top: 50%; transform: translateY(-50%);
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 6px solid #f97316;
+  }
+  .callout.bottom::after {
+    bottom: -6px; left: 50%; transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #f97316;
+  }
+  .callout.right::after {
+    left: -6px; top: 50%; transform: translateY(-50%);
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 6px solid #f97316;
+  }
+  .callout.top::after {
+    top: -6px; left: 50%; transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 6px solid #f97316;
+  }
+
+  /* Issue highlight */
+  .issue-zone {
+    outline: 2px dashed rgba(239, 68, 68, 0.5);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  .improvement-zone {
+    outline: 2px dashed rgba(34, 197, 94, 0.4);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* Fade transitions */
+  .fade-enter { animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Pulse for live indicators */
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+</style>
+</head>
+<body class="min-h-screen text-white antialiased">
+
+<!-- Top Navigation Bar -->
+<div class="sticky top-0 z-50 bg-[#050506]/95 backdrop-blur-sm border-b border-border">
+  <div class="max-w-[1800px] mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>
+      </div>
+      <span class="text-lg font-bold tracking-tight">Spike</span>
+      <span class="text-muted mx-2">/</span>
+      <span class="text-muted text-sm">Event Page Redesign — Before & After</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div id="viewToggle" class="flex gap-1 bg-raised rounded-lg p-1">
+        <button onclick="setView('desktop')" class="view-btn active rounded-md px-4 py-1.5 text-xs font-semibold" data-view="desktop">Desktop</button>
+        <button onclick="setView('mobile')" class="view-btn rounded-md px-4 py-1.5 text-xs font-semibold" data-view="mobile">Mobile</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DESKTOP VIEW -->
+<!-- ============================================================ -->
+<div id="desktopView" class="max-w-[1800px] mx-auto px-6 py-8">
+  <!-- Section labels -->
+  <div class="grid grid-cols-2 gap-8 mb-4">
+    <div class="flex items-center gap-3">
+      <span class="px-3 py-1 rounded-md bg-red-500/20 text-red-400 text-xs font-bold uppercase tracking-wider">Current</span>
+      <span class="text-sm text-muted">Issues highlighted in red</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="px-3 py-1 rounded-md bg-green-500/20 text-green-400 text-xs font-bold uppercase tracking-wider">Proposed</span>
+      <span class="text-sm text-muted">Improvements highlighted in green</span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-8">
+
+    <!-- ======== CURRENT DESKTOP ======== -->
+    <div class="relative">
+      <div class="desktop-frame">
+        <div class="desktop-content">
+          <!-- Current Header -->
+          <div class="relative m-1">
+            <div class="px-5 py-4 flex items-center gap-3 border-b border-border">
+              <div class="w-8 h-8 rounded-lg bg-raised flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h1 class="text-base font-bold text-white truncate">Training E2E 1770420288749</h1>
+                <p class="text-xs text-muted">Event Management</p>
+              </div>
+              <button class="px-4 py-2 rounded-lg bg-accent text-white text-xs font-bold">Join Event</button>
+              <button class="px-3 py-2 rounded-lg bg-raised text-muted text-xs flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Message
+              </button>
+              <button class="p-2 rounded-lg bg-raised text-muted">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16,6 12,2 8,6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              </button>
+              <button class="p-2 rounded-lg bg-raised text-muted">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Current Banner -->
+          <div class="px-5 pt-4">
+            <div class="rounded-xl overflow-hidden border border-border bg-surface">
+              <!-- Banner gradient -->
+              <div class="relative">
+                <div class="h-44 bg-gradient-to-r from-orange-900/30 to-amber-900/20"></div>
+                <!-- Date badge -->
+                <div class="absolute -bottom-10 left-5">
+                  <div class="w-20 h-20 rounded-xl bg-bg border-4 border-bg flex flex-col items-center justify-center shadow-xl">
+                    <span class="text-2xl font-extrabold text-accent leading-none">11</span>
+                    <span class="text-[10px] font-bold text-muted uppercase mt-0.5">FEB</span>
+                    <span class="text-[9px] text-muted/60">2026</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Info Row -->
+              <div class="p-5 pt-14 flex items-center gap-5">
+                <div class="flex-1 min-w-0 space-y-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded-md bg-orange-500/15 text-orange-400 border border-orange-500/20 text-[10px] font-bold uppercase">TRAININGSESSION</span>
+                  </div>
+                  <h2 class="text-lg font-bold text-white truncate">Training E2E 1770420288749</h2>
+                  <div class="flex items-center gap-3 text-xs text-muted">
+                    <span class="flex items-center gap-1">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                      18:00 - 20:00
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      123 Test Street
+                    </span>
+                    <span class="border-l border-border pl-3 flex items-center gap-1.5">
+                      <div class="w-5 h-5 rounded-full bg-gradient-to-br from-orange-400 to-red-500"></div>
+                      <span class="text-[10px] text-muted">HOSTED BY</span>
+                      <span class="text-white text-xs">Denys1</span>
+                    </span>
+                  </div>
+                </div>
+                <!-- Stats -->
+                <div class="flex gap-5 shrink-0">
+                  <div class="text-center">
+                    <div class="text-xl font-bold text-white">0</div>
+                    <div class="text-[10px] text-muted">Teams</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-xl font-bold text-white">1</div>
+                    <div class="text-[10px] text-muted">Players</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-xl font-bold text-accent">Free</div>
+                    <div class="text-[10px] text-muted">Cost</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tabs -->
+              <div class="border-t border-border flex gap-1 px-5 overflow-x-auto scrollbar-hide">
+                <a class="flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium text-accent relative whitespace-nowrap">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  Overview
+                  <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full"></span>
+                </a>
+                <a class="flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium text-muted whitespace-nowrap">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  Teams
+                </a>
+                <a class="flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium text-muted whitespace-nowrap">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  Members <span class="px-1 py-0.5 rounded-full bg-hover text-[10px] ml-0.5">1</span>
+                </a>
+                <a class="flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium text-muted whitespace-nowrap">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                  Training Plan
+                </a>
+                <a class="flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium text-muted whitespace-nowrap">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                  Payments
+                </a>
+                <a class="flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium text-muted whitespace-nowrap">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.32 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                  Settings
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Overview Content -->
+          <div class="px-5 py-4 grid grid-cols-[2fr_1fr] gap-4 items-start">
+            <!-- Main -->
+            <div class="space-y-4">
+              <!-- Address link -->
+              <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-surface border border-border text-xs text-accent">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                123 Test Street
+              </div>
+
+              <!-- Teams Preview -->
+              <div class="rounded-xl bg-surface border border-border p-5">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-sm font-bold text-white">Teams</h3>
+                  <a class="text-xs text-accent">View All</a>
+                </div>
+                <div class="text-center py-6 text-muted">
+                  <svg class="w-10 h-10 mx-auto mb-2 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  <p class="text-xs">No teams registered yet</p>
+                </div>
+              </div>
+
+              <!-- Discussion -->
+              <div class="rounded-xl bg-surface border border-border p-5">
+                <h3 class="text-sm font-bold text-white mb-3">Discussion (0)</h3>
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-7 h-7 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shrink-0"></div>
+                  <div class="flex-1 px-3 py-2 rounded-lg bg-bg border border-border text-xs text-muted/50">Share your thoughts...</div>
+                </div>
+                <div class="text-center py-4 text-muted">
+                  <p class="text-xs">No comments yet</p>
+                  <p class="text-[10px] text-muted/60 mt-0.5">Be the first to share your thoughts!</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-4">
+              <div class="rounded-xl bg-surface border border-border overflow-hidden">
+                <div class="p-3 border-b border-border flex justify-between items-center">
+                  <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Location
+                  </h3>
+                  <a class="text-[10px] text-accent">Get Directions</a>
+                </div>
+                <div class="h-32 bg-raised flex items-center justify-center">
+                  <div class="text-muted/30 text-xs">Map Preview</div>
+                </div>
+                <div class="p-2.5 text-[10px] text-muted bg-bg/50">123 Test Street</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== PROPOSED DESKTOP ======== -->
+    <div class="relative">
+      <div class="desktop-frame">
+        <div class="desktop-content">
+          <!-- Proposed Header — Clean -->
+          <div class="improvement-zone m-1">
+            <div class="px-5 py-3 flex items-center gap-3 border-b border-border">
+              <div class="w-8 h-8 rounded-lg bg-raised flex items-center justify-center hover:bg-hover transition-colors cursor-pointer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              </div>
+              <h1 class="flex-1 text-sm font-semibold text-white truncate">Tuesday Training Session</h1>
+              <button class="p-2 rounded-lg bg-raised text-muted hover:bg-hover transition-colors">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Proposed Banner -->
+          <div class="px-5 pt-4">
+            <div class="rounded-xl overflow-hidden border border-border bg-surface">
+              <!-- Banner with overlaid title -->
+              <div class="h-40 bg-gradient-to-r from-orange-900/30 to-amber-900/20 relative">
+                <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-5">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-0.5 rounded-md bg-accent/20 text-accent border border-accent/20 text-[10px] font-bold uppercase">Training Session</span>
+                  </div>
+                  <h2 class="text-xl font-bold text-white mb-1.5">Tuesday Training Session</h2>
+                  <div class="flex items-center gap-3 text-xs text-muted/80">
+                    <span class="flex items-center gap-1">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      <span class="text-white font-medium">Wed, Feb 11</span>
+                      <span class="text-warning font-semibold">· In 5 days</span>
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                      18:00 - 20:00
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-3 text-xs text-muted/80 mt-1.5">
+                    <span class="flex items-center gap-1">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      <span class="text-white">123 Test Street</span>
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <div class="w-4 h-4 rounded-full bg-gradient-to-br from-orange-400 to-red-500"></div>
+                      Hosted by Denys1
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stats Bar with CTA -->
+              <div class="px-5 py-3 flex items-center justify-between border-t border-border">
+                <div class="flex items-center gap-5 text-xs">
+                  <div class="flex items-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    <span class="font-semibold text-white">1/12 Players</span>
+                    <span class="text-success text-[10px] font-medium">(11 spots left)</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-muted">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    0 Teams
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    <span class="font-bold text-accent">Free</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="px-3 py-1.5 rounded-lg bg-raised border border-border text-muted text-xs font-medium hover:bg-hover transition-colors flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    Decline
+                  </button>
+                  <button class="px-3 py-1.5 rounded-lg bg-accent text-white text-xs font-bold hover:bg-accent/90 transition-colors flex items-center gap-1">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+                    Accept
+                  </button>
+                </div>
+              </div>
+
+              <!-- Tabs -->
+              <div class="border-t border-border flex gap-1 px-5 overflow-x-auto scrollbar-hide">
+                <a class="px-3 py-2.5 text-xs font-medium text-accent relative whitespace-nowrap">
+                  Overview
+                  <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full"></span>
+                </a>
+                <a class="px-3 py-2.5 text-xs font-medium text-muted whitespace-nowrap">Teams</a>
+                <a class="px-3 py-2.5 text-xs font-medium text-muted whitespace-nowrap">Members <span class="px-1 py-0.5 rounded-full bg-hover text-[10px] ml-0.5">1</span></a>
+                <a class="px-3 py-2.5 text-xs font-medium text-muted whitespace-nowrap">Training Plan</a>
+                <a class="px-3 py-2.5 text-xs font-medium text-muted whitespace-nowrap">Payments</a>
+                <a class="px-3 py-2.5 text-xs font-medium text-muted whitespace-nowrap">
+                  Discussion <span class="px-1 py-0.5 rounded-full bg-accent/20 text-accent text-[10px] ml-0.5">3</span>
+                </a>
+                <a class="px-3 py-2.5 text-xs font-medium text-muted whitespace-nowrap">Settings</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proposed Overview Content -->
+          <div class="px-5 py-4 grid grid-cols-[2fr_1fr] gap-4 items-start">
+            <!-- Main -->
+            <div class="space-y-4">
+              <!-- Invitation Response Card (NEW) -->
+              <div class="rounded-xl bg-surface border border-accent/30 p-5">
+                <div class="flex items-start gap-3 mb-4">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shrink-0 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="text-sm font-bold text-white">You're invited!</h3>
+                    <p class="text-xs text-muted mt-0.5"><span class="text-white">Denys Bielov</span> invited you to this event</p>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button class="flex-1 py-2.5 rounded-lg bg-accent text-white text-xs font-bold hover:bg-accent/90 transition-colors flex items-center justify-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+                    Accept
+                  </button>
+                  <button class="flex-1 py-2.5 rounded-lg bg-raised border border-border text-muted text-xs font-medium hover:bg-hover hover:text-white transition-colors flex items-center justify-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    Decline
+                  </button>
+                </div>
+              </div>
+
+              <!-- About -->
+              <div class="rounded-xl bg-surface border border-border p-5">
+                <h3 class="text-sm font-bold text-white mb-2">About This Event</h3>
+                <p class="text-xs text-muted leading-relaxed">Join us for a training session focused on improving defensive techniques and serve reception. All intermediate players welcome. We'll work on positioning, reading the hitter, and platform angles.</p>
+              </div>
+
+              <!-- Who's Coming (NEW) -->
+              <div class="rounded-xl bg-surface border border-border p-5">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-sm font-bold text-white">Who's Coming</h3>
+                  <a class="text-xs text-accent">View all</a>
+                </div>
+                <div class="flex items-center gap-1 mb-3">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-red-500 border-2 border-surface"></div>
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 border-2 border-surface -ml-2"></div>
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-surface -ml-2"></div>
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 border-2 border-surface -ml-2"></div>
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 border-2 border-surface -ml-2"></div>
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-surface -ml-2"></div>
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 border-2 border-surface -ml-2"></div>
+                  <div class="w-8 h-8 rounded-full bg-raised border-2 border-surface -ml-2 flex items-center justify-center text-[10px] text-muted font-bold">+1</div>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs text-success">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  2 of your friends are attending
+                </div>
+              </div>
+
+              <!-- Discussion -->
+              <div class="rounded-xl bg-surface border border-border p-5">
+                <h3 class="text-sm font-bold text-white mb-4">Discussion (3)</h3>
+                <!-- Comment input -->
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-7 h-7 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shrink-0"></div>
+                  <div class="flex-1 px-3 py-2 rounded-lg bg-bg border border-border text-xs text-muted/50">Share your thoughts...</div>
+                </div>
+                <!-- Comments -->
+                <div class="space-y-4">
+                  <div class="flex gap-3">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 shrink-0"></div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold text-white">John D.</span>
+                        <span class="text-[10px] text-muted">2h ago</span>
+                      </div>
+                      <p class="text-xs text-muted mt-1">Looking forward to this! Should I bring extra balls?</p>
+                    </div>
+                  </div>
+                  <div class="flex gap-3">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 shrink-0"></div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold text-white">Sarah M.</span>
+                        <span class="text-[10px] text-muted">5h ago</span>
+                      </div>
+                      <p class="text-xs text-muted mt-1">Great session last time. Can we focus on serve receive drills?</p>
+                    </div>
+                  </div>
+                  <div class="flex gap-3">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 shrink-0"></div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold text-white">Alex K.</span>
+                        <span class="text-[10px] text-muted">1d ago</span>
+                      </div>
+                      <p class="text-xs text-muted mt-1">I'll be there! Bringing two friends who want to try out.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-4">
+              <!-- Location -->
+              <div class="rounded-xl bg-surface border border-border overflow-hidden">
+                <div class="p-3 border-b border-border flex justify-between items-center">
+                  <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Location
+                  </h3>
+                  <a class="text-[10px] text-accent">Get Directions</a>
+                </div>
+                <div class="h-32 bg-raised flex items-center justify-center">
+                  <div class="text-muted/30 text-xs">Map Preview</div>
+                </div>
+                <div class="p-2.5 text-[10px] text-muted bg-bg/50">123 Test Street</div>
+              </div>
+
+              <!-- Organizer Card (NEW) -->
+              <div class="rounded-xl bg-surface border border-border p-4">
+                <h3 class="text-xs font-bold text-white mb-3">Organizer</h3>
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shrink-0"></div>
+                  <div>
+                    <div class="text-xs font-semibold text-white">Denys Bielov</div>
+                    <div class="text-[10px] text-muted">12 events hosted</div>
+                  </div>
+                </div>
+                <button class="w-full px-3 py-2 rounded-lg bg-raised text-xs text-muted hover:bg-hover transition-colors text-center flex items-center justify-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  Contact Organizer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- MOBILE VIEW -->
+<!-- ============================================================ -->
+<div id="mobileView" class="max-w-[1200px] mx-auto px-6 py-8 hidden">
+  <!-- Section labels -->
+  <div class="flex justify-around mb-6">
+    <div class="flex items-center gap-2">
+      <span class="px-3 py-1 rounded-md bg-red-500/20 text-red-400 text-xs font-bold uppercase tracking-wider">Current Mobile</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="px-3 py-1 rounded-md bg-green-500/20 text-green-400 text-xs font-bold uppercase tracking-wider">Proposed Mobile</span>
+    </div>
+  </div>
+
+  <div class="flex justify-center gap-12 flex-wrap">
+
+    <!-- ======== CURRENT MOBILE ======== -->
+    <div class="relative">
+      <div class="phone-frame">
+        <div class="phone-content">
+          <!-- Mobile top bar -->
+          <div class="px-4 py-3 flex items-center justify-between border-b border-border bg-bg/95 sticky top-0 z-10">
+            <div class="flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+              <span class="text-sm font-bold">Spike</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-orange-400 to-red-500"></div>
+            </div>
+          </div>
+
+          <!-- Current mobile header - cramped -->
+          <div class="px-4 py-3">
+            <div class="flex items-start gap-2">
+              <div class="w-7 h-7 rounded-lg bg-raised flex items-center justify-center shrink-0 mt-0.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h1 class="text-base font-bold text-white leading-tight">Training E2E 1770420288749</h1>
+                <p class="text-[10px] text-muted mt-0.5">Event Management</p>
+              </div>
+              <button class="px-3 py-1.5 rounded-lg bg-accent text-white text-[11px] font-bold shrink-0">Join Event</button>
+              <button class="p-1.5 rounded-lg bg-raised text-muted shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Current mobile banner - too tall -->
+          <div class="issue-zone mx-1">
+            <div class="rounded-t-xl overflow-hidden border border-border border-b-0 bg-surface mx-3">
+              <div class="h-44 bg-gradient-to-r from-orange-900/30 to-amber-900/20 relative">
+                <div class="absolute -bottom-10 left-4">
+                  <div class="w-16 h-16 rounded-xl bg-bg border-4 border-bg flex flex-col items-center justify-center shadow-xl">
+                    <span class="text-xl font-extrabold text-accent leading-none">11</span>
+                    <span class="text-[9px] font-bold text-muted uppercase">FEB</span>
+                    <span class="text-[8px] text-muted/60">2026</span>
+                  </div>
+                </div>
+              </div>
+              <div class="p-4 pt-10 space-y-2">
+                <span class="px-2 py-0.5 rounded-md bg-orange-500/15 text-orange-400 border border-orange-500/20 text-[9px] font-bold uppercase">TRAININGSESSION</span>
+                <h2 class="text-base font-bold text-white">Training E2E 1770420288749</h2>
+                <div class="flex items-center gap-2 text-[11px] text-muted">
+                  <span class="flex items-center gap-1">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                    18:00 - 20:00
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    123 Test Street
+                  </span>
+                  <div class="w-5 h-5 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shrink-0"></div>
+                </div>
+                <div class="flex gap-5 pt-1">
+                  <div class="text-center">
+                    <div class="text-lg font-bold text-white">0</div>
+                    <div class="text-[9px] text-muted">Teams</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-lg font-bold text-white">1</div>
+                    <div class="text-[9px] text-muted">Players</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-lg font-bold text-accent">Free</div>
+                    <div class="text-[9px] text-muted">Cost</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Tabs overflow -->
+              <div class="border-t border-border flex overflow-x-auto scrollbar-hide">
+                <a class="px-3 py-2.5 text-[11px] font-medium text-accent relative whitespace-nowrap flex items-center gap-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+                  Overview
+                  <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full"></span>
+                </a>
+                <a class="px-3 py-2.5 text-[11px] font-medium text-muted whitespace-nowrap flex items-center gap-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  Teams
+                </a>
+                <a class="px-3 py-2.5 text-[11px] font-medium text-muted whitespace-nowrap flex items-center gap-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  Members <span class="text-[9px] ml-0.5">1</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current mobile content -->
+          <div class="px-3 py-3 space-y-3">
+            <div class="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-surface border border-border text-[11px] text-accent">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              123 Test Street
+            </div>
+            <div class="rounded-xl bg-surface border border-border p-4">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-white">Teams</h3>
+                <a class="text-[10px] text-accent">View All</a>
+              </div>
+              <div class="text-center py-5 text-muted">
+                <svg class="w-8 h-8 mx-auto mb-1.5 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                <p class="text-[10px]">No teams registered yet</p>
+              </div>
+            </div>
+            <div class="rounded-xl bg-surface border border-border p-4">
+              <h3 class="text-xs font-bold text-white mb-2">Discussion (0)</h3>
+              <div class="text-center py-4 text-muted">
+                <p class="text-[10px]">No comments yet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== PROPOSED MOBILE ======== -->
+    <div class="relative">
+      <div class="phone-frame">
+        <div class="phone-content" style="padding-bottom: 72px;">
+          <!-- Mobile top bar -->
+          <div class="px-4 py-3 flex items-center justify-between border-b border-border bg-bg/95 sticky top-0 z-10">
+            <div class="flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+              <span class="text-sm font-bold">Spike</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <div class="w-6 h-6 rounded-full bg-gradient-to-br from-orange-400 to-red-500"></div>
+            </div>
+          </div>
+
+          <!-- Proposed mobile header - clean -->
+          <div class="improvement-zone mx-1">
+            <div class="px-4 py-2.5 flex items-center gap-3">
+              <div class="w-7 h-7 rounded-lg bg-raised flex items-center justify-center shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              </div>
+              <h1 class="flex-1 text-sm font-semibold text-white truncate">Tuesday Training Session</h1>
+              <button class="p-1.5 rounded-lg bg-raised text-muted">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Proposed mobile banner - compact -->
+          <div class="mx-3 mt-3">
+            <div class="rounded-xl overflow-hidden border border-border bg-surface">
+              <div class="h-32 bg-gradient-to-r from-orange-900/30 to-amber-900/20 relative">
+                <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 px-4 pb-3">
+                  <div class="flex items-center gap-1.5 mb-1.5">
+                    <span class="px-1.5 py-0.5 rounded bg-accent/20 text-accent text-[9px] font-bold uppercase">Training</span>
+                  </div>
+                  <h2 class="text-base font-bold text-white leading-tight">Tuesday Training Session</h2>
+                  <div class="flex items-center gap-2 text-[11px] text-muted/80 mt-1.5">
+                    <span class="flex items-center gap-1">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+                      <span class="text-white font-medium">Wed, Feb 11</span>
+                      <span class="text-warning font-semibold">· 5 days</span>
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                      18:00 - 20:00
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2 text-[11px] text-muted/80 mt-1">
+                    <span class="flex items-center gap-1">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      <span class="text-white">123 Test Street</span>
+                    </span>
+                    <span class="flex items-center gap-1 ml-auto">
+                      <div class="w-4 h-4 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shrink-0"></div>
+                      Denys1
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick stats bar -->
+              <div class="px-4 py-2.5 flex items-center justify-around text-center border-t border-border">
+                <div>
+                  <div class="text-[10px] text-muted">Players</div>
+                  <div class="text-xs font-bold text-white">1/12</div>
+                </div>
+                <div class="w-px h-6 bg-border"></div>
+                <div>
+                  <div class="text-[10px] text-muted">Teams</div>
+                  <div class="text-xs font-bold text-white">0</div>
+                </div>
+                <div class="w-px h-6 bg-border"></div>
+                <div>
+                  <div class="text-[10px] text-muted">Cost</div>
+                  <div class="text-xs font-bold text-accent">Free</div>
+                </div>
+              </div>
+
+              <!-- Mobile tabs - compact -->
+              <div class="border-t border-border flex overflow-x-auto scrollbar-hide relative">
+                <a class="px-3 py-2.5 text-[11px] font-medium text-accent relative whitespace-nowrap">
+                  Overview
+                  <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full"></span>
+                </a>
+                <a class="px-3 py-2.5 text-[11px] font-medium text-muted whitespace-nowrap">Teams</a>
+                <a class="px-3 py-2.5 text-[11px] font-medium text-muted whitespace-nowrap">Members</a>
+                <a class="px-3 py-2.5 text-[11px] font-medium text-muted whitespace-nowrap">Training</a>
+                <a class="px-3 py-2.5 text-[11px] font-medium text-muted whitespace-nowrap">Pay</a>
+                <a class="px-3 py-2.5 text-[11px] font-medium text-muted whitespace-nowrap">
+                  Chat <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block ml-0.5 -mt-1 pulse-dot"></span>
+                </a>
+                <!-- Right fade -->
+                <div class="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-surface to-transparent pointer-events-none"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proposed mobile content -->
+          <div class="px-3 py-3 space-y-3">
+            <!-- Invitation Accept/Decline (NEW) -->
+            <div class="rounded-xl bg-surface border border-accent/30 p-4">
+              <div class="flex items-center gap-2.5 mb-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shrink-0 flex items-center justify-center">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <div>
+                  <h3 class="text-xs font-bold text-white">You're invited!</h3>
+                  <p class="text-[10px] text-muted"><span class="text-white">Denys Bielov</span> invited you</p>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button class="flex-1 py-2.5 rounded-lg bg-accent text-white text-xs font-bold flex items-center justify-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+                  Accept
+                </button>
+                <button class="flex-1 py-2.5 rounded-lg bg-raised border border-border text-muted text-xs font-medium flex items-center justify-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  Decline
+                </button>
+              </div>
+            </div>
+
+            <!-- About -->
+            <div class="rounded-xl bg-surface border border-border p-4">
+              <h3 class="text-xs font-bold text-white mb-1.5">About This Event</h3>
+              <p class="text-[11px] text-muted leading-relaxed line-clamp-3">Join us for a training session focused on improving defensive techniques and serve reception. All intermediate players welcome.</p>
+              <button class="text-[11px] text-accent mt-1">Read more</button>
+            </div>
+
+            <!-- Who's Coming -->
+            <div class="rounded-xl bg-surface border border-border p-4">
+              <div class="flex items-center justify-between mb-2.5">
+                <h3 class="text-xs font-bold text-white">Who's Coming</h3>
+                <a class="text-[10px] text-accent">View all</a>
+              </div>
+              <div class="flex items-center gap-0.5 mb-2.5">
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-orange-400 to-red-500 border-2 border-surface"></div>
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 border-2 border-surface -ml-1.5"></div>
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-surface -ml-1.5"></div>
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 border-2 border-surface -ml-1.5"></div>
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 border-2 border-surface -ml-1.5"></div>
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-surface -ml-1.5"></div>
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 border-2 border-surface -ml-1.5"></div>
+                <div class="w-7 h-7 rounded-full bg-raised border-2 border-surface -ml-1.5 flex items-center justify-center text-[9px] text-muted font-bold">+1</div>
+              </div>
+              <div class="flex items-center gap-1.5 text-[11px] text-success">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                2 friends are attending
+              </div>
+            </div>
+
+            <!-- Location (compact, with mini-map) -->
+            <div class="rounded-xl bg-surface border border-border overflow-hidden">
+              <div class="p-3 flex justify-between items-center">
+                <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  123 Test Street
+                </h3>
+                <a class="text-[10px] text-accent flex items-center gap-1">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3,11 22,2 13,21 11,13"/></svg>
+                  Directions
+                </a>
+              </div>
+              <div class="h-24 bg-raised flex items-center justify-center border-t border-border">
+                <div class="text-muted/30 text-[10px]">Compact Map</div>
+              </div>
+            </div>
+
+            <!-- Discussion -->
+            <div class="rounded-xl bg-surface border border-border p-4">
+              <h3 class="text-xs font-bold text-white mb-3">Discussion (3)</h3>
+              <div class="flex items-center gap-2.5 mb-3">
+                <div class="w-6 h-6 rounded-full bg-gradient-to-br from-orange-400 to-red-500 shrink-0"></div>
+                <div class="flex-1 px-2.5 py-1.5 rounded-lg bg-bg border border-border text-[10px] text-muted/50">Share your thoughts...</div>
+              </div>
+              <div class="space-y-3">
+                <div class="flex gap-2.5">
+                  <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 shrink-0"></div>
+                  <div class="flex-1">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[11px] font-semibold text-white">John D.</span>
+                      <span class="text-[9px] text-muted">2h ago</span>
+                    </div>
+                    <p class="text-[11px] text-muted mt-0.5">Should I bring extra balls?</p>
+                  </div>
+                </div>
+                <div class="flex gap-2.5">
+                  <div class="w-6 h-6 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 shrink-0"></div>
+                  <div class="flex-1">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[11px] font-semibold text-white">Sarah M.</span>
+                      <span class="text-[9px] text-muted">5h ago</span>
+                    </div>
+                    <p class="text-[11px] text-muted mt-0.5">Can we focus on serve receive?</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sticky Bottom Bar — Invitation variant -->
+          <div class="absolute bottom-0 left-0 right-0 bg-bg/95 backdrop-blur-sm border-t border-border p-3 z-20">
+            <div class="flex items-center gap-2">
+              <div class="flex-1 min-w-0 pl-1">
+                <div class="text-[10px] text-muted">Invited by Denys Bielov</div>
+                <div class="text-xs font-semibold text-white">Free · 11 spots left</div>
+              </div>
+              <button class="px-5 py-2.5 rounded-xl bg-raised border border-border text-muted text-sm font-medium flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Decline
+              </button>
+              <button class="px-5 py-2.5 rounded-xl bg-accent text-white text-sm font-bold flex items-center gap-1.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+                Accept
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function setView(view) {
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+  document.getElementById('desktopView').classList.toggle('hidden', view !== 'desktop');
+  document.getElementById('mobileView').classList.toggle('hidden', view !== 'mobile');
+}
+</script>
+
+</body>
+</html>

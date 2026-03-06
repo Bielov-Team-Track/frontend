@@ -22,6 +22,13 @@ import ChatWindow from "./components/ChatWindow";
 import MessagesPageSkeleton from "./components/MessagesPageSkeleton";
 import NewChat from "./components/NewChat";
 
+// Sidebar resize constants
+const EXPANDED_WIDTH = 384;
+const COLLAPSED_WIDTH = 72;
+const SNAP_THRESHOLD = 200;
+const MIN_EXPANDED = 280;
+const MAX_WIDTH = 500;
+
 const MessagesPage = () => {
 	const { userProfile } = useAuth();
 	const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
@@ -30,9 +37,65 @@ const MessagesPage = () => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const debouncedSearch = useDebouncedValue(searchQuery, 300);
 
+	// Sidebar resize state — width is committed to React state only on mouseup.
+	// During drag, we update the CSS variable directly via ref for zero re-renders.
+	const [sidebarWidth, setSidebarWidth] = useState(EXPANDED_WIDTH);
+	const sidebarRef = useRef<HTMLDivElement>(null);
+	const widthRef = useRef(EXPANDED_WIDTH);
+	const rafRef = useRef<number>(0);
+	const sidebarCollapsed = sidebarWidth <= COLLAPSED_WIDTH;
+
 	const queryClient = useQueryClient();
 	const { connection, setCurrentChatId } = useChatConnectionStore();
 	const currentChatGroupRef = useRef<string | null>(null);
+
+	// Resize drag handlers — direct DOM manipulation during drag, state commit on mouseup
+	const handleResizeStart = useCallback((e: React.MouseEvent) => {
+		e.preventDefault();
+		const startX = e.clientX;
+		const startWidth = widthRef.current;
+		const el = sidebarRef.current;
+
+		// Disable CSS transitions during drag to prevent animation queue pileup
+		if (el) el.style.transition = "none";
+
+		const handleMouseMove = (moveEvent: MouseEvent) => {
+			// rAF throttle — cap at 60fps, skip sub-frame events
+			cancelAnimationFrame(rafRef.current);
+			rafRef.current = requestAnimationFrame(() => {
+				const delta = moveEvent.clientX - startX;
+				const newWidth = Math.max(COLLAPSED_WIDTH, Math.min(MAX_WIDTH, startWidth + delta));
+				widthRef.current = newWidth;
+				// Direct DOM update — no React re-render
+				if (el) el.style.setProperty("--sidebar-w", `${newWidth}px`);
+			});
+		};
+
+		const handleMouseUp = () => {
+			cancelAnimationFrame(rafRef.current);
+			document.removeEventListener("mousemove", handleMouseMove);
+			document.removeEventListener("mouseup", handleMouseUp);
+			document.body.style.cursor = "";
+			document.body.style.userSelect = "";
+
+			// Re-enable transitions for snap animation
+			if (el) el.style.transition = "";
+
+			// Apply snap logic and commit to React state (single re-render)
+			let finalWidth = widthRef.current;
+			if (finalWidth < SNAP_THRESHOLD) finalWidth = COLLAPSED_WIDTH;
+			else if (finalWidth < MIN_EXPANDED) finalWidth = MIN_EXPANDED;
+
+			widthRef.current = finalWidth;
+			if (el) el.style.setProperty("--sidebar-w", `${finalWidth}px`);
+			setSidebarWidth(finalWidth);
+		};
+
+		document.body.style.cursor = "col-resize";
+		document.body.style.userSelect = "none";
+		document.addEventListener("mousemove", handleMouseMove);
+		document.addEventListener("mouseup", handleMouseUp);
+	}, []);
 
 	const PAGE_SIZE = 20;
 	const MESSAGE_PAGE_SIZE = 50;
@@ -494,12 +557,15 @@ const MessagesPage = () => {
 					className={cn(
 						"h-full min-h-0 shrink-0",
 						// Mobile: full width when no chat selected, hidden when chat is open
-						selectedChatId ? "hidden md:block" : "w-full",
-						// Desktop: fixed sidebar width
-						"md:w-96",
-					)}>
-					<div className="rounded-2xl h-full min-h-0">
-						{isNewChatModalOpen ? (
+						selectedChatId ? "hidden md:block" : "w-full md:w-auto",
+					)}
+				>
+					<div
+						ref={sidebarRef}
+						className="rounded-2xl h-full min-h-0 w-full md:w-[var(--sidebar-w)] transition-[width] duration-200"
+						style={{ "--sidebar-w": `${sidebarWidth}px` } as React.CSSProperties}
+					>
+						{isNewChatModalOpen && !sidebarCollapsed ? (
 							<div className="flex flex-col gap-4 h-full min-h-0 bg-background/50 backdrop-blur-xl border border-border p-6 rounded-r-0 rounded-2xl overflow-hidden">
 								<div className="flex items-center gap-2 mb-4">
 									<Button
@@ -526,13 +592,19 @@ const MessagesPage = () => {
 								hasMore={hasMoreChats}
 								isLoadingMore={isFetchingMoreChats}
 								currentUserId={userProfile?.id}
+								collapsed={sidebarCollapsed}
 							/>
 						)}
 					</div>
 				</div>
 
-				{/* Divider - desktop only */}
-				<div className="hidden md:block w-px bg-border shrink-0" />
+				{/* Resize Handle - desktop only */}
+				<div
+					className="hidden md:flex items-center justify-center w-1.5 shrink-0 cursor-col-resize group hover:bg-accent/10 active:bg-accent/20 transition-colors"
+					onMouseDown={handleResizeStart}
+				>
+					<div className="w-px h-full bg-border group-hover:bg-accent/40 group-active:bg-accent transition-colors" />
+				</div>
 
 				{/* Right Panel - Chat Window */}
 				<div

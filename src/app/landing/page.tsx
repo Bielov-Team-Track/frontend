@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/providers";
 import {
 	Users,
@@ -722,8 +722,8 @@ export default function LandingPage() {
 		}
 	}, [isAuthenticated, isLoading, router]);
 
-	// Show nothing while checking auth to prevent flash of landing content
-	if (isLoading || isAuthenticated) {
+	// Only hide if confirmed authenticated (about to redirect)
+	if (!isLoading && isAuthenticated) {
 		return null;
 	}
 

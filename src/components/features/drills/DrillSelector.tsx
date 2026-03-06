@@ -7,7 +7,7 @@ import { Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CATEGORY_COLORS, INTENSITY_COLORS } from "./types";
 
-interface SelectedDrill {
+export interface SelectedDrill {
     drillId: string;
     drillName: string;
     drillCategory: string;

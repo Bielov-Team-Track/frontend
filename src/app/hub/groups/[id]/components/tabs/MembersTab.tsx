@@ -326,8 +326,8 @@ function GroupMemberRow({ member, onEdit, onRemove }: { member: GroupMember; onE
 				<RoleBadgeList roles={extractRoleStrings(member.roles)} emptyText="Member" />
 			</td>
 			<td className="px-4 py-3">
-				<span className={`px-2 py-1 rounded text-xs font-medium border ${getClubRoleBadgeColor(member.clubMember?.roles[0])}`}>
-					{member.clubMember?.roles[0] || "Member"}
+				<span className={`px-2 py-1 rounded text-xs font-medium border ${getClubRoleBadgeColor(extractRoleStrings(member.clubMember?.roles)[0])}`}>
+					{extractRoleStrings(member.clubMember?.roles)[0] || "Member"}
 				</span>
 			</td>
 			<td className="px-4 py-3">

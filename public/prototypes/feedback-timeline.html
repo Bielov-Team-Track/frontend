@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback - Timeline Feed</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        primary: '#FF7D00',
+        secondary: '#29757A',
+        success: '#4A7A45',
+        error: '#BE3F23',
+        info: '#2E5A88',
+        warning: '#D99100',
+        base: { light: '#F5F5F5', dark: '#121A1B' },
+        subtle: { light: '#EBEBEB', dark: '#1E292B' },
+        surface: { light: '#FFFFFF', dark: '#243335' },
+        raised: { light: '#F0F0F0', dark: '#2C383A' },
+        overlay: { light: '#FFFFFF', dark: '#344345' },
+      },
+      fontFamily: {
+        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+        display: ['DM Serif Display', 'serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'DM Sans', system-ui, sans-serif; }
+  .font-display { font-family: 'DM Serif Display', serif; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #29757A40; border-radius: 3px; }
+
+  /* Glass card */
+  .glass-card {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Timeline line */
+  .timeline-line {
+    position: absolute;
+    left: 23px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #29757A40, #29757A10);
+  }
+
+  /* Expand animation */
+  .expand-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .expand-content.open {
+    grid-template-rows: 1fr;
+  }
+  .expand-inner {
+    overflow: hidden;
+  }
+
+  /* Fade in animation */
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in {
+    animation: fadeSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+  }
+
+  /* Badge pulse */
+  @keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+  .badge-pulse:hover {
+    animation: badgePulse 0.6s ease;
+  }
+
+  /* Filter chip active */
+  .filter-chip.active {
+    background: #FF7D00;
+    color: white;
+    border-color: #FF7D00;
+  }
+
+  /* Praise shimmer */
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  .praise-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255, 125, 0, 0.08), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite;
+  }
+</style>
+</head>
+<body class="bg-base-light dark:bg-base-dark text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+
+<!-- Top Bar -->
+<header class="sticky top-0 z-50 glass-card bg-base-light/80 dark:bg-base-dark/80 border-b border-gray-200/20 dark:border-white/5">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button onclick="history.back()" class="p-1.5 rounded-lg hover:bg-subtle-light dark:hover:bg-subtle-dark transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 class="text-lg font-semibold">Feedback</h1>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-subtle-light dark:hover:bg-subtle-dark transition-colors" title="Toggle theme">
+        <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-3xl mx-auto px-4 sm:px-6 pb-20">
+
+  <!-- Summary Strip -->
+  <section class="py-5 animate-in" style="animation-delay: 0.05s">
+    <div class="grid grid-cols-3 gap-3">
+      <div class="glass-card bg-surface-light/70 dark:bg-surface-dark/60 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-shadow">
+        <div class="text-2xl font-bold text-primary font-display">12</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-medium">Total Feedback</div>
+      </div>
+      <div class="glass-card bg-surface-light/70 dark:bg-surface-dark/60 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-shadow">
+        <div class="text-2xl font-bold text-secondary font-display">24</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-medium">Improvement Points</div>
+      </div>
+      <div class="glass-card bg-surface-light/70 dark:bg-surface-dark/60 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-shadow">
+        <div class="text-2xl font-bold text-warning font-display">8</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-medium">Praise Received</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter Bar -->
+  <section class="pb-4 animate-in" style="animation-delay: 0.1s">
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <button class="filter-chip active flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-gray-300 dark:border-gray-600 transition-all" onclick="setFilter(this, 'all')">All</button>
+      <button class="filter-chip flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-primary/50 transition-all" onclick="setFilter(this, 'coach-smith')">Coach Smith</button>
+      <button class="filter-chip flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-primary/50 transition-all" onclick="setFilter(this, 'coach-lee')">Coach Lee</button>
+      <button class="filter-chip flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-primary/50 transition-all" onclick="setFilter(this, 'coach-kim')">Coach Kim</button>
+      <div class="w-px h-5 bg-gray-300 dark:bg-gray-600 flex-shrink-0 mx-1"></div>
+      <button class="filter-chip flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-warning/50 transition-all flex items-center gap-1" onclick="togglePraiseFilter(this)">
+        <span>&#127942;</span> Has Praise
+      </button>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section class="relative">
+
+    <!-- January 2026 -->
+    <div class="mb-8 animate-in" style="animation-delay: 0.15s">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center flex-shrink-0">
+          <span class="text-primary text-sm font-bold">J</span>
+        </div>
+        <div>
+          <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-200">January 2026</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-500">4 feedback entries</p>
+        </div>
+      </div>
+
+      <div class="relative pl-12">
+        <div class="timeline-line"></div>
+
+        <!-- Entry 1 -->
+        <div class="mb-4 relative" data-coach="coach-smith" data-praise="true">
+          <div class="absolute left-[-25px] top-4 w-3 h-3 rounded-full bg-primary border-2 border-base-light dark:border-base-dark z-10"></div>
+          <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer group" onclick="toggleExpand(this)">
+            <div class="p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center text-xs font-bold text-secondary">MS</div>
+                  <div>
+                    <span class="text-sm font-medium">Coach Smith</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-500 ml-2">Jan 28</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs px-2 py-0.5 rounded-full bg-warning/10 text-warning font-medium">&#129309; Team Player</span>
+                  <svg class="w-4 h-4 text-gray-400 transition-transform group-hover:text-gray-600 dark:group-hover:text-gray-300 expand-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-500 mb-2 font-medium">&#127912; Beach Tournament Finals</div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">"Great improvement on your serve consistency this tournament. Your float serve was particularly effective in the second set. Keep working on the jump serve power."</p>
+              <div class="flex items-center gap-3 mt-3 text-xs text-gray-500 dark:text-gray-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg> 2 improvement points</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> 1 drill assigned</span>
+              </div>
+            </div>
+
+            <!-- Expandable Content -->
+            <div class="expand-content">
+              <div class="expand-inner">
+                <div class="border-t border-gray-200/30 dark:border-white/5 px-4 py-4 space-y-3">
+                  <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Improvement Points</h4>
+                    <div class="space-y-2">
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span class="text-info text-xs font-bold">1</span>
+                        </div>
+                        <div>
+                          <p class="text-sm text-gray-700 dark:text-gray-300">Work on back-row attack positioning - you're arriving too early and losing power on the approach</p>
+                          <div class="mt-2 flex items-center gap-2">
+                            <a href="#" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium transition-colors">
+                              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                              Back-Row Approach Drill
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span class="text-info text-xs font-bold">2</span>
+                        </div>
+                        <div>
+                          <p class="text-sm text-gray-700 dark:text-gray-300">Improve communication on defense - call the ball louder and earlier, especially on cross-court attacks</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Praise</h4>
+                    <div class="praise-shimmer p-3 rounded-lg border border-warning/20 bg-warning/5">
+                      <div class="flex items-center gap-2">
+                        <span class="text-lg badge-pulse inline-block cursor-default">&#129309;</span>
+                        <div>
+                          <span class="text-sm font-medium text-warning">Team Player Badge</span>
+                          <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">"Excellent court communication and always supporting teammates through tough rallies. You kept the energy up when we were down 18-22 in set 3."</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entry 2 -->
+        <div class="mb-4 relative" data-coach="coach-lee" data-praise="false">
+          <div class="absolute left-[-25px] top-4 w-3 h-3 rounded-full bg-secondary border-2 border-base-light dark:border-base-dark z-10"></div>
+          <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer group" onclick="toggleExpand(this)">
+            <div class="p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-info/20 flex items-center justify-center text-xs font-bold text-info">JL</div>
+                  <div>
+                    <span class="text-sm font-medium">Coach Lee</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-500 ml-2">Jan 21</span>
+                  </div>
+                </div>
+                <svg class="w-4 h-4 text-gray-400 transition-transform group-hover:text-gray-600 dark:group-hover:text-gray-300 expand-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-500 mb-2 font-medium">&#127947; Club Practice Session</div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">"Your defensive reads are getting better but you need to work on your platform angle when passing from zone 5. Focus on keeping your shoulders square to the target."</p>
+              <div class="flex items-center gap-3 mt-3 text-xs text-gray-500 dark:text-gray-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg> 3 improvement points</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> 2 drills assigned</span>
+              </div>
+            </div>
+            <div class="expand-content">
+              <div class="expand-inner">
+                <div class="border-t border-gray-200/30 dark:border-white/5 px-4 py-4 space-y-3">
+                  <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Improvement Points</h4>
+                    <div class="space-y-2">
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">1</span></div>
+                        <div>
+                          <p class="text-sm text-gray-700 dark:text-gray-300">Fix platform angle on zone 5 passes - shoulders need to face zone 3, not zone 2</p>
+                          <div class="mt-2 flex items-center gap-2">
+                            <a href="#" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium transition-colors">
+                              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                              Platform Passing Drill
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">2</span></div>
+                        <div>
+                          <p class="text-sm text-gray-700 dark:text-gray-300">Move feet first before reaching for the ball on dig attempts</p>
+                          <div class="mt-2 flex items-center gap-2">
+                            <a href="#" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium transition-colors">
+                              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                              Footwork & Dig Drill
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">3</span></div>
+                        <div><p class="text-sm text-gray-700 dark:text-gray-300">Work on transitioning faster from defense to attack position after a dig</p></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entry 3 -->
+        <div class="mb-4 relative" data-coach="coach-kim" data-praise="true">
+          <div class="absolute left-[-25px] top-4 w-3 h-3 rounded-full bg-warning border-2 border-base-light dark:border-base-dark z-10"></div>
+          <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer group" onclick="toggleExpand(this)">
+            <div class="p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-warning/20 flex items-center justify-center text-xs font-bold text-warning">SK</div>
+                  <div>
+                    <span class="text-sm font-medium">Coach Kim</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-500 ml-2">Jan 15</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">&#11088; Star Player</span>
+                  <svg class="w-4 h-4 text-gray-400 transition-transform group-hover:text-gray-600 dark:group-hover:text-gray-300 expand-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-500 mb-2 font-medium">&#127950; Indoor League Match</div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">"Outstanding performance tonight. Your setting decisions were on point, especially the quick sets to the middle. You read the block perfectly and distributed the ball beautifully."</p>
+              <div class="flex items-center gap-3 mt-3 text-xs text-gray-500 dark:text-gray-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg> 1 improvement point</span>
+              </div>
+            </div>
+            <div class="expand-content">
+              <div class="expand-inner">
+                <div class="border-t border-gray-200/30 dark:border-white/5 px-4 py-4 space-y-3">
+                  <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Improvement Points</h4>
+                    <div class="space-y-2">
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">1</span></div>
+                        <div><p class="text-sm text-gray-700 dark:text-gray-300">Try incorporating more back-row sets when the middle is well-blocked - add variety to keep opponents guessing</p></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Praise</h4>
+                    <div class="praise-shimmer p-3 rounded-lg border border-primary/20 bg-primary/5">
+                      <div class="flex items-center gap-2">
+                        <span class="text-lg badge-pulse inline-block cursor-default">&#11088;</span>
+                        <div>
+                          <span class="text-sm font-medium text-primary">Star Player Badge</span>
+                          <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">"MVP of tonight's match. 42 assists with a .350 team hitting percentage. Keep this level of play!"</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entry 4 -->
+        <div class="mb-4 relative" data-coach="coach-smith" data-praise="false">
+          <div class="absolute left-[-25px] top-4 w-3 h-3 rounded-full bg-primary border-2 border-base-light dark:border-base-dark z-10"></div>
+          <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer group" onclick="toggleExpand(this)">
+            <div class="p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center text-xs font-bold text-secondary">MS</div>
+                  <div>
+                    <span class="text-sm font-medium">Coach Smith</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-500 ml-2">Jan 8</span>
+                  </div>
+                </div>
+                <svg class="w-4 h-4 text-gray-400 transition-transform group-hover:text-gray-600 dark:group-hover:text-gray-300 expand-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-500 mb-2 font-medium">&#127947; Pre-Season Training Camp</div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">"Good intensity at camp. Your blocking timing has improved since last season. Need to see more consistency in serve receive - too many shanked passes on hard-driven serves."</p>
+              <div class="flex items-center gap-3 mt-3 text-xs text-gray-500 dark:text-gray-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg> 2 improvement points</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> 1 drill assigned</span>
+              </div>
+            </div>
+            <div class="expand-content">
+              <div class="expand-inner">
+                <div class="border-t border-gray-200/30 dark:border-white/5 px-4 py-4 space-y-3">
+                  <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Improvement Points</h4>
+                    <div class="space-y-2">
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">1</span></div>
+                        <div>
+                          <p class="text-sm text-gray-700 dark:text-gray-300">Serve receive consistency on hard-driven serves - work on getting lower and absorbing pace</p>
+                          <div class="mt-2 flex items-center gap-2">
+                            <a href="#" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium transition-colors">
+                              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                              Serve Receive Under Pressure
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">2</span></div>
+                        <div><p class="text-sm text-gray-700 dark:text-gray-300">Keep your eye on the setter before committing to a block - you're jumping too early on quick sets</p></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- December 2025 -->
+    <div class="mb-8 animate-in" style="animation-delay: 0.25s">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-full bg-secondary/10 dark:bg-secondary/20 flex items-center justify-center flex-shrink-0">
+          <span class="text-secondary text-sm font-bold">D</span>
+        </div>
+        <div>
+          <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-200">December 2025</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-500">3 feedback entries</p>
+        </div>
+      </div>
+
+      <div class="relative pl-12">
+        <div class="timeline-line"></div>
+
+        <!-- Entry 5 -->
+        <div class="mb-4 relative" data-coach="coach-lee" data-praise="true">
+          <div class="absolute left-[-25px] top-4 w-3 h-3 rounded-full bg-secondary border-2 border-base-light dark:border-base-dark z-10"></div>
+          <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer group" onclick="toggleExpand(this)">
+            <div class="p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-info/20 flex items-center justify-center text-xs font-bold text-info">JL</div>
+                  <div>
+                    <span class="text-sm font-medium">Coach Lee</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-500 ml-2">Dec 18</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success font-medium">&#128170; Max Effort</span>
+                  <svg class="w-4 h-4 text-gray-400 transition-transform group-hover:text-gray-600 dark:group-hover:text-gray-300 expand-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-500 mb-2 font-medium">&#127942; End-of-Season Tournament</div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">"Incredible effort in the semifinals. You dove for every ball and kept rallies alive that nobody expected. Your attitude lifted the entire team."</p>
+              <div class="flex items-center gap-3 mt-3 text-xs text-gray-500 dark:text-gray-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg> 2 improvement points</span>
+              </div>
+            </div>
+            <div class="expand-content">
+              <div class="expand-inner">
+                <div class="border-t border-gray-200/30 dark:border-white/5 px-4 py-4 space-y-3">
+                  <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Improvement Points</h4>
+                    <div class="space-y-2">
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">1</span></div>
+                        <div><p class="text-sm text-gray-700 dark:text-gray-300">Channel that energy into smarter positioning instead of always diving - sometimes being in the right spot is better than a spectacular dig</p></div>
+                      </div>
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">2</span></div>
+                        <div><p class="text-sm text-gray-700 dark:text-gray-300">Pace yourself better in long matches - your effort dropped noticeably in set 4</p></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Praise</h4>
+                    <div class="praise-shimmer p-3 rounded-lg border border-success/20 bg-success/5">
+                      <div class="flex items-center gap-2">
+                        <span class="text-lg badge-pulse inline-block cursor-default">&#128170;</span>
+                        <div>
+                          <span class="text-sm font-medium text-success">Maximum Effort Badge</span>
+                          <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">"The heart of the team today. 28 digs including 6 incredible saves that turned the momentum."</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entry 6 -->
+        <div class="mb-4 relative" data-coach="coach-smith" data-praise="true">
+          <div class="absolute left-[-25px] top-4 w-3 h-3 rounded-full bg-primary border-2 border-base-light dark:border-base-dark z-10"></div>
+          <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer group" onclick="toggleExpand(this)">
+            <div class="p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center text-xs font-bold text-secondary">MS</div>
+                  <div>
+                    <span class="text-sm font-medium">Coach Smith</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-500 ml-2">Dec 10</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs px-2 py-0.5 rounded-full bg-info/10 text-info font-medium">&#128640; Breakthrough</span>
+                  <svg class="w-4 h-4 text-gray-400 transition-transform group-hover:text-gray-600 dark:group-hover:text-gray-300 expand-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-500 mb-2 font-medium">&#127947; Weekly Practice</div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">"I saw a breakthrough in your jump serve today. The toss placement was consistent and you finally got that topspin working. This is the level I've been waiting to see."</p>
+              <div class="flex items-center gap-3 mt-3 text-xs text-gray-500 dark:text-gray-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg> 1 improvement point</span>
+              </div>
+            </div>
+            <div class="expand-content">
+              <div class="expand-inner">
+                <div class="border-t border-gray-200/30 dark:border-white/5 px-4 py-4 space-y-3">
+                  <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Improvement Points</h4>
+                    <div class="space-y-2">
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">1</span></div>
+                        <div><p class="text-sm text-gray-700 dark:text-gray-300">Now that the topspin is there, work on adding more zones to target - don't just go cross-court every time</p></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Praise</h4>
+                    <div class="praise-shimmer p-3 rounded-lg border border-info/20 bg-info/5">
+                      <div class="flex items-center gap-2">
+                        <span class="text-lg badge-pulse inline-block cursor-default">&#128640;</span>
+                        <div>
+                          <span class="text-sm font-medium text-info">Breakthrough Moment Badge</span>
+                          <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">"Your jump serve went from a liability to a weapon today. Months of work paying off!"</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entry 7 -->
+        <div class="mb-4 relative" data-coach="coach-kim" data-praise="false">
+          <div class="absolute left-[-25px] top-4 w-3 h-3 rounded-full bg-warning border-2 border-base-light dark:border-base-dark z-10"></div>
+          <div class="glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer group" onclick="toggleExpand(this)">
+            <div class="p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-warning/20 flex items-center justify-center text-xs font-bold text-warning">SK</div>
+                  <div>
+                    <span class="text-sm font-medium">Coach Kim</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-500 ml-2">Dec 3</span>
+                  </div>
+                </div>
+                <svg class="w-4 h-4 text-gray-400 transition-transform group-hover:text-gray-600 dark:group-hover:text-gray-300 expand-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-500 mb-2 font-medium">&#127912; Beach Doubles Practice</div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">"Your beach game needs work. Indoor skills don't always translate directly. Focus on reading the wind for serves and using cut shots more effectively in 2v2."</p>
+              <div class="flex items-center gap-3 mt-3 text-xs text-gray-500 dark:text-gray-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg> 3 improvement points</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> 1 drill assigned</span>
+              </div>
+            </div>
+            <div class="expand-content">
+              <div class="expand-inner">
+                <div class="border-t border-gray-200/30 dark:border-white/5 px-4 py-4 space-y-3">
+                  <div>
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Improvement Points</h4>
+                    <div class="space-y-2">
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">1</span></div>
+                        <div>
+                          <p class="text-sm text-gray-700 dark:text-gray-300">Adjust serve technique for wind - use more float serves on windy days, save the jump serve for calm conditions</p>
+                          <div class="mt-2 flex items-center gap-2">
+                            <a href="#" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium transition-colors">
+                              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                              Beach Serve Variation Drill
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">2</span></div>
+                        <div><p class="text-sm text-gray-700 dark:text-gray-300">Develop cut shots and pokeys - you're too reliant on hard-driven attacks that get read easily in 2v2</p></div>
+                      </div>
+                      <div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+                        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">3</span></div>
+                        <div><p class="text-sm text-gray-700 dark:text-gray-300">Move more in the sand - your court coverage drops significantly after set 2, need better conditioning</p></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load More -->
+    <div class="text-center pb-8 animate-in" style="animation-delay: 0.3s">
+      <button class="px-6 py-2.5 rounded-full text-sm font-medium text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 hover:border-primary hover:text-primary transition-all">
+        Load Earlier Feedback
+      </button>
+    </div>
+  </section>
+</main>
+
+<script>
+function toggleTheme() {
+  document.documentElement.classList.toggle('dark');
+}
+
+function toggleExpand(card) {
+  const content = card.querySelector('.expand-content');
+  const chevron = card.querySelector('.expand-chevron');
+  const isOpen = content.classList.contains('open');
+
+  // Close all others first
+  document.querySelectorAll('.expand-content.open').forEach(el => {
+    if (el !== content) {
+      el.classList.remove('open');
+      el.closest('.glass-card').querySelector('.expand-chevron').style.transform = '';
+    }
+  });
+
+  content.classList.toggle('open');
+  chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+function setFilter(btn, filter) {
+  // Update active state
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    if (!chip.textContent.includes('Has Praise')) {
+      chip.classList.remove('active');
+    }
+  });
+  btn.classList.add('active');
+
+  // Filter entries
+  const entries = document.querySelectorAll('[data-coach]');
+  entries.forEach(entry => {
+    if (filter === 'all') {
+      entry.style.display = '';
+    } else {
+      entry.style.display = entry.dataset.coach === filter ? '' : 'none';
+    }
+  });
+}
+
+function togglePraiseFilter(btn) {
+  btn.classList.toggle('active');
+  const filterActive = btn.classList.contains('active');
+
+  if (filterActive) {
+    document.querySelectorAll('[data-coach]').forEach(entry => {
+      if (entry.dataset.praise !== 'true') {
+        entry.style.display = 'none';
+      }
+    });
+  } else {
+    document.querySelectorAll('[data-coach]').forEach(entry => {
+      entry.style.display = '';
+    });
+    // Re-apply coach filter if any
+    const activeCoach = document.querySelector('.filter-chip.active:not([onclick*="togglePraise"])');
+    if (activeCoach && !activeCoach.textContent.includes('All')) {
+      activeCoach.click();
+    }
+  }
+}
+
+// Stagger animations on load
+document.addEventListener('DOMContentLoaded', () => {
+  const items = document.querySelectorAll('.animate-in');
+  items.forEach((item, i) => {
+    item.style.animationDelay = `${0.05 + i * 0.08}s`;
+  });
+});
+</script>
+</body>
+</html>

@@ -7,16 +7,14 @@ import {
 	AccountPayoutInfo,
 } from "../models/Payment";
 
-// Event-specific payment endpoints stay in events-service
-const EVENTS_PREFIX = "events/v1";
-
-// Payment account management endpoints are in payments-service
 const PAYMENTS_PREFIX = "payments/v1";
 
 export async function updatePayment(positionId: string, paid: boolean) {
-	const endpoint = `/payments/${positionId}`;
+	const endpoint = `/participants/${positionId}/payments`;
 
-	await client.post(EVENTS_PREFIX + endpoint, { paid: paid });
+	await client.patch(PAYMENTS_PREFIX + endpoint, {
+		status: paid ? "paid" : "unpaid",
+	});
 }
 
 export async function loadUserPaymentForEvent(
@@ -25,22 +23,27 @@ export async function loadUserPaymentForEvent(
 ): Promise<Payment> {
 	const endpoint = `/events/${eventId}/payments?userId=${userId}`;
 
-	return (await client.get<Payment>(EVENTS_PREFIX + endpoint)).data;
+	return (await client.get<Payment>(PAYMENTS_PREFIX + endpoint)).data;
+}
+
+export async function loadEventPayments(eventId: string): Promise<Payment[]> {
+	const endpoint = `/events/${eventId}/payments`;
+	return (await client.get<Payment[]>(PAYMENTS_PREFIX + endpoint)).data;
 }
 
 export async function loadTeamPayments(teamId: string): Promise<Payment[]> {
 	const endpoint = `/teams/${teamId}/payments`;
 
-	return (await client.get<Payment[]>(EVENTS_PREFIX + endpoint)).data;
+	return (await client.get<Payment[]>(PAYMENTS_PREFIX + endpoint)).data;
 }
 
 export async function getUserPayments(userId: string): Promise<UserPayment[]> {
-	const endpoint = `/payments?userId=${userId}`;
+	const endpoint = `/users/${userId}/payments`;
 
-	return (await client.get<UserPayment[]>(EVENTS_PREFIX + endpoint)).data;
+	return (await client.get<UserPayment[]>(PAYMENTS_PREFIX + endpoint)).data;
 }
 
-// --- Payment Account endpoints (payments-service) ---
+// --- Payment Account endpoints ---
 
 export async function getPaymentAccount(): Promise<PaymentAccount> {
 	const endpoint = `/payments/account`;
@@ -66,25 +69,25 @@ export async function getDashboardLink(): Promise<string> {
 	return response.data.url;
 }
 
-// --- Checkout endpoints (events-service) ---
+// --- Checkout endpoints ---
 
 export async function createCheckoutSession(
 	participantId: string,
 ): Promise<string> {
 	const endpoint = `/participants/${participantId}/checkout`;
-	const response = await client.post<{ url: string }>(EVENTS_PREFIX + endpoint);
+	const response = await client.post<{ url: string }>(PAYMENTS_PREFIX + endpoint);
 	return response.data.url;
 }
 
-export async function createEventCheckoutSession(
+export async function createEventPaymentIntent(
 	eventId: string,
-): Promise<string> {
+): Promise<{ clientSecret: string }> {
 	const endpoint = `/events/${eventId}/checkout`;
-	const response = await client.post<{ url: string }>(EVENTS_PREFIX + endpoint);
-	return response.data.url;
+	const response = await client.post<{ clientSecret: string }>(PAYMENTS_PREFIX + endpoint);
+	return response.data;
 }
 
-// --- Balance & Payout (payments-service) ---
+// --- Balance & Payout ---
 
 export async function getAccountBalance(): Promise<AccountBalance> {
 	const endpoint = `/payments/account/balance`;

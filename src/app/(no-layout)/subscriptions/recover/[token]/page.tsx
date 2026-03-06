@@ -88,9 +88,12 @@ export default function PaymentRecoveryPage() {
 							appearance: {
 								theme: "night",
 								variables: {
-									colorPrimary: "#6366f1",
-									colorBackground: "#1a1a2e",
-									colorText: "#e2e8f0",
+									colorPrimary: "#ff6900",
+									colorBackground: "#161616",
+									colorText: "#fafafa",
+									colorDanger: "#ff6467",
+									colorTextSecondary: "#a1a1a1",
+									colorTextPlaceholder: "#a1a1a1",
 									borderRadius: "12px",
 								},
 							},
@@ -162,7 +165,7 @@ function RecoveryPaymentForm({ onSuccess }: { onSuccess: () => void }) {
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-4">
-			<PaymentElement />
+			<PaymentElement options={{ wallets: { applePay: "auto", googlePay: "auto" } }} />
 			{error && (
 				<p className="text-sm text-red-400" role="alert">
 					{error}

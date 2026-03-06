@@ -40,8 +40,8 @@ function ForgotPasswordForm({ onEmailSent }: ForgotPasswordFormProps) {
 			})
 			.catch(({ response }) => {
 				setIsLoading(false);
-				const errorResponse = response.data as ErrorResponse;
-				setError(errorResponse.errors.map((e) => e.errorMessage).join(", "));
+				const errorResponse = response?.data as { errors: { errorMessage: string }[] } | undefined;
+				setError(errorResponse?.errors?.map((e: { errorMessage: string }) => e.errorMessage).join(", ") ?? "An error occurred");
 			});
 	};
 

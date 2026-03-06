@@ -17,7 +17,8 @@ function extractRoleStrings(roles: any[] | undefined): string[] {
 interface MemberRowProps {
 	member: ClubMember;
 	clubId: string;
-	currentUserRole?: ClubRole;
+	canEdit?: boolean;
+	canRemove?: boolean;
 	subscription?: Subscription;
 	onEdit: () => void;
 	onRemove?: () => void;
@@ -38,12 +39,11 @@ const getSkillLevelBadge = (skillLevel?: string) => {
 	);
 };
 
-export default function MemberRow({ member, clubId, currentUserRole, subscription, onEdit, onRemove }: MemberRowProps) {
+export default function MemberRow({ member, clubId, canEdit = false, canRemove: canRemoveProp = false, subscription, onEdit, onRemove }: MemberRowProps) {
 	const memberUrl = `/hub/clubs/${clubId}/members/${member.userId}`;
 
-	// Check if current user can remove this member
-	// Owners and Admins can remove members, but not themselves or other owners
-	const canRemove = onRemove && (currentUserRole === ClubRole.Owner || currentUserRole === ClubRole.Admin) && !extractRoleStrings(member.roles).includes(ClubRole.Owner);
+	// Can remove if permitted and target is not an owner
+	const canRemove = canRemoveProp && onRemove && !extractRoleStrings(member.roles).includes(ClubRole.Owner);
 
 	return (
 		<tr className="border-b border-border hover:bg-muted/10 group">
@@ -93,30 +93,34 @@ export default function MemberRow({ member, clubId, currentUserRole, subscriptio
 				</Link>
 			</td>
 			<td className="px-4 py-3 text-right">
-				<div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-					<button
-						onClick={(e) => {
-							e.preventDefault();
-							e.stopPropagation();
-							onEdit();
-						}}
-						className="p-2 rounded-lg hover:bg-hover text-muted hover:text-foreground transition-colors"
-						title="Edit member">
-						<Edit size={16} />
-					</button>
-					{canRemove && (
-						<button
-							onClick={(e) => {
-								e.preventDefault();
-								e.stopPropagation();
-								onRemove();
-							}}
-							className="p-2 rounded-lg hover:bg-red-500/20 text-muted hover:text-red-400 transition-colors"
-							title="Remove member">
-							<UserMinus size={16} />
-						</button>
-					)}
-				</div>
+				{(canEdit || canRemove) && (
+					<div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+						{canEdit && (
+							<button
+								onClick={(e) => {
+									e.preventDefault();
+									e.stopPropagation();
+									onEdit();
+								}}
+								className="p-2 rounded-lg hover:bg-hover text-muted hover:text-foreground transition-colors"
+								title="Edit member">
+								<Edit size={16} />
+							</button>
+						)}
+						{canRemove && (
+							<button
+								onClick={(e) => {
+									e.preventDefault();
+									e.stopPropagation();
+									onRemove!();
+								}}
+								className="p-2 rounded-lg hover:bg-red-500/20 text-muted hover:text-red-400 transition-colors"
+								title="Remove member">
+								<UserMinus size={16} />
+							</button>
+						)}
+					</div>
+				)}
 			</td>
 		</tr>
 	);

@@ -155,7 +155,7 @@ export default function CreateTournamentModal({
 					<Select
 						label="Visibility"
 						value={visibility}
-						onChange={(value) => setVisibility(value)}
+						onChange={(value) => setVisibility(value ?? "")}
 						options={VISIBILITY_OPTIONS}
 					/>
 				</div>

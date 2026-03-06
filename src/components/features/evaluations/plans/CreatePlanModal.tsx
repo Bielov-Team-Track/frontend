@@ -423,7 +423,7 @@ function StepExercises({
 						</div>
 					) : availableExercises.length === 0 ? (
 						<EmptyState
-							icon={<ClipboardList size={32} />}
+							icon={ClipboardList}
 							title="No exercises found"
 							description={
 								searchQuery
@@ -432,7 +432,6 @@ function StepExercises({
 										? "All exercises have been added"
 										: "Create some exercises first"
 							}
-							compact
 						/>
 					) : (
 						<div className="divide-y divide-border">

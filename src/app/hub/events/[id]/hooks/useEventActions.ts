@@ -6,10 +6,12 @@ import { useCallback, useState } from "react";
 
 interface UseEventActionsOptions {
 	eventId: string;
+	payToJoin?: boolean;
 	onSuccess?: () => void;
+	onPaymentRequired?: () => void;
 }
 
-export function useEventActions({ eventId, onSuccess }: UseEventActionsOptions) {
+export function useEventActions({ eventId, payToJoin, onSuccess, onPaymentRequired }: UseEventActionsOptions) {
 	const [showDeclineModal, setShowDeclineModal] = useState(false);
 	const [declineNote, setDeclineNote] = useState("");
 
@@ -36,8 +38,12 @@ export function useEventActions({ eventId, onSuccess }: UseEventActionsOptions) 
 	});
 
 	const handleAcceptInvitation = useCallback(() => {
+		if (payToJoin) {
+			onPaymentRequired?.();
+			return;
+		}
 		respondMutation.mutate({ accept: true });
-	}, [respondMutation.mutate]);
+	}, [payToJoin, onPaymentRequired, respondMutation.mutate]);
 
 	const handleDeclineInvitation = useCallback((note?: string) => {
 		if (note !== undefined) {
@@ -56,8 +62,12 @@ export function useEventActions({ eventId, onSuccess }: UseEventActionsOptions) 
 	const handleCloseDeclineModal = useCallback(() => setShowDeclineModal(false), []);
 
 	const handleJoin = useCallback(() => {
+		if (payToJoin) {
+			onPaymentRequired?.();
+			return;
+		}
 		joinMutation.mutate();
-	}, [joinMutation.mutate]);
+	}, [payToJoin, onPaymentRequired, joinMutation.mutate]);
 
 	const handleJoinWaitlist = useCallback(() => {
 		joinWaitlistMutation.mutate();

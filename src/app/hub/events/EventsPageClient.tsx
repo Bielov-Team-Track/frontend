@@ -85,9 +85,11 @@ interface EventsPageClientProps {
 	title?: string;
 	/** Pre-selected context for the create event modal (e.g. when viewing a club's events) */
 	defaultContext?: ContextSelection;
+	/** Whether the user can create events. Defaults to true (e.g. on the global events page). */
+	canCreate?: boolean;
 }
 
-function EventsPageClient({ baseFilter, title = "Events", defaultContext }: EventsPageClientProps) {
+function EventsPageClient({ baseFilter, title = "Events", defaultContext, canCreate = true }: EventsPageClientProps) {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedTypes, setSelectedTypes] = useState<EventType[]>([]);
 	const [timeFilter, setTimeFilter] = useState<TimeFilterValue>("all");
@@ -208,9 +210,11 @@ function EventsPageClient({ baseFilter, title = "Events", defaultContext }: Even
 			{/* Header Row: Title + Create Button */}
 			<div className="flex items-center justify-between shrink-0">
 				<h2 className="text-lg font-semibold text-foreground">{title}</h2>
-				<Button variant="outline" leftIcon={<Plus size={16} />} onClick={() => openCreateEvent({ source: "events", contextSelection: defaultContext })}>
-					Create Event
-				</Button>
+				{canCreate && (
+					<Button variant="outline" leftIcon={<Plus size={16} />} onClick={() => openCreateEvent({ source: "events", contextSelection: defaultContext })}>
+						Create Event
+					</Button>
+				)}
 			</div>
 
 			{/* Toolbar Row */}

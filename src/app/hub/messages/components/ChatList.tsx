@@ -14,6 +14,7 @@ type ChatListProps = {
 	hasMore?: boolean;
 	isLoadingMore?: boolean;
 	currentUserId?: string;
+	collapsed?: boolean;
 };
 
 const ChatList = ({
@@ -27,6 +28,7 @@ const ChatList = ({
 	hasMore,
 	isLoadingMore,
 	currentUserId,
+	collapsed,
 }: ChatListProps) => {
 	const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
 		if (!hasMore || isLoadingMore || !onLoadMore) return;
@@ -36,12 +38,9 @@ const ChatList = ({
 		}
 	};
 	return (
-		<div data-testid="chat-list" className="flex flex-col h-full bg-background/50 backdrop-blur-xl border border-border  overflow-hidden shadow-2xl">
-			<div className="p-4 border-b border-border flex flex-col justify-between gap-4">
-				<div className="flex justify-between items-center px-1">
-					<span className="font-bold text-xl tracking-tight text-foreground">
-						Messages
-					</span>
+		<div data-testid="chat-list" className="flex flex-col h-full bg-background/50 backdrop-blur-xl border border-border overflow-hidden shadow-2xl">
+			<div className={`border-b border-border flex flex-col justify-between ${collapsed ? "p-2 items-center" : "p-4 gap-4"}`}>
+				{collapsed ? (
 					<Button
 						data-testid="new-chat-button"
 						onClick={onCreateChatClick}
@@ -51,41 +50,68 @@ const ChatList = ({
 						title="New Chat">
 						<Plus size={18} />
 					</Button>
-				</div>
-				<div className="relative">
-					<Input
-						data-testid="search-chats"
-						leftIcon={<Search className="text-muted-foreground" size={16} />}
-						placeholder="Search chats..."
-						value={searchQuery}
-						onChange={(e) => onSearchChange(e.target.value)}
-					/>
-				</div>
+				) : (
+					<>
+						<div className="flex justify-between items-center px-1">
+							<span className="font-bold text-xl tracking-tight text-foreground">
+								Messages
+							</span>
+							<Button
+								data-testid="new-chat-button"
+								onClick={onCreateChatClick}
+								size="icon" variant="ghost"
+								color="neutral"
+								className="bg-surface hover:bg-hover text-foreground rounded-full w-8 h-8 p-0"
+								title="New Chat">
+								<Plus size={18} />
+							</Button>
+						</div>
+						<div className="relative">
+							<Input
+								data-testid="search-chats"
+								leftIcon={<Search className="text-muted-foreground" size={16} />}
+								placeholder="Search chats..."
+								value={searchQuery}
+								onChange={(e) => onSearchChange(e.target.value)}
+							/>
+						</div>
+					</>
+				)}
 			</div>
 
-			<div className="overflow-y-auto flex-1 p-2 space-y-1 scrollbar-thin scrollbar-thumb-foreground/10" onScroll={handleScroll}>
+			<div className={`overflow-y-auto flex-1 space-y-1 scrollbar-thin scrollbar-thumb-foreground/10 ${collapsed ? "p-1" : "p-2"}`} onScroll={handleScroll}>
 				{chats.length === 0 && !searchQuery ? (
-					<div data-testid="empty-chat-list" className="p-8 text-center text-muted-foreground flex flex-col items-center gap-4 h-full justify-center">
-						<div className="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
-							<Plus size={24} className="opacity-50" />
+					collapsed ? (
+						<div data-testid="empty-chat-list" className="flex justify-center py-4">
+							<div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center">
+								<Plus size={18} className="opacity-50" />
+							</div>
 						</div>
-						<span className="text-sm">
-							No chats yet. Start connecting!
-						</span>
-						<Button
-							onClick={onCreateChatClick}
-							size="sm"
-							variant="outline"
-							color="neutral">
-							Start a conversation
-						</Button>
-					</div>
+					) : (
+						<div data-testid="empty-chat-list" className="p-8 text-center text-muted-foreground flex flex-col items-center gap-4 h-full justify-center">
+							<div className="w-16 h-16 rounded-full bg-surface flex items-center justify-center">
+								<Plus size={24} className="opacity-50" />
+							</div>
+							<span className="text-sm">
+								No chats yet. Start connecting!
+							</span>
+							<Button
+								onClick={onCreateChatClick}
+								size="sm"
+								variant="outline"
+								color="neutral">
+								Start a conversation
+							</Button>
+						</div>
+					)
 				) : chats.length === 0 && searchQuery ? (
-					<div data-testid="no-search-results" className="p-8 text-center text-muted-foreground h-full flex flex-col items-center justify-center">
-						<Search size={24} className="mb-2 opacity-50" />
-						<span className="text-sm">
-							No chats found matching &quot;{searchQuery}&quot;
-						</span>
+					<div data-testid="no-search-results" className={`text-center text-muted-foreground h-full flex flex-col items-center justify-center ${collapsed ? "p-2" : "p-8"}`}>
+						<Search size={collapsed ? 18 : 24} className="mb-2 opacity-50" />
+						{!collapsed && (
+							<span className="text-sm">
+								No chats found matching &quot;{searchQuery}&quot;
+							</span>
+						)}
 					</div>
 				) : (
 					<>
@@ -96,6 +122,7 @@ const ChatList = ({
 								active={selectedChatId === chat.id}
 								onClick={() => onSelectChat(chat)}
 								currentUserId={currentUserId}
+								collapsed={collapsed}
 							/>
 						))}
 						{isLoadingMore && (

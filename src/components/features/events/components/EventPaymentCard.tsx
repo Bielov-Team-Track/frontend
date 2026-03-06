@@ -1,22 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui";
-import { createEventCheckoutSession } from "@/lib/api/payments";
 import { Event } from "@/lib/models/Event";
 import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { CreditCard } from "lucide-react";
-import { useState } from "react";
 
 interface EventPaymentCardProps {
 	event: Event;
 	userParticipant?: EventParticipant | null;
 	isInvited?: boolean;
+	onPaymentRequired?: () => void;
 }
 
-export default function EventPaymentCard({ event, userParticipant, isInvited = false }: EventPaymentCardProps) {
-	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-
+export default function EventPaymentCard({
+	event,
+	userParticipant,
+	isInvited = false,
+	onPaymentRequired,
+}: EventPaymentCardProps) {
 	// Only show if payToJoin is enabled
 	if (!event.paymentConfig?.payToJoin) {
 		return null;
@@ -26,18 +27,6 @@ export default function EventPaymentCard({ event, userParticipant, isInvited = f
 	if (userParticipant && userParticipant.status === ParticipationStatus.Accepted) {
 		return null;
 	}
-
-	const handlePayToJoin = async () => {
-		try {
-			setIsLoading(true);
-			setError(null);
-			const checkoutUrl = await createEventCheckoutSession(event.id);
-			window.location.href = checkoutUrl;
-		} catch (err: any) {
-			setError(err.response?.data?.error || "Failed to create checkout session. Please try again.");
-			setIsLoading(false);
-		}
-	};
 
 	const buttonText = isInvited ? "Pay and accept" : "Pay and join";
 	const currency = event.paymentConfig.currency || "£";
@@ -66,15 +55,9 @@ export default function EventPaymentCard({ event, userParticipant, isInvited = f
 					</div>
 				</div>
 
-				{error && (
-					<div className="p-3 rounded-lg bg-error/10 border border-error/20 text-sm text-error">{error}</div>
-				)}
-
 				<Button
 					leftIcon={<CreditCard size={16} />}
-					onClick={handlePayToJoin}
-					loading={isLoading}
-					disabled={isLoading}
+					onClick={onPaymentRequired}
 					fullWidth
 					data-testid="pay-to-join-button"
 				>

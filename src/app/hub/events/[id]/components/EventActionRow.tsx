@@ -1,11 +1,12 @@
 "use client";
 
 import { Button } from "@/components";
-import { Check, Clock, X } from "lucide-react";
+import { Check, Clock, MessageCircle, X } from "lucide-react";
 
 interface EventActionRowProps {
 	isOpen: boolean;
 	isFull: boolean;
+	isPrivate: boolean;
 	hasInvitation: boolean;
 	isParticipant: boolean;
 	isDeclined: boolean;
@@ -17,11 +18,13 @@ interface EventActionRowProps {
 	onReaccept?: () => void;
 	onJoin?: () => void;
 	onJoinWaitlist?: () => void;
+	onMessageOrganizers?: () => void;
 }
 
 export default function EventActionRow({
 	isOpen,
 	isFull,
+	isPrivate,
 	hasInvitation,
 	isParticipant,
 	isDeclined,
@@ -33,41 +36,38 @@ export default function EventActionRow({
 	onReaccept,
 	onJoin,
 	onJoinWaitlist,
+	onMessageOrganizers,
 }: EventActionRowProps) {
 	// User has responded (accepted or declined) — show persistent toggle buttons
 	const hasResponded = (isParticipant || isDeclined) && !hasInvitation;
 
 	return (
-		<div className="flex items-center gap-3 px-5 py-2.5 border-t border-border lg:border-t-0 lg:border-l lg:py-2.5">
+		<div className="flex items-center gap-2 px-5 py-2.5 border-t border-border lg:border-t-0 lg:border-l lg:py-2.5">
 			{/* Persistent Accept/Decline toggle — shown after user has responded */}
 			{hasResponded && !canceled && (
 				<div className="flex items-center gap-2">
-					<button
+					<Button
+						size="sm"
+						variant={isParticipant ? "default" : "outline"}
+						leftIcon={<Check size={14} />}
 						onClick={isDeclined ? onReaccept : undefined}
 						disabled={isParticipant}
-						className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${
-							isParticipant
-								? "bg-success text-white"
-								: "bg-success/10 text-success border border-success/20 hover:bg-success/20 cursor-pointer"
-						}`}
+						className={isParticipant ? "bg-success text-white border-success hover:bg-success/90 disabled:opacity-100" : "border-success/30 text-success hover:bg-success/10"}
 						data-testid="desktop-accept-toggle"
 					>
-						<Check size={12} />
-						Accepted
-					</button>
-					<button
+						{isParticipant ? "Accepted" : "Accept"}
+					</Button>
+					<Button
+						size="sm"
+						variant={isDeclined ? "default" : "outline"}
+						leftIcon={<X size={14} />}
 						onClick={isParticipant ? onWithdraw : undefined}
 						disabled={isDeclined}
-						className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${
-							isDeclined
-								? "bg-error text-white"
-								: "bg-error/10 text-error border border-error/20 hover:bg-error/20 cursor-pointer"
-						}`}
+						className={isDeclined ? "bg-error text-white border-error hover:bg-error/90 disabled:opacity-100" : "border-error/30 text-error hover:bg-error/10"}
 						data-testid="desktop-decline-toggle"
 					>
-						<X size={12} />
-						Declined
-					</button>
+						Decline
+					</Button>
 				</div>
 			)}
 
@@ -83,7 +83,6 @@ export default function EventActionRow({
 			{isOpen && isFull && !hasInvitation && !isParticipant && !isDeclined && !isWaitlisted && !canceled && (
 				<Button
 					variant="outline"
-					color="neutral"
 					size="sm"
 					onClick={onJoinWaitlist}
 					aria-label="Join the waitlist"
@@ -99,20 +98,20 @@ export default function EventActionRow({
 					<>
 						<Button
 							variant="outline"
-							color="error"
 							size="sm"
 							leftIcon={<X size={14} />}
 							onClick={onDecline}
+							className="border-error/30 text-error hover:bg-error/10"
 							aria-label="Decline invitation"
 							data-testid="desktop-decline-invitation-button"
 						>
 							Decline
 						</Button>
 						<Button
-							color="success"
 							size="sm"
 							leftIcon={<Check size={14} />}
 							onClick={onAccept}
+							className="bg-success text-white border-success hover:bg-success/90"
 							aria-label="Accept invitation"
 							data-testid="desktop-accept-invitation-button"
 						>
@@ -121,15 +120,27 @@ export default function EventActionRow({
 					</>
 				)}
 				{isOpen && !isFull && !hasInvitation && !isParticipant && !isDeclined && !canceled && (
-					<Button
-						color="primary"
-						size="sm"
-						onClick={onJoin}
-						aria-label="Join this event"
-						data-testid="desktop-join-event-button"
-					>
-						Join Event
-					</Button>
+					isPrivate ? (
+						<Button
+							variant="outline"
+							size="sm"
+							leftIcon={<MessageCircle size={14} />}
+							onClick={onMessageOrganizers}
+							aria-label="Message organizers"
+							data-testid="desktop-message-organizers-button"
+						>
+							Message Organizers
+						</Button>
+					) : (
+						<Button
+							size="sm"
+							onClick={onJoin}
+							aria-label="Join this event"
+							data-testid="desktop-join-event-button"
+						>
+							Join Event
+						</Button>
+					)
 				)}
 			</div>
 		</div>

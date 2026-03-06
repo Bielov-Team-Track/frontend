@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEventContext } from "../../../layout";
+import { useEventContext } from "../../layout";
 import {
 	Button,
 	Badge,
@@ -10,6 +10,7 @@ import {
 	CardContent,
 	CardHeader,
 	CardTitle,
+	Loader,
 } from "@/components/ui";
 import {
 	ArrowLeft,
@@ -233,7 +234,7 @@ function CompletedBanner({ onViewResults }: CompletedBannerProps) {
 // Main page
 // ---------------------------------------------------------------------------
 
-export default function EvaluationDashboardPage() {
+function EvaluationDashboardPageContent() {
 	const params = useParams();
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -563,5 +564,13 @@ export default function EvaluationDashboardPage() {
 				)
 			)}
 		</div>
+	);
+}
+
+export default function EvaluationDashboardPage() {
+	return (
+		<Suspense fallback={<Loader size="lg" />}>
+			<EvaluationDashboardPageContent />
+		</Suspense>
 	);
 }

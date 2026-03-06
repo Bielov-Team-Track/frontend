@@ -37,7 +37,7 @@ export interface AnimationEquipmentItem {
 export interface AnimationKeyframe {
 	id: string;
 	players: AnimationPlayerPosition[];
-	ball: { x: number; y: number };
+	ball?: { x: number; y: number };
 	equipment?: AnimationEquipmentItem[];
 }
 

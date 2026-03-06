@@ -7,7 +7,8 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button, type ButtonProps } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import type { ButtonProps } from "@/components/ui/button/index";
 import { Plus, Link2, Upload, X, Loader2, CheckCircle2, AlertTriangle, XCircle, Film, ImageIcon, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUrlVerification } from "@/components/features/drills/attachments/useUrlVerification";
@@ -32,7 +33,7 @@ export interface AddMediaMenuProps {
 	/** Custom label for the trigger button */
 	label?: string;
 	/** Size variant */
-	size?: "sm" | "md";
+	size?: "sm" | "default";
 	/** Button style: "button" renders a ghost button, "dashed" renders a dashed-border card */
 	variant?: "button" | "dashed";
 	/** Additional class name for the root */
@@ -118,7 +119,6 @@ function UrlInputInline({ onSubmit, onCancel, isLoading }: UrlInputInlineProps) 
 				</div>
 				<Button
 					variant="default"
-					color="accent"
 					size="sm"
 					onClick={handleSubmit}
 					disabled={!canSubmit}
@@ -247,7 +247,7 @@ export default function AddMediaMenu({
 					</DropdownMenuTrigger>
 				) : variant === "button" ? (
 					<DropdownMenuTrigger
-						render={<Button variant="ghost" color="neutral" size={size} />}
+						render={<Button variant="ghost" size={size} />}
 					>
 						<Plus size={iconSize} />
 						{label}

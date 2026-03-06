@@ -88,7 +88,7 @@ export function useUrlEmbedDetection(
 	const [embeds, setEmbeds] = useState<DetectedEmbed[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const timerRef = useRef<ReturnType<typeof setTimeout>>();
+	const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 	const prevUrlsRef = useRef<string>("");
 
 	// -------------------------------------------------------------------------

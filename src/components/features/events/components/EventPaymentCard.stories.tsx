@@ -77,6 +77,10 @@ const meta: Meta<typeof EventPaymentCard> = {
 			control: { type: "boolean" },
 			description: "Whether the user was invited to the event",
 		},
+		onPaymentRequired: {
+			description: "Callback invoked when the user clicks the pay button, used to open the payment modal",
+			action: "paymentRequired",
+		},
 	},
 };
 
@@ -89,6 +93,7 @@ export const PayToJoinEnabled: Story = {
 		event: createMockEvent(),
 		userParticipant: null,
 		isInvited: false,
+		onPaymentRequired: () => {},
 	},
 };
 
@@ -105,6 +110,7 @@ export const PayToJoinDisabled: Story = {
 		}),
 		userParticipant: null,
 		isInvited: false,
+		onPaymentRequired: () => {},
 	},
 };
 
@@ -116,6 +122,7 @@ export const NoBudget: Story = {
 		}),
 		userParticipant: null,
 		isInvited: false,
+		onPaymentRequired: () => {},
 	},
 };
 
@@ -125,6 +132,7 @@ export const PublicJoin: Story = {
 		event: createMockEvent(),
 		userParticipant: null,
 		isInvited: false,
+		onPaymentRequired: () => {},
 	},
 };
 
@@ -134,6 +142,7 @@ export const InvitedUser: Story = {
 		event: createMockEvent(),
 		userParticipant: createMockParticipant({ status: ParticipationStatus.Invited }),
 		isInvited: true,
+		onPaymentRequired: () => {},
 	},
 };
 
@@ -152,6 +161,7 @@ export const DifferentAmounts: Story = {
 				})}
 				userParticipant={null}
 				isInvited={false}
+				onPaymentRequired={() => {}}
 			/>
 			<EventPaymentCard
 				event={createMockEvent({
@@ -164,6 +174,7 @@ export const DifferentAmounts: Story = {
 				})}
 				userParticipant={null}
 				isInvited={false}
+				onPaymentRequired={() => {}}
 			/>
 			<EventPaymentCard
 				event={createMockEvent({
@@ -176,6 +187,7 @@ export const DifferentAmounts: Story = {
 				})}
 				userParticipant={null}
 				isInvited={false}
+				onPaymentRequired={() => {}}
 			/>
 		</div>
 	),
@@ -194,6 +206,7 @@ export const AcceptedParticipant: Story = {
 		event: createMockEvent(),
 		userParticipant: createMockParticipant({ status: ParticipationStatus.Accepted }),
 		isInvited: false,
+		onPaymentRequired: () => {},
 	},
 };
 
@@ -203,6 +216,7 @@ export const ShowsStripeMessage: Story = {
 		event: createMockEvent(),
 		userParticipant: null,
 		isInvited: false,
+		onPaymentRequired: () => {},
 	},
 };
 
@@ -216,6 +230,7 @@ export const AllStates: Story = {
 					event={createMockEvent()}
 					userParticipant={null}
 					isInvited={false}
+					onPaymentRequired={() => {}}
 				/>
 			</div>
 			<div>
@@ -224,6 +239,7 @@ export const AllStates: Story = {
 					event={createMockEvent()}
 					userParticipant={createMockParticipant({ status: ParticipationStatus.Invited })}
 					isInvited={true}
+					onPaymentRequired={() => {}}
 				/>
 			</div>
 		</div>
@@ -243,6 +259,7 @@ export const Playground: Story = {
 		event: createMockEvent(),
 		userParticipant: null,
 		isInvited: false,
+		onPaymentRequired: () => {},
 	},
 	parameters: {
 		docs: {

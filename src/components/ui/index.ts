@@ -7,7 +7,7 @@ export { default as Avatar } from "./avatar/index";
 export { Avatar as AvatarPrimitive, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage } from "./avatar";
 export { default as BackButton } from "./back-button";
 export { default as Badge } from "./badge/index";
-export type { BadgeProps } from "./badge/index";
+export type { BadgeProps, BadgeVariant } from "./badge/index";
 export { default as BlockOverlay } from "./block-overlay";
 export { default as Button } from "./button/index";
 export { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";

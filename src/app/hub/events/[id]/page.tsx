@@ -3,6 +3,8 @@
 import { Button } from "@/components";
 import EventCommentsSection from "@/components/features/comments/components/EventCommentsSection";
 import { Modal } from "@/components/ui";
+import EventPaymentCard from "@/components/features/events/components/EventPaymentCard";
+import EventPaymentForm from "@/components/features/events/components/EventPaymentForm";
 import { EventType } from "@/lib/models/Event";
 import { isPast } from "date-fns";
 import { CalendarOff, ClipboardCheck, CreditCard, MapPin } from "lucide-react";
@@ -12,9 +14,14 @@ import { InvitationSidebarCard } from "./components/InvitationResponseVariants";
 import StickyBottomBar from "./components/StickyBottomBar";
 import WhosComingSection from "./components/WhosComingSection";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateParticipantStatus } from "@/lib/api/events";
+import { respondToInvitation } from "@/lib/api/events";
+import { createChat } from "@/lib/api/messages";
 import { useEventActions } from "./hooks/useEventActions";
 import { useEventContext } from "./layout";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+import { useAuth } from "@/providers/AuthProvider";
+import { useUserPayment } from "@/hooks/useUserPayment";
 
 // Lazy load Map component - it's below the fold and heavy
 const Map = dynamic(() => import("@/components/features/locations").then((mod) => mod.Map), {
@@ -27,7 +34,23 @@ const Map = dynamic(() => import("@/components/features/locations").then((mod) =
 // =============================================================================
 export default function EventOverviewPage() {
 	const { event, teams, hasInvitation, myParticipation, refetchMyParticipation, isAdmin, participants, eventId, isOpen, isFull } = useEventContext();
+	const { userProfile } = useAuth();
+	const { payment: userPayment } = useUserPayment(
+		eventId,
+		myParticipation && event?.paymentConfig?.cost ? userProfile?.id ?? null : null
+	);
 	const queryClient = useQueryClient();
+	const router = useRouter();
+
+	// Payment modal state — owned here, not in the hook (separation of concerns)
+	const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+	const handlePaymentSuccess = useCallback(() => {
+		setShowPaymentModal(false);
+		refetchMyParticipation();
+		queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
+		queryClient.invalidateQueries({ queryKey: ["event-my-participation", eventId] });
+	}, [refetchMyParticipation, queryClient, eventId]);
 
 	const {
 		handleAcceptInvitation,
@@ -40,20 +63,34 @@ export default function EventOverviewPage() {
 		setDeclineNote,
 	} = useEventActions({
 		eventId: event?.id ?? eventId,
+		payToJoin: !!event?.paymentConfig?.payToJoin,
+		onSuccess: () => {
+			refetchMyParticipation();
+			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
+		},
+		onPaymentRequired: () => setShowPaymentModal(true),
+	});
+
+	// Respond mutation — uses POST /respond to change own status
+	const respondMutation = useMutation({
+		mutationFn: (accept: boolean) => respondToInvitation(eventId, accept),
 		onSuccess: () => {
 			refetchMyParticipation();
 			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
 		},
 	});
 
-	// Change participation status — uses PATCH status endpoint
-	const changeStatusMutation = useMutation({
-		mutationFn: (status: string) => updateParticipantStatus(eventId, myParticipation!.userId, status),
-		onSuccess: () => {
-			refetchMyParticipation();
-			queryClient.invalidateQueries({ queryKey: ["event-participants", eventId] });
-		},
-	});
+	// Message organizers — create a chat with event organizers and navigate to it
+	const handleMessageOrganizers = useCallback(async () => {
+		const organizers = participants.filter((p) => p.role === "Organizer" || p.role === "Admin" || p.role === "Owner");
+		if (organizers.length === 0) return;
+		try {
+			const chat = await createChat(organizers.map((o) => o.userProfile));
+			router.push(`/hub/messages/${chat.id}`);
+		} catch {
+			router.push("/hub/messages");
+		}
+	}, [participants, router]);
 
 	// Get the inviter's name from the participation record
 	const inviterName = myParticipation?.invitedByUser
@@ -71,7 +108,7 @@ export default function EventOverviewPage() {
 		<>
 			{/* Past event notice */}
 			{eventHasPassed && (
-				<div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-warning/10 border border-warning/20 text-warning text-sm">
+				<div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-xl bg-warning/10 border border-warning/20 text-warning text-sm">
 					<CalendarOff size={18} className="shrink-0" />
 					This event has passed.
 				</div>
@@ -153,6 +190,15 @@ export default function EventOverviewPage() {
 									<CreditCard size={16} className="text-accent" />
 									Payment
 								</h3>
+								{myParticipation && (
+									<span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+										userPayment?.status === "paid" || myParticipation.paymentStatus === "Paid"
+											? "bg-success/20 text-success"
+											: "bg-warning/20 text-warning"
+									}`}>
+										{userPayment?.status === "paid" || myParticipation.paymentStatus === "Paid" ? "Paid" : "Unpaid"}
+									</span>
+								)}
 							</div>
 							<div className="p-4">
 								<div className="flex items-baseline gap-1.5">
@@ -161,6 +207,16 @@ export default function EventOverviewPage() {
 								</div>
 							</div>
 						</div>
+					)}
+
+					{/* Pay-to-Join Card — shown when not invited (invited users pay via invitation card) */}
+					{event.paymentConfig?.payToJoin && (
+						<EventPaymentCard
+							event={event}
+							userParticipant={myParticipation}
+							isInvited={hasInvitation}
+							onPaymentRequired={() => setShowPaymentModal(true)}
+						/>
 					)}
 
 					{/* Location Card - hidden on mobile */}
@@ -206,9 +262,10 @@ export default function EventOverviewPage() {
 			hasInvitation={hasInvitation}
 			onAccept={handleAcceptInvitation}
 			onDecline={() => handleDeclineInvitation()}
-			onWithdraw={() => changeStatusMutation.mutate("Declined")}
-			onReaccept={() => changeStatusMutation.mutate("Accepted")}
+			onWithdraw={() => respondMutation.mutate(false)}
+			onReaccept={handleAcceptInvitation}
 			onJoin={handleJoin}
+			onMessageOrganizers={handleMessageOrganizers}
 		/>
 
 		{/* Decline Invitation Modal */}
@@ -232,6 +289,26 @@ export default function EventOverviewPage() {
 						Decline Invitation
 					</Button>
 				</div>
+			</Modal>
+
+			{/* Payment Modal — embedded Stripe Payment Element */}
+			<Modal
+				isOpen={showPaymentModal}
+				onClose={() => setShowPaymentModal(false)}
+				title="Complete Payment"
+				description="Enter your card details to secure your spot."
+				size="md"
+				preventOutsideClose
+				data-testid="event-payment-modal"
+			>
+				<EventPaymentForm
+					eventId={event.id}
+					eventName={event.name}
+					cost={event.paymentConfig?.cost ?? 0}
+					currency={event.paymentConfig?.currency || "£"}
+					onSuccess={handlePaymentSuccess}
+					onCancel={() => setShowPaymentModal(false)}
+				/>
 			</Modal>
 		</>
 	);

@@ -5,10 +5,12 @@ import TransferOwnershipModal from "@/components/features/clubs/settings/Transfe
 import { SettingsCard, SettingsHeader } from "@/components/layout/settings-layout";
 import { Button } from "@/components/ui";
 import { archiveClub, deleteClub, exportClubData, getClub, transferClubOwnership } from "@/lib/api/clubs";
+import { ClubRole } from "@/lib/models/Club";
+import { useClubContext } from "../../layout";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Archive, Download, Trash2, UserCog } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ActionCardProps {
 	icon: React.ReactNode;
@@ -40,6 +42,16 @@ export default function ClubDangerZonePage() {
 	const router = useRouter();
 	const clubId = params.id as string;
 	const queryClient = useQueryClient();
+	const { myRoles } = useClubContext();
+
+	const isOwner = myRoles.includes(ClubRole.Owner);
+
+	// Redirect non-owners away from danger zone
+	useEffect(() => {
+		if (myRoles.length > 0 && !isOwner) {
+			router.replace(`/hub/clubs/${clubId}/settings/general`);
+		}
+	}, [myRoles, isOwner, clubId, router]);
 
 	const [transferModalOpen, setTransferModalOpen] = useState(false);
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -96,7 +108,7 @@ export default function ClubDangerZonePage() {
 		}
 	};
 
-	if (!club) return null;
+	if (!club || !isOwner) return null;
 
 	return (
 		<div className="space-y-6">

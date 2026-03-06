@@ -1,12 +1,14 @@
 "use client";
 
-import { Plus, GripVertical, Trash2, Link, } from "lucide-react";
+import { Plus, GripVertical, Trash2, Link, Dumbbell } from "lucide-react";
 import { Button, Input, TextArea } from "@/components/ui";
+import DrillSelector from "@/components/features/drills/DrillSelector";
+import type { SelectedDrill } from "@/components/features/drills/DrillSelector";
 
 interface ImprovementPointDraft {
 	id: string;
 	description: string;
-	drillIds: string[];
+	drills: SelectedDrill[];
 	mediaLinks: { url: string; type: "Video" | "Article" | "Image"; title?: string }[];
 }
 
@@ -19,7 +21,7 @@ export function ImprovementPointsEditor({ points, onChange }: ImprovementPointsE
 	const addPoint = () => {
 		onChange([
 			...points,
-			{ id: crypto.randomUUID(), description: "", drillIds: [], mediaLinks: [] },
+			{ id: crypto.randomUUID(), description: "", drills: [], mediaLinks: [] },
 		]);
 	};
 
@@ -52,6 +54,12 @@ export function ImprovementPointsEditor({ points, onChange }: ImprovementPointsE
 		const mediaLinks = [...updated[pointIndex].mediaLinks];
 		mediaLinks[mediaIndex] = { ...mediaLinks[mediaIndex], [field]: value };
 		updated[pointIndex] = { ...updated[pointIndex], mediaLinks };
+		onChange(updated);
+	};
+
+	const updateDrills = (index: number, drills: SelectedDrill[]) => {
+		const updated = [...points];
+		updated[index] = { ...updated[index], drills };
 		onChange(updated);
 	};
 
@@ -94,6 +102,19 @@ export function ImprovementPointsEditor({ points, onChange }: ImprovementPointsE
 						>
 							<Trash2 size={14} />
 						</button>
+					</div>
+
+					{/* Attached drills */}
+					<div className="pl-6 space-y-1">
+						<div className="flex items-center gap-1 text-xs text-muted">
+							<Dumbbell size={12} />
+							<span>Attach drills</span>
+						</div>
+						<DrillSelector
+							selectedDrills={point.drills}
+							onChange={(drills) => updateDrills(index, drills)}
+							placeholder="Search drills to attach..."
+						/>
 					</div>
 
 					{/* Media links */}

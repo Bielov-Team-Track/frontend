@@ -383,7 +383,7 @@ export default function DrillsPage() {
 					</div>
 				) : filteredDrills.length === 0 ? (
 					<EmptyState
-						icon={<BookOpen size={48} />}
+						icon={BookOpen}
 						title={hasFilters ? "No drills match your filters" : "No drills yet"}
 						description={
 							hasFilters
@@ -391,15 +391,9 @@ export default function DrillsPage() {
 								: "Be the first to create a drill and share it with the community!"
 						}
 						action={
-							hasFilters ? (
-								<Button variant="outline" onClick={clearFilters}>
-									Clear Filters
-								</Button>
-							) : (
-								<Button leftIcon={<Plus size={16} />} onClick={() => setIsCreateModalOpen(true)}>
-									Create Drill
-								</Button>
-							)
+							hasFilters
+								? { label: "Clear Filters", onClick: clearFilters, variant: "outline" as const }
+								: { label: "Create Drill", onClick: () => setIsCreateModalOpen(true), icon: Plus }
 						}
 					/>
 				) : (
@@ -407,7 +401,7 @@ export default function DrillsPage() {
 						{filteredDrills.map((drill) => (
 							<DrillCard
 								key={drill.id}
-								drill={drill}
+								drill={drill as any}
 								showAddButton={false}
 								onSkillClick={handleSkillClick}
 								onLikeClick={handleLikeClick}

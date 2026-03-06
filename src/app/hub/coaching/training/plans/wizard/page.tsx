@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button, Input, TextArea, Card } from "@/components";
@@ -41,7 +41,7 @@ interface DraftData {
 	savedAt: number;
 }
 
-export default function TrainingPlanWizardPage() {
+function TrainingPlanWizardPageContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const editId = searchParams.get("id");
@@ -743,10 +743,10 @@ export default function TrainingPlanWizardPage() {
 
 			{/* Drill Detail Modal */}
 			<DrillDetailModal
-				drill={selectedDrill}
+				drill={selectedDrill as any}
 				isOpen={!!selectedDrill}
 				onClose={() => setSelectedDrill(null)}
-				onAddToTimeline={handleAddDrill}
+				onAddToTimeline={handleAddDrill as any}
 				showAddButton
 			/>
 
@@ -775,5 +775,13 @@ export default function TrainingPlanWizardPage() {
 			{/* Keyboard Shortcuts Overlay */}
 			<KeyboardShortcutsOverlay isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
 		</div>
+	);
+}
+
+export default function TrainingPlanWizardPage() {
+	return (
+		<Suspense fallback={<Loader size="lg" />}>
+			<TrainingPlanWizardPageContent />
+		</Suspense>
 	);
 }

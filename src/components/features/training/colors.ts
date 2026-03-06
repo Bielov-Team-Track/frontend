@@ -47,3 +47,29 @@ export const INTENSITY_LABELS: Record<DrillIntensity, string> = {
 	Medium: "Moderate",
 	High: "Intense",
 };
+
+// Section color palette – hex values matching the wizard's palette
+export const SECTION_COLORS = [
+	{ color: "#FF7D00", line: "#FF7D00" },
+	{ color: "#29757A", line: "#29757A" },
+	{ color: "#2E5A88", line: "#2E5A88" },
+	{ color: "#D99100", line: "#D99100" },
+	{ color: "#4A7A45", line: "#4A7A45" },
+	{ color: "#BE3F23", line: "#BE3F23" },
+];
+
+// Map skills to badge colors for visual variety
+export const SKILL_COLOR_MAP: Record<string, "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error"> = {
+	Serving: "accent",
+	Passing: "info",
+	Setting: "secondary",
+	Attacking: "error",
+	Blocking: "warning",
+	Defense: "primary",
+	Conditioning: "success",
+	Footwork: "accent",
+};
+
+export function getSkillBadgeColor(skill: string): "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error" {
+	return SKILL_COLOR_MAP[skill] || "info";
+}

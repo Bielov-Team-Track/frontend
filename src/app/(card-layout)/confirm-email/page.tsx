@@ -46,7 +46,7 @@ function ConfirmEmailContent() {
 				setIsEmailVerified(true);
 			})
 			.catch((errorResponse) => {
-				const data: ErrorResponse = errorResponse.response?.data;
+				const data = errorResponse.response?.data as { errors: { errorCode: string }[] } | undefined;
 
 				if (!data) {
 					setError("An error occurred while verifying your email");

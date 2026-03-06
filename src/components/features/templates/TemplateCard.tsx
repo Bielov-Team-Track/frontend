@@ -19,6 +19,8 @@ interface TemplateCardProps {
 	href?: string;
 	showCreator?: boolean;
 	variant?: "default" | "compact";
+	/** When true, renders as a plain div instead of a Link (for use inside clickable wrappers) */
+	disableNavigation?: boolean;
 }
 
 /** Inline nested link replacement — navigates on click without nesting <a> inside <a> */
@@ -54,7 +56,7 @@ function InlineLink({
 	);
 }
 
-export default function TemplateCard({ template, href, showCreator = false, variant = "default" }: TemplateCardProps) {
+export default function TemplateCard({ template, href, showCreator = false, variant = "default", disableNavigation = false }: TemplateCardProps) {
 	const cardHref = href || `/hub/coaching/training/plans/${template.id}`;
 
 	// Get author display name
@@ -67,9 +69,12 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 	const showAuthor = !showClub && !!authorName;
 
 	if (variant === "compact") {
+		const Wrapper = disableNavigation ? "div" : Link;
+		const wrapperProps = disableNavigation ? {} : { href: cardHref };
+
 		return (
-			<Link
-				href={cardHref}
+			<Wrapper
+				{...wrapperProps as any}
 				className="group block p-3 rounded-xl bg-surface hover:bg-hover hover:shadow-md transition-all duration-200">
 				<div className="flex-1 min-w-0">
 					{/* Header: Level + Visibility */}
@@ -132,7 +137,7 @@ export default function TemplateCard({ template, href, showCreator = false, vari
 						</InlineLink>
 					)}
 				</div>
-			</Link>
+			</Wrapper>
 		);
 	}
 

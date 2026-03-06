@@ -61,16 +61,23 @@ const RegisterPageClient = ({ clubSlug: clubId }: Props) => {
 	const submitMutation = useMutation({
 		mutationFn: (formAnswers?: FormFieldAnswerDto[]) => createRegistration(club!.id, { formAnswers }),
 		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["myRegistration", club?.id] });
 			queryClient.invalidateQueries({ queryKey: ["club-members", clubId] });
 		},
 	});
 
 	const updatePlayerMutation = useMutation({
 		mutationFn: createOrUpdatePlayerProfile,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["playerProfile"] });
+		},
 	});
 
 	const updateCoachMutation = useMutation({
 		mutationFn: createOrUpdateCoachProfile,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["coachProfile"] });
+		},
 	});
 
 	if (isLoadingClub || isLoadingSettings || isLoadingRegistration) {

@@ -43,7 +43,7 @@ export function AnnotationToolbar({
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+      <div className="flex items-center gap-1 p-1 bg-surface rounded-lg">
         {tools.map((tool) => (
           <Button
             key={tool.id}
@@ -108,7 +108,7 @@ export function AnnotationToolbar({
       </div>
 
       {showShortcuts && (
-        <div className="bg-muted rounded-lg px-3 py-2 text-xs">
+        <div className="bg-surface rounded-lg px-3 py-2 text-xs">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1">
             {SHORTCUTS.map((s) => (
               <div key={s.action} className="flex items-center justify-between gap-2">

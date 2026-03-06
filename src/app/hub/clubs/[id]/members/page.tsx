@@ -4,7 +4,7 @@ import { MembersTab } from "../components/tabs";
 import { useClubContext } from "../layout";
 
 export default function ClubMembersPage() {
-	const { clubId, members, showInviteModal } = useClubContext();
+	const { clubId, members, showInviteModal, permissions } = useClubContext();
 
-	return <MembersTab members={members} clubId={clubId} onInvite={showInviteModal} />;
+	return <MembersTab members={members} clubId={clubId} onInvite={showInviteModal} permissions={permissions} />;
 }

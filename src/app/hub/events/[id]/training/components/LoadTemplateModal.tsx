@@ -179,7 +179,7 @@ function TemplateTabContent({
 							disabled={isActionLoading}
 							className="w-full text-left cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 						>
-							<TemplateCard template={template} variant="compact" />
+							<TemplateCard template={template} variant="compact" disableNavigation />
 						</button>
 					))}
 				</div>

@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>Evaluation - Run (Evaluator)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg-base: #121A1B;
+    --bg-subtle: #1E292B;
+    --bg-surface: #243335;
+    --bg-raised: #2C383A;
+    --bg-overlay: #344345;
+    --text-primary: #F0F0F0;
+    --text-secondary: #A0ABAB;
+    --text-muted: #6B7B7D;
+    --border: #3A4A4C;
+    --primary: #FF7D00;
+    --secondary: #29757A;
+    --success: #4A7A45;
+    --error: #BE3F23;
+    --warning: #D99100;
+  }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    line-height: 1.5;
+    width: 390px;
+    min-height: 844px;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Top Bar */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .exercise-info {
+    flex: 1;
+    text-align: center;
+  }
+  .exercise-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .exercise-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .progress-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: rgba(255, 125, 0, 0.15);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .menu-btn, .back-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--bg-raised);
+    border: none;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .group-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: rgba(107, 163, 214, 0.15);
+    color: #6BA3D6;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* ===== EXERCISE STRIP (replaces step dots) ===== */
+  .exercise-strip-wrapper {
+    background: var(--bg-subtle);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .exercise-strip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .exercise-strip::-webkit-scrollbar {
+    display: none;
+  }
+  .exercise-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    flex-shrink: 0;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .exercise-chip.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+  .exercise-chip.completed {
+    background: rgba(74, 122, 69, 0.15);
+    border-color: rgba(74, 122, 69, 0.3);
+  }
+  .exercise-chip-num {
+    width: 20px; height: 20px;
+    border-radius: 5px;
+    background: rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .exercise-chip.active .exercise-chip-num {
+    background: rgba(255,255,255,0.2);
+  }
+  .exercise-chip.completed .exercise-chip-num {
+    background: transparent;
+    color: #7BBF74;
+    font-size: 14px;
+  }
+  .exercise-chip-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .exercise-chip.active .exercise-chip-name {
+    color: #fff;
+    font-weight: 600;
+  }
+  .exercise-chip.completed .exercise-chip-name {
+    color: #7BBF74;
+  }
+
+  /* Player Header */
+  .player-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 16px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .player-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: #5A7A9E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .player-name {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .player-position {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
+  /* Metrics */
+  .metrics-list {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 220px;
+  }
+  .metric-card {
+    background: var(--bg-surface);
+    border-radius: 14px;
+    padding: 16px;
+    backdrop-filter: blur(8px);
+  }
+  .metric-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .metric-name {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .metric-type-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .type-slider { background: rgba(46, 90, 136, 0.2); color: #6BA3D6; }
+  .type-ratio { background: rgba(217, 145, 0, 0.2); color: #F0C44A; }
+  .type-checkbox { background: rgba(74, 122, 69, 0.2); color: #7BBF74; }
+  .type-number { background: rgba(255, 125, 0, 0.15); color: #FFB366; }
+
+  /* Slider Metric */
+  .slider-container {
+    width: 100%;
+  }
+  .slider-track {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--bg-overlay);
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .slider-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--secondary), var(--primary));
+  }
+  .slider-thumb {
+    position: absolute;
+    top: -6px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid var(--bg-base);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .slider-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .slider-max {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  /* Ratio Metric */
+  .ratio-input {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+  }
+  .ratio-field {
+    width: 80px;
+    height: 56px;
+    border-radius: 12px;
+    background: var(--bg-raised);
+    border: 2px solid var(--border);
+    color: var(--text-primary);
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    font-family: inherit;
+  }
+  .ratio-field:focus {
+    border-color: var(--primary);
+    outline: none;
+  }
+  .ratio-separator {
+    font-size: 16px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .ratio-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  /* Checkbox Metric */
+  .checkbox-toggle {
+    display: flex;
+    gap: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--bg-raised);
+  }
+  .toggle-option {
+    flex: 1;
+    padding: 14px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+  .toggle-pass {
+    background: rgba(74, 122, 69, 0.15);
+    color: var(--success);
+    border-color: var(--success);
+    border-radius: 12px 0 0 12px;
+  }
+  .toggle-fail {
+    color: var(--text-muted);
+    border-radius: 0 12px 12px 0;
+  }
+
+  /* Number Metric */
+  .number-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+  .stepper-btn {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-size: 22px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .number-value {
+    font-size: 32px;
+    font-weight: 700;
+    width: 80px;
+    text-align: center;
+    color: var(--primary);
+  }
+
+  /* Notes */
+  .add-note-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    margin: 0 16px;
+  }
+
+  /* ===== BOTTOM NAV (App nav bar) ===== */
+  .bottom-app-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 390px;
+    height: 64px;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 30;
+  }
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    flex: 1;
+    padding: 8px 0;
+  }
+  .bottom-nav-icon {
+    font-size: 20px;
+    color: var(--text-muted);
+  }
+  .bottom-nav-item.active .bottom-nav-icon {
+    color: var(--primary);
+  }
+  .bottom-nav-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+  .bottom-nav-item.active .bottom-nav-label {
+    color: var(--primary);
+  }
+
+  /* Player action bar — sits above bottom-app-nav */
+  .bottom-player-nav {
+    position: fixed;
+    bottom: 64px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 390px;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    z-index: 20;
+  }
+  .next-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: calc(100% - 32px);
+    margin: 12px 16px 8px;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .prev-link {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 4px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .player-dots {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px 14px;
+    overflow-x: auto;
+    justify-content: center;
+  }
+  .player-dot {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .player-dot.active {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+  .player-dot .check-overlay {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <button class="back-btn">←</button>
+  <div class="exercise-info">
+    <div class="exercise-label">Exercise 2 of 8</div>
+    <div class="exercise-name">Passing & Reception</div>
+    <div style="display: flex; align-items: center; gap: 8px; justify-content: center; margin-top: 4px;">
+      <span class="group-badge">● Group A</span>
+      <span class="progress-pill">3/4 scored</span>
+    </div>
+  </div>
+  <button class="menu-btn">☰</button>
+</div>
+
+<!-- Exercise Strip (replaces step dots) -->
+<div class="exercise-strip-wrapper">
+  <div class="exercise-strip">
+    <div class="exercise-chip completed">
+      <div class="exercise-chip-num">✓</div>
+      <div class="exercise-chip-name">Serving Acc...</div>
+    </div>
+    <div class="exercise-chip active">
+      <div class="exercise-chip-num">2</div>
+      <div class="exercise-chip-name">Passing & Rec...</div>
+    </div>
+    <div class="exercise-chip">
+      <div class="exercise-chip-num">3</div>
+      <div class="exercise-chip-name">Setting Prec...</div>
+    </div>
+    <div class="exercise-chip">
+      <div class="exercise-chip-num">4</div>
+      <div class="exercise-chip-name">Attack & Spike</div>
+    </div>
+    <div class="exercise-chip">
+      <div class="exercise-chip-num">5</div>
+      <div class="exercise-chip-name">Game Situat...</div>
+    </div>
+    <div class="exercise-chip">
+      <div class="exercise-chip-num">6</div>
+      <div class="exercise-chip-name">Net Play</div>
+    </div>
+    <div class="exercise-chip">
+      <div class="exercise-chip-num">7</div>
+      <div class="exercise-chip-name">Court Vision</div>
+    </div>
+    <div class="exercise-chip">
+      <div class="exercise-chip-num">8</div>
+      <div class="exercise-chip-name">Endurance</div>
+    </div>
+  </div>
+</div>
+
+<!-- Player Header -->
+<div class="player-header">
+  <div class="player-avatar">DM</div>
+  <div>
+    <div class="player-name">Dmytro Melnyk</div>
+    <div class="player-position">Outside Hitter · 178cm</div>
+  </div>
+</div>
+
+<!-- Metrics -->
+<div class="metrics-list">
+
+  <!-- Slider Metric -->
+  <div class="metric-card">
+    <div class="metric-header">
+      <div class="metric-name">First Contact Quality</div>
+      <span class="metric-type-badge type-slider">Slider</span>
+    </div>
+    <div class="slider-value">7 <span class="slider-max">/ 10</span></div>
+    <div class="slider-container">
+      <div class="slider-track">
+        <div class="slider-fill" style="width: 70%;"></div>
+        <div class="slider-thumb" style="left: calc(70% - 10px);"></div>
+      </div>
+      <div class="slider-labels">
+        <span>0</span>
+        <span>5</span>
+        <span>10</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ratio Metric -->
+  <div class="metric-card">
+    <div class="metric-header">
+      <div class="metric-name">Successful Passes</div>
+      <span class="metric-type-badge type-ratio">Ratio</span>
+    </div>
+    <div class="ratio-input">
+      <div>
+        <input class="ratio-field" type="text" value="7" readonly>
+        <div class="ratio-label">Successful</div>
+      </div>
+      <div class="ratio-separator">out of</div>
+      <div>
+        <input class="ratio-field" type="text" value="10" readonly>
+        <div class="ratio-label">Attempts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkbox Metric -->
+  <div class="metric-card">
+    <div class="metric-header">
+      <div class="metric-name">Platform Technique</div>
+      <span class="metric-type-badge type-checkbox">Pass/Fail</span>
+    </div>
+    <div class="checkbox-toggle">
+      <div class="toggle-option toggle-pass">✓ Pass</div>
+      <div class="toggle-option toggle-fail">✗ Fail</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Add Note -->
+<button class="add-note-btn">📝 Add note for this player...</button>
+
+<!-- Player Navigation (above bottom nav) -->
+<div class="bottom-player-nav">
+  <button class="next-btn">Next Player →</button>
+  <a class="prev-link">← Previous Player</a>
+  <div class="player-dots">
+    <div class="player-dot avatar-1" style="background:#5A7A9E;">
+      OB
+      <div class="check-overlay">✓</div>
+    </div>
+    <div class="player-dot avatar-2" style="background:#7A5A9E;">
+      MK
+      <div class="check-overlay">✓</div>
+    </div>
+    <div class="player-dot avatar-3" style="background:#9E5A7A;">
+      AS
+      <div class="check-overlay">✓</div>
+    </div>
+    <div class="player-dot active" style="background:#5A9E7A;">DM</div>
+  </div>
+</div>
+
+<!-- Bottom App Nav -->
+<div class="bottom-app-nav">
+  <div class="bottom-nav-item">
+    <div class="bottom-nav-icon">🏠</div>
+    <div class="bottom-nav-label">Dashboard</div>
+  </div>
+  <div class="bottom-nav-item active">
+    <div class="bottom-nav-icon">📅</div>
+    <div class="bottom-nav-label">Events</div>
+  </div>
+  <div class="bottom-nav-item">
+    <div class="bottom-nav-icon">💬</div>
+    <div class="bottom-nav-label">Messages</div>
+  </div>
+  <div class="bottom-nav-item">
+    <div class="bottom-nav-icon">👤</div>
+    <div class="bottom-nav-label">Player</div>
+  </div>
+  <div class="bottom-nav-item">
+    <div class="bottom-nav-icon">⚙️</div>
+    <div class="bottom-nav-label">Settings</div>
+  </div>
+</div>
+
+</body>
+</html>

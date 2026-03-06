@@ -9,11 +9,19 @@ import { Feedback } from "@/lib/models/Feedback";
 import { useFeedbackById } from "@/hooks/useFeedback";
 import { MessageSquare } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 const PAGE_SIZE = 12;
 
 export default function PlayerFeedbackPage() {
+	return (
+		<Suspense fallback={<Loader />}>
+			<PlayerFeedbackContent />
+		</Suspense>
+	);
+}
+
+function PlayerFeedbackContent() {
 	const [page, setPage] = useState(1);
 	const [search, setSearch] = useState("");
 	const [viewMode, setViewMode] = useState<ViewMode>("grid");

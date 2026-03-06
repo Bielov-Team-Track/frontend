@@ -62,6 +62,15 @@ const nextConfig = {
 	env: {
 		CUSTOM_KEY: process.env.CUSTOM_KEY,
 	},
+	async redirects() {
+		return [
+			{
+				source: "/prototypes",
+				destination: "/prototypes/index.html",
+				permanent: false,
+			},
+		];
+	},
 	async headers() {
 		return [
 			{

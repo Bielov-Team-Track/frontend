@@ -3,7 +3,7 @@
 import { Button } from "@/components";
 import { Event } from "@/lib/models/Event";
 import { format } from "date-fns";
-import { Calendar, Check, X } from "lucide-react";
+import { Calendar, Check, CreditCard, X } from "lucide-react";
 
 interface InvitationSidebarCardProps {
 	event: Event;
@@ -15,6 +15,8 @@ interface InvitationSidebarCardProps {
 
 export function InvitationSidebarCard({ event, invitedBy, isSubscriptionCovered, onAccept, onDecline }: InvitationSidebarCardProps) {
 	const startDate = new Date(event.startTime);
+	const payToJoin = !!event.paymentConfig?.payToJoin;
+	const cost = event.paymentConfig?.cost;
 
 	return (
 		<div className="rounded-2xl bg-accent/10 border border-accent/30 p-6" data-testid="invitation-sidebar-card">
@@ -36,17 +38,20 @@ export function InvitationSidebarCard({ event, invitedBy, isSubscriptionCovered,
 				{isSubscriptionCovered && (
 					<p className="text-emerald-500 text-xs mt-1 font-medium">Covered by your subscription</p>
 				)}
+				{payToJoin && cost != null && cost > 0 && (
+					<p className="text-accent text-xs mt-1 font-medium">Payment required · £{cost} per person</p>
+				)}
 			</div>
 
 			<div className="flex gap-2">
 				<Button
 					color="primary"
 					className="flex-1"
-					leftIcon={<Check size={16} />}
+					leftIcon={payToJoin ? <CreditCard size={16} /> : <Check size={16} />}
 					onClick={onAccept}
 					data-testid="invitation-accept-button"
 				>
-					Accept
+					{payToJoin ? "Pay & Accept" : "Accept"}
 				</Button>
 				<Button
 					variant="outline"

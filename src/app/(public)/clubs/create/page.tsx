@@ -477,7 +477,7 @@ export default function CreateClubPage() {
 								</div>
 								<button
 									type="button"
-									onClick={() => handleRemoveVenue(venue.tempId)}
+									onClick={() => venue.tempId && handleRemoveVenue(venue.tempId)}
 									className="p-2 text-muted hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors shrink-0">
 									<Trash size={16} />
 								</button>

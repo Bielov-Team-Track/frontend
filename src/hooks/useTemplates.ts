@@ -529,9 +529,46 @@ export function useCreateEventPlan() {
     return useMutation({
         mutationFn: ({ eventId, request }: { eventId: string; request: CreateEventPlanRequest }) =>
             createEventPlan(eventId, request),
-        onSuccess: (_, { eventId }) => {
+        onSuccess: (plan, { eventId }) => {
             queryClient.invalidateQueries({ queryKey: planKeys.eventPlan(eventId) });
-            queryClient.invalidateQueries({ queryKey: ["event", eventId] });
+            // Optimistically patch the cached event with the new training plan reference.
+            // The events-service updates asynchronously via MassTransit, so the refetch
+            // may return stale data without the trainingPlanId yet.
+            queryClient.setQueriesData<Record<string, unknown>>(
+                { queryKey: ["event", eventId] },
+                (old) => old ? {
+                    ...old,
+                    trainingPlanId: plan.id,
+                    trainingPlanSummary: JSON.stringify({
+                        name: plan.name,
+                        totalDuration: plan.totalDuration,
+                        sectionCount: plan.sectionCount ?? 0,
+                        drillCount: plan.drillCount ?? 0,
+                    }),
+                } : old,
+            );
+            queryClient.invalidateQueries({ queryKey: ["events"] });
+        },
+    });
+}
+
+/**
+ * Hook to delete the training plan for an event
+ */
+export function useDeleteEventPlan() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ planId }: { planId: string; eventId: string }) => deletePlan(planId),
+        onSuccess: (_, { eventId }) => {
+            queryClient.removeQueries({ queryKey: planKeys.eventPlan(eventId) });
+            queryClient.setQueriesData<Record<string, unknown>>(
+                { queryKey: ["event", eventId] },
+                (old) => old ? {
+                    ...old,
+                    trainingPlanId: null,
+                    trainingPlanSummary: null,
+                } : old,
+            );
             queryClient.invalidateQueries({ queryKey: ["events"] });
         },
     });

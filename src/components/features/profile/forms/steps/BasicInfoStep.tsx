@@ -1,18 +1,21 @@
-import { Button } from "@/components/ui";
+import { Button, Input } from "@/components/ui";
 import ImageCropper from "@/components/ui/image-cropper";
 import { updateProfileImage } from "@/lib/api/user";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Camera } from "lucide-react";
+import { Camera, User } from "lucide-react";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 
 const schema = yup.object().shape({
-	imageUrl: yup.string().url("Invalid image URL").optional(),
+	name: yup.string().required("First name is required").min(2, "Must be at least 2 characters"),
+	surname: yup.string().required("Last name is required").min(2, "Must be at least 2 characters"),
 });
 
-type BasicInfoData = {
+export type BasicInfoData = {
+	name: string;
+	surname: string;
 	imageUrl?: string;
 	imageThumbHash?: string;
 };
@@ -32,11 +35,15 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const {
+		control,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<BasicInfoData>({
+	} = useForm<{ name: string; surname: string }>({
 		resolver: yupResolver(schema) as any,
-		defaultValues: {},
+		defaultValues: {
+			name: defaultValues?.name ?? "",
+			surname: defaultValues?.surname ?? "",
+		},
 	});
 
 	const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,9 +74,10 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 		}
 	};
 
-	const onSubmit = (data: BasicInfoData) => {
+	const onSubmit = (data: { name: string; surname: string }) => {
 		onNext({
-			...data,
+			name: data.name,
+			surname: data.surname,
 			imageUrl: uploadedImageUrl || undefined,
 			imageThumbHash: uploadedThumbHash || undefined,
 		});
@@ -99,10 +107,43 @@ const BasicInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 	}
 
 	return (
-		<form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+		<form id={formId} onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 			<div className="flex flex-col gap-2">
-				<h2 className="text-xl font-semibold text-foreground">Profile Picture</h2>
-				<p className="text-sm text-muted">Add a profile picture to help others recognize you.</p>
+				<h2 className="text-xl font-semibold text-foreground">Basic Info</h2>
+				<p className="text-sm text-muted">Tell us your name and optionally add a profile picture.</p>
+			</div>
+
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<Controller
+					name="name"
+					control={control}
+					render={({ field }) => (
+						<Input
+							{...field}
+							type="text"
+							label="First Name"
+							placeholder="Enter your first name"
+							leftIcon={<User size={16} />}
+							error={errors.name?.message}
+							required
+						/>
+					)}
+				/>
+				<Controller
+					name="surname"
+					control={control}
+					render={({ field }) => (
+						<Input
+							{...field}
+							type="text"
+							label="Last Name"
+							placeholder="Enter your last name"
+							leftIcon={<User size={16} />}
+							error={errors.surname?.message}
+							required
+						/>
+					)}
+				/>
 			</div>
 
 			<div className="flex flex-col gap-2">

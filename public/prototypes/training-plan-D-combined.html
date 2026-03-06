@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Plan Builder — Prototype D: Combined</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        base: '#121A1B',
+        subtle: '#1E292B',
+        surface: '#243335',
+        raised: '#2C383A',
+        overlay: '#344345',
+        border: '#2C383A',
+        'border-strong': '#3A4A4D',
+        muted: '#666666',
+        foreground: '#F5F5F5',
+        primary: '#FF7D00',
+        secondary: '#29757A',
+        accent: '#FF7D00',
+        success: '#4A7A45',
+        error: '#BE3F23',
+        info: '#2E5A88',
+        warning: '#D99100',
+        hover: '#2C383A',
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: Inter, system-ui, sans-serif; background: #121A1B; color: #F5F5F5; }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #3A4A4D; border-radius: 3px; }
+  .drag-ghost { opacity: 0.4; }
+  .drag-over { border-color: #FF7D00 !important; background: rgba(255,125,0,0.05) !important; }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+  .animate-slide-in { animation: slideIn 0.3s ease-out; }
+
+  /* Horizontal session overview bar */
+  .session-bar { position: relative; height: 40px; background: #1E292B; border-radius: 10px; overflow: visible; }
+  .session-bar-inner { position: relative; height: 100%; border-radius: 10px; overflow: hidden; }
+  .session-segment { position: absolute; top: 3px; bottom: 3px; border-radius: 7px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; overflow: hidden; }
+  .session-segment:hover { filter: brightness(1.2); transform: scaleY(1.08); z-index: 2; }
+  .session-segment .seg-label { font-size: 10px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 8px; }
+  .session-segment.overflow { opacity: 0.45; }
+  .session-end-marker { position: absolute; top: -4px; bottom: -4px; width: 2px; background: #BE3F23; z-index: 20; border-radius: 1px; }
+  .session-end-marker::after { content: 'END'; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 8px; font-weight: 700; color: #BE3F23; letter-spacing: 0.05em; }
+  .section-span { position: absolute; top: 0; height: 100%; display: flex; align-items: center; overflow: hidden; border-radius: 4px; }
+  .section-span-label { font-size: 9px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 5px; letter-spacing: 0.03em; text-transform: uppercase; }
+
+  /* Duration slider */
+  .duration-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: transparent; cursor: pointer; position: relative; z-index: 2; }
+  .duration-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #FF7D00; border: 3px solid #121A1B; box-shadow: 0 0 0 2px #FF7D0060, 0 2px 8px rgba(0,0,0,0.3); cursor: grab; transition: box-shadow 0.2s; }
+  .duration-slider::-webkit-slider-thumb:hover { box-shadow: 0 0 0 3px #FF7D0080, 0 2px 12px rgba(255,125,0,0.3); }
+  .duration-slider::-webkit-slider-thumb:active { cursor: grabbing; box-shadow: 0 0 0 4px #FF7D00A0, 0 2px 16px rgba(255,125,0,0.4); }
+  .duration-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #FF7D00; border: 3px solid #121A1B; box-shadow: 0 0 0 2px #FF7D0060; cursor: grab; }
+  .duration-slider::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: #2C383A; }
+  .duration-slider::-moz-range-track { height: 6px; border-radius: 3px; background: #2C383A; }
+
+  .spark-bar { transition: height 0.3s ease; }
+
+  /* Section header in timeline */
+  .section-header { position: relative; }
+  .section-header::before {
+    content: '';
+    position: absolute; left: -25px; top: 50%;
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 3px solid #121A1B;
+    transform: translateY(-50%);
+    z-index: 10;
+  }
+
+  /* Filter dropdown */
+  .filter-dropdown { display: none; }
+  .filter-dropdown.open { display: block; }
+</style>
+</head>
+<body class="min-h-screen">
+<div class="max-w-[1440px] mx-auto p-6">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <a href="#" class="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-4">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Plans
+    </a>
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-foreground">Create Training Plan</h1>
+        <p class="text-sm text-muted mt-1">Build a reusable training session template</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="px-4 py-2 rounded-xl text-sm font-medium text-muted border border-border hover:border-border-strong hover:text-foreground transition-all">Cancel</button>
+        <button class="px-4 py-2 rounded-xl text-sm font-medium bg-primary text-white hover:brightness-110 transition-all flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save Template
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template Details (collapsible) -->
+  <div class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm mb-6">
+    <div class="flex items-center justify-between px-5 py-3 cursor-pointer" onclick="toggleDetails()">
+      <div class="flex items-center gap-3">
+        <h2 class="text-sm font-bold text-foreground">Template Details</h2>
+        <span id="detailsSummary" class="text-xs text-muted"></span>
+      </div>
+      <svg id="detailsChevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted transition-transform"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div id="detailsContent" class="px-5 pb-5 border-t border-border">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+        <div>
+          <label class="block text-xs font-medium text-muted mb-1.5">Name <span class="text-error">*</span></label>
+          <input type="text" id="templateName" placeholder="e.g., Pre-Game Warm-up" oninput="updateDetailsSummary()"
+            class="w-full px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all" value="Advanced Attacking Clinic" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-muted mb-1.5">Description</label>
+          <input type="text" id="templateDesc" placeholder="What is this plan for?"
+            class="w-full px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all" value="High-intensity session for intermediate+ players" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-muted mb-1.5">Club <span class="text-muted/50">(optional)</span></label>
+          <select id="templateClub" class="w-full px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm outline-none cursor-pointer focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all" onchange="updateDetailsSummary()">
+            <option value="">Personal (no club)</option>
+            <option value="c1">Kyiv Volleyball Club</option>
+            <option value="c2">Beach Warriors</option>
+            <option value="c3">Spike Academy</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-muted mb-1.5">Visibility</label>
+          <div class="flex gap-2">
+            <button id="visPrivate" onclick="setVisibility('Private')" class="flex-1 px-3 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary border border-primary/30 transition-all">Private</button>
+            <button id="visPublic" onclick="setVisibility('Public')" class="flex-1 px-3 py-2 rounded-lg text-sm font-medium text-muted border border-border hover:border-border-strong transition-all">Public</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Overview Bar -->
+  <div class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm p-5 mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-3">
+        <h2 class="text-sm font-bold text-foreground uppercase tracking-wider">Session Overview</h2>
+        <!-- View switcher -->
+        <div class="flex items-center bg-subtle/50 rounded-lg p-0.5 border border-border">
+          <button onclick="setBarView('categories')" id="viewCategories" class="px-2.5 py-1 rounded-md text-[10px] font-medium transition-all bg-primary/15 text-primary">Categories</button>
+          <button onclick="setBarView('skills')" id="viewSkills" class="px-2.5 py-1 rounded-md text-[10px] font-medium transition-all text-muted hover:text-foreground">Skills</button>
+          <button onclick="setBarView('intensity')" id="viewIntensity" class="px-2.5 py-1 rounded-md text-[10px] font-medium transition-all text-muted hover:text-foreground">Intensity</button>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div id="timeDisplay" class="text-right">
+          <span class="text-xl font-bold text-foreground">0</span><span class="text-sm text-muted font-medium"> / 90m</span>
+        </div>
+        <span id="timeStatus" class="text-xs font-bold text-muted">90m remaining</span>
+      </div>
+    </div>
+
+    <!-- Pills for selected view -->
+    <div id="sessionPills" class="mb-3"></div>
+
+    <!-- Horizontal segment bar -->
+    <div class="session-bar" id="sessionBar">
+      <div class="session-bar-inner" id="sessionBarInner">
+        <div class="absolute inset-0 flex items-center justify-center text-xs text-muted/30" id="barEmpty">Add drills to visualize your session</div>
+      </div>
+    </div>
+    <!-- Section spans below bar -->
+    <div class="relative h-5 mt-1 mb-3" id="sessionSections"></div>
+
+    <!-- Duration slider -->
+    <div>
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="text-xs text-muted">Target Duration</span>
+        <span class="text-xs font-bold text-foreground" id="sliderValue">90m</span>
+      </div>
+      <div class="relative px-1">
+        <input type="range" min="10" max="180" step="1" value="90" id="durationSlider" class="duration-slider w-full" oninput="onSliderInput(this)" onchange="onSliderCommit(this)" />
+        <div class="flex justify-between px-[2px] mt-1.5">
+          <span class="text-[9px] text-muted/50 font-mono w-6 text-center">30</span>
+          <span class="text-[9px] text-muted/50 font-mono w-6 text-center">60</span>
+          <span class="text-[9px] text-muted/50 font-mono w-6 text-center">90</span>
+          <span class="text-[9px] text-muted/50 font-mono w-6 text-center">120</span>
+          <span class="text-[9px] text-muted/50 font-mono w-6 text-center">150</span>
+          <span class="text-[9px] text-muted/50 font-mono w-6 text-center">180</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Split Layout -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT: Drill Library -->
+    <div class="lg:col-span-4 space-y-4">
+      <!-- Search + Filters -->
+      <div class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm p-4">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="drillSearch" placeholder="Search drills..." class="w-full pl-9 pr-20 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all" oninput="renderDrillLibrary()" />
+          <button onclick="toggleFilters()" id="filterToggle" class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium text-muted hover:text-foreground border border-border hover:border-border-strong transition-all">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span id="filterToggleLabel">Filters</span>
+            <span id="activeFilterCount" class="hidden w-4 h-4 rounded-full bg-primary text-white text-[9px] flex items-center justify-center font-bold">0</span>
+          </button>
+        </div>
+
+        <!-- Collapsible filter panel -->
+        <div id="filterPanel" class="hidden mt-3 pt-3 border-t border-border space-y-2.5">
+          <!-- Category row -->
+          <div class="flex items-center gap-2">
+            <span class="text-[9px] font-bold text-muted uppercase tracking-wider w-14 flex-shrink-0">Cat.</span>
+            <div class="flex flex-wrap gap-1" id="categoryFilters"></div>
+          </div>
+          <!-- Intensity row -->
+          <div class="flex items-center gap-2">
+            <span class="text-[9px] font-bold text-muted uppercase tracking-wider w-14 flex-shrink-0">Level</span>
+            <div class="flex gap-1" id="intensityFilters"></div>
+          </div>
+          <!-- Duration row -->
+          <div class="flex items-center gap-2">
+            <span class="text-[9px] font-bold text-muted uppercase tracking-wider w-14 flex-shrink-0">Time</span>
+            <div class="flex gap-1" id="durationFilters"></div>
+          </div>
+          <!-- Skills row -->
+          <div class="flex items-center gap-2">
+            <span class="text-[9px] font-bold text-muted uppercase tracking-wider w-14 flex-shrink-0">Skills</span>
+            <div class="flex flex-wrap gap-1" id="skillFilters"></div>
+          </div>
+          <!-- Clear all -->
+          <div class="flex justify-end">
+            <button onclick="clearAllFilters()" class="text-[10px] text-muted/50 hover:text-primary transition-colors">Clear all filters</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drill List -->
+      <div class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm overflow-hidden flex flex-col" style="max-height: 550px;">
+        <div class="px-4 py-3 border-b border-border flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-foreground text-sm">Drill Library</h3>
+            <p class="text-xs text-muted mt-0.5" id="drillCount">12 drills</p>
+          </div>
+          <!-- 2) SORT DROPDOWN -->
+          <div class="relative">
+            <button onclick="toggleSortDropdown()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-muted border border-border hover:border-border-strong hover:text-foreground transition-all">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5h10M11 9h7M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
+              <span id="sortLabel">Name</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div id="sortDropdown" class="filter-dropdown absolute right-0 top-full mt-1 w-40 bg-raised/95 backdrop-blur-lg shadow-lg rounded-xl border border-border py-1 z-20">
+              <button onclick="setSort('name')" class="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-hover transition-colors flex items-center justify-between">Name <span class="sort-check text-primary" data-sort="name">✓</span></button>
+              <button onclick="setSort('duration')" class="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-hover transition-colors flex items-center justify-between">Duration <span class="sort-check text-primary hidden" data-sort="duration">✓</span></button>
+              <button onclick="setSort('intensity')" class="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-hover transition-colors flex items-center justify-between">Intensity <span class="sort-check text-primary hidden" data-sort="intensity">✓</span></button>
+              <button onclick="setSort('category')" class="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-hover transition-colors flex items-center justify-between">Category <span class="sort-check text-primary hidden" data-sort="category">✓</span></button>
+              <div class="border-t border-border my-1"></div>
+              <button onclick="setSort('likes')" class="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-hover transition-colors flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                  Most Liked
+                </span>
+                <span class="sort-check text-primary hidden" data-sort="likes">✓</span>
+              </button>
+              <button onclick="setSort('bookmarks')" class="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-hover transition-colors flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+                  Most Saved
+                </span>
+                <span class="sort-check text-primary hidden" data-sort="bookmarks">✓</span>
+              </button>
+              <button onclick="setSort('recent')" class="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-hover transition-colors flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  Recent
+                </span>
+                <span class="sort-check text-primary hidden" data-sort="recent">✓</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-thin" id="drillLibrary"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Timeline -->
+    <div class="lg:col-span-8 space-y-4">
+      <!-- Section actions row -->
+      <div class="flex items-center justify-between">
+        <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted border border-dashed border-border hover:border-primary/50 hover:text-primary transition-all" onclick="addSection()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Section
+        </button>
+        <button id="clearAllBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-medium text-muted border border-border hover:text-error hover:border-error/30 transition-all" onclick="clearTimeline()">Clear All</button>
+      </div>
+
+      <!-- Timeline Area -->
+      <div id="timelineArea" class="min-h-[400px]">
+        <!-- Empty State -->
+        <div id="emptyState" class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm p-12 text-center">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-subtle flex items-center justify-center mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-muted"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-1">Build your training timeline</h3>
+          <p class="text-sm text-muted mb-6 max-w-sm mx-auto">Drag drills from the library or click + to add them to your session</p>
+          <button class="px-4 py-2 rounded-xl text-sm font-medium border border-primary/30 text-primary hover:bg-primary/10 transition-all flex items-center gap-2 mx-auto">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Load Template
+          </button>
+        </div>
+
+        <!-- Timeline Content -->
+        <div id="timelineContent" class="hidden">
+          <div class="relative pl-8" id="timelineList"></div>
+
+          <div id="dropZone" class="mt-4 p-5 rounded-xl border-2 border-dashed border-border text-center transition-all hover:border-primary/30"
+               ondragover="event.preventDefault()" ondrop="onDropZoneDrop(event)" ondragenter="this.classList.add('border-primary/50','bg-primary/5')" ondragleave="this.classList.remove('border-primary/50','bg-primary/5')">
+            <p class="text-sm text-muted">Drop drills here or <button class="text-primary hover:underline" onclick="document.getElementById('drillSearch').focus()">browse library</button></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Drill Detail Drawer -->
+<div id="drillDrawer" class="fixed inset-y-0 right-0 w-[420px] bg-overlay/95 backdrop-blur-xl shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+  <div class="h-full flex flex-col">
+    <div class="p-5 border-b border-border flex items-center justify-between">
+      <h3 class="font-bold text-foreground" id="drawerDrillName"></h3>
+      <button onclick="closeDrawer()" class="p-2 rounded-lg hover:bg-hover text-muted hover:text-foreground transition-colors">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-5 space-y-4" id="drawerContent"></div>
+    <div class="p-4 border-t border-border">
+      <button class="w-full px-4 py-2.5 rounded-xl text-sm font-medium bg-primary text-white hover:brightness-110 transition-all flex items-center justify-center gap-2" onclick="addDrawerDrillToTimeline()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add to Timeline
+      </button>
+    </div>
+  </div>
+</div>
+<div id="drawerOverlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 z-40" onclick="closeDrawer()"></div>
+
+<!-- Duration Edit Popover -->
+<div id="durationPopover" class="fixed bg-raised/95 backdrop-blur-lg shadow-lg rounded-xl border border-border p-4 z-50 hidden" style="min-width: 220px;">
+  <label class="block text-xs font-medium text-muted mb-2">Duration (minutes)</label>
+  <div class="flex items-center gap-2">
+    <button class="w-8 h-8 rounded-lg bg-subtle border border-border text-foreground hover:bg-hover flex items-center justify-center" onclick="adjustPopoverDuration(-5)">-5</button>
+    <input type="number" id="popoverDuration" class="flex-1 px-3 py-1.5 rounded-lg bg-subtle/50 border border-border text-foreground text-sm text-center focus:border-primary/50 outline-none" min="1" />
+    <button class="w-8 h-8 rounded-lg bg-subtle border border-border text-foreground hover:bg-hover flex items-center justify-center" onclick="adjustPopoverDuration(5)">+5</button>
+  </div>
+  <label class="block text-xs text-muted mt-3 mb-1">Notes</label>
+  <textarea id="popoverNotes" class="w-full px-3 py-1.5 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 outline-none resize-none" rows="2" placeholder="Optional coach notes..."></textarea>
+  <div class="flex gap-2 mt-3">
+    <button class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium text-muted border border-border hover:text-foreground transition-all" onclick="closeDurationPopover()">Cancel</button>
+    <button class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-white hover:brightness-110 transition-all" onclick="saveDuration()">Save</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+
+const SKILLS = ['Serving','Passing','Setting','Attacking','Blocking','Defense','Conditioning','Footwork'];
+const CATEGORIES = ['Warmup','Technical','Tactical','Game','Conditioning','Cooldown'];
+const INTENSITIES = ['Low','Medium','High'];
+const DURATION_RANGES = [
+  { label: '≤5m', min: 0, max: 5 },
+  { label: '5-10m', min: 5, max: 10 },
+  { label: '10-15m', min: 10, max: 15 },
+  { label: '15m+', min: 15, max: 999 },
+];
+const CATEGORY_COLORS = { Warmup:'#29757A', Technical:'#2E5A88', Tactical:'#FF7D00', Game:'#D99100', Conditioning:'#BE3F23', Cooldown:'#4A7A45' };
+const INTENSITY_COLORS = { Low:'#4A7A45', Medium:'#D99100', High:'#BE3F23' };
+const INTENSITY_VAL = { Low: 1, Medium: 2, High: 3 };
+const SECTION_COLORS = ['#FF7D00','#29757A','#2E5A88','#D99100','#4A7A45','#BE3F23'];
+
+const MOCK_DRILLS = [
+  { id:'d1', name:'Dynamic Stretching', duration:10, category:'Warmup', intensity:'Low', skills:['Conditioning','Footwork'], description:'Full-body dynamic stretch routine to prepare muscles and joints', instructions:['Arm circles x20','Leg swings x15 each','Hip rotations x10 each','Walking lunges with twist x10'], likeCount: 42, bookmarkCount: 18, createdAt: '2025-12-01' },
+  { id:'d2', name:'Pepper Drill', duration:8, category:'Warmup', intensity:'Low', skills:['Passing','Setting','Attacking'], description:'Partner passing, setting, and hitting warm-up drill', likeCount: 67, bookmarkCount: 31, createdAt: '2026-01-15' },
+  { id:'d3', name:'Serve Receive Lines', duration:15, category:'Technical', intensity:'Medium', skills:['Serving','Passing'], description:'Servers on one side, passers on the other. Focus on platform angle and footwork.', likeCount: 38, bookmarkCount: 22, createdAt: '2025-11-20' },
+  { id:'d4', name:'Setting Accuracy', duration:12, category:'Technical', intensity:'Medium', skills:['Setting'], description:'Setters work on consistent hand position and delivery to zones 2 and 4.', likeCount: 29, bookmarkCount: 15, createdAt: '2026-01-28' },
+  { id:'d5', name:'Attacking Approach', duration:15, category:'Technical', intensity:'High', skills:['Attacking','Footwork'], description:'Three-step approach drill with focus on timing, arm swing, and contact point.', likeCount: 84, bookmarkCount: 45, createdAt: '2025-10-05' },
+  { id:'d6', name:'Block & Recover', duration:12, category:'Technical', intensity:'High', skills:['Blocking','Defense','Footwork'], description:'Block at net then transition to defensive position.', likeCount: 51, bookmarkCount: 28, createdAt: '2025-09-12' },
+  { id:'d7', name:'6v6 Controlled', duration:20, category:'Tactical', intensity:'Medium', skills:['Serving','Passing','Setting','Attacking','Blocking','Defense'], description:'Full rotation game with specific tactical focus.', likeCount: 95, bookmarkCount: 52, createdAt: '2026-02-01' },
+  { id:'d8', name:'Transition Offense', duration:15, category:'Tactical', intensity:'High', skills:['Attacking','Setting','Defense'], description:'Dig → set → attack sequences from different positions.', likeCount: 73, bookmarkCount: 39, createdAt: '2025-11-05' },
+  { id:'d9', name:'King of the Court', duration:20, category:'Game', intensity:'High', skills:['Serving','Passing','Setting','Attacking'], description:'Competitive 3v3 or 4v4 with rotation. Winners stay.', likeCount: 112, bookmarkCount: 61, createdAt: '2025-08-20' },
+  { id:'d10', name:'Suicide Sprints', duration:8, category:'Conditioning', intensity:'High', skills:['Conditioning','Footwork'], description:'Court-length sprint intervals with volleyball movements.', likeCount: 23, bookmarkCount: 8, createdAt: '2026-01-10' },
+  { id:'d11', name:'Cool Down Jog & Stretch', duration:10, category:'Cooldown', intensity:'Low', skills:['Conditioning'], description:'Light jog followed by static stretching for all muscle groups.', likeCount: 35, bookmarkCount: 20, createdAt: '2025-12-15' },
+  { id:'d12', name:'Jump Serve Practice', duration:12, category:'Technical', intensity:'High', skills:['Serving'], description:'Individual jump serve practice with toss consistency focus.', likeCount: 58, bookmarkCount: 34, createdAt: '2026-01-20' },
+];
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+
+let timeline = [];
+let sections = [];
+let selectedSkillFilters = new Set();
+let selectedCategoryFilter = null;
+let selectedIntensityFilter = null;
+let selectedDurationFilter = null;
+let currentSort = 'name';
+let drawerDrill = null;
+let editingItemId = null;
+let dragSrcId = null;
+let visibility = 'Private';
+let sessionDuration = 90;
+let barView = 'categories'; // 'intensity' | 'categories' | 'skills'
+
+// ═══════════════════════════════════════════════════
+// BAR VIEW SWITCHER
+// ═══════════════════════════════════════════════════
+
+function setBarView(view) {
+  barView = view;
+  ['intensity','categories','skills'].forEach(v => {
+    const btn = document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1));
+    if (v === view) { btn.className = 'px-2.5 py-1 rounded-md text-[10px] font-medium transition-all bg-primary/15 text-primary'; }
+    else { btn.className = 'px-2.5 py-1 rounded-md text-[10px] font-medium transition-all text-muted hover:text-foreground'; }
+  });
+  updateAll();
+}
+
+// ═══════════════════════════════════════════════════
+// SESSION PILLS
+// ═══════════════════════════════════════════════════
+
+function renderSessionPills() {
+  const container = document.getElementById('sessionPills');
+
+  // Gather what's present in timeline
+  const presentIntensities = new Set(timeline.map(t => t.intensity));
+  const presentCategories = new Set(timeline.map(t => t.category));
+  const presentSkills = new Set(timeline.flatMap(t => t.skills));
+
+  // Calculate durations
+  const intensityDurations = {};
+  const categoryDurations = {};
+  timeline.forEach(t => {
+    intensityDurations[t.intensity] = (intensityDurations[t.intensity] || 0) + t.duration;
+    categoryDurations[t.category] = (categoryDurations[t.category] || 0) + t.duration;
+  });
+
+  let html = '';
+
+  if (barView === 'intensity') {
+    html = `
+      <div class="flex items-center gap-2">
+        ${INTENSITIES.map(i => {
+          const active = presentIntensities.has(i);
+          const dur = intensityDurations[i] || 0;
+          return `<span class="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+            active ? 'border' : 'text-muted/30 border border-border/50'
+          }" style="${active ? `background:${INTENSITY_COLORS[i]}15;border-color:${INTENSITY_COLORS[i]}40;color:${INTENSITY_COLORS[i]}` : ''}">${i}${active ? ` · ${dur}m` : ''}</span>`;
+        }).join('')}
+      </div>
+    `;
+  } else if (barView === 'categories') {
+    html = `
+      <div class="flex flex-wrap items-center gap-2">
+        ${CATEGORIES.map(c => {
+          const active = presentCategories.has(c);
+          const dur = categoryDurations[c] || 0;
+          return `<span class="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all flex items-center gap-1.5 ${
+            active ? 'border' : 'text-muted/30 border border-border/50'
+          }" style="${active ? `background:${CATEGORY_COLORS[c]}15;border-color:${CATEGORY_COLORS[c]}40;color:${CATEGORY_COLORS[c]}` : ''}">
+            <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:${active ? CATEGORY_COLORS[c] : '#666'}50"></span>
+            ${c}${active ? ` · ${dur}m` : ''}
+          </span>`;
+        }).join('')}
+      </div>
+    `;
+  } else if (barView === 'skills') {
+    html = `
+      <div class="flex flex-wrap items-center gap-1.5">
+        ${SKILLS.map(s => {
+          const active = presentSkills.has(s);
+          return `<span class="px-2 py-1 rounded-lg text-[11px] font-medium transition-all ${
+            active
+              ? 'bg-primary/15 text-primary border border-primary/30'
+              : 'text-muted/30 border border-border/50'
+          }">${s}</span>`;
+        }).join('')}
+        <span class="text-[10px] text-muted/50 ml-2">${presentSkills.size}/${SKILLS.length} covered</span>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// 1) DURATION SLIDER
+// ═══════════════════════════════════════════════════
+
+const SNAP_POINTS = [30, 60, 90, 120, 150, 180];
+const SNAP_THRESHOLD = 4; // snap within ±4 of a 30m mark
+
+function snapValue(raw) {
+  for (const sp of SNAP_POINTS) {
+    if (Math.abs(raw - sp) <= SNAP_THRESHOLD) return sp;
+  }
+  return raw;
+}
+
+function onSliderInput(slider) {
+  const raw = parseInt(slider.value);
+  const snapped = snapValue(raw);
+  if (snapped !== raw) slider.value = snapped;
+  sessionDuration = snapped;
+  document.getElementById('sliderValue').textContent = sessionDuration + 'm';
+  updateAll();
+}
+
+function onSliderCommit(slider) {
+  // Final snap on release
+  const snapped = snapValue(parseInt(slider.value));
+  slider.value = snapped;
+  sessionDuration = snapped;
+  document.getElementById('sliderValue').textContent = sessionDuration + 'm';
+  updateAll();
+}
+
+// ═══════════════════════════════════════════════════
+// TEMPLATE DETAILS
+// ═══════════════════════════════════════════════════
+
+let detailsOpen = true;
+function toggleDetails() {
+  detailsOpen = !detailsOpen;
+  document.getElementById('detailsContent').classList.toggle('hidden', !detailsOpen);
+  document.getElementById('detailsChevron').style.transform = detailsOpen ? '' : 'rotate(-90deg)';
+  if (!detailsOpen) updateDetailsSummary();
+}
+
+function updateDetailsSummary() {
+  const name = document.getElementById('templateName').value || 'Untitled';
+  const club = document.getElementById('templateClub');
+  const clubName = club.options[club.selectedIndex]?.text || '';
+  const parts = [name];
+  if (clubName && club.value) parts.push(clubName);
+  parts.push(visibility);
+  document.getElementById('detailsSummary').textContent = detailsOpen ? '' : parts.join(' · ');
+}
+
+function setVisibility(v) {
+  visibility = v;
+  const cls = (active) => active
+    ? 'flex-1 px-3 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary border border-primary/30 transition-all'
+    : 'flex-1 px-3 py-2 rounded-lg text-sm font-medium text-muted border border-border hover:border-border-strong transition-all';
+  document.getElementById('visPrivate').className = cls(v === 'Private');
+  document.getElementById('visPublic').className = cls(v === 'Public');
+  updateDetailsSummary();
+}
+
+// ═══════════════════════════════════════════════════
+// 3) FILTERS — Skills, Category, Intensity, Duration
+// ═══════════════════════════════════════════════════
+
+let filtersOpen = false;
+
+function toggleFilters() {
+  filtersOpen = !filtersOpen;
+  document.getElementById('filterPanel').classList.toggle('hidden', !filtersOpen);
+}
+
+function renderAllFilters() {
+  // Active filter count badge
+  const count = selectedSkillFilters.size + (selectedCategoryFilter ? 1 : 0) + (selectedIntensityFilter ? 1 : 0) + (selectedDurationFilter !== null ? 1 : 0);
+  const badge = document.getElementById('activeFilterCount');
+  if (count > 0) { badge.classList.remove('hidden'); badge.textContent = count; }
+  else { badge.classList.add('hidden'); }
+
+  // Skills - compact pills
+  document.getElementById('skillFilters').innerHTML = SKILLS.map(s => {
+    const active = selectedSkillFilters.has(s);
+    return `<button onclick="toggleSkill('${s}')" class="px-1.5 py-0.5 rounded text-[10px] font-medium transition-all ${
+      active ? 'bg-primary/15 text-primary border border-primary/30' : 'text-muted/60 border border-border hover:text-foreground'
+    }">${s}</button>`;
+  }).join('');
+
+  // Category - colored dots + text
+  document.getElementById('categoryFilters').innerHTML = CATEGORIES.map(c => {
+    const active = selectedCategoryFilter === c;
+    return `<button onclick="toggleCategoryFilter('${c}')" class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium transition-all ${
+      active ? 'border' : 'text-muted/60 border border-border hover:text-foreground'
+    }" style="${active ? `background:${CATEGORY_COLORS[c]}20;border-color:${CATEGORY_COLORS[c]}50;color:${CATEGORY_COLORS[c]}` : ''}"><span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:${CATEGORY_COLORS[c]}"></span>${c}</button>`;
+  }).join('');
+
+  // Intensity
+  document.getElementById('intensityFilters').innerHTML = INTENSITIES.map(i => {
+    const active = selectedIntensityFilter === i;
+    return `<button onclick="toggleIntensityFilter('${i}')" class="px-1.5 py-0.5 rounded text-[10px] font-medium transition-all ${
+      active ? 'border' : 'text-muted/60 border border-border hover:text-foreground'
+    }" style="${active ? `background:${INTENSITY_COLORS[i]}20;border-color:${INTENSITY_COLORS[i]}50;color:${INTENSITY_COLORS[i]}` : ''}">${i}</button>`;
+  }).join('');
+
+  // Duration
+  document.getElementById('durationFilters').innerHTML = DURATION_RANGES.map((r, idx) => {
+    const active = selectedDurationFilter === idx;
+    return `<button onclick="toggleDurationFilter(${idx})" class="px-1.5 py-0.5 rounded text-[10px] font-medium transition-all ${
+      active ? 'bg-primary/15 text-primary border border-primary/30' : 'text-muted/60 border border-border hover:text-foreground'
+    }">${r.label}</button>`;
+  }).join('');
+}
+
+function toggleSkill(s) {
+  if (selectedSkillFilters.has(s)) selectedSkillFilters.delete(s); else selectedSkillFilters.add(s);
+  renderAllFilters(); renderDrillLibrary();
+}
+function clearSkillFilters() { selectedSkillFilters.clear(); renderAllFilters(); renderDrillLibrary(); }
+
+function toggleCategoryFilter(c) {
+  selectedCategoryFilter = selectedCategoryFilter === c ? null : c;
+  renderAllFilters(); renderDrillLibrary();
+}
+function clearCategoryFilter() { selectedCategoryFilter = null; renderAllFilters(); renderDrillLibrary(); }
+
+function toggleIntensityFilter(i) {
+  selectedIntensityFilter = selectedIntensityFilter === i ? null : i;
+  renderAllFilters(); renderDrillLibrary();
+}
+function clearIntensityFilter() { selectedIntensityFilter = null; renderAllFilters(); renderDrillLibrary(); }
+
+function toggleDurationFilter(idx) {
+  selectedDurationFilter = selectedDurationFilter === idx ? null : idx;
+  renderAllFilters(); renderDrillLibrary();
+}
+function clearDurationFilter() { selectedDurationFilter = null; renderAllFilters(); renderDrillLibrary(); }
+
+// ═══════════════════════════════════════════════════
+// 2) SORT
+// ═══════════════════════════════════════════════════
+
+function toggleSortDropdown() {
+  document.getElementById('sortDropdown').classList.toggle('open');
+}
+
+function setSort(s) {
+  currentSort = s;
+  document.querySelectorAll('.sort-check').forEach(el => el.classList.toggle('hidden', el.dataset.sort !== s));
+  const labels = { name:'Name', duration:'Duration', intensity:'Intensity', category:'Category', likes:'Most Liked', bookmarks:'Most Saved', recent:'Recent' };
+  document.getElementById('sortLabel').textContent = labels[s] || s;
+  document.getElementById('sortDropdown').classList.remove('open');
+  renderDrillLibrary();
+}
+
+// Close sort dropdown on outside click
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('sortDropdown');
+  if (dd.classList.contains('open') && !e.target.closest('#sortDropdown') && !e.target.closest('[onclick*="toggleSortDropdown"]')) {
+    dd.classList.remove('open');
+  }
+});
+
+function sortDrills(drills) {
+  const sorted = [...drills];
+  switch (currentSort) {
+    case 'name': return sorted.sort((a,b) => a.name.localeCompare(b.name));
+    case 'duration': return sorted.sort((a,b) => a.duration - b.duration);
+    case 'intensity': return sorted.sort((a,b) => INTENSITY_VAL[b.intensity] - INTENSITY_VAL[a.intensity]);
+    case 'category': return sorted.sort((a,b) => CATEGORIES.indexOf(a.category) - CATEGORIES.indexOf(b.category));
+    case 'likes': return sorted.sort((a,b) => (b.likeCount||0) - (a.likeCount||0));
+    case 'bookmarks': return sorted.sort((a,b) => (b.bookmarkCount||0) - (a.bookmarkCount||0));
+    case 'recent': return sorted.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+    default: return sorted;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// DRILL LIBRARY
+// ═══════════════════════════════════════════════════
+
+function renderDrillLibrary() {
+  const search = document.getElementById('drillSearch').value.toLowerCase();
+  let drills = MOCK_DRILLS;
+  if (search) drills = drills.filter(d => d.name.toLowerCase().includes(search) || d.description.toLowerCase().includes(search));
+  if (selectedSkillFilters.size > 0) drills = drills.filter(d => d.skills.some(s => selectedSkillFilters.has(s)));
+  if (selectedCategoryFilter) drills = drills.filter(d => d.category === selectedCategoryFilter);
+  if (selectedIntensityFilter) drills = drills.filter(d => d.intensity === selectedIntensityFilter);
+  if (selectedDurationFilter !== null) {
+    const range = DURATION_RANGES[selectedDurationFilter];
+    drills = drills.filter(d => d.duration >= range.min && d.duration <= range.max);
+  }
+  drills = sortDrills(drills);
+
+  document.getElementById('drillCount').textContent = `${drills.length} drill${drills.length !== 1 ? 's' : ''}`;
+  document.getElementById('drillLibrary').innerHTML = drills.length === 0
+    ? '<div class="text-center py-8"><p class="text-sm text-muted">No drills match your filters</p><button onclick="clearAllFilters()" class="text-xs text-primary hover:underline mt-1">Clear all filters</button></div>'
+    : drills.map(drill => `
+    <div class="group flex items-center gap-3 p-3 rounded-xl bg-subtle/30 hover:bg-hover border border-transparent hover:border-primary/30 transition-all cursor-pointer"
+         draggable="true" ondragstart="onLibraryDragStart(event, '${drill.id}')" ondragend="onDragEnd(event)"
+         onclick="addDrillToTimeline('${drill.id}')">
+      <div class="flex-shrink-0 w-1 h-10 rounded-full" style="background: ${CATEGORY_COLORS[drill.category]}"></div>
+      <div class="flex-1 min-w-0">
+        <span class="text-sm font-medium text-foreground truncate block">${drill.name}</span>
+        <div class="flex items-center gap-2 mt-0.5">
+          <span class="text-xs text-muted flex items-center gap-1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${drill.duration}m
+          </span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-medium" style="background: ${CATEGORY_COLORS[drill.category]}20; color: ${CATEGORY_COLORS[drill.category]}">${drill.category}</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-medium" style="background: ${INTENSITY_COLORS[drill.intensity]}20; color: ${INTENSITY_COLORS[drill.intensity]}">${drill.intensity}</span>
+          ${drill.likeCount ? `<span class="text-[10px] text-muted/40 flex items-center gap-0.5"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>${drill.likeCount}</span>` : ''}
+        </div>
+      </div>
+      <button onclick="event.stopPropagation(); openDrawer('${drill.id}')"
+        class="flex-shrink-0 w-7 h-7 rounded-lg bg-subtle border border-border text-muted hover:text-foreground hover:border-border-strong flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" title="View details">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function clearAllFilters() {
+  selectedSkillFilters.clear(); selectedCategoryFilter = null; selectedIntensityFilter = null; selectedDurationFilter = null;
+  document.getElementById('drillSearch').value = '';
+  renderAllFilters(); renderDrillLibrary();
+}
+
+// ═══════════════════════════════════════════════════
+// 4) SECTIONS — Visual on Timeline
+// ═══════════════════════════════════════════════════
+
+function addSection() {
+  const colorIdx = sections.length % SECTION_COLORS.length;
+  const defaultName = `Section ${sections.length + 1}`;
+  const newSection = { id: 'sec-' + Date.now(), name: defaultName, color: SECTION_COLORS[colorIdx] };
+  sections.push(newSection);
+  updateAll();
+  // Focus the new section name for immediate editing
+  setTimeout(() => {
+    const nameEl = document.querySelector(`[data-section-id="${newSection.id}"] .section-name`);
+    if (nameEl) {
+      nameEl.focus();
+      // Select all text
+      const range = document.createRange();
+      range.selectNodeContents(nameEl);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }, 50);
+}
+
+function deleteSection(sectionId) {
+  // Move items to ungrouped
+  timeline.forEach(t => { if (t.sectionId === sectionId) t.sectionId = undefined; });
+  sections = sections.filter(s => s.id !== sectionId);
+  updateAll();
+}
+
+function onSectionNameBlur(event, sectionId) {
+  const sec = sections.find(s => s.id === sectionId);
+  if (!sec) return;
+  const newName = event.target.textContent.trim();
+  if (newName) {
+    sec.name = newName;
+  } else {
+    // Restore previous name if empty
+    event.target.textContent = sec.name;
+  }
+  // Update the section spans without full re-render to avoid losing focus
+  renderSessionBar();
+}
+
+function onSectionNameKeydown(event, sectionId) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    event.target.blur();
+  } else if (event.key === 'Escape') {
+    // Restore original name and blur
+    const sec = sections.find(s => s.id === sectionId);
+    if (sec) event.target.textContent = sec.name;
+    event.target.blur();
+  }
+}
+
+function addDrillToTimeline(drillId, sectionId) {
+  const drill = MOCK_DRILLS.find(d => d.id === drillId);
+  if (!drill) return;
+  timeline.push({ ...drill, instanceId: 'ti-' + Date.now() + Math.random().toString(36).substr(2, 5), sectionId: sectionId || undefined, notes: '' });
+  updateAll();
+}
+
+function removeDrillFromTimeline(instanceId) {
+  timeline = timeline.filter(t => t.instanceId !== instanceId);
+  updateAll();
+}
+
+function moveDrill(instanceId, direction) {
+  const idx = timeline.findIndex(t => t.instanceId === instanceId);
+  if (idx === -1) return;
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= timeline.length) return;
+
+  // Swap positions
+  const item = timeline[idx];
+  timeline.splice(idx, 1);
+  timeline.splice(newIdx, 0, item);
+
+  // Adopt the section of the new neighbor if moving into a different context
+  const neighbor = timeline[newIdx + (direction > 0 ? -1 : 1)];
+  if (neighbor && neighbor.sectionId !== item.sectionId) {
+    item.sectionId = neighbor.sectionId;
+  }
+
+  updateAll();
+}
+
+function clearTimeline() {
+  timeline = [];
+  sections = [];
+  updateAll();
+}
+
+function formatTime(minutes) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+}
+
+// Build ordered list: sections with their items, then ungrouped
+function buildOrderedTimeline() {
+  const result = [];
+  // Sections in order
+  sections.forEach(sec => {
+    const items = timeline.filter(t => t.sectionId === sec.id);
+    if (items.length > 0 || true) { // Always show section
+      result.push({ type: 'section', section: sec, items });
+    }
+  });
+  // Ungrouped
+  const ungrouped = timeline.filter(t => !t.sectionId || !sections.find(s => s.id === t.sectionId));
+  if (ungrouped.length > 0) {
+    result.push({ type: 'ungrouped', items: ungrouped });
+  }
+  return result;
+}
+
+function renderTimeline() {
+  const empty = document.getElementById('emptyState');
+  const content = document.getElementById('timelineContent');
+  const clearBtn = document.getElementById('clearAllBtn');
+
+  if (timeline.length === 0 && sections.length === 0) {
+    empty.classList.remove('hidden');
+    content.classList.add('hidden');
+    clearBtn.classList.add('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  content.classList.remove('hidden');
+  clearBtn.classList.remove('hidden');
+
+  const list = document.getElementById('timelineList');
+  list.innerHTML = `
+    <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-border"></div>
+    <div class="absolute left-[5px] top-0 w-[13px] h-[13px] rounded-full bg-accent border-[3px] border-base z-10"></div>
+  `;
+
+  let accTime = 0;
+  const ordered = buildOrderedTimeline();
+
+  ordered.forEach(group => {
+    if (group.type === 'section') {
+      // Section header
+      const secDur = group.items.reduce((a, t) => a + t.duration, 0);
+      const secHeader = document.createElement('div');
+      secHeader.className = 'relative mb-2 mt-4 first:mt-0';
+      secHeader.dataset.sectionId = group.section.id;
+      secHeader.innerHTML = `
+        <div class="absolute left-[-25px] top-1/2 -translate-y-1/2 w-[13px] h-[13px] rounded-full border-[3px] border-base z-10" style="background: ${group.section.color}"></div>
+        <div class="ml-2 flex items-center justify-between rounded-xl px-4 py-2.5" style="background: ${group.section.color}10; border: 1px solid ${group.section.color}30">
+          <div class="flex items-center gap-2.5">
+            <div class="w-2.5 h-2.5 rounded-full" style="background: ${group.section.color}"></div>
+            <h3 contenteditable="true" spellcheck="false"
+                class="section-name text-xs font-bold uppercase tracking-wider outline-none px-1 -mx-1 rounded cursor-text hover:bg-white/5 focus:bg-white/10 focus:ring-1 focus:ring-white/20 transition-all"
+                style="color: ${group.section.color}"
+                onblur="onSectionNameBlur(event, '${group.section.id}')"
+                onkeydown="onSectionNameKeydown(event, '${group.section.id}')">${group.section.name}</h3>
+            <span class="text-[10px] text-muted">${group.items.length} drill${group.items.length !== 1 ? 's' : ''} · ${secDur}m</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="addDrillToSection('${group.section.id}')" class="p-1 rounded-lg hover:bg-hover text-muted/50 hover:text-foreground transition-all" title="Add drill to section">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <button onclick="deleteSection('${group.section.id}')" class="p-1 rounded-lg hover:bg-hover text-muted/50 hover:text-error transition-all" title="Delete section">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+      list.appendChild(secHeader);
+
+      // Section items (indented with left border colored)
+      if (group.items.length === 0) {
+        const emptyEl = document.createElement('div');
+        emptyEl.className = 'relative mb-2';
+        emptyEl.innerHTML = `
+          <div class="ml-2 rounded-xl border-2 border-dashed py-4 text-center text-xs text-muted/40 transition-all hover:border-opacity-60" style="border-color: ${group.section.color}30"
+               ondragover="event.preventDefault()" ondragenter="this.classList.add('bg-primary/5')" ondragleave="this.classList.remove('bg-primary/5')"
+               ondrop="event.preventDefault(); this.classList.remove('bg-primary/5'); handleSectionDrop(event, '${group.section.id}')">
+            Drop drills here
+          </div>
+        `;
+        list.appendChild(emptyEl);
+      } else {
+        group.items.forEach(item => {
+          accTime = renderTimelineItem(list, item, accTime, group.section.color);
+        });
+      }
+    } else {
+      // Ungrouped items
+      if (sections.length > 0) {
+        const ungroupedHeader = document.createElement('div');
+        ungroupedHeader.className = 'relative mb-2 mt-4';
+        ungroupedHeader.innerHTML = `
+          <div class="absolute left-[-25px] top-1/2 -translate-y-1/2 w-[9px] h-[9px] rounded-full bg-muted/30 border-2 border-base z-10"></div>
+          <div class="ml-2 px-4 py-2 rounded-xl bg-subtle/30 border border-border">
+            <span class="text-[10px] font-bold text-muted/60 uppercase tracking-wider">Ungrouped</span>
+            <span class="text-[10px] text-muted/40 ml-2">${group.items.length} drill${group.items.length !== 1 ? 's' : ''}</span>
+          </div>
+        `;
+        list.appendChild(ungroupedHeader);
+      }
+      group.items.forEach(item => {
+        accTime = renderTimelineItem(list, item, accTime, null);
+      });
+    }
+  });
+
+  // End node
+  const totalTime = formatTime(accTime);
+  const endEl = document.createElement('div');
+  endEl.className = 'relative mt-2';
+  endEl.innerHTML = `
+    <div class="absolute left-[-25px] top-2 w-[13px] h-[13px] rounded-full bg-muted/50 border-[3px] border-base z-10"></div>
+    <div class="absolute left-[-72px] top-1 text-[11px] font-mono text-primary font-bold w-10 text-right">${totalTime}</div>
+    <div class="ml-2 text-xs text-muted py-2">End of session</div>
+  `;
+  list.appendChild(endEl);
+}
+
+function renderTimelineItem(container, item, accTime, sectionColor) {
+  const timeLabel = formatTime(accTime);
+  accTime += item.duration;
+
+  const el = document.createElement('div');
+  el.className = 'relative mb-2 animate-slide-in';
+  el.dataset.instanceId = item.instanceId;
+  el.draggable = true;
+  el.ondragstart = (e) => { dragSrcId = item.instanceId; e.dataTransfer.setData('text/plain', JSON.stringify({type:'timeline',instanceId:item.instanceId})); e.dataTransfer.effectAllowed='move'; setTimeout(() => el.classList.add('drag-ghost'), 0); };
+  el.ondragover = (e) => e.preventDefault();
+  el.ondragenter = (e) => { e.preventDefault(); if (dragSrcId !== item.instanceId) el.querySelector('.ti-card')?.classList.add('drag-over'); };
+  el.ondragleave = () => el.querySelector('.ti-card')?.classList.remove('drag-over');
+  el.ondrop = (e) => { e.preventDefault(); el.querySelector('.ti-card')?.classList.remove('drag-over'); handleTimelineDrop(e, item.instanceId); };
+  el.ondragend = () => { el.classList.remove('drag-ghost'); dragSrcId = null; };
+
+  const leftBorder = sectionColor ? `border-left: 2px solid ${sectionColor}40;` : '';
+  const isGrouped = !!sectionColor;
+  const cardMargin = isGrouped ? 'ml-6' : 'ml-2';
+
+  el.innerHTML = `
+    <div class="absolute left-[-25px] top-5 w-[9px] h-[9px] rounded-full border-2 border-base z-10" style="background: ${sectionColor || '#666666'}50"></div>
+    <div class="absolute left-[-72px] top-4 text-[11px] font-mono text-muted w-10 text-right">${timeLabel}</div>
+
+    <div class="ti-card group ${cardMargin} rounded-xl bg-surface/80 backdrop-blur-sm shadow-sm border border-border hover:border-accent/30 transition-all" style="${leftBorder}">
+      <div class="flex items-center gap-3 p-3">
+        <div class="flex-shrink-0 cursor-grab active:cursor-grabbing text-muted/40 hover:text-muted transition-colors">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+        </div>
+        <div class="flex-shrink-0 w-1 h-9 rounded-full" style="background: ${CATEGORY_COLORS[item.category]}"></div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <h4 class="font-semibold text-sm text-foreground truncate">${item.name}</h4>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium" style="background: ${INTENSITY_COLORS[item.intensity]}20; color: ${INTENSITY_COLORS[item.intensity]}">${item.intensity}</span>
+          </div>
+          <div class="flex items-center gap-2 mt-0.5">
+            <button onclick="event.stopPropagation(); openDurationPopover(event, '${item.instanceId}')"
+              class="flex items-center gap-1 text-xs text-muted hover:text-primary transition-colors cursor-pointer">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              ${item.duration} min
+            </button>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium" style="background: ${CATEGORY_COLORS[item.category]}20; color: ${CATEGORY_COLORS[item.category]}">${item.category}</span>
+            ${item.notes ? `<span class="text-[10px] text-muted/50 truncate max-w-[120px]" title="${item.notes}">${item.notes}</span>` : ''}
+          </div>
+        </div>
+        <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button onclick="event.stopPropagation(); moveDrill('${item.instanceId}', -1)" class="p-1 rounded-lg text-muted hover:text-foreground hover:bg-hover transition-all" title="Move up">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+          </button>
+          <button onclick="event.stopPropagation(); moveDrill('${item.instanceId}', 1)" class="p-1 rounded-lg text-muted hover:text-foreground hover:bg-hover transition-all" title="Move down">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="w-px h-4 bg-border mx-1"></div>
+          <button onclick="event.stopPropagation(); openDrawer('${item.id}')" class="p-1.5 rounded-lg text-muted hover:text-foreground hover:bg-hover transition-all" title="Details">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button onclick="event.stopPropagation(); removeDrillFromTimeline('${item.instanceId}')" class="p-1.5 rounded-lg text-muted hover:text-error hover:bg-error/10 transition-all" title="Remove">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+  return accTime;
+}
+
+function addDrillToSection(sectionId) {
+  // Focus search and set a hint — in real app would open a picker
+  document.getElementById('drillSearch').focus();
+  document.getElementById('drillSearch').placeholder = `Search drills to add to section...`;
+  // Temp: store the target section so next add goes there
+  window._addToSectionId = sectionId;
+}
+
+// Override addDrillToTimeline to support section targeting
+const _origAddDrill = addDrillToTimeline;
+addDrillToTimeline = function(drillId, sectionId) {
+  const targetSection = sectionId || window._addToSectionId || undefined;
+  window._addToSectionId = undefined;
+  document.getElementById('drillSearch').placeholder = 'Search drills...';
+  const drill = MOCK_DRILLS.find(d => d.id === drillId);
+  if (!drill) return;
+  timeline.push({ ...drill, instanceId: 'ti-' + Date.now() + Math.random().toString(36).substr(2, 5), sectionId: targetSection, notes: '' });
+  updateAll();
+};
+
+function handleSectionDrop(e, sectionId) {
+  let data;
+  try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch { return; }
+  if (data.type === 'library') {
+    addDrillToTimeline(data.drillId, sectionId);
+  } else if (data.type === 'timeline') {
+    const item = timeline.find(t => t.instanceId === data.instanceId);
+    if (item) { item.sectionId = sectionId; updateAll(); }
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// TIMELINE DROP
+// ═══════════════════════════════════════════════════
+
+function handleTimelineDrop(e, targetInstanceId) {
+  let data;
+  try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch { return; }
+
+  if (data.type === 'library') {
+    const drill = MOCK_DRILLS.find(d => d.id === data.drillId);
+    if (!drill) return;
+    const targetItem = timeline.find(t => t.instanceId === targetInstanceId);
+    const newItem = { ...drill, instanceId: 'ti-' + Date.now() + Math.random().toString(36).substr(2,5), sectionId: targetItem?.sectionId, notes: '' };
+    const idx = timeline.findIndex(t => t.instanceId === targetInstanceId);
+    timeline.splice(idx, 0, newItem);
+  } else if (data.type === 'timeline') {
+    if (data.instanceId === targetInstanceId) return;
+    const srcIdx = timeline.findIndex(t => t.instanceId === data.instanceId);
+    const tgtIdx = timeline.findIndex(t => t.instanceId === targetInstanceId);
+    const targetItem = timeline.find(t => t.instanceId === targetInstanceId);
+    const [moved] = timeline.splice(srcIdx, 1);
+    // Adopt the section of the drop target
+    moved.sectionId = targetItem?.sectionId;
+    timeline.splice(tgtIdx > srcIdx ? tgtIdx - 1 : tgtIdx, 0, moved);
+  }
+  updateAll();
+}
+
+function onDropZoneDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('border-primary/50','bg-primary/5');
+  let data;
+  try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch { return; }
+  if (data.type === 'library') {
+    const drill = MOCK_DRILLS.find(d => d.id === data.drillId);
+    if (!drill) return;
+    timeline.push({ ...drill, instanceId: 'ti-' + Date.now() + Math.random().toString(36).substr(2,5), sectionId: undefined, notes: '' });
+    updateAll();
+  }
+}
+
+function onLibraryDragStart(e, drillId) {
+  e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'library', drillId }));
+  e.dataTransfer.effectAllowed = 'copy';
+  e.target.classList.add('drag-ghost');
+  document.getElementById('dropZone')?.classList.add('border-primary/50', 'bg-primary/5');
+}
+
+function onDragEnd(e) {
+  e.target.classList.remove('drag-ghost');
+  document.getElementById('dropZone')?.classList.remove('border-primary/50', 'bg-primary/5');
+  dragSrcId = null;
+}
+
+// ═══════════════════════════════════════════════════
+// SESSION BAR
+// ═══════════════════════════════════════════════════
+
+function renderSessionBar() {
+  const bar = document.getElementById('sessionBar');
+  const inner = document.getElementById('sessionBarInner');
+  const empty = document.getElementById('barEmpty');
+
+  // Remove old segments and markers
+  inner.querySelectorAll('.session-segment').forEach(el => el.remove());
+  bar.querySelectorAll('.session-end-marker').forEach(el => el.remove());
+
+  if (timeline.length === 0) { empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  const totalPlanned = timeline.reduce((a, t) => a + t.duration, 0);
+  const isOverflow = totalPlanned > sessionDuration;
+  // Scale to whichever is larger: session duration or total planned
+  const scaleMax = Math.max(sessionDuration, totalPlanned);
+
+  let offset = 0;
+  timeline.forEach((item, i) => {
+    const pct = (item.duration / scaleMax) * 100;
+    const leftPct = (offset / scaleMax) * 100;
+    const isInSection = item.sectionId && sections.find(s => s.id === item.sectionId);
+    const isOverflowing = offset >= sessionDuration;
+    const crossesBoundary = offset < sessionDuration && (offset + item.duration) > sessionDuration;
+    offset += item.duration;
+
+    const seg = document.createElement('div');
+    seg.className = 'session-segment' + (isOverflowing ? ' overflow' : '');
+    seg.style.left = leftPct + '%';
+    seg.style.width = Math.max(pct, 0.6) + '%';
+
+    // Color based on selected view
+    if (barView === 'intensity') {
+      seg.style.background = INTENSITY_COLORS[item.intensity] + (i % 2 === 0 ? 'DD' : 'AA');
+    } else if (barView === 'categories') {
+      seg.style.background = CATEGORY_COLORS[item.category] + (i % 2 === 0 ? 'CC' : '99');
+    } else {
+      // Skills view - use primary color, opacity based on skill coverage
+      const skillCoverage = item.skills.length / SKILLS.length;
+      const opacity = (0.4 + skillCoverage * 0.5).toFixed(2);
+      seg.style.background = `rgba(255, 125, 0, ${opacity})`;
+    }
+
+    // Grouped drills: slightly shorter and shifted down to distinguish
+    if (isInSection) {
+      seg.style.top = '6px';
+      seg.style.bottom = '3px';
+      seg.style.borderRadius = '5px';
+    } else {
+      seg.style.top = '3px';
+      seg.style.bottom = '6px';
+      seg.style.borderRadius = '5px';
+    }
+
+    // Label based on view
+    const displayPct = (item.duration / scaleMax) * 100;
+    let segLabel = item.name;
+    if (barView === 'intensity') segLabel = item.intensity;
+    else if (barView === 'skills') segLabel = `${item.skills.length} skills`;
+
+    let segTitle = `${item.name} — ${item.duration}m`;
+    segTitle += ` | ${item.category} | ${item.intensity}`;
+    segTitle += ` | Skills: ${item.skills.join(', ')}`;
+    segTitle += isOverflowing ? ' (over session limit)' : '';
+    segTitle += isInSection ? ` [${sections.find(s => s.id === item.sectionId).name}]` : '';
+    seg.title = segTitle;
+    seg.innerHTML = displayPct > 7 ? `<span class="seg-label text-white/90">${segLabel}</span>` : '';
+    seg.onclick = () => {
+      const target = document.querySelector(`[data-instance-id="${item.instanceId}"]`);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    inner.appendChild(seg);
+  });
+
+  // Show end-of-session marker when overflowing
+  if (isOverflow) {
+    const markerPct = (sessionDuration / scaleMax) * 100;
+    const marker = document.createElement('div');
+    marker.className = 'session-end-marker';
+    marker.style.left = markerPct + '%';
+    bar.appendChild(marker);
+  }
+
+  // Render section spans below the bar
+  renderSessionSections(scaleMax);
+}
+
+function renderSessionSections(scaleMax) {
+  const container = document.getElementById('sessionSections');
+  container.innerHTML = '';
+
+  if (timeline.length === 0) return;
+
+  // Don't show section spans if there are no sections defined
+  if (sections.length === 0) return;
+
+  // Walk timeline in order, compute each section's span
+  const ordered = buildOrderedTimeline();
+  let offset = 0;
+
+  ordered.forEach(group => {
+    const groupDur = group.items.reduce((a, t) => a + t.duration, 0);
+    if (groupDur === 0) { return; }
+
+    const leftPct = (offset / scaleMax) * 100;
+    const widthPct = (groupDur / scaleMax) * 100;
+    offset += groupDur;
+
+    const span = document.createElement('div');
+    span.className = 'section-span';
+    span.style.left = leftPct + '%';
+    span.style.width = widthPct + '%';
+
+    if (group.type === 'section') {
+      span.style.background = group.section.color + '18';
+      span.style.borderBottom = '2px solid ' + group.section.color + '80';
+      span.innerHTML = `<span class="section-span-label" style="color: ${group.section.color}">${group.section.name}</span>`;
+    } else {
+      span.style.background = '#66666610';
+      span.style.borderBottom = '2px solid #66666640';
+      span.innerHTML = `<span class="section-span-label" style="color: #666">Ungrouped</span>`;
+    }
+
+    container.appendChild(span);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════
+
+function renderStats() {
+  const used = timeline.reduce((a,t) => a + t.duration, 0);
+  const rem = sessionDuration - used;
+  const over = rem < 0;
+  document.getElementById('timeDisplay').innerHTML = `<span class="text-xl font-bold ${over ? 'text-error' : 'text-foreground'}">${used}</span><span class="text-sm text-muted font-medium"> / ${sessionDuration}m</span>`;
+  document.getElementById('timeStatus').textContent = over ? `${Math.abs(rem)}m over` : `${rem}m remaining`;
+  document.getElementById('timeStatus').className = `text-xs font-bold ${over ? 'text-error' : 'text-muted'}`;
+}
+
+// ═══════════════════════════════════════════════════
+// UPDATE ALL
+// ═══════════════════════════════════════════════════
+
+function updateAll() {
+  renderTimeline();
+  renderSessionBar();
+  renderSessionPills();
+  renderStats();
+}
+
+// ═══════════════════════════════════════════════════
+// DURATION POPOVER
+// ═══════════════════════════════════════════════════
+
+function openDurationPopover(e, instanceId) {
+  editingItemId = instanceId;
+  const item = timeline.find(t => t.instanceId === instanceId);
+  if (!item) return;
+  document.getElementById('popoverDuration').value = item.duration;
+  document.getElementById('popoverNotes').value = item.notes || '';
+  const pop = document.getElementById('durationPopover');
+  const rect = e.target.getBoundingClientRect();
+  pop.style.top = (rect.bottom + 8) + 'px';
+  pop.style.left = Math.max(8, rect.left - 60) + 'px';
+  pop.classList.remove('hidden');
+}
+
+function adjustPopoverDuration(delta) {
+  const inp = document.getElementById('popoverDuration');
+  inp.value = Math.max(1, parseInt(inp.value) + delta);
+}
+
+function saveDuration() {
+  const item = timeline.find(t => t.instanceId === editingItemId);
+  if (item) {
+    item.duration = parseInt(document.getElementById('popoverDuration').value) || item.duration;
+    item.notes = document.getElementById('popoverNotes').value.trim();
+  }
+  closeDurationPopover();
+  updateAll();
+}
+
+function closeDurationPopover() {
+  document.getElementById('durationPopover').classList.add('hidden');
+  editingItemId = null;
+}
+
+document.addEventListener('click', (e) => {
+  const pop = document.getElementById('durationPopover');
+  if (!pop.classList.contains('hidden') && !pop.contains(e.target)) closeDurationPopover();
+});
+
+// ═══════════════════════════════════════════════════
+// DRILL DRAWER
+// ═══════════════════════════════════════════════════
+
+function openDrawer(drillId) {
+  drawerDrill = MOCK_DRILLS.find(d => d.id === drillId);
+  if (!drawerDrill) return;
+  document.getElementById('drawerDrillName').textContent = drawerDrill.name;
+  document.getElementById('drawerContent').innerHTML = `
+    <div class="flex flex-wrap gap-2">
+      <span class="px-2 py-1 rounded-lg text-xs font-medium" style="background: ${CATEGORY_COLORS[drawerDrill.category]}20; color: ${CATEGORY_COLORS[drawerDrill.category]}">${drawerDrill.category}</span>
+      <span class="px-2 py-1 rounded-lg text-xs font-medium" style="background: ${INTENSITY_COLORS[drawerDrill.intensity]}20; color: ${INTENSITY_COLORS[drawerDrill.intensity]}">${drawerDrill.intensity}</span>
+      <span class="px-2 py-1 rounded-lg text-xs font-medium bg-subtle text-muted flex items-center gap-1">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ${drawerDrill.duration} min
+      </span>
+    </div>
+    <div class="flex items-center gap-4 text-xs text-muted">
+      <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" class="text-error/60"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg> ${drawerDrill.likeCount || 0} likes</span>
+      <span class="flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg> ${drawerDrill.bookmarkCount || 0} saves</span>
+    </div>
+    <p class="text-sm text-muted/80 leading-relaxed">${drawerDrill.description}</p>
+    <div>
+      <h4 class="text-xs font-bold text-muted uppercase tracking-wider mb-2">Skills</h4>
+      <div class="flex flex-wrap gap-1.5">
+        ${drawerDrill.skills.map(s => `<span class="px-2 py-0.5 rounded text-xs text-foreground bg-subtle border border-border">${s}</span>`).join('')}
+      </div>
+    </div>
+    ${drawerDrill.instructions ? `
+    <div>
+      <h4 class="text-xs font-bold text-muted uppercase tracking-wider mb-2">Instructions</h4>
+      <ol class="space-y-1.5 ml-4 list-decimal text-sm text-muted/80">
+        ${drawerDrill.instructions.map(i => `<li>${i}</li>`).join('')}
+      </ol>
+    </div>` : ''}
+  `;
+  document.getElementById('drillDrawer').classList.remove('translate-x-full');
+  document.getElementById('drawerOverlay').classList.remove('opacity-0', 'pointer-events-none');
+}
+
+function closeDrawer() {
+  document.getElementById('drillDrawer').classList.add('translate-x-full');
+  document.getElementById('drawerOverlay').classList.add('opacity-0', 'pointer-events-none');
+  drawerDrill = null;
+}
+
+function addDrawerDrillToTimeline() {
+  if (drawerDrill) { addDrillToTimeline(drawerDrill.id); closeDrawer(); }
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+
+renderAllFilters();
+renderDrillLibrary();
+updateDetailsSummary();
+updateAll();
+</script>
+
+</body>
+</html>

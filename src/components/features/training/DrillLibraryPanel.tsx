@@ -114,7 +114,7 @@ function DrillCardSkeleton() {
 // =============================================================================
 
 export default function DrillLibraryPanel({ onAddDrill, onViewDetails }: DrillLibraryPanelProps) {
-	const { user } = useAuth();
+	const { userProfile: user } = useAuth();
 
 	// Filter state
 	const [search, setSearch] = useState("");
@@ -518,7 +518,7 @@ export default function DrillLibraryPanel({ onAddDrill, onViewDetails }: DrillLi
 					</h3>
 					{/* Sort Dropdown */}
 					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
+						<DropdownMenuTrigger>
 							<button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-muted-foreground border border-border hover:border-border-strong hover:text-foreground hover:bg-surface-hover transition-all">
 								<ArrowUpDown size={12} />
 								<span>{SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label}</span>

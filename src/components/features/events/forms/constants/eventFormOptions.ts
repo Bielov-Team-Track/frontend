@@ -59,10 +59,6 @@ const FIELD_STEP_MAP: Record<string, number> = {
 	isPublic: 3,
 	usePaymentConfig: 4,
 	paymentConfig: 4,
-	usePayments: 4,
-	paymentsConfig: 4,
-	useBudget: 4,
-	budget: 4,
 };
 
 /** Returns the step number that a field belongs to */

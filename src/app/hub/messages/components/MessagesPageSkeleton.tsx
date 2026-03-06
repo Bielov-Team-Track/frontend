@@ -1,5 +1,3 @@
-import { ResizableContainer } from "@/components";
-
 const SkeletonPulse = ({ className }: { className?: string }) => (
 	<div className={`animate-pulse bg-surface rounded-md ${className}`} />
 );
@@ -18,7 +16,7 @@ const ChatListItemSkeleton = () => (
 );
 
 const ChatWindowSkeleton = () => (
-	<div className="flex flex-col h-full bg-background/50 backdrop-blur-xl border border-border">
+	<div className="flex flex-col h-full bg-background/50 backdrop-blur-xl border-l-0 md:border-l border-border">
 		{/* Header */}
 		<div className="h-16 border-b border-border flex items-center px-6 gap-3 shrink-0">
 			<SkeletonPulse className="w-10 h-10 rounded-full" />
@@ -56,8 +54,8 @@ const ChatWindowSkeleton = () => (
 					<SkeletonPulse className="h-3 w-12 rounded opacity-50" />
 				</div>
 			</div>
-            
-            {/* Right message */}
+
+			{/* Right message */}
 			<div className="flex gap-3 max-w-[60%] ml-auto flex-row-reverse">
 				<SkeletonPulse className="w-8 h-8 rounded-full shrink-0 mt-auto" />
 				<div className="flex flex-col gap-1 w-full items-end">
@@ -76,29 +74,41 @@ const ChatWindowSkeleton = () => (
 
 const MessagesPageSkeleton = () => {
 	return (
-		<div className="relative h-full w-full rounded-2xl overflow-hidden shadow-2xl">
-			<ResizableContainer
-				leftPanel={
-					<div className="rounded-2xl h-full min-h-0 bg-background/50 backdrop-blur-xl border border-border">
-						{/* Search Header */}
-						<div className="p-4 flex flex-col gap-4">
-							<div className="flex justify-between items-center px-2">
-								<SkeletonPulse className="h-8 w-24 rounded" />
+		<div className="relative h-[calc(100dvh-7rem)] w-full rounded-2xl overflow-hidden shadow-md bg-surface">
+			<div className="flex h-full min-h-0">
+				{/* Left Panel - Chat List */}
+				<div className="h-full min-h-0 shrink-0 w-full md:w-[384px]">
+					<div className="flex flex-col h-full bg-background/50 backdrop-blur-xl border border-border overflow-hidden shadow-2xl">
+						{/* Header */}
+						<div className="p-4 border-b border-border flex flex-col justify-between gap-4">
+							<div className="flex justify-between items-center px-1">
+								<SkeletonPulse className="h-7 w-24 rounded" />
 								<SkeletonPulse className="h-8 w-8 rounded-full" />
 							</div>
 							<SkeletonPulse className="h-10 w-full rounded-xl" />
 						</div>
-						
+
 						{/* Chat List */}
-						<div className="flex flex-col gap-1 overflow-hidden">
+						<div className="overflow-hidden flex-1 p-2 space-y-1">
 							{Array.from({ length: 8 }).map((_, i) => (
 								<ChatListItemSkeleton key={i} />
 							))}
 						</div>
 					</div>
-				}
-				rightPanel={<ChatWindowSkeleton />}
-			/>
+				</div>
+
+				{/* Resize Handle - desktop only */}
+				<div className="hidden md:flex items-center justify-center w-1.5 shrink-0">
+					<div className="w-px h-full bg-border" />
+				</div>
+
+				{/* Right Panel - Chat Window (hidden on mobile when no chat selected) */}
+				<div className="hidden md:flex md:flex-1 h-full min-h-0 min-w-0">
+					<div className="h-full min-h-0 flex flex-col w-full">
+						<ChatWindowSkeleton />
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 };

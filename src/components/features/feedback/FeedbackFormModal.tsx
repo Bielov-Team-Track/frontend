@@ -81,7 +81,7 @@ export function FeedbackFormModal({
 				.filter((p) => p.description.trim())
 				.map((p) => ({
 					description: p.description,
-					drillIds: p.drillIds.length > 0 ? p.drillIds : undefined,
+					drillIds: p.drills.length > 0 ? p.drills.map(d => d.drillId) : undefined,
 					mediaLinks: p.mediaLinks
 						.filter((m) => m.url.trim())
 						.map((m) => ({

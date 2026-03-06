@@ -126,7 +126,7 @@ function probeImage(url: string): Promise<boolean> {
 export function useUrlVerification(url: string, debounceMs = 400): UrlVerification {
 	const [result, setResult] = useState<UrlVerification>(INITIAL);
 	const abortRef = useRef<AbortController | null>(null);
-	const timerRef = useRef<ReturnType<typeof setTimeout>>();
+	const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
 	useEffect(() => {
 		// Clean up pending work

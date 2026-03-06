@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback - Card Grid</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        primary: '#FF7D00',
+        secondary: '#29757A',
+        success: '#4A7A45',
+        error: '#BE3F23',
+        info: '#2E5A88',
+        warning: '#D99100',
+        base: { light: '#F5F5F5', dark: '#121A1B' },
+        subtle: { light: '#EBEBEB', dark: '#1E292B' },
+        surface: { light: '#FFFFFF', dark: '#243335' },
+        raised: { light: '#F0F0F0', dark: '#2C383A' },
+        overlay: { light: '#FFFFFF', dark: '#344345' },
+      },
+      fontFamily: {
+        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #29757A40; border-radius: 3px; }
+
+  .glass-card {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Card hover effect */
+  .feedback-card {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .feedback-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12), 0 0 0 1px rgba(255, 125, 0, 0.08);
+  }
+  .dark .feedback-card:hover {
+    box-shadow: 0 12px 28px rgba(0,0,0,0.3), 0 0 0 1px rgba(255, 125, 0, 0.12);
+  }
+
+  /* Modal */
+  .modal-backdrop {
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+  .modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .modal-content {
+    transform: translateY(20px) scale(0.97);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .modal-backdrop.open .modal-content {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  /* View toggle */
+  .view-btn.active {
+    background: #FF7D00;
+    color: white;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-card {
+    animation: fadeUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+  }
+
+  /* List view styles */
+  .list-view .cards-grid {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .list-view .feedback-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+  }
+  .list-view .feedback-card .card-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+  }
+  .list-view .feedback-card .card-comment {
+    display: none;
+  }
+  .list-view .feedback-card .card-meta-bottom {
+    display: none;
+  }
+  .list-view .feedback-card .card-event-badge {
+    display: none;
+  }
+  .list-view .card-header-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .list-view .list-only { display: flex !important; }
+
+  /* Praise gradient border */
+  .praise-border {
+    position: relative;
+  }
+  .praise-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #FF7D00, #D99100, #FF7D00);
+    z-index: -1;
+    opacity: 0.4;
+  }
+</style>
+</head>
+<body class="bg-base-light dark:bg-base-dark text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+
+<!-- Top Bar -->
+<header class="sticky top-0 z-40 glass-card bg-base-light/80 dark:bg-base-dark/80 border-b border-gray-200/20 dark:border-white/5">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <button onclick="history.back()" class="p-1.5 rounded-lg hover:bg-subtle-light dark:hover:bg-subtle-dark transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 class="text-lg font-semibold">Feedback</h1>
+    </div>
+    <div class="flex items-center gap-2">
+      <!-- View toggle -->
+      <div class="flex items-center bg-subtle-light dark:bg-subtle-dark rounded-lg p-0.5">
+        <button class="view-btn active p-1.5 rounded-md transition-all" onclick="setView('grid', this)" title="Grid view">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        </button>
+        <button class="view-btn p-1.5 rounded-md text-gray-500 transition-all" onclick="setView('list', this)" title="List view">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+      <!-- Filter -->
+      <div class="relative">
+        <button onclick="document.getElementById('filterDropdown').classList.toggle('hidden')" class="p-2 rounded-lg hover:bg-subtle-light dark:hover:bg-subtle-dark transition-colors flex items-center gap-1 text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+          <span class="hidden sm:inline text-xs font-medium">Filter</span>
+        </button>
+        <div id="filterDropdown" class="hidden absolute right-0 top-full mt-1 w-52 glass-card bg-surface-light/95 dark:bg-raised-dark/95 rounded-xl shadow-xl p-3 space-y-3 z-50">
+          <div>
+            <label class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Coach</label>
+            <select class="mt-1 w-full text-xs bg-subtle-light dark:bg-subtle-dark rounded-lg px-2.5 py-1.5 border-0">
+              <option>All Coaches</option>
+              <option>Coach Smith</option>
+              <option>Coach Lee</option>
+              <option>Coach Kim</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Period</label>
+            <select class="mt-1 w-full text-xs bg-subtle-light dark:bg-subtle-dark rounded-lg px-2.5 py-1.5 border-0">
+              <option>All Time</option>
+              <option>This Month</option>
+              <option>Last 3 Months</option>
+              <option>This Season</option>
+            </select>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary/20">
+            <span class="text-xs">Only with praise</span>
+          </label>
+        </div>
+      </div>
+      <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-subtle-light dark:hover:bg-subtle-dark transition-colors">
+        <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-4 sm:px-6 py-5" id="mainContent">
+
+  <!-- Summary Bar -->
+  <div class="flex items-center gap-4 mb-5 overflow-x-auto pb-1">
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <div class="w-2 h-2 rounded-full bg-primary"></div>
+      <span class="text-sm"><strong class="text-primary">12</strong> Feedback</span>
+    </div>
+    <div class="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <div class="w-2 h-2 rounded-full bg-secondary"></div>
+      <span class="text-sm"><strong class="text-secondary">24</strong> Points</span>
+    </div>
+    <div class="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <div class="w-2 h-2 rounded-full bg-warning"></div>
+      <span class="text-sm"><strong class="text-warning">8</strong> Praise</span>
+    </div>
+    <div class="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <div class="w-2 h-2 rounded-full bg-info"></div>
+      <span class="text-sm"><strong class="text-info">5</strong> Drills</span>
+    </div>
+  </div>
+
+  <!-- Card Grid -->
+  <div class="cards-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+    <!-- Card 1 -->
+    <div class="feedback-card glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm cursor-pointer animate-card" style="animation-delay: 0.05s" onclick="openModal(0)">
+      <div class="p-4">
+        <div class="card-body">
+          <div class="card-header-info">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-xs font-bold text-secondary">MS</div>
+                <div>
+                  <div class="text-sm font-semibold">Coach Smith</div>
+                  <div class="text-[11px] text-gray-500">Jan 28, 2026</div>
+                </div>
+              </div>
+              <span class="text-lg" title="Team Player Badge">&#129309;</span>
+            </div>
+            <div class="list-only hidden items-center gap-4 text-xs text-gray-500">
+              <span>2 points</span>
+              <span>1 drill</span>
+            </div>
+          </div>
+          <div class="card-event-badge">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-subtle-light/80 dark:bg-subtle-dark/80 text-xs font-medium mb-3">
+              <span>&#127912;</span> Beach Tournament Finals
+            </div>
+          </div>
+          <p class="card-comment text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">"Great improvement on your serve consistency this tournament. Your float serve was particularly effective in the second set."</p>
+          <div class="card-meta-bottom flex items-center gap-3 mt-3 pt-3 border-t border-gray-200/20 dark:border-white/5">
+            <span class="flex items-center gap-1 text-xs text-secondary font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/></svg>
+              2 points
+            </span>
+            <span class="flex items-center gap-1 text-xs text-primary font-medium">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              1 drill
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="feedback-card glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm cursor-pointer animate-card" style="animation-delay: 0.1s" onclick="openModal(1)">
+      <div class="p-4">
+        <div class="card-body">
+          <div class="card-header-info">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-info/20 flex items-center justify-center text-xs font-bold text-info">JL</div>
+                <div>
+                  <div class="text-sm font-semibold">Coach Lee</div>
+                  <div class="text-[11px] text-gray-500">Jan 21, 2026</div>
+                </div>
+              </div>
+            </div>
+            <div class="list-only hidden items-center gap-4 text-xs text-gray-500">
+              <span>3 points</span>
+              <span>2 drills</span>
+            </div>
+          </div>
+          <div class="card-event-badge">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-subtle-light/80 dark:bg-subtle-dark/80 text-xs font-medium mb-3">
+              <span>&#127947;</span> Club Practice Session
+            </div>
+          </div>
+          <p class="card-comment text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">"Your defensive reads are getting better but you need to work on your platform angle when passing from zone 5."</p>
+          <div class="card-meta-bottom flex items-center gap-3 mt-3 pt-3 border-t border-gray-200/20 dark:border-white/5">
+            <span class="flex items-center gap-1 text-xs text-secondary font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/></svg>
+              3 points
+            </span>
+            <span class="flex items-center gap-1 text-xs text-primary font-medium">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              2 drills
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="feedback-card glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm cursor-pointer animate-card" style="animation-delay: 0.15s" onclick="openModal(2)">
+      <div class="p-4">
+        <div class="card-body">
+          <div class="card-header-info">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-warning/20 flex items-center justify-center text-xs font-bold text-warning">SK</div>
+                <div>
+                  <div class="text-sm font-semibold">Coach Kim</div>
+                  <div class="text-[11px] text-gray-500">Jan 15, 2026</div>
+                </div>
+              </div>
+              <span class="text-lg" title="Star Player Badge">&#11088;</span>
+            </div>
+            <div class="list-only hidden items-center gap-4 text-xs text-gray-500">
+              <span>1 point</span>
+            </div>
+          </div>
+          <div class="card-event-badge">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-subtle-light/80 dark:bg-subtle-dark/80 text-xs font-medium mb-3">
+              <span>&#127950;</span> Indoor League Match
+            </div>
+          </div>
+          <p class="card-comment text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">"Outstanding performance tonight. Your setting decisions were on point, especially the quick sets to the middle."</p>
+          <div class="card-meta-bottom flex items-center gap-3 mt-3 pt-3 border-t border-gray-200/20 dark:border-white/5">
+            <span class="flex items-center gap-1 text-xs text-secondary font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/></svg>
+              1 point
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="feedback-card glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm cursor-pointer animate-card" style="animation-delay: 0.2s" onclick="openModal(3)">
+      <div class="p-4">
+        <div class="card-body">
+          <div class="card-header-info">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-xs font-bold text-secondary">MS</div>
+                <div>
+                  <div class="text-sm font-semibold">Coach Smith</div>
+                  <div class="text-[11px] text-gray-500">Jan 8, 2026</div>
+                </div>
+              </div>
+            </div>
+            <div class="list-only hidden items-center gap-4 text-xs text-gray-500">
+              <span>2 points</span>
+              <span>1 drill</span>
+            </div>
+          </div>
+          <div class="card-event-badge">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-subtle-light/80 dark:bg-subtle-dark/80 text-xs font-medium mb-3">
+              <span>&#127947;</span> Pre-Season Training Camp
+            </div>
+          </div>
+          <p class="card-comment text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">"Good intensity at camp. Your blocking timing has improved since last season. Need more consistency in serve receive."</p>
+          <div class="card-meta-bottom flex items-center gap-3 mt-3 pt-3 border-t border-gray-200/20 dark:border-white/5">
+            <span class="flex items-center gap-1 text-xs text-secondary font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/></svg>
+              2 points
+            </span>
+            <span class="flex items-center gap-1 text-xs text-primary font-medium">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              1 drill
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="feedback-card glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm cursor-pointer animate-card" style="animation-delay: 0.25s" onclick="openModal(4)">
+      <div class="p-4">
+        <div class="card-body">
+          <div class="card-header-info">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-info/20 flex items-center justify-center text-xs font-bold text-info">JL</div>
+                <div>
+                  <div class="text-sm font-semibold">Coach Lee</div>
+                  <div class="text-[11px] text-gray-500">Dec 18, 2025</div>
+                </div>
+              </div>
+              <span class="text-lg" title="Max Effort Badge">&#128170;</span>
+            </div>
+            <div class="list-only hidden items-center gap-4 text-xs text-gray-500">
+              <span>2 points</span>
+            </div>
+          </div>
+          <div class="card-event-badge">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-subtle-light/80 dark:bg-subtle-dark/80 text-xs font-medium mb-3">
+              <span>&#127942;</span> End-of-Season Tournament
+            </div>
+          </div>
+          <p class="card-comment text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">"Incredible effort in the semifinals. You dove for every ball and kept rallies alive. Your attitude lifted the entire team."</p>
+          <div class="card-meta-bottom flex items-center gap-3 mt-3 pt-3 border-t border-gray-200/20 dark:border-white/5">
+            <span class="flex items-center gap-1 text-xs text-secondary font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/></svg>
+              2 points
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="feedback-card glass-card bg-surface-light/80 dark:bg-surface-dark/70 rounded-xl shadow-sm cursor-pointer animate-card" style="animation-delay: 0.3s" onclick="openModal(5)">
+      <div class="p-4">
+        <div class="card-body">
+          <div class="card-header-info">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-xs font-bold text-secondary">MS</div>
+                <div>
+                  <div class="text-sm font-semibold">Coach Smith</div>
+                  <div class="text-[11px] text-gray-500">Dec 10, 2025</div>
+                </div>
+              </div>
+              <span class="text-lg" title="Breakthrough Badge">&#128640;</span>
+            </div>
+            <div class="list-only hidden items-center gap-4 text-xs text-gray-500">
+              <span>1 point</span>
+            </div>
+          </div>
+          <div class="card-event-badge">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-subtle-light/80 dark:bg-subtle-dark/80 text-xs font-medium mb-3">
+              <span>&#127947;</span> Weekly Practice
+            </div>
+          </div>
+          <p class="card-comment text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">"Breakthrough in your jump serve today. The toss placement was consistent and you finally got that topspin working."</p>
+          <div class="card-meta-bottom flex items-center gap-3 mt-3 pt-3 border-t border-gray-200/20 dark:border-white/5">
+            <span class="flex items-center gap-1 text-xs text-secondary font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/></svg>
+              1 point
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Detail Modal -->
+<div id="feedbackModal" class="modal-backdrop fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50" onclick="closeModal(event)">
+  <div class="modal-content glass-card bg-surface-light/95 dark:bg-overlay-dark/95 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[85vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
+    <div class="sticky top-0 glass-card bg-surface-light/90 dark:bg-overlay-dark/90 px-5 py-4 flex items-center justify-between border-b border-gray-200/20 dark:border-white/5 z-10">
+      <div class="flex items-center gap-3">
+        <div id="modalAvatar" class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"></div>
+        <div>
+          <div id="modalCoach" class="text-sm font-semibold"></div>
+          <div id="modalDate" class="text-xs text-gray-500"></div>
+        </div>
+      </div>
+      <button onclick="closeModal()" class="p-1.5 rounded-lg hover:bg-subtle-light dark:hover:bg-subtle-dark transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="p-5 space-y-4" id="modalBody">
+      <!-- Content injected by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+const feedbackData = [
+  {
+    coach: 'Coach Smith', initials: 'MS', color: 'secondary', date: 'January 28, 2026',
+    event: '&#127912; Beach Tournament Finals',
+    comment: 'Great improvement on your serve consistency this tournament. Your float serve was particularly effective in the second set. Keep working on the jump serve power.',
+    points: [
+      { text: 'Work on back-row attack positioning - arriving too early and losing power on the approach', drill: 'Back-Row Approach Drill' },
+      { text: 'Improve communication on defense - call the ball louder and earlier on cross-court attacks' }
+    ],
+    praise: { badge: '&#129309;', name: 'Team Player', message: 'Excellent court communication and supporting teammates through tough rallies.' }
+  },
+  {
+    coach: 'Coach Lee', initials: 'JL', color: 'info', date: 'January 21, 2026',
+    event: '&#127947; Club Practice Session',
+    comment: 'Your defensive reads are getting better but you need to work on your platform angle when passing from zone 5. Focus on keeping your shoulders square to the target.',
+    points: [
+      { text: 'Fix platform angle on zone 5 passes - shoulders need to face zone 3', drill: 'Platform Passing Drill' },
+      { text: 'Move feet first before reaching for the ball on dig attempts', drill: 'Footwork & Dig Drill' },
+      { text: 'Work on transitioning faster from defense to attack position after a dig' }
+    ],
+    praise: null
+  },
+  {
+    coach: 'Coach Kim', initials: 'SK', color: 'warning', date: 'January 15, 2026',
+    event: '&#127950; Indoor League Match',
+    comment: 'Outstanding performance tonight. Your setting decisions were on point, especially the quick sets to the middle. You read the block perfectly and distributed the ball beautifully.',
+    points: [
+      { text: 'Try incorporating more back-row sets when the middle is well-blocked' }
+    ],
+    praise: { badge: '&#11088;', name: 'Star Player', message: 'MVP of tonight\'s match. 42 assists with a .350 team hitting percentage.' }
+  },
+  {
+    coach: 'Coach Smith', initials: 'MS', color: 'secondary', date: 'January 8, 2026',
+    event: '&#127947; Pre-Season Training Camp',
+    comment: 'Good intensity at camp. Your blocking timing has improved since last season. Need to see more consistency in serve receive - too many shanked passes on hard-driven serves.',
+    points: [
+      { text: 'Serve receive consistency on hard-driven serves - get lower and absorb pace', drill: 'Serve Receive Under Pressure' },
+      { text: 'Keep eye on the setter before committing to a block - jumping too early on quick sets' }
+    ],
+    praise: null
+  },
+  {
+    coach: 'Coach Lee', initials: 'JL', color: 'info', date: 'December 18, 2025',
+    event: '&#127942; End-of-Season Tournament',
+    comment: 'Incredible effort in the semifinals. You dove for every ball and kept rallies alive that nobody expected. Your attitude lifted the entire team.',
+    points: [
+      { text: 'Channel energy into smarter positioning instead of always diving' },
+      { text: 'Pace yourself better in long matches - effort dropped noticeably in set 4' }
+    ],
+    praise: { badge: '&#128170;', name: 'Maximum Effort', message: 'The heart of the team today. 28 digs including 6 incredible saves.' }
+  },
+  {
+    coach: 'Coach Smith', initials: 'MS', color: 'secondary', date: 'December 10, 2025',
+    event: '&#127947; Weekly Practice',
+    comment: 'I saw a breakthrough in your jump serve today. The toss placement was consistent and you finally got that topspin working. This is the level I\'ve been waiting to see.',
+    points: [
+      { text: 'Now that the topspin is there, work on adding more zones to target' }
+    ],
+    praise: { badge: '&#128640;', name: 'Breakthrough Moment', message: 'Your jump serve went from a liability to a weapon today.' }
+  }
+];
+
+function openModal(index) {
+  const fb = feedbackData[index];
+  const modal = document.getElementById('feedbackModal');
+  const avatar = document.getElementById('modalAvatar');
+  const colorMap = { secondary: '#29757A', info: '#2E5A88', warning: '#D99100' };
+
+  avatar.textContent = fb.initials;
+  avatar.className = `w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold`;
+  avatar.style.background = colorMap[fb.color] + '30';
+  avatar.style.color = colorMap[fb.color];
+
+  document.getElementById('modalCoach').textContent = fb.coach;
+  document.getElementById('modalDate').textContent = fb.date;
+
+  let html = `
+    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-subtle-light/80 dark:bg-subtle-dark/80 text-xs font-medium">${fb.event}</div>
+    <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">"${fb.comment}"</p>
+  `;
+
+  if (fb.points.length) {
+    html += `<div><h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Improvement Points</h4><div class="space-y-2">`;
+    fb.points.forEach((pt, i) => {
+      html += `<div class="flex items-start gap-2 p-2.5 rounded-lg bg-subtle-light/50 dark:bg-subtle-dark/50">
+        <div class="w-5 h-5 rounded-full bg-info/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="text-info text-xs font-bold">${i+1}</span></div>
+        <div><p class="text-sm text-gray-700 dark:text-gray-300">${pt.text}</p>
+        ${pt.drill ? `<a href="#" class="inline-flex items-center gap-1.5 px-2.5 py-1 mt-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium transition-colors">
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>${pt.drill}</a>` : ''}
+        </div></div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  if (fb.praise) {
+    html += `<div><h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Praise</h4>
+      <div class="p-3 rounded-lg border border-primary/20 bg-primary/5">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">${fb.praise.badge}</span>
+          <div><span class="text-sm font-medium text-primary">${fb.praise.name}</span>
+          <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">"${fb.praise.message}"</p></div>
+        </div>
+      </div></div>`;
+  }
+
+  document.getElementById('modalBody').innerHTML = html;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('feedbackModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function setView(view, btn) {
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const main = document.getElementById('mainContent');
+  if (view === 'list') {
+    main.classList.add('list-view');
+  } else {
+    main.classList.remove('list-view');
+  }
+}
+
+function toggleTheme() {
+  document.documentElement.classList.toggle('dark');
+}
+
+// Close dropdown on click outside
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('filterDropdown');
+  if (!e.target.closest('[onclick*="filterDropdown"]') && !dd.contains(e.target)) {
+    dd.classList.add('hidden');
+  }
+});
+
+// ESC to close modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>

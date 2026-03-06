@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { CheckCircle2, ClipboardList, PauseCircle } from "lucide-react";
 
-import { Avatar, Badge, Button, Card, CardContent } from "@/components/ui";
+import { Avatar, Badge, Button, Card, CardContent, Loader } from "@/components/ui";
 import { useEvaluationSession, useSessionScores, useSubmitExerciseScores } from "@/hooks/useEvaluations";
 import { useRealtimeEvaluationSession } from "@/hooks/useRealtimeEvaluationSession";
 import { useEvaluationSessionStore } from "@/lib/realtime/evaluationSessionStore";
@@ -15,7 +15,7 @@ import { ExerciseNav } from "@/components/features/evaluations/session";
 import { MetricInput } from "@/components/features/evaluations/session";
 import { PlayerNav } from "@/components/features/evaluations/session";
 
-import { useEventContext } from "../../../layout";
+import { useEventContext } from "../../layout";
 
 // ---------------------------------------------------------------------------
 // Paused overlay
@@ -99,7 +99,7 @@ function extractLocalScores(score: PlayerExerciseScoreDto | undefined): Record<s
 // Main page
 // ---------------------------------------------------------------------------
 
-export default function EvaluationRunPage() {
+function EvaluationRunPageContent() {
 	const params = useParams();
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -385,7 +385,7 @@ export default function EvaluationRunPage() {
 
 	const sortedMetrics = currentExercise?.metrics.slice().sort((a, b) => a.order - b.order) ?? [];
 
-	const isDisabled = effectiveStatus === "Paused" || effectiveStatus === "Completed" || effectiveStatus === "Draft";
+	const isDisabled = effectiveStatus === "Paused" || (effectiveStatus as string) === "Completed" || effectiveStatus === "Draft";
 
 	return (
 		<div className="space-y-4 relative">
@@ -520,5 +520,13 @@ export default function EvaluationRunPage() {
 				</div>
 			)}
 		</div>
+	);
+}
+
+export default function EvaluationRunPage() {
+	return (
+		<Suspense fallback={<Loader size="lg" />}>
+			<EvaluationRunPageContent />
+		</Suspense>
 	);
 }

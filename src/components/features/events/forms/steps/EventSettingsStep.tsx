@@ -13,7 +13,7 @@ const eventFormatCards = [
 		icon: UserPlus,
 	},
 	{
-		value: EventFormat.ListTeams,
+		value: EventFormat.OpenTeams,
 		label: "Open Teams",
 		description: "Teams with flexible player slots",
 		icon: UsersRound,

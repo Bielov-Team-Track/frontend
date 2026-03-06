@@ -9,7 +9,7 @@ import { COURT_WIDTH, COURT_HEIGHT, COURT_PADDING } from "../constants"
  * Returns `null` if the SVG ref is not available.
  */
 export function getSVGCoordinates(
-	e: React.MouseEvent<SVGSVGElement> | React.DragEvent<SVGSVGElement>,
+	e: React.MouseEvent | React.DragEvent,
 	svgRef: React.RefObject<SVGSVGElement | null>,
 	courtViewMode: CourtViewMode
 ): { x: number; y: number } | null {

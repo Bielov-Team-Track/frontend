@@ -45,7 +45,7 @@ export default function TrainingEditMode({ timeline, setTimeline, eventDuration,
 	const createEventPlanMutation = useCreateEventPlan();
 
 	// Computed values
-	const plannedDuration = timeline.reduce((acc, item) => acc + item.duration, 0);
+	const plannedDuration = timeline.reduce((acc, item) => acc + (item.duration ?? 0), 0);
 	const remainingTime = eventDuration - plannedDuration;
 	const progressPercent = Math.min((plannedDuration / eventDuration) * 100, 100);
 
@@ -332,7 +332,7 @@ function TimelineList({
 			<div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-accent border-4 border-background" />
 
 			{timeline.map((item, index) => {
-				const accumulatedTime = timeline.slice(0, index).reduce((a, b) => a + b.duration, 0);
+				const accumulatedTime = timeline.slice(0, index).reduce((a, b) => a + (b.duration ?? 0), 0);
 				const timeLabel = formatTime(accumulatedTime);
 
 				return (

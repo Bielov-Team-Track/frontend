@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Season Strength & Skills - Training Plan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #121A1B;
+            color: #F5F5F5;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            padding-right: 120px;
+        }
+
+        /* Hero Header */
+        .hero-card {
+            background: rgba(36, 51, 53, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid #344345;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .hero-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #F5F5F5;
+        }
+
+        .hero-description {
+            font-size: 16px;
+            color: #A0A0A0;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .meta-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            background: #243335;
+            border: 1px solid #344345;
+        }
+
+        .badge-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .author-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #344345;
+            margin-bottom: 24px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF7D00, #29757A);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .author-info {
+            flex: 1;
+        }
+
+        .author-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .author-role {
+            font-size: 13px;
+            color: #A0A0A0;
+        }
+
+        .timeline-preview {
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            margin-bottom: 24px;
+        }
+
+        .timeline-segment {
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-segment:hover {
+            opacity: 0.8;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #FF7D00;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #FF8F1A;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 125, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: #243335;
+            color: #F5F5F5;
+            border: 1px solid #344345;
+        }
+
+        .btn-secondary:hover {
+            background: #2C383A;
+            border-color: #FF7D00;
+        }
+
+        /* Analytics Strip */
+        .analytics-strip {
+            margin-bottom: 48px;
+        }
+
+        .analytics-section {
+            margin-bottom: 16px;
+        }
+
+        .analytics-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #666666;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pill {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pill-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Timeline Flow */
+        .timeline-flow {
+            display: flex;
+            gap: 24px;
+            position: relative;
+        }
+
+        .timeline-left {
+            width: 80px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(
+                to bottom,
+                #29757A 0%,
+                #29757A 22%,
+                #2E5A88 22%,
+                #2E5A88 72%,
+                #4A7A45 72%,
+                #4A7A45 100%
+            );
+        }
+
+        .timeline-marker {
+            position: relative;
+            margin-bottom: 20px;
+            padding-left: 36px;
+        }
+
+        .timeline-time {
+            font-size: 14px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            color: #A0A0A0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 16px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid #121A1B;
+        }
+
+        .intensity-sparkline {
+            position: absolute;
+            left: 44px;
+            top: 60px;
+            width: 30px;
+            opacity: 0.5;
+        }
+
+        .timeline-right {
+            flex: 1;
+        }
+
+        /* Section Header */
+        .section-header {
+            background: linear-gradient(90deg, rgba(41, 117, 122, 0.15), rgba(41, 117, 122, 0.02));
+            border-left: 4px solid #29757A;
+            padding: 16px 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            margin-top: 8px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #F5F5F5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-meta {
+            font-size: 13px;
+            color: #A0A0A0;
+            margin-top: 4px;
+        }
+
+        /* Drill Card */
+        .drill-card {
+            background: rgba(36, 51, 53, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid #344345;
+            border-left: 3px solid #29757A;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .drill-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border-color: #FF7D00;
+        }
+
+        .drill-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .drill-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #F5F5F5;
+            flex: 1;
+        }
+
+        .duration-badge {
+            background: rgba(255, 125, 0, 0.15);
+            color: #FF7D00;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            border: 1px solid rgba(255, 125, 0, 0.3);
+        }
+
+        .drill-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid;
+        }
+
+        .tag-category {
+            background: rgba(61, 188, 196, 0.15);
+            border-color: rgba(61, 188, 196, 0.3);
+            color: #3DBCC4;
+        }
+
+        .tag-intensity {
+            background: rgba(217, 145, 0, 0.15);
+            border-color: rgba(217, 145, 0, 0.3);
+            color: #D99100;
+        }
+
+        .tag-intensity.low {
+            background: rgba(74, 122, 69, 0.15);
+            border-color: rgba(74, 122, 69, 0.3);
+            color: #6ABF62;
+        }
+
+        .tag-intensity.high {
+            background: rgba(190, 63, 35, 0.15);
+            border-color: rgba(190, 63, 35, 0.3);
+            color: #E85A3D;
+        }
+
+        .drill-skills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .skill-pill {
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+            background: #1E292B;
+            color: #A0A0A0;
+            border: 1px solid #344345;
+        }
+
+        .drill-notes {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #344345;
+            font-size: 13px;
+            color: #A0A0A0;
+            font-style: italic;
+        }
+
+        /* Section Transition */
+        .section-transition {
+            text-align: center;
+            margin: 32px 0;
+            position: relative;
+        }
+
+        .transition-line {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #344345 20%, #344345 80%, transparent);
+            margin: 16px 0;
+        }
+
+        .transition-text {
+            font-size: 13px;
+            color: #666666;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Session End */
+        .session-end {
+            background: linear-gradient(135deg, rgba(74, 122, 69, 0.15), rgba(41, 117, 122, 0.1));
+            border: 2px solid #4A7A45;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .session-end-title {
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #6ABF62;
+            margin-bottom: 8px;
+        }
+
+        .session-end-summary {
+            font-size: 14px;
+            color: #A0A0A0;
+        }
+
+        /* Mini Map */
+        .mini-map {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            background: rgba(36, 51, 53, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid #344345;
+            border-radius: 12px;
+            padding: 16px 12px;
+            z-index: 100;
+        }
+
+        .mini-map-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #666666;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .mini-map-bar {
+            width: 100%;
+            height: 200px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mini-map-segment {
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #121A1B;
+        }
+
+        .mini-map-segment:hover {
+            opacity: 0.7;
+        }
+
+        .mini-map-indicator {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #FF7D00;
+            box-shadow: 0 0 8px rgba(255, 125, 0, 0.6);
+            transition: top 0.3s ease;
+        }
+
+        /* Color variants for different categories */
+        .drill-card.warmup { border-left-color: #29757A; }
+        .drill-card.technical { border-left-color: #2E5A88; }
+        .drill-card.tactical { border-left-color: #FF7D00; }
+        .drill-card.game { border-left-color: #D99100; }
+        .drill-card.cooldown { border-left-color: #4A7A45; }
+
+        .section-header.technical {
+            background: linear-gradient(90deg, rgba(46, 90, 136, 0.15), rgba(46, 90, 136, 0.02));
+            border-left-color: #2E5A88;
+        }
+
+        .section-header.cooldown {
+            background: linear-gradient(90deg, rgba(74, 122, 69, 0.15), rgba(74, 122, 69, 0.02));
+            border-left-color: #4A7A45;
+        }
+
+        .tag-category.technical {
+            background: rgba(91, 155, 213, 0.15);
+            border-color: rgba(91, 155, 213, 0.3);
+            color: #5B9BD5;
+        }
+
+        .tag-category.tactical {
+            background: rgba(255, 149, 51, 0.15);
+            border-color: rgba(255, 149, 51, 0.3);
+            color: #FF9533;
+        }
+
+        .tag-category.game {
+            background: rgba(255, 188, 51, 0.15);
+            border-color: rgba(255, 188, 51, 0.3);
+            color: #FFBC33;
+        }
+
+        .tag-category.cooldown {
+            background: rgba(106, 191, 98, 0.15);
+            border-color: rgba(106, 191, 98, 0.3);
+            color: #6ABF62;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding-right: 20px;
+            }
+
+            .mini-map {
+                display: none;
+            }
+
+            .timeline-left {
+                width: 60px;
+            }
+
+            .intensity-sparkline {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Header -->
+        <div class="hero-card">
+            <h1 class="hero-title">Pre-Season Strength & Skills</h1>
+            <p class="hero-description">
+                A comprehensive 90-minute session designed for intermediate players. Focuses on serving, attacking, and defensive transitions with proper warmup and cooldown.
+            </p>
+
+            <div class="meta-badges">
+                <span class="badge">
+                    <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                        <path d="M12 6v6l4 2" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    90 minutes
+                </span>
+                <span class="badge">
+                    <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    12 drills
+                </span>
+                <span class="badge">
+                    <svg class="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    3 sections
+                </span>
+                <span class="badge">Intermediate</span>
+                <span class="badge">Public</span>
+            </div>
+
+            <div class="author-row">
+                <div class="avatar">CD</div>
+                <div class="author-info">
+                    <div class="author-name">Coach Denys</div>
+                    <div class="author-role">Head Volleyball Coach</div>
+                </div>
+            </div>
+
+            <div class="timeline-preview">
+                <div class="timeline-segment" style="width: 22.2%; background: #29757A;" title="Warmup - 20min"></div>
+                <div class="timeline-segment" style="width: 50%; background: #2E5A88;" title="Core Skills - 45min"></div>
+                <div class="timeline-segment" style="width: 27.8%; background: #4A7A45;" title="Cooldown - 25min"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary">Use in Event</button>
+                <button class="btn btn-secondary">Edit Template</button>
+                <button class="btn btn-secondary">Duplicate</button>
+            </div>
+        </div>
+
+        <!-- Analytics Strip -->
+        <div class="analytics-strip">
+            <div class="analytics-section">
+                <div class="analytics-label">Category Breakdown</div>
+                <div class="pill-row">
+                    <div class="pill" style="background: rgba(61, 188, 196, 0.15); color: #3DBCC4;">
+                        <span class="pill-dot" style="background: #29757A;"></span>
+                        Warmup 15m
+                    </div>
+                    <div class="pill" style="background: rgba(91, 155, 213, 0.15); color: #5B9BD5;">
+                        <span class="pill-dot" style="background: #2E5A88;"></span>
+                        Technical 23m
+                    </div>
+                    <div class="pill" style="background: rgba(255, 149, 51, 0.15); color: #FF9533;">
+                        <span class="pill-dot" style="background: #FF7D00;"></span>
+                        Tactical 22m
+                    </div>
+                    <div class="pill" style="background: rgba(255, 188, 51, 0.15); color: #FFBC33;">
+                        <span class="pill-dot" style="background: #D99100;"></span>
+                        Game 20m
+                    </div>
+                    <div class="pill" style="background: rgba(106, 191, 98, 0.15); color: #6ABF62;">
+                        <span class="pill-dot" style="background: #4A7A45;"></span>
+                        Cooldown 10m
+                    </div>
+                </div>
+            </div>
+
+            <div class="analytics-section">
+                <div class="analytics-label">Intensity Distribution</div>
+                <div class="pill-row">
+                    <div class="pill" style="background: rgba(74, 122, 69, 0.15); color: #6ABF62;">
+                        <span class="pill-dot" style="background: #4A7A45;"></span>
+                        Low 25m
+                    </div>
+                    <div class="pill" style="background: rgba(217, 145, 0, 0.15); color: #D99100;">
+                        <span class="pill-dot" style="background: #D99100;"></span>
+                        Medium 34m
+                    </div>
+                    <div class="pill" style="background: rgba(190, 63, 35, 0.15); color: #E85A3D;">
+                        <span class="pill-dot" style="background: #BE3F23;"></span>
+                        High 31m
+                    </div>
+                </div>
+            </div>
+
+            <div class="analytics-section">
+                <div class="analytics-label">Skills Practiced</div>
+                <div class="pill-row">
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Flexibility</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Ball Control</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Passing</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Setting</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Serving</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Attacking</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Blocking</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Defense</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Positioning</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Transition</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Teamwork</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Game Play</div>
+                    <div class="pill" style="background: #1E292B; color: #A0A0A0;">Communication</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Flow -->
+        <div class="timeline-flow">
+            <!-- Left Column: Timeline -->
+            <div class="timeline-left">
+                <div class="timeline-line"></div>
+
+                <!-- Intensity Sparkline -->
+                <svg class="intensity-sparkline" viewBox="0 0 30 500" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="intensityGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4A7A45;stop-opacity:0.3" />
+                            <stop offset="15%" style="stop-color:#4A7A45;stop-opacity:0.3" />
+                            <stop offset="20%" style="stop-color:#D99100;stop-opacity:0.4" />
+                            <stop offset="35%" style="stop-color:#BE3F23;stop-opacity:0.5" />
+                            <stop offset="65%" style="stop-color:#BE3F23;stop-opacity:0.5" />
+                            <stop offset="75%" style="stop-color:#D99100;stop-opacity:0.4" />
+                            <stop offset="85%" style="stop-color:#4A7A45;stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:#4A7A45;stop-opacity:0.3" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M 15 490 L 15 460 L 10 430 L 8 400 L 12 370 L 5 340 L 15 300 L 22 260 L 25 220 L 23 180 L 20 140 L 15 100 L 10 60 L 8 20 L 10 10"
+                          fill="url(#intensityGradient)"
+                          stroke="#666666"
+                          stroke-width="1"
+                          opacity="0.6"/>
+                </svg>
+
+                <!-- Time Markers -->
+                <div class="timeline-marker">
+                    <div class="timeline-dot" style="background: #4A7A45;"></div>
+                    <div class="timeline-time">0:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 250px;">
+                    <div class="timeline-dot" style="background: #4A7A45;"></div>
+                    <div class="timeline-time">8:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 180px;">
+                    <div class="timeline-dot" style="background: #D99100;"></div>
+                    <div class="timeline-time">15:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 580px;">
+                    <div class="timeline-dot" style="background: #D99100;"></div>
+                    <div class="timeline-time">20:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 700px;">
+                    <div class="timeline-dot" style="background: #BE3F23;"></div>
+                    <div class="timeline-time">30:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 540px;">
+                    <div class="timeline-dot" style="background: #BE3F23;"></div>
+                    <div class="timeline-time">38:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 550px;">
+                    <div class="timeline-dot" style="background: #BE3F23;"></div>
+                    <div class="timeline-time">45:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 520px;">
+                    <div class="timeline-dot" style="background: #D99100;"></div>
+                    <div class="timeline-time">52:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 500px;">
+                    <div class="timeline-dot" style="background: #D99100;"></div>
+                    <div class="timeline-time">59:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 360px;">
+                    <div class="timeline-dot" style="background: #D99100;"></div>
+                    <div class="timeline-time">64:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 900px;">
+                    <div class="timeline-dot" style="background: #D99100;"></div>
+                    <div class="timeline-time">65:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 350px;">
+                    <div class="timeline-dot" style="background: #4A7A45;"></div>
+                    <div class="timeline-time">80:00</div>
+                </div>
+                <div class="timeline-marker" style="margin-top: 350px;">
+                    <div class="timeline-dot" style="background: #4A7A45;"></div>
+                    <div class="timeline-time">85:00</div>
+                </div>
+            </div>
+
+            <!-- Right Column: Content -->
+            <div class="timeline-right">
+                <!-- Section 1: Warmup -->
+                <div class="section-header">
+                    <div class="section-title">
+                        WARMUP
+                        <span style="font-weight: 400; opacity: 0.6;">·</span>
+                        <span style="font-weight: 400; font-size: 12px;">3 drills · 20 min</span>
+                    </div>
+                </div>
+
+                <!-- Drill 1 -->
+                <div class="drill-card warmup">
+                    <div class="drill-header">
+                        <div class="drill-name">Dynamic Stretching</div>
+                        <div class="duration-badge">8 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category">Warmup</div>
+                        <div class="tag tag-intensity low">Low</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Flexibility</div>
+                    </div>
+                </div>
+
+                <!-- Drill 2 -->
+                <div class="drill-card warmup">
+                    <div class="drill-header">
+                        <div class="drill-name">Light Jogging with Ball</div>
+                        <div class="duration-badge">7 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category">Warmup</div>
+                        <div class="tag tag-intensity low">Low</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Ball Control</div>
+                    </div>
+                </div>
+
+                <!-- Drill 3 -->
+                <div class="drill-card technical">
+                    <div class="drill-header">
+                        <div class="drill-name">Pepper Drill</div>
+                        <div class="duration-badge">5 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category technical">Technical</div>
+                        <div class="tag tag-intensity">Medium</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Passing</div>
+                        <div class="skill-pill">Setting</div>
+                    </div>
+                </div>
+
+                <!-- Transition -->
+                <div class="section-transition">
+                    <div class="transition-line"></div>
+                    <div class="transition-text">20 minutes elapsed</div>
+                    <div class="transition-line"></div>
+                </div>
+
+                <!-- Section 2: Core Skills -->
+                <div class="section-header technical">
+                    <div class="section-title">
+                        CORE SKILLS
+                        <span style="font-weight: 400; opacity: 0.6;">·</span>
+                        <span style="font-weight: 400; font-size: 12px;">6 drills · 45 min</span>
+                    </div>
+                </div>
+
+                <!-- Drill 4 -->
+                <div class="drill-card technical">
+                    <div class="drill-header">
+                        <div class="drill-name">Serve Receive Formation</div>
+                        <div class="duration-badge">10 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category technical">Technical</div>
+                        <div class="tag tag-intensity">Medium</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Passing</div>
+                        <div class="skill-pill">Positioning</div>
+                    </div>
+                </div>
+
+                <!-- Drill 5 -->
+                <div class="drill-card technical">
+                    <div class="drill-header">
+                        <div class="drill-name">Float Serve Practice</div>
+                        <div class="duration-badge">8 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category technical">Technical</div>
+                        <div class="tag tag-intensity high">High</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Serving</div>
+                    </div>
+                </div>
+
+                <!-- Drill 6 -->
+                <div class="drill-card tactical">
+                    <div class="drill-header">
+                        <div class="drill-name">Quick Attack Combo</div>
+                        <div class="duration-badge">8 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category tactical">Tactical</div>
+                        <div class="tag tag-intensity high">High</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Attacking</div>
+                        <div class="skill-pill">Setting</div>
+                    </div>
+                </div>
+
+                <!-- Drill 7 -->
+                <div class="drill-card tactical">
+                    <div class="drill-header">
+                        <div class="drill-name">Block-Transition Drill</div>
+                        <div class="duration-badge">7 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category tactical">Tactical</div>
+                        <div class="tag tag-intensity high">High</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Blocking</div>
+                        <div class="skill-pill">Transition</div>
+                    </div>
+                </div>
+
+                <!-- Drill 8 -->
+                <div class="drill-card tactical">
+                    <div class="drill-header">
+                        <div class="drill-name">Defensive Rotation</div>
+                        <div class="duration-badge">7 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category tactical">Tactical</div>
+                        <div class="tag tag-intensity">Medium</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Defense</div>
+                        <div class="skill-pill">Positioning</div>
+                    </div>
+                </div>
+
+                <!-- Drill 9 -->
+                <div class="drill-card game">
+                    <div class="drill-header">
+                        <div class="drill-name">Free Ball Side-out</div>
+                        <div class="duration-badge">5 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category game">Game</div>
+                        <div class="tag tag-intensity">Medium</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Teamwork</div>
+                    </div>
+                </div>
+
+                <!-- Transition -->
+                <div class="section-transition">
+                    <div class="transition-line"></div>
+                    <div class="transition-text">65 minutes elapsed</div>
+                    <div class="transition-line"></div>
+                </div>
+
+                <!-- Section 3: Cooldown -->
+                <div class="section-header cooldown">
+                    <div class="section-title">
+                        COOLDOWN
+                        <span style="font-weight: 400; opacity: 0.6;">·</span>
+                        <span style="font-weight: 400; font-size: 12px;">3 drills · 25 min</span>
+                    </div>
+                </div>
+
+                <!-- Drill 10 -->
+                <div class="drill-card game">
+                    <div class="drill-header">
+                        <div class="drill-name">6v6 Controlled Scrimmage</div>
+                        <div class="duration-badge">15 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category game">Game</div>
+                        <div class="tag tag-intensity">Medium</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Teamwork</div>
+                        <div class="skill-pill">Game Play</div>
+                    </div>
+                </div>
+
+                <!-- Drill 11 -->
+                <div class="drill-card cooldown">
+                    <div class="drill-header">
+                        <div class="drill-name">Static Stretching</div>
+                        <div class="duration-badge">5 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category cooldown">Cooldown</div>
+                        <div class="tag tag-intensity low">Low</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Flexibility</div>
+                    </div>
+                </div>
+
+                <!-- Drill 12 -->
+                <div class="drill-card cooldown">
+                    <div class="drill-header">
+                        <div class="drill-name">Team Debrief</div>
+                        <div class="duration-badge">5 min</div>
+                    </div>
+                    <div class="drill-tags">
+                        <div class="tag tag-category cooldown">Cooldown</div>
+                        <div class="tag tag-intensity low">Low</div>
+                    </div>
+                    <div class="drill-skills">
+                        <div class="skill-pill">Communication</div>
+                    </div>
+                </div>
+
+                <!-- Session End -->
+                <div class="session-end">
+                    <div class="session-end-title">Session Complete · 90 Minutes</div>
+                    <div class="session-end-summary">
+                        12 drills completed across 3 sections | Intensity progression: Low → High → Low
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mini Map -->
+    <div class="mini-map">
+        <div class="mini-map-title">Session</div>
+        <div class="mini-map-bar">
+            <div class="mini-map-segment" style="height: 22.2%; background: #29757A;" onclick="scrollToSection(0)"></div>
+            <div class="mini-map-segment" style="height: 50%; background: #2E5A88;" onclick="scrollToSection(1)"></div>
+            <div class="mini-map-segment" style="height: 27.8%; background: #4A7A45;" onclick="scrollToSection(2)"></div>
+            <div class="mini-map-indicator" id="scrollIndicator"></div>
+        </div>
+    </div>
+
+    <script>
+        // Scroll indicator
+        function updateScrollIndicator() {
+            const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+            const indicator = document.getElementById('scrollIndicator');
+            if (indicator) {
+                indicator.style.top = `${scrollPercent * 190}px`;
+            }
+        }
+
+        window.addEventListener('scroll', updateScrollIndicator);
+        updateScrollIndicator();
+
+        // Scroll to section
+        function scrollToSection(index) {
+            const headers = document.querySelectorAll('.section-header');
+            if (headers[index]) {
+                headers[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Drill card hover effect
+        document.querySelectorAll('.drill-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.borderLeftWidth = '4px';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.borderLeftWidth = '3px';
+            });
+        });
+    </script>
+</body>
+</html>

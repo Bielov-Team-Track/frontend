@@ -1,18 +1,20 @@
 "use client";
 
-import { Avatar } from "@/components";
+import { Avatar, Button } from "@/components";
 import { InviteeSelectorModal } from "@/components/features/events/forms/steps/registration";
 import { getClub, getClubMembers, getGroupsByClubPaged, getPendingRegistrationsCount, getTeamsByClubPaged, inviteMembers } from "@/lib/api/clubs";
-import { Club, Group, Team } from "@/lib/models/Club";
+import { Club, ClubRole, Group, Team } from "@/lib/models/Club";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ScrollableTabBar } from "@/components";
-import { ArrowLeft, Building2, Calendar, ImageOff, Layers, Newspaper, Settings, Shield, UserPlus, Users } from "lucide-react";
+import { ArrowLeft, Building2, Calendar, ImageOff, Layers, Lock, Newspaper, Settings, Shield, UserPlus, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { createContext, useContext, useMemo, useState } from "react";
 import { CursorPagedResult } from "@/lib/models/Pagination";
 import { InfiniteData, FetchNextPageOptions, InfiniteQueryObserverResult } from "@tanstack/react-query";
+import { useRoleSummary } from "@/hooks/useRoleSummary";
+import { ClubPermissions, useClubPermissions } from "@/hooks/useClubPermissions";
 
 // Context to share club data with child pages
 interface ClubContextValue {
@@ -37,6 +39,8 @@ interface ClubContextValue {
 	groupsTotalCount: number;
 	isLoading: boolean;
 	showInviteModal: () => void;
+	myRoles: ClubRole[];
+	permissions: ClubPermissions;
 }
 
 const ClubContext = createContext<ClubContextValue | null>(null);
@@ -122,11 +126,25 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 	const teamsTotalCount = teamsInfinite.data?.pages[0]?.totalCount ?? teams.length;
 	const groupsTotalCount = groupsInfinite.data?.pages[0]?.totalCount ?? groups.length;
 
+	// Role-based access
+	const { data: roleSummary, isLoading: roleSummaryLoading } = useRoleSummary();
+	const myRoles = useMemo(() => {
+		const clubSummary = roleSummary?.clubs.find((c) => c.clubId === clubId);
+		return clubSummary?.roles ?? [];
+	}, [roleSummary, clubId]);
+
+	const permissions = useClubPermissions(myRoles);
+
 	const { data: pendingCount = 0 } = useQuery({
 		queryKey: ["club-registrations-count", clubId],
 		queryFn: () => getPendingRegistrationsCount(clubId),
-		enabled: !!clubId,
+		enabled: !!clubId && permissions.canManageRegistrations,
 	});
+
+	const visibleTabs = useMemo(
+		() => TABS.filter((tab) => tab.id !== "settings" || permissions.canAccessSettings),
+		[permissions.canAccessSettings]
+	);
 
 	// Mutations
 	const inviteMutation = useMutation({
@@ -145,7 +163,7 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 			case "groups":
 				return groupsTotalCount;
 			case "members":
-				return pendingCount > 0 ? `+${pendingCount}` : members.length;
+				return permissions.canManageRegistrations && pendingCount > 0 ? `+${pendingCount}` : members.length;
 			default:
 				return undefined;
 		}
@@ -159,7 +177,7 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 	};
 
 	// Loading state
-	if (clubLoading) {
+	if (clubLoading || roleSummaryLoading) {
 		return (
 			<div className="flex items-center justify-center h-96">
 				<span className="loading loading-spinner loading-lg text-accent" />
@@ -176,6 +194,46 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 				<Link href="/hub/clubs" className="text-accent hover:underline">
 					Back to clubs
 				</Link>
+			</div>
+		);
+	}
+
+	// Non-members see a gate with link to apply
+	if (myRoles.length === 0) {
+		return (
+			<div className="flex flex-col items-center justify-center py-20 px-4">
+				<div className="max-w-md w-full text-center">
+					<div className="mb-6 flex justify-center">
+						{club.logoUrl ? (
+							<Avatar src={club.logoUrl} variant="club" size="xl" />
+						) : (
+							<div className="w-20 h-20 rounded-2xl bg-surface border border-border flex items-center justify-center">
+								<Lock className="w-8 h-8 text-muted" />
+							</div>
+						)}
+					</div>
+					<h2 className="text-xl font-bold text-foreground mb-2">{club.name}</h2>
+					<div className="flex items-center justify-center gap-2 mb-4">
+						<Lock size={14} className="text-muted" />
+						<span className="text-muted text-sm">Members Only</span>
+					</div>
+					<p className="text-muted mb-8">
+						You need to be a member to view this club&apos;s content. Apply to join and get access once your application is approved.
+					</p>
+					<div className="flex flex-col sm:flex-row gap-3 justify-center">
+						<Button asChild>
+							<Link href={`/clubs/${clubId}/register`}>Apply to Join</Link>
+						</Button>
+						{club.isPublic && (
+							<Button variant="secondary" asChild>
+								<Link href={`/clubs/${clubId}`}>View Public Page</Link>
+							</Button>
+						)}
+						<Button variant="ghost" asChild>
+							<Link href="/hub/clubs">Back to My Clubs</Link>
+						</Button>
+					</div>
+				</div>
 			</div>
 		);
 	}
@@ -204,6 +262,8 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 				groupsTotalCount,
 				isLoading: clubLoading,
 				showInviteModal: () => setShowInviteModal(true),
+				myRoles,
+				permissions,
 			}}>
 			<div className="space-y-6">
 				{/* Header */}
@@ -265,7 +325,7 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
 
 					{/* Tabs */}
 					<ScrollableTabBar>
-						{TABS.map((tab) => {
+						{visibleTabs.map((tab) => {
 							const count = getTabCount(tab.id);
 							const isActive = activeTab === tab.id;
 							return (

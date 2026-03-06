@@ -515,7 +515,7 @@ function StepMetrics({
 								<div key={index} className="flex items-center gap-2">
 									<Select
 										value={sw.skill}
-										onChange={(value) => updateSkillWeight(index, "skill", value)}
+										onChange={(value) => updateSkillWeight(index, "skill", value ?? "")}
 										options={VOLLEYBALL_SKILLS.filter(
 											(skill) => skill === sw.skill || !currentMetric.skillWeights.some((w) => w.skill === skill)
 										).map((skill) => ({ value: skill, label: skill }))}

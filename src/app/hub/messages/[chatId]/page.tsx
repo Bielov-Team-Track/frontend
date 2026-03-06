@@ -13,7 +13,7 @@ const MessagesPage = () => {
 	useEffect(() => {
 		loadChatsForUser()
 			.then((data) => {
-				setChats(data);
+				setChats(data.items);
 				setIsLoading(false);
 			})
 			.catch((err) => {

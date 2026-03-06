@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluation Plan Builder — Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        base: '#121A1B',
+        subtle: '#1E292B',
+        surface: '#243335',
+        raised: '#2C383A',
+        overlay: '#344345',
+        border: '#2C383A',
+        'border-strong': '#3A4A4D',
+        muted: '#666666',
+        foreground: '#F5F5F5',
+        primary: '#FF7D00',
+        secondary: '#29757A',
+        accent: '#FF7D00',
+        success: '#4A7A45',
+        error: '#BE3F23',
+        info: '#2E5A88',
+        warning: '#D99100',
+        hover: '#2C383A',
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: Inter, system-ui, sans-serif; background: #121A1B; color: #F5F5F5; }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #3A4A4D; border-radius: 3px; }
+  .drag-ghost { opacity: 0.4; }
+  .drag-over { border-color: #FF7D00 !important; background: rgba(255,125,0,0.05) !important; }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+  .animate-slide-in { animation: slideIn 0.3s ease-out; }
+
+  /* Session bar */
+  .session-bar { position: relative; height: 40px; background: #1E292B; border-radius: 10px; overflow: visible; }
+  .session-bar-inner { position: relative; height: 100%; border-radius: 10px; overflow: hidden; }
+  .session-segment { position: absolute; top: 3px; bottom: 3px; border-radius: 7px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; overflow: hidden; }
+  .session-segment:hover { filter: brightness(1.2); transform: scaleY(1.08); z-index: 2; }
+  .session-segment .seg-label { font-size: 10px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 8px; }
+  .session-segment.overflow { opacity: 0.45; }
+  .session-end-marker { position: absolute; top: -4px; bottom: -4px; width: 2px; background: #BE3F23; z-index: 20; border-radius: 1px; }
+  .session-end-marker::after { content: 'END'; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 8px; font-weight: 700; color: #BE3F23; letter-spacing: 0.05em; }
+  .section-span { position: absolute; top: 0; height: 100%; display: flex; align-items: center; overflow: hidden; border-radius: 4px; }
+  .section-span-label { font-size: 9px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 5px; letter-spacing: 0.03em; text-transform: uppercase; }
+
+  /* Range slider (dual thumb) */
+  .range-slider-container { position: relative; height: 24px; }
+  .range-slider-track { position: absolute; top: 50%; left: 0; right: 0; height: 6px; transform: translateY(-50%); background: #2C383A; border-radius: 3px; }
+  .range-slider-fill { position: absolute; top: 50%; height: 6px; transform: translateY(-50%); background: linear-gradient(90deg, #FF7D00, #D99100); border-radius: 3px; transition: left 0.1s, right 0.1s; }
+  .range-slider-thumb { position: absolute; top: 50%; width: 20px; height: 20px; border-radius: 50%; background: #FF7D00; border: 3px solid #121A1B; box-shadow: 0 0 0 2px #FF7D0060, 0 2px 8px rgba(0,0,0,0.3); cursor: grab; transform: translate(-50%, -50%); z-index: 10; transition: box-shadow 0.2s; }
+  .range-slider-thumb:hover { box-shadow: 0 0 0 3px #FF7D0080, 0 2px 12px rgba(255,125,0,0.3); }
+  .range-slider-thumb:active, .range-slider-thumb.dragging { cursor: grabbing; box-shadow: 0 0 0 4px #FF7D00A0, 0 2px 16px rgba(255,125,0,0.4); }
+  .range-slider-thumb.max-thumb { background: #D99100; }
+  .range-slider-label { position: absolute; top: -18px; transform: translateX(-50%); font-size: 10px; font-weight: 600; color: #F5F5F5; white-space: nowrap; }
+
+  /* Skill bucket card */
+  .skill-bucket { position: relative; overflow: hidden; }
+  .skill-bucket::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .skill-bucket-bar { transition: width 0.5s ease-out; }
+
+  /* Filter dropdown */
+  .filter-dropdown { display: none; }
+  .filter-dropdown.open { display: block; }
+</style>
+</head>
+<body class="min-h-screen">
+<div class="max-w-[1440px] mx-auto p-6">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <a href="#" class="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-4">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Plans
+    </a>
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-foreground">Create Evaluation Plan</h1>
+        <p class="text-sm text-muted mt-1">Build a reusable player assessment template</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="px-4 py-2 rounded-xl text-sm font-medium text-muted border border-border hover:border-border-strong hover:text-foreground transition-all">Cancel</button>
+        <button class="px-4 py-2 rounded-xl text-sm font-medium bg-primary text-white hover:brightness-110 transition-all flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save Template
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template Details (collapsible) -->
+  <div class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm mb-6">
+    <div class="flex items-center justify-between px-5 py-3 cursor-pointer" onclick="toggleDetails()">
+      <div class="flex items-center gap-3">
+        <h2 class="text-sm font-bold text-foreground">Template Details</h2>
+        <span id="detailsSummary" class="text-xs text-muted"></span>
+      </div>
+      <svg id="detailsChevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted transition-transform"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div id="detailsContent" class="px-5 pb-5 border-t border-border">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+        <div>
+          <label class="block text-xs font-medium text-muted mb-1.5">Name <span class="text-error">*</span></label>
+          <input type="text" id="templateName" placeholder="e.g., Tryout Evaluation" oninput="updateDetailsSummary()"
+            class="w-full px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all" value="Setter Skills Assessment" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-muted mb-1.5">Description</label>
+          <input type="text" id="templateDesc" placeholder="What does this plan evaluate?"
+            class="w-full px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all" value="Comprehensive setter evaluation for intermediate+ players" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-muted mb-1.5">Club <span class="text-muted/50">(optional)</span></label>
+          <select id="templateClub" class="w-full px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm outline-none cursor-pointer focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all" onchange="updateDetailsSummary()">
+            <option value="">Personal (no club)</option>
+            <option value="c1">Kyiv Volleyball Club</option>
+            <option value="c2">Beach Warriors</option>
+            <option value="c3">Spike Academy</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-muted mb-1.5">Visibility</label>
+          <div class="flex gap-2">
+            <button id="visPrivate" onclick="setVisibility('Private')" class="flex-1 px-3 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary border border-primary/30 transition-all">Private</button>
+            <button id="visPublic" onclick="setVisibility('Public')" class="flex-1 px-3 py-2 rounded-lg text-sm font-medium text-muted border border-border hover:border-border-strong transition-all">Public</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Overview -->
+  <div class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm p-5 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-sm font-bold text-foreground uppercase tracking-wider">Plan Overview</h2>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="timeDisplay" class="text-sm"><span class="font-bold text-foreground">0</span><span class="text-muted">m total</span></span>
+        </div>
+        <div class="w-px h-4 bg-border"></div>
+        <div class="flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span id="pointsDisplay" class="text-sm"><span class="font-bold text-primary">0</span><span class="text-muted"> pts</span></span>
+          <span id="pointsStatus" class="text-xs font-medium text-muted ml-1"></span>
+        </div>
+        <div class="w-px h-4 bg-border"></div>
+        <span id="exerciseCount" class="text-xs font-medium text-muted">0 exercises</span>
+      </div>
+    </div>
+
+    <!-- Points range slider -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs text-muted">Target Points Range</span>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-foreground" id="rangeDisplay">50 - 150 pts</span>
+        </div>
+      </div>
+      <div class="relative px-3">
+        <div class="range-slider-container" id="pointsRangeSlider">
+          <div class="range-slider-track"></div>
+          <div class="range-slider-fill" id="rangeFill"></div>
+          <div class="range-slider-thumb min-thumb" id="minThumb" data-type="min">
+            <span class="range-slider-label" id="minLabel">50</span>
+          </div>
+          <div class="range-slider-thumb max-thumb" id="maxThumb" data-type="max">
+            <span class="range-slider-label" id="maxLabel">150</span>
+          </div>
+        </div>
+        <div class="flex justify-between mt-3">
+          <span class="text-[9px] text-muted/50 font-mono">0</span>
+          <span class="text-[9px] text-muted/50 font-mono">50</span>
+          <span class="text-[9px] text-muted/50 font-mono">100</span>
+          <span class="text-[9px] text-muted/50 font-mono">150</span>
+          <span class="text-[9px] text-muted/50 font-mono">200</span>
+          <span class="text-[9px] text-muted/50 font-mono">250</span>
+          <span class="text-[9px] text-muted/50 font-mono">300</span>
+        </div>
+      </div>
+      <!-- Current points indicator -->
+      <div class="mt-4 flex items-center gap-3">
+        <div class="flex-1 h-2 rounded-full bg-subtle overflow-hidden">
+          <div id="currentPointsBar" class="h-full rounded-full transition-all duration-300" style="width: 0%; background: #4A7A45;"></div>
+        </div>
+        <span id="currentPointsLabel" class="text-xs font-medium text-muted w-20 text-right">0 / 50-150</span>
+      </div>
+    </div>
+
+    <!-- Timeline bar -->
+    <div class="session-bar mb-1" id="sessionBar">
+      <div class="session-bar-inner" id="sessionBarInner">
+        <div class="absolute inset-0 flex items-center justify-center text-xs text-muted/30" id="barEmpty">Add exercises to visualize your plan</div>
+      </div>
+    </div>
+    <div class="relative h-5 mb-4" id="sessionSections"></div>
+
+    <!-- Skill Buckets -->
+    <div>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xs font-bold text-muted uppercase tracking-wider">Skill Distribution</h3>
+        <span class="text-[10px] text-muted/50" id="skillCoverage">0/7 skills covered</span>
+      </div>
+      <div class="grid grid-cols-7 gap-2" id="skillBuckets"></div>
+    </div>
+  </div>
+
+  <!-- Main Split Layout -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT: Exercise Library -->
+    <div class="lg:col-span-4 space-y-4">
+      <!-- Search + Filters -->
+      <div class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm p-4">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="exerciseSearch" placeholder="Search exercises..." class="w-full pl-9 pr-20 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all" oninput="renderExerciseLibrary()" />
+          <button onclick="toggleFilters()" id="filterToggle" class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium text-muted hover:text-foreground border border-border hover:border-border-strong transition-all">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span id="filterToggleLabel">Filters</span>
+            <span id="activeFilterCount" class="hidden w-4 h-4 rounded-full bg-primary text-white text-[9px] flex items-center justify-center font-bold">0</span>
+          </button>
+        </div>
+
+        <!-- Collapsible filter panel -->
+        <div id="filterPanel" class="hidden mt-3 pt-3 border-t border-border space-y-2.5">
+          <!-- Skills row -->
+          <div class="flex items-center gap-2">
+            <span class="text-[9px] font-bold text-muted uppercase tracking-wider w-14 flex-shrink-0">Skills</span>
+            <div class="flex flex-wrap gap-1" id="skillFilters"></div>
+          </div>
+          <!-- Duration row -->
+          <div class="flex items-center gap-2">
+            <span class="text-[9px] font-bold text-muted uppercase tracking-wider w-14 flex-shrink-0">Time</span>
+            <div class="flex gap-1" id="durationFilters"></div>
+          </div>
+          <!-- Points row -->
+          <div class="flex items-center gap-2">
+            <span class="text-[9px] font-bold text-muted uppercase tracking-wider w-14 flex-shrink-0">Points</span>
+            <div class="flex gap-1" id="pointsFilters"></div>
+          </div>
+          <!-- Clear all -->
+          <div class="flex justify-end">
+            <button onclick="clearAllFilters()" class="text-[10px] text-muted/50 hover:text-primary transition-colors">Clear all filters</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exercise List -->
+      <div class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm overflow-hidden flex flex-col" style="max-height: 480px;">
+        <div class="px-4 py-3 border-b border-border flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-foreground text-sm">Exercise Library</h3>
+            <p class="text-xs text-muted mt-0.5" id="exerciseCountLabel">12 exercises</p>
+          </div>
+          <!-- Sort Dropdown -->
+          <div class="relative">
+            <button onclick="toggleSortDropdown()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-muted border border-border hover:border-border-strong hover:text-foreground transition-all">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5h10M11 9h7M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
+              <span id="sortLabel">Name</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div id="sortDropdown" class="filter-dropdown absolute right-0 top-full mt-1 w-40 bg-raised/95 backdrop-blur-lg shadow-lg rounded-xl border border-border py-1 z-20">
+              <button onclick="setSort('name')" class="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-hover transition-colors flex items-center justify-between">Name <span class="sort-check text-primary" data-sort="name">✓</span></button>
+              <button onclick="setSort('duration')" class="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-hover transition-colors flex items-center justify-between">Duration <span class="sort-check text-primary hidden" data-sort="duration">✓</span></button>
+              <button onclick="setSort('points')" class="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-hover transition-colors flex items-center justify-between">Points <span class="sort-check text-primary hidden" data-sort="points">✓</span></button>
+              <button onclick="setSort('metrics')" class="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-hover transition-colors flex items-center justify-between">Metric Count <span class="sort-check text-primary hidden" data-sort="metrics">✓</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-thin" id="exerciseLibrary"></div>
+      </div>
+
+      <!-- Quick Add Exercise -->
+      <button onclick="openCreateExercise()" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-dashed border-border text-muted hover:border-primary/50 hover:text-primary transition-all">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create New Exercise
+      </button>
+    </div>
+
+    <!-- RIGHT: Plan Builder -->
+    <div class="lg:col-span-8 space-y-4">
+      <!-- Section actions row -->
+      <div class="flex items-center justify-between">
+        <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted border border-dashed border-border hover:border-primary/50 hover:text-primary transition-all" onclick="addSection()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Section
+        </button>
+        <button id="clearAllBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-medium text-muted border border-border hover:text-error hover:border-error/30 transition-all" onclick="clearPlan()">Clear All</button>
+      </div>
+
+      <!-- Plan Area -->
+      <div id="planArea" class="min-h-[400px]">
+        <!-- Empty State -->
+        <div id="emptyState" class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm p-12 text-center">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-subtle flex items-center justify-center mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-muted"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-1">Build your evaluation plan</h3>
+          <p class="text-sm text-muted mb-6 max-w-sm mx-auto">Drag exercises from the library or click to add them to your assessment</p>
+          <button class="px-4 py-2 rounded-xl text-sm font-medium border border-primary/30 text-primary hover:bg-primary/10 transition-all flex items-center gap-2 mx-auto">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Load Template
+          </button>
+        </div>
+
+        <!-- Plan Content -->
+        <div id="planContent" class="hidden">
+          <div class="relative pl-8" id="planList"></div>
+
+          <div id="dropZone" class="mt-4 p-5 rounded-xl border-2 border-dashed border-border text-center transition-all hover:border-primary/30"
+               ondragover="event.preventDefault()" ondrop="onDropZoneDrop(event)" ondragenter="this.classList.add('border-primary/50','bg-primary/5')" ondragleave="this.classList.remove('border-primary/50','bg-primary/5')">
+            <p class="text-sm text-muted">Drop exercises here or <button class="text-primary hover:underline" onclick="document.getElementById('exerciseSearch').focus()">browse library</button></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Exercise Detail Drawer -->
+<div id="exerciseDrawer" class="fixed inset-y-0 right-0 w-[480px] bg-overlay/95 backdrop-blur-xl shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+  <div class="h-full flex flex-col">
+    <div class="p-5 border-b border-border flex items-center justify-between">
+      <h3 class="font-bold text-foreground" id="drawerExerciseName"></h3>
+      <button onclick="closeDrawer()" class="p-2 rounded-lg hover:bg-hover text-muted hover:text-foreground transition-colors">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-5 space-y-4" id="drawerContent"></div>
+    <div class="p-4 border-t border-border">
+      <button class="w-full px-4 py-2.5 rounded-xl text-sm font-medium bg-primary text-white hover:brightness-110 transition-all flex items-center justify-center gap-2" onclick="addDrawerExerciseToPlan()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add to Plan
+      </button>
+    </div>
+  </div>
+</div>
+<div id="drawerOverlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 z-40" onclick="closeDrawer()"></div>
+
+<!-- Duration/Points Edit Popover -->
+<div id="editPopover" class="fixed bg-raised/95 backdrop-blur-lg shadow-lg rounded-xl border border-border p-4 z-50 hidden" style="min-width: 260px;">
+  <div class="space-y-3">
+    <div>
+      <label class="block text-xs font-medium text-muted mb-1.5">Duration (minutes)</label>
+      <div class="flex items-center gap-2">
+        <button class="w-8 h-8 rounded-lg bg-subtle border border-border text-foreground hover:bg-hover flex items-center justify-center" onclick="adjustPopoverValue('duration', -5)">-5</button>
+        <input type="number" id="popoverDuration" class="flex-1 px-3 py-1.5 rounded-lg bg-subtle/50 border border-border text-foreground text-sm text-center focus:border-primary/50 outline-none" min="1" />
+        <button class="w-8 h-8 rounded-lg bg-subtle border border-border text-foreground hover:bg-hover flex items-center justify-center" onclick="adjustPopoverValue('duration', 5)">+5</button>
+      </div>
+    </div>
+    <div>
+      <label class="block text-xs font-medium text-muted mb-1.5">Notes</label>
+      <textarea id="popoverNotes" class="w-full px-3 py-1.5 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 outline-none resize-none" rows="2" placeholder="Optional coach notes..."></textarea>
+    </div>
+  </div>
+  <div class="flex gap-2 mt-4">
+    <button class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium text-muted border border-border hover:text-foreground transition-all" onclick="closeEditPopover()">Cancel</button>
+    <button class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-white hover:brightness-110 transition-all" onclick="saveEdit()">Save</button>
+  </div>
+</div>
+
+<!-- Create Exercise Modal -->
+<div id="createExerciseModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div class="bg-surface rounded-2xl shadow-2xl w-full max-w-lg border border-border">
+    <div class="p-5 border-b border-border flex items-center justify-between">
+      <h3 class="font-bold text-foreground">Create New Exercise</h3>
+      <button onclick="closeCreateExercise()" class="p-2 rounded-lg hover:bg-hover text-muted hover:text-foreground transition-colors">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="p-5 space-y-4">
+      <div class="grid grid-cols-3 gap-3">
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-muted mb-1.5">Exercise Name <span class="text-error">*</span></label>
+          <input type="text" id="newExerciseName" placeholder="e.g., Quick Hands Drill"
+            class="w-full px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-muted mb-1.5">Duration</label>
+          <input type="number" id="newExerciseDuration" placeholder="10" value="10"
+            class="w-full px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 outline-none transition-all" />
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-muted mb-1.5">Description</label>
+        <textarea id="newExerciseDesc" rows="2" placeholder="What does this exercise evaluate?"
+          class="w-full px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none"></textarea>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-muted mb-1.5">Primary Skill</label>
+        <div class="flex flex-wrap gap-1.5" id="newExerciseSkills"></div>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-muted mb-1.5">Initial Metric</label>
+        <div class="grid grid-cols-4 gap-2">
+          <input type="text" id="newMetricName" placeholder="Metric name"
+            class="col-span-2 px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 outline-none" />
+          <select id="newMetricType" class="px-2 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm outline-none">
+            <option value="Slider">Slider</option>
+            <option value="Checkbox">Yes/No</option>
+            <option value="Number">Number</option>
+            <option value="Ratio">Ratio</option>
+          </select>
+          <input type="number" id="newMetricPoints" placeholder="10" value="10"
+            class="px-2 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm text-center focus:border-primary/50 outline-none" />
+        </div>
+      </div>
+    </div>
+    <div class="p-5 border-t border-border flex justify-end gap-3">
+      <button onclick="closeCreateExercise()" class="px-4 py-2 rounded-xl text-sm font-medium text-muted border border-border hover:text-foreground transition-all">Cancel</button>
+      <button onclick="createExercise()" class="px-4 py-2 rounded-xl text-sm font-medium bg-primary text-white hover:brightness-110 transition-all">Create Exercise</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+
+const SKILLS = ['Passing', 'Setting', 'Defending', 'Serving', 'Attacking', 'Blocking', 'Game'];
+const METRIC_TYPES = ['Checkbox', 'Slider', 'Number', 'Ratio'];
+const DURATION_RANGES = [
+  { label: '≤5m', min: 0, max: 5 },
+  { label: '5-10m', min: 5, max: 10 },
+  { label: '10-15m', min: 10, max: 15 },
+  { label: '15m+', min: 15, max: 999 },
+];
+const POINTS_RANGES = [
+  { label: '≤20', min: 0, max: 20 },
+  { label: '20-40', min: 20, max: 40 },
+  { label: '40-60', min: 40, max: 60 },
+  { label: '60+', min: 60, max: 9999 },
+];
+
+const SKILL_COLORS = {
+  Passing: '#29757A',
+  Setting: '#2E5A88',
+  Defending: '#4A7A45',
+  Serving: '#FF7D00',
+  Attacking: '#BE3F23',
+  Blocking: '#D99100',
+  Game: '#8B5CF6'
+};
+
+const SKILL_ICONS = {
+  Passing: '<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/>',
+  Setting: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+  Defending: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  Serving: '<circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 14.14 14.14"/>',
+  Attacking: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  Blocking: '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/>',
+  Game: '<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>'
+};
+
+const METRIC_TYPE_COLORS = {
+  Checkbox: '#4A7A45',
+  Slider: '#2E5A88',
+  Number: '#D99100',
+  Ratio: '#BE3F23'
+};
+
+const METRIC_TYPE_ICONS = {
+  Checkbox: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
+  Slider: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>',
+  Number: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>',
+  Ratio: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="19" x2="19" y2="5"/><circle cx="7" cy="7" r="2"/><circle cx="17" cy="17" r="2"/></svg>'
+};
+
+const SECTION_COLORS = ['#FF7D00','#29757A','#2E5A88','#D99100','#4A7A45','#BE3F23','#8B5CF6'];
+
+// Mock exercises with metrics and duration
+const MOCK_EXERCISES = [
+  {
+    id: 'e1',
+    name: 'Setting Accuracy Drill',
+    description: 'Evaluate setter accuracy to zones 2 and 4 under pressure',
+    duration: 12,
+    skills: ['Setting'],
+    metrics: [
+      { name: 'Technical Form', type: 'Slider', maxPoints: 10 },
+      { name: 'Zone 2 Accuracy', type: 'Ratio', maxPoints: 15, config: { format: 'X/10' } },
+      { name: 'Zone 4 Accuracy', type: 'Ratio', maxPoints: 15, config: { format: 'X/10' } },
+      { name: 'Consistent Hand Position', type: 'Checkbox', maxPoints: 5 }
+    ]
+  },
+  {
+    id: 'e2',
+    name: 'Quick Set Distribution',
+    description: 'Speed and decision-making in quick attack scenarios',
+    duration: 10,
+    skills: ['Setting', 'Game'],
+    metrics: [
+      { name: 'Reaction Time', type: 'Number', maxPoints: 10, config: { unit: 'ms', target: 300 } },
+      { name: 'Middle Quick Success', type: 'Ratio', maxPoints: 15, config: { format: 'X/8' } },
+      { name: 'Right-side Quick', type: 'Ratio', maxPoints: 15, config: { format: 'X/8' } }
+    ]
+  },
+  {
+    id: 'e3',
+    name: 'Serve Receive to Target',
+    description: 'Accuracy and consistency of first contact',
+    duration: 10,
+    skills: ['Passing'],
+    metrics: [
+      { name: 'Perfect Passes', type: 'Ratio', maxPoints: 20, config: { format: 'X/10' } },
+      { name: 'Platform Control', type: 'Slider', maxPoints: 10 },
+      { name: 'Footwork Quality', type: 'Slider', maxPoints: 10 }
+    ]
+  },
+  {
+    id: 'e4',
+    name: 'Attack Approach & Contact',
+    description: 'Full approach mechanics and hitting technique',
+    duration: 15,
+    skills: ['Attacking'],
+    metrics: [
+      { name: 'Approach Timing', type: 'Slider', maxPoints: 10 },
+      { name: 'Arm Swing Mechanics', type: 'Slider', maxPoints: 10 },
+      { name: 'Contact Point', type: 'Slider', maxPoints: 10 },
+      { name: 'Kills', type: 'Ratio', maxPoints: 15, config: { format: 'X/10' } },
+      { name: 'Hitting Errors', type: 'Number', maxPoints: 5, config: { inverse: true } }
+    ]
+  },
+  {
+    id: 'e5',
+    name: 'Block Positioning',
+    description: 'Block timing, positioning, and technique',
+    duration: 12,
+    skills: ['Blocking'],
+    metrics: [
+      { name: 'Footwork Speed', type: 'Slider', maxPoints: 10 },
+      { name: 'Jump Timing', type: 'Slider', maxPoints: 10 },
+      { name: 'Hand Penetration', type: 'Slider', maxPoints: 10 },
+      { name: 'Blocks', type: 'Number', maxPoints: 15 }
+    ]
+  },
+  {
+    id: 'e6',
+    name: 'Defensive Dig Drill',
+    description: 'Floor defense and ball control',
+    duration: 10,
+    skills: ['Defending'],
+    metrics: [
+      { name: 'Dig Quality', type: 'Slider', maxPoints: 10 },
+      { name: 'Successful Digs', type: 'Ratio', maxPoints: 20, config: { format: 'X/10' } },
+      { name: 'Emergency Save', type: 'Checkbox', maxPoints: 5 }
+    ]
+  },
+  {
+    id: 'e7',
+    name: 'Float Serve Assessment',
+    description: 'Float serve technique and targeting',
+    duration: 8,
+    skills: ['Serving'],
+    metrics: [
+      { name: 'Toss Consistency', type: 'Slider', maxPoints: 10 },
+      { name: 'Contact Quality', type: 'Slider', maxPoints: 10 },
+      { name: 'Aces', type: 'Number', maxPoints: 10 },
+      { name: 'Service Errors', type: 'Number', maxPoints: 5, config: { inverse: true } },
+      { name: 'Zone Targeting', type: 'Ratio', maxPoints: 15, config: { format: 'X/10' } }
+    ]
+  },
+  {
+    id: 'e8',
+    name: 'Jump Serve Power',
+    description: 'Jump serve mechanics and power',
+    duration: 10,
+    skills: ['Serving', 'Attacking'],
+    metrics: [
+      { name: 'Approach Mechanics', type: 'Slider', maxPoints: 10 },
+      { name: 'Toss Height', type: 'Slider', maxPoints: 5 },
+      { name: 'Arm Swing', type: 'Slider', maxPoints: 10 },
+      { name: 'Aces', type: 'Number', maxPoints: 15 },
+      { name: 'In-Play Serves', type: 'Ratio', maxPoints: 10, config: { format: 'X/10' } }
+    ]
+  },
+  {
+    id: 'e9',
+    name: '6v6 Game Awareness',
+    description: 'Decision-making and court awareness in game situations',
+    duration: 20,
+    skills: ['Game'],
+    metrics: [
+      { name: 'Court Awareness', type: 'Slider', maxPoints: 10 },
+      { name: 'Communication', type: 'Slider', maxPoints: 10 },
+      { name: 'Coverage', type: 'Slider', maxPoints: 10 },
+      { name: 'Smart Plays', type: 'Number', maxPoints: 10 }
+    ]
+  },
+  {
+    id: 'e10',
+    name: 'Transition Attack',
+    description: 'Dig to attack transition efficiency',
+    duration: 12,
+    skills: ['Defending', 'Attacking', 'Game'],
+    metrics: [
+      { name: 'Transition Speed', type: 'Slider', maxPoints: 10 },
+      { name: 'Successful Transitions', type: 'Ratio', maxPoints: 20, config: { format: 'X/10' } },
+      { name: 'Kill Conversion', type: 'Ratio', maxPoints: 15, config: { format: 'X/8' } }
+    ]
+  },
+  {
+    id: 'e11',
+    name: 'Setter Dump & Tip',
+    description: 'Setter offensive options and deception',
+    duration: 8,
+    skills: ['Setting', 'Attacking'],
+    metrics: [
+      { name: 'Deception', type: 'Slider', maxPoints: 10 },
+      { name: 'Dump Kills', type: 'Number', maxPoints: 15 },
+      { name: 'Tip Placement', type: 'Slider', maxPoints: 10 },
+      { name: 'Decision Quality', type: 'Slider', maxPoints: 10 }
+    ]
+  },
+  {
+    id: 'e12',
+    name: 'Back Row Attack',
+    description: 'Back row hitting technique and power',
+    duration: 12,
+    skills: ['Attacking'],
+    metrics: [
+      { name: 'Approach Depth', type: 'Slider', maxPoints: 10 },
+      { name: 'Jump Behind Line', type: 'Checkbox', maxPoints: 5 },
+      { name: 'Attack Power', type: 'Slider', maxPoints: 10 },
+      { name: 'Kills', type: 'Ratio', maxPoints: 20, config: { format: 'X/10' } }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+
+let plan = [];
+let sections = [];
+let selectedSkillFilters = new Set();
+let selectedDurationFilter = null;
+let selectedPointsFilter = null;
+let currentSort = 'name';
+let drawerExercise = null;
+let dragSrcId = null;
+let visibility = 'Private';
+let editingItemId = null;
+let newExerciseSkill = 'Game';
+let minPoints = 50;
+let maxPoints = 150;
+let draggingThumb = null;
+
+// ═══════════════════════════════════════════════════
+// POINTS RANGE SLIDER
+// ═══════════════════════════════════════════════════
+
+const POINTS_MIN = 0;
+const POINTS_MAX = 300;
+const SNAP_POINTS_VALUES = [0, 25, 50, 75, 100, 125, 150, 175, 200, 250, 300];
+const SNAP_THRESHOLD = 8;
+
+function snapPointsValue(raw) {
+  for (const sp of SNAP_POINTS_VALUES) {
+    if (Math.abs(raw - sp) <= SNAP_THRESHOLD) return sp;
+  }
+  return raw;
+}
+
+function initRangeSlider() {
+  const container = document.getElementById('pointsRangeSlider');
+  const minThumb = document.getElementById('minThumb');
+  const maxThumb = document.getElementById('maxThumb');
+
+  function onMouseDown(e) {
+    e.preventDefault();
+    draggingThumb = e.target.closest('.range-slider-thumb');
+    if (draggingThumb) {
+      draggingThumb.classList.add('dragging');
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    }
+  }
+
+  function onMouseMove(e) {
+    if (!draggingThumb) return;
+    const rect = container.getBoundingClientRect();
+    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const value = Math.round(POINTS_MIN + percent * (POINTS_MAX - POINTS_MIN));
+    const snapped = snapPointsValue(value);
+
+    if (draggingThumb.dataset.type === 'min') {
+      minPoints = Math.min(snapped, maxPoints - 10);
+    } else {
+      maxPoints = Math.max(snapped, minPoints + 10);
+    }
+    updateRangeSlider();
+    updateAll();
+  }
+
+  function onMouseUp() {
+    if (draggingThumb) {
+      draggingThumb.classList.remove('dragging');
+      draggingThumb = null;
+    }
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  }
+
+  minThumb.addEventListener('mousedown', onMouseDown);
+  maxThumb.addEventListener('mousedown', onMouseDown);
+
+  // Touch support
+  function onTouchStart(e) {
+    draggingThumb = e.target.closest('.range-slider-thumb');
+    if (draggingThumb) {
+      draggingThumb.classList.add('dragging');
+    }
+  }
+
+  function onTouchMove(e) {
+    if (!draggingThumb) return;
+    const touch = e.touches[0];
+    const rect = container.getBoundingClientRect();
+    const percent = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+    const value = Math.round(POINTS_MIN + percent * (POINTS_MAX - POINTS_MIN));
+    const snapped = snapPointsValue(value);
+
+    if (draggingThumb.dataset.type === 'min') {
+      minPoints = Math.min(snapped, maxPoints - 10);
+    } else {
+      maxPoints = Math.max(snapped, minPoints + 10);
+    }
+    updateRangeSlider();
+    updateAll();
+  }
+
+  function onTouchEnd() {
+    if (draggingThumb) {
+      draggingThumb.classList.remove('dragging');
+      draggingThumb = null;
+    }
+  }
+
+  container.addEventListener('touchstart', onTouchStart);
+  container.addEventListener('touchmove', onTouchMove);
+  container.addEventListener('touchend', onTouchEnd);
+
+  updateRangeSlider();
+}
+
+function updateRangeSlider() {
+  const minPercent = ((minPoints - POINTS_MIN) / (POINTS_MAX - POINTS_MIN)) * 100;
+  const maxPercent = ((maxPoints - POINTS_MIN) / (POINTS_MAX - POINTS_MIN)) * 100;
+
+  document.getElementById('minThumb').style.left = minPercent + '%';
+  document.getElementById('maxThumb').style.left = maxPercent + '%';
+  document.getElementById('rangeFill').style.left = minPercent + '%';
+  document.getElementById('rangeFill').style.right = (100 - maxPercent) + '%';
+
+  document.getElementById('minLabel').textContent = minPoints;
+  document.getElementById('maxLabel').textContent = maxPoints;
+  document.getElementById('rangeDisplay').textContent = `${minPoints} - ${maxPoints} pts`;
+}
+
+// ═══════════════════════════════════════════════════
+// SKILL BUCKETS
+// ═══════════════════════════════════════════════════
+
+function renderSkillBuckets() {
+  const container = document.getElementById('skillBuckets');
+
+  // Calculate points per skill
+  const skillPoints = {};
+  SKILLS.forEach(s => skillPoints[s] = 0);
+
+  plan.forEach(item => {
+    const itemPoints = getExercisePoints(item);
+    const pointsPerSkill = itemPoints / item.skills.length;
+    item.skills.forEach(s => {
+      skillPoints[s] += pointsPerSkill;
+    });
+  });
+
+  const maxPoints = Math.max(...Object.values(skillPoints), 1);
+  const totalPoints = plan.reduce((a, e) => a + getExercisePoints(e), 0);
+  const coveredSkills = SKILLS.filter(s => skillPoints[s] > 0).length;
+
+  document.getElementById('skillCoverage').textContent = `${coveredSkills}/${SKILLS.length} skills covered`;
+
+  container.innerHTML = SKILLS.map(skill => {
+    const points = Math.round(skillPoints[skill]);
+    const percentage = maxPoints > 0 ? (skillPoints[skill] / maxPoints) * 100 : 0;
+    const isActive = points > 0;
+    const shareOfTotal = totalPoints > 0 ? Math.round((skillPoints[skill] / totalPoints) * 100) : 0;
+
+    return `
+      <div class="skill-bucket rounded-xl p-3 transition-all ${isActive ? 'bg-subtle/80 border border-border' : 'bg-subtle/30 border border-transparent'}" style="${isActive ? `--bucket-color: ${SKILL_COLORS[skill]}` : ''}">
+        <div class="absolute top-0 left-0 right-0 h-[3px] rounded-t-xl" style="background: ${isActive ? SKILL_COLORS[skill] : '#3A4A4D'}"></div>
+
+        <!-- Skill Icon -->
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-2 mx-auto" style="background: ${isActive ? SKILL_COLORS[skill] + '20' : '#2C383A'}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${isActive ? SKILL_COLORS[skill] : '#666'}" stroke-width="2">
+            ${SKILL_ICONS[skill]}
+          </svg>
+        </div>
+
+        <!-- Skill Name -->
+        <div class="text-[10px] font-medium text-center truncate mb-2 ${isActive ? 'text-foreground' : 'text-muted/50'}">${skill}</div>
+
+        <!-- Points -->
+        <div class="text-center mb-2">
+          <span class="text-lg font-bold ${isActive ? 'text-foreground' : 'text-muted/30'}">${points}</span>
+          <span class="text-[9px] ${isActive ? 'text-muted' : 'text-muted/30'}">pts</span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="h-1.5 rounded-full bg-base overflow-hidden">
+          <div class="skill-bucket-bar h-full rounded-full" style="width: ${percentage}%; background: ${isActive ? SKILL_COLORS[skill] : '#3A4A4D'}"></div>
+        </div>
+
+        <!-- Share percentage -->
+        ${isActive ? `<div class="text-[9px] text-muted/60 text-center mt-1.5">${shareOfTotal}%</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// TEMPLATE DETAILS
+// ═══════════════════════════════════════════════════
+
+let detailsOpen = true;
+function toggleDetails() {
+  detailsOpen = !detailsOpen;
+  document.getElementById('detailsContent').classList.toggle('hidden', !detailsOpen);
+  document.getElementById('detailsChevron').style.transform = detailsOpen ? '' : 'rotate(-90deg)';
+  if (!detailsOpen) updateDetailsSummary();
+}
+
+function updateDetailsSummary() {
+  const name = document.getElementById('templateName').value || 'Untitled';
+  const club = document.getElementById('templateClub');
+  const clubName = club.options[club.selectedIndex]?.text || '';
+  const parts = [name];
+  if (clubName && club.value) parts.push(clubName);
+  parts.push(visibility);
+  document.getElementById('detailsSummary').textContent = detailsOpen ? '' : parts.join(' · ');
+}
+
+function setVisibility(v) {
+  visibility = v;
+  const cls = (active) => active
+    ? 'flex-1 px-3 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary border border-primary/30 transition-all'
+    : 'flex-1 px-3 py-2 rounded-lg text-sm font-medium text-muted border border-border hover:border-border-strong transition-all';
+  document.getElementById('visPrivate').className = cls(v === 'Private');
+  document.getElementById('visPublic').className = cls(v === 'Public');
+  updateDetailsSummary();
+}
+
+// ═══════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════
+
+let filtersOpen = false;
+
+function toggleFilters() {
+  filtersOpen = !filtersOpen;
+  document.getElementById('filterPanel').classList.toggle('hidden', !filtersOpen);
+}
+
+function renderAllFilters() {
+  const count = selectedSkillFilters.size + (selectedDurationFilter !== null ? 1 : 0) + (selectedPointsFilter !== null ? 1 : 0);
+  const badge = document.getElementById('activeFilterCount');
+  if (count > 0) { badge.classList.remove('hidden'); badge.textContent = count; }
+  else { badge.classList.add('hidden'); }
+
+  // Skills
+  document.getElementById('skillFilters').innerHTML = SKILLS.map(s => {
+    const active = selectedSkillFilters.has(s);
+    return `<button onclick="toggleSkill('${s}')" class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium transition-all ${
+      active ? 'border' : 'text-muted/60 border border-border hover:text-foreground'
+    }" style="${active ? `background:${SKILL_COLORS[s]}20;border-color:${SKILL_COLORS[s]}50;color:${SKILL_COLORS[s]}` : ''}"><span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:${SKILL_COLORS[s]}"></span>${s}</button>`;
+  }).join('');
+
+  // Duration
+  document.getElementById('durationFilters').innerHTML = DURATION_RANGES.map((r, idx) => {
+    const active = selectedDurationFilter === idx;
+    return `<button onclick="toggleDurationFilter(${idx})" class="px-1.5 py-0.5 rounded text-[10px] font-medium transition-all ${
+      active ? 'bg-primary/15 text-primary border border-primary/30' : 'text-muted/60 border border-border hover:text-foreground'
+    }">${r.label}</button>`;
+  }).join('');
+
+  // Points
+  document.getElementById('pointsFilters').innerHTML = POINTS_RANGES.map((r, idx) => {
+    const active = selectedPointsFilter === idx;
+    return `<button onclick="togglePointsFilter(${idx})" class="px-1.5 py-0.5 rounded text-[10px] font-medium transition-all ${
+      active ? 'bg-primary/15 text-primary border border-primary/30' : 'text-muted/60 border border-border hover:text-foreground'
+    }">${r.label}</button>`;
+  }).join('');
+}
+
+function toggleSkill(s) {
+  if (selectedSkillFilters.has(s)) selectedSkillFilters.delete(s); else selectedSkillFilters.add(s);
+  renderAllFilters(); renderExerciseLibrary();
+}
+
+function toggleDurationFilter(idx) {
+  selectedDurationFilter = selectedDurationFilter === idx ? null : idx;
+  renderAllFilters(); renderExerciseLibrary();
+}
+
+function togglePointsFilter(idx) {
+  selectedPointsFilter = selectedPointsFilter === idx ? null : idx;
+  renderAllFilters(); renderExerciseLibrary();
+}
+
+function clearAllFilters() {
+  selectedSkillFilters.clear(); selectedDurationFilter = null; selectedPointsFilter = null;
+  document.getElementById('exerciseSearch').value = '';
+  renderAllFilters(); renderExerciseLibrary();
+}
+
+// ═══════════════════════════════════════════════════
+// SORT
+// ═══════════════════════════════════════════════════
+
+function toggleSortDropdown() {
+  document.getElementById('sortDropdown').classList.toggle('open');
+}
+
+function setSort(s) {
+  currentSort = s;
+  document.querySelectorAll('.sort-check').forEach(el => el.classList.toggle('hidden', el.dataset.sort !== s));
+  const labels = { name: 'Name', duration: 'Duration', points: 'Points', metrics: 'Metric Count' };
+  document.getElementById('sortLabel').textContent = labels[s] || s;
+  document.getElementById('sortDropdown').classList.remove('open');
+  renderExerciseLibrary();
+}
+
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('sortDropdown');
+  if (dd.classList.contains('open') && !e.target.closest('#sortDropdown') && !e.target.closest('[onclick*="toggleSortDropdown"]')) {
+    dd.classList.remove('open');
+  }
+});
+
+function sortExercises(exercises) {
+  const sorted = [...exercises];
+  switch (currentSort) {
+    case 'name': return sorted.sort((a,b) => a.name.localeCompare(b.name));
+    case 'duration': return sorted.sort((a,b) => b.duration - a.duration);
+    case 'points': return sorted.sort((a,b) => getExercisePoints(b) - getExercisePoints(a));
+    case 'metrics': return sorted.sort((a,b) => b.metrics.length - a.metrics.length);
+    default: return sorted;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// EXERCISE LIBRARY
+// ═══════════════════════════════════════════════════
+
+function getExercisePoints(exercise) {
+  return exercise.metrics.reduce((a, m) => a + m.maxPoints, 0);
+}
+
+function renderExerciseLibrary() {
+  const search = document.getElementById('exerciseSearch').value.toLowerCase();
+  let exercises = MOCK_EXERCISES;
+  if (search) exercises = exercises.filter(e => e.name.toLowerCase().includes(search) || e.description.toLowerCase().includes(search));
+  if (selectedSkillFilters.size > 0) exercises = exercises.filter(e => e.skills.some(s => selectedSkillFilters.has(s)));
+  if (selectedDurationFilter !== null) {
+    const range = DURATION_RANGES[selectedDurationFilter];
+    exercises = exercises.filter(e => e.duration >= range.min && e.duration <= range.max);
+  }
+  if (selectedPointsFilter !== null) {
+    const range = POINTS_RANGES[selectedPointsFilter];
+    exercises = exercises.filter(e => {
+      const pts = getExercisePoints(e);
+      return pts >= range.min && pts <= range.max;
+    });
+  }
+  exercises = sortExercises(exercises);
+
+  document.getElementById('exerciseCountLabel').textContent = `${exercises.length} exercise${exercises.length !== 1 ? 's' : ''}`;
+  document.getElementById('exerciseLibrary').innerHTML = exercises.length === 0
+    ? '<div class="text-center py-8"><p class="text-sm text-muted">No exercises match your filters</p><button onclick="clearAllFilters()" class="text-xs text-primary hover:underline mt-1">Clear all filters</button></div>'
+    : exercises.map(exercise => {
+        const totalPoints = getExercisePoints(exercise);
+        const primarySkill = exercise.skills[0];
+        return `
+    <div class="group flex items-center gap-3 p-3 rounded-xl bg-subtle/30 hover:bg-hover border border-transparent hover:border-primary/30 transition-all cursor-pointer"
+         draggable="true" ondragstart="onLibraryDragStart(event, '${exercise.id}')" ondragend="onDragEnd(event)"
+         onclick="addExerciseToPlan('${exercise.id}')">
+      <div class="flex-shrink-0 w-1 h-12 rounded-full" style="background: ${SKILL_COLORS[primarySkill]}"></div>
+      <div class="flex-1 min-w-0">
+        <span class="text-sm font-medium text-foreground truncate block">${exercise.name}</span>
+        <div class="flex items-center gap-2 mt-0.5">
+          <span class="text-xs text-muted flex items-center gap-1">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${exercise.duration}m
+          </span>
+          <span class="text-xs text-primary flex items-center gap-1">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            ${totalPoints}pts
+          </span>
+          <span class="text-[10px] text-muted/50">${exercise.metrics.length} metrics</span>
+        </div>
+        <div class="flex flex-wrap gap-1 mt-1">
+          ${exercise.skills.map(s => `<span class="px-1.5 py-0.5 rounded text-[9px] font-medium" style="background: ${SKILL_COLORS[s]}20; color: ${SKILL_COLORS[s]}">${s}</span>`).join('')}
+        </div>
+      </div>
+      <button onclick="event.stopPropagation(); openDrawer('${exercise.id}')"
+        class="flex-shrink-0 w-7 h-7 rounded-lg bg-subtle border border-border text-muted hover:text-foreground hover:border-border-strong flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" title="View details">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+  `}).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// SECTIONS
+// ═══════════════════════════════════════════════════
+
+function addSection() {
+  const colorIdx = sections.length % SECTION_COLORS.length;
+  const defaultName = `Section ${sections.length + 1}`;
+  const newSection = { id: 'sec-' + Date.now(), name: defaultName, color: SECTION_COLORS[colorIdx] };
+  sections.push(newSection);
+  updateAll();
+  setTimeout(() => {
+    const nameEl = document.querySelector(`[data-section-id="${newSection.id}"] .section-name`);
+    if (nameEl) {
+      nameEl.focus();
+      const range = document.createRange();
+      range.selectNodeContents(nameEl);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }, 50);
+}
+
+function deleteSection(sectionId) {
+  plan.forEach(e => { if (e.sectionId === sectionId) e.sectionId = undefined; });
+  sections = sections.filter(s => s.id !== sectionId);
+  updateAll();
+}
+
+function onSectionNameBlur(event, sectionId) {
+  const sec = sections.find(s => s.id === sectionId);
+  if (!sec) return;
+  const newName = event.target.textContent.trim();
+  if (newName) { sec.name = newName; }
+  else { event.target.textContent = sec.name; }
+  renderSessionBar();
+}
+
+function onSectionNameKeydown(event, sectionId) {
+  if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); }
+  else if (event.key === 'Escape') {
+    const sec = sections.find(s => s.id === sectionId);
+    if (sec) event.target.textContent = sec.name;
+    event.target.blur();
+  }
+}
+
+function addExerciseToPlan(exerciseId, sectionId) {
+  const exercise = MOCK_EXERCISES.find(e => e.id === exerciseId);
+  if (!exercise) return;
+  plan.push({ ...exercise, instanceId: 'pi-' + Date.now() + Math.random().toString(36).substr(2, 5), sectionId: sectionId || window._addToSectionId || undefined, notes: '' });
+  window._addToSectionId = undefined;
+  document.getElementById('exerciseSearch').placeholder = 'Search exercises...';
+  updateAll();
+}
+
+function removeExerciseFromPlan(instanceId) {
+  plan = plan.filter(e => e.instanceId !== instanceId);
+  updateAll();
+}
+
+function moveExercise(instanceId, direction) {
+  const idx = plan.findIndex(e => e.instanceId === instanceId);
+  if (idx === -1) return;
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= plan.length) return;
+  const item = plan[idx];
+  plan.splice(idx, 1);
+  plan.splice(newIdx, 0, item);
+  const neighbor = plan[newIdx + (direction > 0 ? -1 : 1)];
+  if (neighbor && neighbor.sectionId !== item.sectionId) {
+    item.sectionId = neighbor.sectionId;
+  }
+  updateAll();
+}
+
+function clearPlan() {
+  plan = [];
+  sections = [];
+  updateAll();
+}
+
+// ═══════════════════════════════════════════════════
+// PLAN BUILDER
+// ═══════════════════════════════════════════════════
+
+function formatTime(minutes) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+}
+
+function buildOrderedPlan() {
+  const result = [];
+  sections.forEach(sec => {
+    const items = plan.filter(e => e.sectionId === sec.id);
+    result.push({ type: 'section', section: sec, items });
+  });
+  const ungrouped = plan.filter(e => !e.sectionId || !sections.find(s => s.id === e.sectionId));
+  if (ungrouped.length > 0) {
+    result.push({ type: 'ungrouped', items: ungrouped });
+  }
+  return result;
+}
+
+function renderPlan() {
+  const empty = document.getElementById('emptyState');
+  const content = document.getElementById('planContent');
+  const clearBtn = document.getElementById('clearAllBtn');
+
+  if (plan.length === 0 && sections.length === 0) {
+    empty.classList.remove('hidden');
+    content.classList.add('hidden');
+    clearBtn.classList.add('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  content.classList.remove('hidden');
+  clearBtn.classList.remove('hidden');
+
+  const list = document.getElementById('planList');
+  list.innerHTML = `
+    <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-border"></div>
+    <div class="absolute left-[5px] top-0 w-[13px] h-[13px] rounded-full bg-accent border-[3px] border-base z-10"></div>
+  `;
+
+  let accTime = 0;
+  const ordered = buildOrderedPlan();
+
+  ordered.forEach(group => {
+    if (group.type === 'section') {
+      const secDur = group.items.reduce((a, e) => a + e.duration, 0);
+      const secPoints = group.items.reduce((a, e) => a + getExercisePoints(e), 0);
+      const secHeader = document.createElement('div');
+      secHeader.className = 'relative mb-2 mt-4 first:mt-0';
+      secHeader.dataset.sectionId = group.section.id;
+      secHeader.innerHTML = `
+        <div class="absolute left-[-25px] top-1/2 -translate-y-1/2 w-[13px] h-[13px] rounded-full border-[3px] border-base z-10" style="background: ${group.section.color}"></div>
+        <div class="ml-2 flex items-center justify-between rounded-xl px-4 py-2.5" style="background: ${group.section.color}10; border: 1px solid ${group.section.color}30">
+          <div class="flex items-center gap-2.5">
+            <div class="w-2.5 h-2.5 rounded-full" style="background: ${group.section.color}"></div>
+            <h3 contenteditable="true" spellcheck="false"
+                class="section-name text-xs font-bold uppercase tracking-wider outline-none px-1 -mx-1 rounded cursor-text hover:bg-white/5 focus:bg-white/10 focus:ring-1 focus:ring-white/20 transition-all"
+                style="color: ${group.section.color}"
+                onblur="onSectionNameBlur(event, '${group.section.id}')"
+                onkeydown="onSectionNameKeydown(event, '${group.section.id}')">${group.section.name}</h3>
+            <span class="text-[10px] text-muted">${group.items.length} · ${secDur}m · ${secPoints}pts</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="addExerciseToSection('${group.section.id}')" class="p-1 rounded-lg hover:bg-hover text-muted/50 hover:text-foreground transition-all" title="Add exercise to section">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <button onclick="deleteSection('${group.section.id}')" class="p-1 rounded-lg hover:bg-hover text-muted/50 hover:text-error transition-all" title="Delete section">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+      list.appendChild(secHeader);
+
+      if (group.items.length === 0) {
+        const emptyEl = document.createElement('div');
+        emptyEl.className = 'relative mb-2';
+        emptyEl.innerHTML = `
+          <div class="ml-2 rounded-xl border-2 border-dashed py-4 text-center text-xs text-muted/40 transition-all hover:border-opacity-60" style="border-color: ${group.section.color}30"
+               ondragover="event.preventDefault()" ondragenter="this.classList.add('bg-primary/5')" ondragleave="this.classList.remove('bg-primary/5')"
+               ondrop="event.preventDefault(); this.classList.remove('bg-primary/5'); handleSectionDrop(event, '${group.section.id}')">
+              Drop exercises here
+          </div>
+        `;
+        list.appendChild(emptyEl);
+      } else {
+        group.items.forEach(item => {
+          accTime = renderPlanItem(list, item, accTime, group.section.color);
+        });
+      }
+    } else {
+      if (sections.length > 0) {
+        const ungroupedHeader = document.createElement('div');
+        ungroupedHeader.className = 'relative mb-2 mt-4';
+        ungroupedHeader.innerHTML = `
+          <div class="absolute left-[-25px] top-1/2 -translate-y-1/2 w-[9px] h-[9px] rounded-full bg-muted/30 border-2 border-base z-10"></div>
+          <div class="ml-2 px-4 py-2 rounded-xl bg-subtle/30 border border-border">
+            <span class="text-[10px] font-bold text-muted/60 uppercase tracking-wider">Ungrouped</span>
+            <span class="text-[10px] text-muted/40 ml-2">${group.items.length} exercise${group.items.length !== 1 ? 's' : ''}</span>
+          </div>
+        `;
+        list.appendChild(ungroupedHeader);
+      }
+      group.items.forEach(item => {
+        accTime = renderPlanItem(list, item, accTime, null);
+      });
+    }
+  });
+
+  // End node
+  const totalTime = formatTime(accTime);
+  const totalPoints = plan.reduce((a, e) => a + getExercisePoints(e), 0);
+  const endEl = document.createElement('div');
+  endEl.className = 'relative mt-2';
+  endEl.innerHTML = `
+    <div class="absolute left-[-25px] top-2 w-[13px] h-[13px] rounded-full bg-muted/50 border-[3px] border-base z-10"></div>
+    <div class="absolute left-[-72px] top-1 text-[11px] font-mono text-primary font-bold w-10 text-right">${totalTime}</div>
+    <div class="ml-2 text-xs text-muted py-2">End of evaluation · <span class="text-primary font-medium">${totalPoints}pts</span></div>
+  `;
+  list.appendChild(endEl);
+}
+
+function renderPlanItem(container, item, accTime, sectionColor) {
+  const timeLabel = formatTime(accTime);
+  accTime += item.duration;
+
+  const el = document.createElement('div');
+  el.className = 'relative mb-2 animate-slide-in';
+  el.dataset.instanceId = item.instanceId;
+  el.draggable = true;
+  el.ondragstart = (e) => { dragSrcId = item.instanceId; e.dataTransfer.setData('text/plain', JSON.stringify({type:'plan',instanceId:item.instanceId})); e.dataTransfer.effectAllowed='move'; setTimeout(() => el.classList.add('drag-ghost'), 0); };
+  el.ondragover = (e) => e.preventDefault();
+  el.ondragenter = (e) => { e.preventDefault(); if (dragSrcId !== item.instanceId) el.querySelector('.pi-card')?.classList.add('drag-over'); };
+  el.ondragleave = () => el.querySelector('.pi-card')?.classList.remove('drag-over');
+  el.ondrop = (e) => { e.preventDefault(); el.querySelector('.pi-card')?.classList.remove('drag-over'); handlePlanDrop(e, item.instanceId); };
+  el.ondragend = () => { el.classList.remove('drag-ghost'); dragSrcId = null; };
+
+  const leftBorder = sectionColor ? `border-left: 2px solid ${sectionColor}40;` : '';
+  const cardMargin = sectionColor ? 'ml-6' : 'ml-2';
+  const totalPoints = getExercisePoints(item);
+  const primarySkill = item.skills[0];
+
+  el.innerHTML = `
+    <div class="absolute left-[-25px] top-5 w-[9px] h-[9px] rounded-full border-2 border-base z-10" style="background: ${sectionColor || SKILL_COLORS[primarySkill]}50"></div>
+    <div class="absolute left-[-72px] top-4 text-[11px] font-mono text-muted w-10 text-right">${timeLabel}</div>
+
+    <div class="pi-card group ${cardMargin} rounded-xl bg-surface/80 backdrop-blur-sm shadow-sm border border-border hover:border-accent/30 transition-all" style="${leftBorder}">
+      <div class="flex items-start gap-3 p-3">
+        <div class="flex-shrink-0 cursor-grab active:cursor-grabbing text-muted/40 hover:text-muted transition-colors pt-1">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+        </div>
+        <div class="flex-shrink-0 w-1 h-full min-h-[60px] rounded-full" style="background: ${SKILL_COLORS[primarySkill]}"></div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h4 class="font-semibold text-sm text-foreground truncate">${item.name}</h4>
+            <button onclick="event.stopPropagation(); openEditPopover(event, '${item.instanceId}')"
+              class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] text-muted hover:text-foreground hover:bg-subtle transition-colors cursor-pointer">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              ${item.duration}m
+            </button>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary flex items-center gap-1">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              ${totalPoints}pts
+            </span>
+          </div>
+
+          <!-- Metrics preview -->
+          <div class="flex flex-wrap gap-1.5 mt-2">
+            ${item.metrics.slice(0, 3).map(m => `
+              <span class="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium bg-subtle border border-border text-muted">
+                <span style="color: ${METRIC_TYPE_COLORS[m.type]}">${METRIC_TYPE_ICONS[m.type]}</span>
+                ${m.name}
+                <span class="text-muted/50">${m.maxPoints}</span>
+              </span>
+            `).join('')}
+            ${item.metrics.length > 3 ? `<span class="px-2 py-1 rounded-lg text-[10px] font-medium text-muted/50">+${item.metrics.length - 3}</span>` : ''}
+          </div>
+
+          <!-- Skills + Notes -->
+          <div class="flex items-center gap-2 mt-2">
+            ${item.skills.map(s => `<span class="px-1.5 py-0.5 rounded text-[9px] font-medium" style="background: ${SKILL_COLORS[s]}20; color: ${SKILL_COLORS[s]}">${s}</span>`).join('')}
+            ${item.notes ? `<span class="text-[10px] text-muted/50 truncate max-w-[120px]" title="${item.notes}">${item.notes}</span>` : ''}
+          </div>
+        </div>
+        <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button onclick="event.stopPropagation(); moveExercise('${item.instanceId}', -1)" class="p-1 rounded-lg text-muted hover:text-foreground hover:bg-hover transition-all" title="Move up">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+          </button>
+          <button onclick="event.stopPropagation(); moveExercise('${item.instanceId}', 1)" class="p-1 rounded-lg text-muted hover:text-foreground hover:bg-hover transition-all" title="Move down">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="w-px h-4 bg-border mx-1"></div>
+          <button onclick="event.stopPropagation(); openDrawer('${item.id}')" class="p-1.5 rounded-lg text-muted hover:text-foreground hover:bg-hover transition-all" title="Details">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button onclick="event.stopPropagation(); removeExerciseFromPlan('${item.instanceId}')" class="p-1.5 rounded-lg text-muted hover:text-error hover:bg-error/10 transition-all" title="Remove">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+  return accTime;
+}
+
+function addExerciseToSection(sectionId) {
+  document.getElementById('exerciseSearch').focus();
+  document.getElementById('exerciseSearch').placeholder = `Search exercises to add to section...`;
+  window._addToSectionId = sectionId;
+}
+
+// ═══════════════════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════════════════
+
+function handleSectionDrop(e, sectionId) {
+  let data;
+  try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch { return; }
+  if (data.type === 'library') {
+    addExerciseToPlan(data.exerciseId, sectionId);
+  } else if (data.type === 'plan') {
+    const item = plan.find(e => e.instanceId === data.instanceId);
+    if (item) { item.sectionId = sectionId; updateAll(); }
+  }
+}
+
+function handlePlanDrop(e, targetInstanceId) {
+  let data;
+  try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch { return; }
+
+  if (data.type === 'library') {
+    const exercise = MOCK_EXERCISES.find(ex => ex.id === data.exerciseId);
+    if (!exercise) return;
+    const targetItem = plan.find(p => p.instanceId === targetInstanceId);
+    const newItem = { ...exercise, instanceId: 'pi-' + Date.now() + Math.random().toString(36).substr(2,5), sectionId: targetItem?.sectionId, notes: '' };
+    const idx = plan.findIndex(p => p.instanceId === targetInstanceId);
+    plan.splice(idx, 0, newItem);
+  } else if (data.type === 'plan') {
+    if (data.instanceId === targetInstanceId) return;
+    const srcIdx = plan.findIndex(p => p.instanceId === data.instanceId);
+    const tgtIdx = plan.findIndex(p => p.instanceId === targetInstanceId);
+    const targetItem = plan.find(p => p.instanceId === targetInstanceId);
+    const [moved] = plan.splice(srcIdx, 1);
+    moved.sectionId = targetItem?.sectionId;
+    plan.splice(tgtIdx > srcIdx ? tgtIdx - 1 : tgtIdx, 0, moved);
+  }
+  updateAll();
+}
+
+function onDropZoneDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('border-primary/50','bg-primary/5');
+  let data;
+  try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch { return; }
+  if (data.type === 'library') {
+    const exercise = MOCK_EXERCISES.find(ex => ex.id === data.exerciseId);
+    if (!exercise) return;
+    plan.push({ ...exercise, instanceId: 'pi-' + Date.now() + Math.random().toString(36).substr(2,5), sectionId: undefined, notes: '' });
+    updateAll();
+  }
+}
+
+function onLibraryDragStart(e, exerciseId) {
+  e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'library', exerciseId }));
+  e.dataTransfer.effectAllowed = 'copy';
+  e.target.classList.add('drag-ghost');
+  document.getElementById('dropZone')?.classList.add('border-primary/50', 'bg-primary/5');
+}
+
+function onDragEnd(e) {
+  e.target.classList.remove('drag-ghost');
+  document.getElementById('dropZone')?.classList.remove('border-primary/50', 'bg-primary/5');
+  dragSrcId = null;
+}
+
+// ═══════════════════════════════════════════════════
+// SESSION BAR (points-based visualization)
+// ═══════════════════════════════════════════════════
+
+function renderSessionBar() {
+  const bar = document.getElementById('sessionBar');
+  const inner = document.getElementById('sessionBarInner');
+  const empty = document.getElementById('barEmpty');
+
+  inner.querySelectorAll('.session-segment').forEach(el => el.remove());
+  bar.querySelectorAll('.session-end-marker').forEach(el => el.remove());
+
+  if (plan.length === 0) { empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  const totalPoints = plan.reduce((a, e) => a + getExercisePoints(e), 0);
+  const isOverflow = totalPoints > maxPoints;
+  const scaleMax = Math.max(maxPoints, totalPoints);
+
+  let offset = 0;
+  plan.forEach((item, i) => {
+    const itemPoints = getExercisePoints(item);
+    const pct = (itemPoints / scaleMax) * 100;
+    const leftPct = (offset / scaleMax) * 100;
+    const isOverflowing = offset >= maxPoints;
+    offset += itemPoints;
+
+    const seg = document.createElement('div');
+    seg.className = 'session-segment' + (isOverflowing ? ' overflow' : '');
+    seg.style.left = leftPct + '%';
+    seg.style.width = Math.max(pct, 0.6) + '%';
+    seg.style.top = '3px';
+    seg.style.bottom = '3px';
+
+    const primarySkill = item.skills[0];
+    seg.style.background = SKILL_COLORS[primarySkill] + (i % 2 === 0 ? 'DD' : 'AA');
+
+    seg.title = `${item.name} — ${itemPoints}pts | ${item.duration}m | ${item.skills.join(', ')}`;
+    seg.innerHTML = pct > 8 ? `<span class="seg-label text-white/90">${item.name}</span>` : '';
+    seg.onclick = () => {
+      const target = document.querySelector(`[data-instance-id="${item.instanceId}"]`);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    inner.appendChild(seg);
+  });
+
+  // Show max points marker when overflowing
+  if (isOverflow) {
+    const markerPct = (maxPoints / scaleMax) * 100;
+    const marker = document.createElement('div');
+    marker.className = 'session-end-marker';
+    marker.style.left = markerPct + '%';
+    bar.appendChild(marker);
+  }
+
+  // Show min points marker
+  if (minPoints > 0 && totalPoints < scaleMax) {
+    const minMarkerPct = (minPoints / scaleMax) * 100;
+    const minMarker = document.createElement('div');
+    minMarker.className = 'absolute top-0 bottom-0 w-0.5 bg-warning/50 z-10';
+    minMarker.style.left = minMarkerPct + '%';
+    minMarker.title = `Minimum: ${minPoints} pts`;
+    inner.appendChild(minMarker);
+  }
+
+  renderSessionSections(scaleMax);
+}
+
+function renderSessionSections(scaleMax) {
+  const container = document.getElementById('sessionSections');
+  container.innerHTML = '';
+
+  if (plan.length === 0 || sections.length === 0) return;
+
+  const ordered = buildOrderedPlan();
+  let offset = 0;
+
+  ordered.forEach(group => {
+    const groupPoints = group.items.reduce((a, e) => a + getExercisePoints(e), 0);
+    if (groupPoints === 0) return;
+
+    const leftPct = (offset / scaleMax) * 100;
+    const widthPct = (groupPoints / scaleMax) * 100;
+    offset += groupPoints;
+
+    const span = document.createElement('div');
+    span.className = 'section-span';
+    span.style.left = leftPct + '%';
+    span.style.width = widthPct + '%';
+
+    if (group.type === 'section') {
+      span.style.background = group.section.color + '18';
+      span.style.borderBottom = '2px solid ' + group.section.color + '80';
+      span.innerHTML = `<span class="section-span-label" style="color: ${group.section.color}">${group.section.name}</span>`;
+    } else {
+      span.style.background = '#66666610';
+      span.style.borderBottom = '2px solid #66666640';
+      span.innerHTML = `<span class="section-span-label" style="color: #666">Ungrouped</span>`;
+    }
+
+    container.appendChild(span);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════════════
+
+function renderStats() {
+  const totalDuration = plan.reduce((a, e) => a + e.duration, 0);
+  const totalPoints = plan.reduce((a, e) => a + getExercisePoints(e), 0);
+  const exerciseCount = plan.length;
+
+  // Points status
+  const belowMin = totalPoints < minPoints;
+  const aboveMax = totalPoints > maxPoints;
+  const inRange = !belowMin && !aboveMax;
+
+  let pointsStatusText = '';
+  let pointsStatusClass = 'text-muted';
+  let barColor = '#4A7A45'; // success green
+
+  if (totalPoints === 0) {
+    pointsStatusText = '';
+  } else if (belowMin) {
+    pointsStatusText = `${minPoints - totalPoints} pts to min`;
+    pointsStatusClass = 'text-warning';
+    barColor = '#D99100';
+  } else if (aboveMax) {
+    pointsStatusText = `${totalPoints - maxPoints} pts over`;
+    pointsStatusClass = 'text-error';
+    barColor = '#BE3F23';
+  } else {
+    pointsStatusText = 'in range';
+    pointsStatusClass = 'text-success';
+    barColor = '#4A7A45';
+  }
+
+  document.getElementById('timeDisplay').innerHTML = `<span class="font-bold text-foreground">${totalDuration}</span><span class="text-muted">m total</span>`;
+  document.getElementById('pointsDisplay').innerHTML = `<span class="font-bold ${aboveMax ? 'text-error' : 'text-primary'}">${totalPoints}</span><span class="text-muted"> pts</span>`;
+  document.getElementById('pointsStatus').textContent = pointsStatusText;
+  document.getElementById('pointsStatus').className = `text-xs font-medium ${pointsStatusClass} ml-1`;
+  document.getElementById('exerciseCount').textContent = `${exerciseCount} exercise${exerciseCount !== 1 ? 's' : ''}`;
+
+  // Update current points bar
+  const barPercent = Math.min(100, (totalPoints / maxPoints) * 100);
+  document.getElementById('currentPointsBar').style.width = barPercent + '%';
+  document.getElementById('currentPointsBar').style.background = barColor;
+  document.getElementById('currentPointsLabel').textContent = `${totalPoints} / ${minPoints}-${maxPoints}`;
+  document.getElementById('currentPointsLabel').className = `text-xs font-medium ${pointsStatusClass} w-24 text-right`;
+}
+
+// ═══════════════════════════════════════════════════
+// UPDATE ALL
+// ═══════════════════════════════════════════════════
+
+function updateAll() {
+  renderPlan();
+  renderSessionBar();
+  renderSkillBuckets();
+  renderStats();
+}
+
+// ═══════════════════════════════════════════════════
+// EDIT POPOVER
+// ═══════════════════════════════════════════════════
+
+function openEditPopover(e, instanceId) {
+  editingItemId = instanceId;
+  const item = plan.find(p => p.instanceId === instanceId);
+  if (!item) return;
+  document.getElementById('popoverDuration').value = item.duration;
+  document.getElementById('popoverNotes').value = item.notes || '';
+  const pop = document.getElementById('editPopover');
+  const rect = e.target.getBoundingClientRect();
+  pop.style.top = (rect.bottom + 8) + 'px';
+  pop.style.left = Math.max(8, rect.left - 60) + 'px';
+  pop.classList.remove('hidden');
+}
+
+function adjustPopoverValue(field, delta) {
+  if (field === 'duration') {
+    const inp = document.getElementById('popoverDuration');
+    inp.value = Math.max(1, parseInt(inp.value) + delta);
+  }
+}
+
+function saveEdit() {
+  const item = plan.find(p => p.instanceId === editingItemId);
+  if (item) {
+    item.duration = parseInt(document.getElementById('popoverDuration').value) || item.duration;
+    item.notes = document.getElementById('popoverNotes').value.trim();
+  }
+  closeEditPopover();
+  updateAll();
+}
+
+function closeEditPopover() {
+  document.getElementById('editPopover').classList.add('hidden');
+  editingItemId = null;
+}
+
+document.addEventListener('click', (e) => {
+  const pop = document.getElementById('editPopover');
+  if (!pop.classList.contains('hidden') && !pop.contains(e.target) && !e.target.closest('[onclick*="openEditPopover"]')) {
+    closeEditPopover();
+  }
+});
+
+// ═══════════════════════════════════════════════════
+// EXERCISE DRAWER
+// ═══════════════════════════════════════════════════
+
+function openDrawer(exerciseId) {
+  drawerExercise = MOCK_EXERCISES.find(e => e.id === exerciseId);
+  if (!drawerExercise) return;
+
+  const totalPoints = getExercisePoints(drawerExercise);
+
+  document.getElementById('drawerExerciseName').textContent = drawerExercise.name;
+  document.getElementById('drawerContent').innerHTML = `
+    <div class="flex flex-wrap gap-2">
+      ${drawerExercise.skills.map(s => `<span class="px-2 py-1 rounded-lg text-xs font-medium" style="background: ${SKILL_COLORS[s]}20; color: ${SKILL_COLORS[s]}">${s}</span>`).join('')}
+      <span class="px-2 py-1 rounded-lg text-xs font-medium bg-subtle text-muted flex items-center gap-1">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ${drawerExercise.duration} min
+      </span>
+      <span class="px-2 py-1 rounded-lg text-xs font-medium bg-primary/10 text-primary flex items-center gap-1">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        ${totalPoints} points
+      </span>
+    </div>
+    <p class="text-sm text-muted/80 leading-relaxed">${drawerExercise.description}</p>
+
+    <div>
+      <h4 class="text-xs font-bold text-muted uppercase tracking-wider mb-3">Metrics (${drawerExercise.metrics.length})</h4>
+      <div class="space-y-2">
+        ${drawerExercise.metrics.map((m, idx) => `
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-subtle/50 border border-border">
+            <div class="flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center" style="background: ${METRIC_TYPE_COLORS[m.type]}20; color: ${METRIC_TYPE_COLORS[m.type]}">
+              ${METRIC_TYPE_ICONS[m.type]}
+            </div>
+            <div class="flex-1 min-w-0">
+              <span class="text-sm font-medium text-foreground">${m.name}</span>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="text-xs text-muted">${m.type}</span>
+                ${m.config?.format ? `<span class="text-xs text-muted/50">${m.config.format}</span>` : ''}
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-sm font-bold text-primary">${m.maxPoints}</span>
+              <span class="text-xs text-muted">pts</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById('exerciseDrawer').classList.remove('translate-x-full');
+  document.getElementById('drawerOverlay').classList.remove('opacity-0', 'pointer-events-none');
+}
+
+function closeDrawer() {
+  document.getElementById('exerciseDrawer').classList.add('translate-x-full');
+  document.getElementById('drawerOverlay').classList.add('opacity-0', 'pointer-events-none');
+  drawerExercise = null;
+}
+
+function addDrawerExerciseToPlan() {
+  if (drawerExercise) { addExerciseToPlan(drawerExercise.id); closeDrawer(); }
+}
+
+// ═══════════════════════════════════════════════════
+// CREATE EXERCISE MODAL
+// ═══════════════════════════════════════════════════
+
+function openCreateExercise() {
+  document.getElementById('createExerciseModal').classList.remove('hidden');
+  document.getElementById('newExerciseName').focus();
+  renderNewExerciseSkills();
+}
+
+function renderNewExerciseSkills() {
+  document.getElementById('newExerciseSkills').innerHTML = SKILLS.map(s => {
+    const active = newExerciseSkill === s;
+    return `<button type="button" onclick="newExerciseSkill='${s}'; renderNewExerciseSkills()" class="px-2 py-1 rounded-lg text-[10px] font-medium transition-all ${
+      active ? 'border' : 'text-muted/60 border border-border hover:text-foreground'
+    }" style="${active ? `background:${SKILL_COLORS[s]}20;border-color:${SKILL_COLORS[s]}50;color:${SKILL_COLORS[s]}` : ''}">${s}</button>`;
+  }).join('');
+}
+
+function closeCreateExercise() {
+  document.getElementById('createExerciseModal').classList.add('hidden');
+  document.getElementById('newExerciseName').value = '';
+  document.getElementById('newExerciseDesc').value = '';
+  document.getElementById('newMetricName').value = '';
+  document.getElementById('newExerciseDuration').value = '10';
+  document.getElementById('newMetricPoints').value = '10';
+  newExerciseSkill = 'Game';
+}
+
+function createExercise() {
+  const name = document.getElementById('newExerciseName').value.trim();
+  if (!name) { alert('Please enter an exercise name'); return; }
+
+  const desc = document.getElementById('newExerciseDesc').value.trim();
+  const duration = parseInt(document.getElementById('newExerciseDuration').value) || 10;
+  const metricName = document.getElementById('newMetricName').value.trim();
+  const metricType = document.getElementById('newMetricType').value;
+  const metricPoints = parseInt(document.getElementById('newMetricPoints').value) || 10;
+
+  const newExercise = {
+    id: 'e-' + Date.now(),
+    name: name,
+    description: desc || 'Custom evaluation exercise',
+    duration: duration,
+    skills: [newExerciseSkill],
+    metrics: metricName ? [{ name: metricName, type: metricType, maxPoints: metricPoints }] : []
+  };
+
+  MOCK_EXERCISES.unshift(newExercise);
+  closeCreateExercise();
+  renderExerciseLibrary();
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+
+initRangeSlider();
+renderAllFilters();
+renderExerciseLibrary();
+updateDetailsSummary();
+renderSkillBuckets();
+updateAll();
+</script>
+
+</body>
+</html>

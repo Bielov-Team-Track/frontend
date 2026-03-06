@@ -1,37 +1,51 @@
-import { Button } from "@/components";
+"use client";
+
+import { Button, Loader } from "@/components";
 import client from "@/lib/api/client";
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
-type SuccessPageParams = {
-	searchParams: Promise<{
-		session_id?: string;
-	}>;
-};
+function PaymentSuccessContent() {
+	const searchParams = useSearchParams();
+	const router = useRouter();
+	const sessionId = searchParams.get("session_id");
 
-async function PaymentSuccessPage({ searchParams }: SuccessPageParams) {
-	const params = await searchParams;
-	const sessionId = params.session_id;
+	const [eventId, setEventId] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
 
-	if (!sessionId) {
-		redirect("/hub");
-	}
+	useEffect(() => {
+		if (!sessionId) {
+			router.replace("/hub");
+			return;
+		}
 
-	let eventId: string | null = null;
-	let error: string | null = null;
+		async function completePayment() {
+			try {
+				const response = await client.post<{
+					paymentId: string;
+					status: string;
+					eventId: string;
+				}>(`/payments/v1/checkout/complete?sessionId=${sessionId}`);
+				setEventId(response.data.eventId);
+			} catch (err: any) {
+				setError(err.response?.data?.error || "Failed to verify payment");
+			} finally {
+				setIsLoading(false);
+			}
+		}
 
-	try {
-		// Complete the payment on backend
-		const response = await client.post<{
-			paymentId: string;
-			status: string;
-			eventId: string;
-		}>(`/events/v1/checkout/complete?sessionId=${sessionId}`);
+		completePayment();
+	}, [sessionId, router]);
 
-		eventId = response.data.eventId;
-	} catch (err: any) {
-		error = err.response?.data?.error || "Failed to verify payment";
+	if (isLoading) {
+		return (
+			<div className="flex items-center justify-center p-8">
+				<div className="text-center text-muted">Verifying payment...</div>
+			</div>
+		);
 	}
 
 	return (
@@ -45,7 +59,7 @@ async function PaymentSuccessPage({ searchParams }: SuccessPageParams) {
 
 				<h1 className="text-4xl font-bold mb-4">Payment Successful!</h1>
 
-				<p className="/70 mb-8">
+				<p className="text-muted mb-8">
 					Thank you for your payment. Your transaction has been completed successfully. You will receive a confirmation email shortly.
 				</p>
 
@@ -57,7 +71,7 @@ async function PaymentSuccessPage({ searchParams }: SuccessPageParams) {
 
 				<div className="flex flex-col gap-3">
 					{eventId ? (
-						<Link href={`/events/${eventId}`}>
+						<Link href={`/hub/events/${eventId}`}>
 							<Button fullWidth>Back to Event</Button>
 						</Link>
 					) : (
@@ -76,4 +90,10 @@ async function PaymentSuccessPage({ searchParams }: SuccessPageParams) {
 	);
 }
 
-export default PaymentSuccessPage;
+export default function PaymentSuccessPage() {
+	return (
+		<Suspense fallback={<div className="flex justify-center p-8"><Loader /></div>}>
+			<PaymentSuccessContent />
+		</Suspense>
+	);
+}

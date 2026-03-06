@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createOrUpdateCoachProfile, createOrUpdatePlayerProfile, updateCurrentProfile } from "@/lib/api/user";
 import { CreateOrUpdateCoachProfileDto, CreateOrUpdatePlayerProfileDto } from "@/lib/models/Profile";
@@ -28,6 +28,8 @@ const CompleteProfileForm = ({ onProfileComplete, isAdult = true, ageTier = "Adu
 	// Form Data State
 	const [selectedRoles, setSelectedRoles] = useState<UserRole[]>([]);
 	const [basicInfo, setBasicInfo] = useState<{
+		name: string;
+		surname: string;
 		imageUrl?: string;
 		imageThumbHash?: string;
 	} | null>(null);
@@ -35,6 +37,10 @@ const CompleteProfileForm = ({ onProfileComplete, isAdult = true, ageTier = "Adu
 	const [coachInfo, setCoachInfo] = useState<CreateOrUpdateCoachProfileDto | null>(null);
 	const [historyInfo, setHistoryInfo] = useState<{ bio: string } | null>(null);
 	// Guardian and children steps will be added in Tasks D3 and D5
+
+	// Keep-mounted step management: steps stay mounted (hidden) to preserve form state
+	const [visitedSteps, setVisitedSteps] = useState<Set<string>>(new Set(["roles"]));
+	const [stepResetKeys, setStepResetKeys] = useState<Record<string, number>>({});
 
 	// Dynamic step calculation based on selected roles and age tier
 	const steps = useMemo(() => {
@@ -48,8 +54,8 @@ const CompleteProfileForm = ({ onProfileComplete, isAdult = true, ageTier = "Adu
 		// Step 0: Role Selection (mandatory for all)
 		stepList.push({ id: "roles", label: "Your Role" });
 
-		// Step 1: Basic Info (mandatory for all - profile picture only)
-		stepList.push({ id: "basic", label: "Profile Picture", formId: "basic-info-form", optional: true });
+		// Step 1: Basic Info (mandatory for all - name, surname, profile picture)
+		stepList.push({ id: "basic", label: "Basic Info", formId: "basic-info-form" });
 
 		// Step 2: Guardian Step (will be added in Task D3)
 		// Mandatory for Teen13ToConsent, optional for TeenConsentTo17, hidden for Adult
@@ -86,51 +92,53 @@ const CompleteProfileForm = ({ onProfileComplete, isAdult = true, ageTier = "Adu
 	const isFirstStep = currentStepIndex === 0;
 	const isLastStep = currentStepIndex === steps.length - 1;
 
+	// Mark steps as visited when navigated to (for lazy mounting)
+	useEffect(() => {
+		if (currentStep) {
+			setVisitedSteps((prev) => {
+				if (prev.has(currentStep.id)) return prev;
+				return new Set(prev).add(currentStep.id);
+			});
+		}
+	}, [currentStep]);
+
+	const isStepInList = (id: string) => steps.some((s) => s.id === id);
+
 	const handleRoleSelectionNext = (roles: UserRole[]) => {
 		setSelectedRoles(roles);
 		setCurrentStepIndex((prev) => prev + 1);
 	};
 
-	const handleBasicInfoNext = (data: { imageUrl?: string; imageThumbHash?: string }) => {
-		setBasicInfo(data);
-		setCurrentStepIndex((prev) => prev + 1);
-	};
-
-	const handlePlayerInfoNext = (data: CreateOrUpdatePlayerProfileDto) => {
-		setPlayerInfo(data);
-		setCurrentStepIndex((prev) => prev + 1);
-	};
-
-	const handleCoachInfoNext = (data: CreateOrUpdateCoachProfileDto) => {
-		setCoachInfo(data);
-		setCurrentStepIndex((prev) => prev + 1);
-	};
-
-	const handleHistoryNext = (data: { bio: string }) => {
-		setHistoryInfo(data);
-		submitProfile();
-	};
-
-	const submitProfile = async () => {
+	const submitProfile = async (overrides?: {
+		basicInfo?: { name: string; surname: string; imageUrl?: string; imageThumbHash?: string };
+		playerInfo?: CreateOrUpdatePlayerProfileDto;
+		coachInfo?: CreateOrUpdateCoachProfileDto;
+	}) => {
 		setIsLoading(true);
 		setError(null);
 
+		const effectiveBasicInfo = overrides?.basicInfo ?? basicInfo;
+		const effectivePlayerInfo = overrides?.playerInfo ?? playerInfo;
+		const effectiveCoachInfo = overrides?.coachInfo ?? coachInfo;
+
 		try {
-			// Update basic profile info
-			if (basicInfo?.imageUrl) {
+			// Update basic profile info (name, surname, and optionally image)
+			if (effectiveBasicInfo) {
 				await updateCurrentProfile({
-					imageUrl: basicInfo.imageUrl,
+					name: effectiveBasicInfo.name,
+					surname: effectiveBasicInfo.surname,
+					...(effectiveBasicInfo.imageUrl ? { imageUrl: effectiveBasicInfo.imageUrl } : {}),
 				});
 			}
 
 			// Update player profile if provided
-			if (playerInfo) {
-				await createOrUpdatePlayerProfile(playerInfo);
+			if (effectivePlayerInfo) {
+				await createOrUpdatePlayerProfile(effectivePlayerInfo);
 			}
 
 			// Update coach profile if provided
-			if (coachInfo) {
-				await createOrUpdateCoachProfile(coachInfo);
+			if (effectiveCoachInfo) {
+				await createOrUpdateCoachProfile(effectiveCoachInfo);
 			}
 
 			if (onProfileComplete) {
@@ -147,42 +155,67 @@ const CompleteProfileForm = ({ onProfileComplete, isAdult = true, ageTier = "Adu
 		}
 	};
 
-	const handleBack = () => {
-		setCurrentStepIndex((prev) => Math.max(0, prev - 1));
-	};
-
-	const handleSkip = () => {
+	const handleBasicInfoNext = (data: { name: string; surname: string; imageUrl?: string; imageThumbHash?: string }) => {
+		setBasicInfo(data);
 		if (isLastStep) {
-			submitProfile();
+			submitProfile({ basicInfo: data });
 		} else {
 			setCurrentStepIndex((prev) => prev + 1);
 		}
 	};
 
-	// Render current step
-	const renderStep = () => {
+	const handlePlayerInfoNext = (data: CreateOrUpdatePlayerProfileDto) => {
+		setPlayerInfo(data);
+		if (isLastStep) {
+			submitProfile({ playerInfo: data });
+		} else {
+			setCurrentStepIndex((prev) => prev + 1);
+		}
+	};
+
+	const handleCoachInfoNext = (data: CreateOrUpdateCoachProfileDto) => {
+		setCoachInfo(data);
+		if (isLastStep) {
+			submitProfile({ coachInfo: data });
+		} else {
+			setCurrentStepIndex((prev) => prev + 1);
+		}
+	};
+
+	const handleHistoryNext = (data: { bio: string }) => {
+		setHistoryInfo(data);
+		submitProfile();
+	};
+
+	const handleBack = () => {
+		setCurrentStepIndex((prev) => Math.max(0, prev - 1));
+	};
+
+	const handleSkip = () => {
 		const stepId = currentStep?.id;
-
-		switch (stepId) {
-			case "roles":
-				return <RoleSelectionStep onComplete={handleRoleSelectionNext} isAdult={isAdult} defaultRoles={selectedRoles} />;
-
-			case "basic":
-				return <BasicInfoStep defaultValues={basicInfo || undefined} onNext={handleBasicInfoNext} formId={currentStep.formId!} />;
-
-			case "player":
-				return <PlayerInfoStep defaultValues={playerInfo || undefined} onNext={handlePlayerInfoNext} formId={currentStep.formId!} />;
-
-			case "coach":
-				return <CoachInfoStep defaultValues={coachInfo || undefined} onNext={handleCoachInfoNext} formId={currentStep.formId!} />;
-
-			case "history":
-				return <HistoryStep defaultValues={historyInfo || undefined} onNext={handleHistoryNext} formId={currentStep.formId!} />;
-
-			// Guardian and children steps will be added here in Tasks D3 and D5
-
-			default:
-				return <div>Unknown step</div>;
+		if (stepId) {
+			// Force remount to reset all form + local state
+			setStepResetKeys((prev) => ({ ...prev, [stepId]: (prev[stepId] || 0) + 1 }));
+			// Clear saved data so skipped steps don't get submitted
+			switch (stepId) {
+				case "basic":
+					setBasicInfo(null);
+					break;
+				case "player":
+					setPlayerInfo(null);
+					break;
+				case "coach":
+					setCoachInfo(null);
+					break;
+				case "history":
+					setHistoryInfo(null);
+					break;
+			}
+		}
+		if (isLastStep) {
+			submitProfile();
+		} else {
+			setCurrentStepIndex((prev) => prev + 1);
 		}
 	};
 
@@ -200,7 +233,55 @@ const CompleteProfileForm = ({ onProfileComplete, isAdult = true, ageTier = "Adu
 				</div>
 			)}
 
-			{renderStep()}
+			{/* Role selection: only rendered when active (no form state to preserve) */}
+			{currentStep?.id === "roles" && (
+				<RoleSelectionStep onComplete={handleRoleSelectionNext} isAdult={isAdult} defaultRoles={selectedRoles} />
+			)}
+
+			{/* Steps are kept mounted (hidden) to preserve form + local state across navigation */}
+			{visitedSteps.has("basic") && isStepInList("basic") && (
+				<div className={currentStep?.id !== "basic" ? "hidden" : undefined}>
+					<BasicInfoStep
+						key={stepResetKeys["basic"] || 0}
+						defaultValues={basicInfo || undefined}
+						onNext={handleBasicInfoNext}
+						formId="basic-info-form"
+					/>
+				</div>
+			)}
+
+			{visitedSteps.has("player") && isStepInList("player") && (
+				<div className={currentStep?.id !== "player" ? "hidden" : undefined}>
+					<PlayerInfoStep
+						key={stepResetKeys["player"] || 0}
+						defaultValues={playerInfo || undefined}
+						onNext={handlePlayerInfoNext}
+						formId="player-info-form"
+					/>
+				</div>
+			)}
+
+			{visitedSteps.has("coach") && isStepInList("coach") && (
+				<div className={currentStep?.id !== "coach" ? "hidden" : undefined}>
+					<CoachInfoStep
+						key={stepResetKeys["coach"] || 0}
+						defaultValues={coachInfo || undefined}
+						onNext={handleCoachInfoNext}
+						formId="coach-info-form"
+					/>
+				</div>
+			)}
+
+			{visitedSteps.has("history") && isStepInList("history") && (
+				<div className={currentStep?.id !== "history" ? "hidden" : undefined}>
+					<HistoryStep
+						key={stepResetKeys["history"] || 0}
+						defaultValues={historyInfo || undefined}
+						onNext={handleHistoryNext}
+						formId="history-form"
+					/>
+				</div>
+			)}
 
 			{/* Navigation Buttons - Skip for role selection step */}
 			{currentStep?.id !== "roles" && (
@@ -221,8 +302,11 @@ const CompleteProfileForm = ({ onProfileComplete, isAdult = true, ageTier = "Adu
 						)}
 
 						<Button
-							type="submit"
-							form={currentStep?.formId}
+							type="button"
+							onClick={() => {
+								const form = document.getElementById(currentStep?.formId ?? "") as HTMLFormElement | null;
+								form?.requestSubmit();
+							}}
 							disabled={isLoading}
 							loading={isLoading}
 							className="gap-2"

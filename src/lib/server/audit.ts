@@ -20,8 +20,8 @@ export const getEventsByFilter = async (filter?: EventFilterRequest): Promise<Ev
 	if (filter?.sortOrder) params.append("sortOrder", filter.sortOrder);
 	if (filter?.type !== undefined) params.append("type", filter.type.toString());
 	if (filter?.surface !== undefined) params.append("surface", filter.surface.toString());
-	if (filter?.from) params.append("from", filter.from.toISOString());
-	if (filter?.to) params.append("to", filter.to.toISOString());
+	if (filter?.from) params.append("from", filter.from);
+	if (filter?.to) params.append("to", filter.to);
 	if (filter?.organizerId) params.append("organizerId", filter.organizerId);
 	if (filter?.participantId) params.append("participantId", filter.participantId);
 

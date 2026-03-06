@@ -147,8 +147,8 @@ export function DevImpersonator() {
 	if (!isEnabled && !isCurrentlyImpersonating) return null;
 
 	return (
-		<div ref={panelRef} className="fixed bottom-4 left-4 z-[9999]">
-			{/* Floating toggle button */}
+		<div ref={panelRef} className="fixed top-4 left-4 z-[9999]">
+			{/* Toggle button */}
 			<button
 				onClick={() => setIsOpen(!isOpen)}
 				className={`flex items-center gap-2 rounded-full px-3 py-2 shadow-lg transition-all
@@ -170,9 +170,9 @@ export function DevImpersonator() {
 				</span>
 			</button>
 
-			{/* Expanded panel */}
+			{/* Dropdown panel */}
 			{isOpen && (
-				<div className="absolute bottom-14 left-0 w-80 rounded-xl bg-surface-raised shadow-xl ring-1 ring-border overflow-hidden">
+				<div className="absolute top-14 left-0 w-80 rounded-xl bg-surface-raised shadow-xl ring-1 ring-border overflow-hidden">
 					{/* Switch back button */}
 					{isCurrentlyImpersonating && (
 						<button

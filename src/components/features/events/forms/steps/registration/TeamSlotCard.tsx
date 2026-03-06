@@ -1,8 +1,8 @@
-import { Avatar, Badge, Button, Input } from "@/components/ui";
+import { Avatar, Badge, Button, ColorPicker, Input } from "@/components/ui";
 import { Team } from "@/lib/models/Club";
 import { cn } from "@/lib/utils";
 import { useClub } from "@/providers";
-import { Check, Mail, Palette, Pencil, Users, X } from "lucide-react";
+import { Check, Mail, Pencil, Users, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import * as yup from "yup";
 import type { MatchTeamSlot } from "../../types/registration";
@@ -47,7 +47,7 @@ export function TeamSlotCard({ label, slot, onChange, disabled }: TeamSlotCardPr
 	return (
 		<div
 			className={cn(
-				"rounded-xl border transition-all bg-surface",
+				"rounded-xl border transition-all bg-surface min-w-0",
 				slot ? "border-accent shadow-sm" : "border-border",
 				disabled && "opacity-50 pointer-events-none"
 			)}>
@@ -60,11 +60,37 @@ export function TeamSlotCard({ label, slot, onChange, disabled }: TeamSlotCardPr
 					<Badge variant="soft" color="neutral" size="xs">Empty</Badge>
 				) : slot.status === "accepted" ? (
 					<Badge variant="soft" color="success" size="xs">Confirmed</Badge>
-				) : slot.status === "pending" ? (
-					<Badge variant="soft" color="warning" size="xs">Invited</Badge>
 				) : slot.status === "declined" ? (
 					<Badge variant="soft" color="error" size="xs">Declined</Badge>
-				) : null}
+				) : (
+					<div className="flex gap-1.5">
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon-xs"
+							onClick={() => {
+								onChange(null);
+								setMode((slot.type as SelectionMode) || "own");
+							}}
+							aria-label="Change team"
+						>
+							<Pencil size={14} className="text-muted-foreground" />
+						</Button>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon-xs"
+							className="group hover:bg-error/10"
+							onClick={() => {
+								onChange(null);
+								setMode(null);
+							}}
+							aria-label="Remove team"
+						>
+							<X size={14} className="text-muted-foreground group-hover:text-error" />
+						</Button>
+					</div>
+				)}
 			</div>
 
 			{/* Body */}
@@ -117,7 +143,7 @@ export function TeamSlotCard({ label, slot, onChange, disabled }: TeamSlotCardPr
 							</div>
 
 							{/* Mode Content */}
-							{mode === "own" && <OwnTeamSelector selectedId={slot?.teamId} onSelect={handleTeamSelect} />}
+							{mode === "own" && <OwnTeamSelector selectedId={(slot as MatchTeamSlot | null)?.teamId} onSelect={handleTeamSelect} />}
 							{mode === "invite" && (
 								<InviteTeamSelector
 									onInvite={(teamId, teamName) => {
@@ -134,52 +160,22 @@ export function TeamSlotCard({ label, slot, onChange, disabled }: TeamSlotCardPr
 						</div>
 					</>
 				) : (
-					<>
-						{/* Filled state */}
-						<div className="flex items-center gap-3">
-							<Avatar
-								variant="team"
-								size="md"
-								name={slot.team?.name || slot.name}
-								color={slot.team?.color || slot.color}
-							/>
-							<div className="flex-1 min-w-0">
-								<div className="text-sm font-semibold text-foreground truncate">
-									{slot.team?.name || slot.name}
-								</div>
-								<div className="text-xs text-muted-foreground truncate">
-									{slot.team?.club?.name || slot.contactEmail || "External team"}
-								</div>
+					<div className="flex items-center gap-3">
+						<Avatar
+							variant="team"
+							size="md"
+							name={slot.team?.name || slot.name}
+							color={slot.team?.color || slot.color}
+						/>
+						<div className="flex-1 min-w-0">
+							<div className="text-sm font-semibold text-foreground truncate">
+								{slot.team?.name || slot.name}
 							</div>
-							<div className="flex gap-1.5 shrink-0">
-								<Button
-									type="button"
-									variant="outline"
-									size="icon"
-									onClick={() => {
-										onChange(null);
-										setMode((slot.type as SelectionMode) || "own");
-									}}
-									aria-label="Change team"
-								>
-									<Pencil size={14} className="text-muted-foreground" />
-								</Button>
-								<Button
-									type="button"
-									variant="outline"
-									size="icon"
-									className="group hover:bg-error/10 hover:border-error"
-									onClick={() => {
-										onChange(null);
-										setMode(null);
-									}}
-									aria-label="Remove team"
-								>
-									<X size={14} className="text-muted-foreground group-hover:text-error" />
-								</Button>
+							<div className="text-xs text-muted-foreground truncate">
+								{slot.team?.club?.name || slot.contactEmail || "External team"}
 							</div>
 						</div>
-					</>
+					</div>
 				)}
 			</div>
 		</div>
@@ -287,11 +283,11 @@ function ManualTeamEntry({ onSubmit }: { onSubmit: (name: string, email: string,
 				maxLength={254}
 				onChange={(e) => setEmail(e.target.value)}
 			/>
-			<div className="flex items-center gap-1.5 sm:gap-2">
-				<Palette size={12} className="text-muted-foreground sm:w-3.5 sm:h-3.5" />
-				<input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="w-6 h-6 sm:w-8 sm:h-8 rounded cursor-pointer" aria-label="Team color" />
-				<span className="text-[10px] sm:text-xs text-muted-foreground">Team color</span>
-			</div>
+			<ColorPicker
+				label="Team color"
+				value={color}
+				onChange={setColor}
+			/>
 
 			{errors.length > 0 && (
 				<div className="space-y-1">

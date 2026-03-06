@@ -174,7 +174,7 @@ export default function CoachingTrainingPlansPage() {
 
 	const hasFilters =
 		selectedSkills.length > 0 ||
-		search ||
+		!!search ||
 		sortBy !== "newest" ||
 		isDurationModified ||
 		source !== "discover" ||
@@ -372,9 +372,9 @@ export default function CoachingTrainingPlansPage() {
 					description={
 						hasFilters
 							? "Try adjusting your search or filters"
-							: source === "bookmarked"
+							: (source as string) === "bookmarked"
 								? "You haven't bookmarked any training plans yet"
-								: source === "club"
+								: (source as string) === "club"
 									? "Your club hasn't created any training plan templates yet"
 									: "No public training plans have been shared yet"
 					}

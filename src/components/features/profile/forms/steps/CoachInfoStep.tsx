@@ -134,7 +134,7 @@ const CoachInfoStep = ({ defaultValues, onNext, formId }: Props) => {
 	};
 
 	return (
-		<form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+		<form id={formId} onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 			<div className="flex flex-col gap-2">
 				<h2 className="text-xl font-semibold text-white">Coach Profile</h2>
 				<p className="text-sm text-muted">Share your coaching experience and certifications.</p>

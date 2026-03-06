@@ -1,16 +1,26 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { sendVerification } from "@/lib/api/auth";
 import Loader from "@/components/ui/loader";
 import { Button } from "@/components";
 import { Mail } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/providers";
 
 function EmailVerificationContent() {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
 	const [resendSuccess, setResendSuccess] = useState<boolean>(false);
+	const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+	const router = useRouter();
+
+	useEffect(() => {
+		if (!isAuthLoading && isAuthenticated) {
+			router.replace("/hub/events");
+		}
+	}, [isAuthLoading, isAuthenticated, router]);
 
 	const handleResendEmail = async () => {
 		setIsLoading(true);
@@ -27,6 +37,10 @@ function EmailVerificationContent() {
 			setIsLoading(false);
 		}
 	};
+
+	if (isAuthLoading || isAuthenticated) {
+		return <Loader />;
+	}
 
 	return (
 		<>

@@ -4,7 +4,7 @@ import { TeamMember, VolleyballPosition } from "@/lib/models/Club";
 import { useDroppable } from "@dnd-kit/core";
 import { Plus, Star } from "lucide-react";
 import Image from "next/image";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { COURT_POSITIONS } from "../constants";
 import PositionAssignmentPopup from "./PositionAssignmentPopup";
 
@@ -29,6 +29,20 @@ export default function VolleyballCourt({
 	onReorderInPosition,
 	sidebarPriorities,
 }: VolleyballCourtProps) {
+	const courtRef = useRef<HTMLDivElement>(null);
+
+	// Close popup on outside click (SPI-5135)
+	useEffect(() => {
+		if (!assigningPosition) return;
+		const handleClickOutside = (e: MouseEvent) => {
+			if (courtRef.current && !courtRef.current.contains(e.target as Node)) {
+				onPositionClick(null);
+			}
+		};
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => document.removeEventListener("mousedown", handleClickOutside);
+	}, [assigningPosition, onPositionClick]);
+
 	// Auto-assign members based on their positions from roster
 	// Uses sidebarPriorities to determine display order
 	const autoAssignments = useMemo(() => {
@@ -77,7 +91,7 @@ export default function VolleyballCourt({
 	};
 
 	return (
-		<div>
+		<div ref={courtRef}>
 			<div className="aspect-[1.8] bg-orange-500/20 rounded-xl border-4 border-border relative p-8 shadow-inner" onClick={() => onPositionClick(null)}>
 				{/* Court Lines */}
 				<div className="absolute inset-0 m-4 border-2 border-border pointer-events-none" />
@@ -176,7 +190,7 @@ function DroppableCourtPosition({
 	return (
 		<div
 			ref={setNodeRef}
-			className="absolute w-20 h-20 -translate-x-1/2 -translate-y-1/2 z-10"
+			className={`absolute w-20 h-20 -translate-x-1/2 -translate-y-1/2 ${showPopup ? "z-50" : "z-10"}`}
 			style={{ left: x, top: y }}
 			onClick={(e) => e.stopPropagation()}>
 			<button
@@ -220,7 +234,8 @@ function DroppableCourtPosition({
 								</div>
 							)}
 						</div>
-						<span className="mt-1 text-xs font-medium text-white bg-black/50 px-2 py-0.5 rounded-full truncate max-w-full">
+						<span className="mt-0.5 text-[10px] font-bold text-white/70">{label}</span>
+						<span className="text-xs font-medium text-white bg-black/50 px-2 py-0.5 rounded-full truncate max-w-full">
 							{assignedMembers.length === 1 ? assignedMembers[0].userProfile?.name : `${assignedMembers.length} Players`}
 						</span>
 					</>

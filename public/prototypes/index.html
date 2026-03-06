@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototypes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #F5F5F5;
+    color: #1A1A1A;
+    padding: 48px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .container { width: 100%; max-width: 640px; }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: #6B7280;
+    margin-bottom: 32px;
+  }
+
+  h2 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6B7280;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    padding-left: 4px;
+  }
+
+  h2:first-of-type { margin-top: 0; }
+
+  .list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+
+  .list a {
+    display: block;
+    padding: 14px 18px;
+    background: #FFFFFF;
+    border: 1px solid #D6DADD;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #1A1A1A;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .list a:hover {
+    border-color: #FF7D00;
+    box-shadow: 0 0 0 1px #FF7D00;
+  }
+
+  .name { font-size: 14px; font-weight: 600; }
+  .desc { font-size: 12px; color: #6B7280; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Prototypes</h1>
+  <p class="subtitle">UI prototypes for VolleySpike features</p>
+
+  <h2>Badges</h2>
+  <div class="list">
+    <a href="badges-A-trophy-room.html">
+      <div class="name">Badges A - Trophy Room</div>
+      <div class="desc">Trophy room layout for badges display</div>
+    </a>
+    <a href="badges-B-progress-grid.html">
+      <div class="name">Badges B - Progress Grid</div>
+      <div class="desc">Grid layout with progress indicators</div>
+    </a>
+    <a href="badges-C-timeline-journey.html">
+      <div class="name">Badges C - Timeline Journey</div>
+      <div class="desc">Timeline-based badge progression</div>
+    </a>
+    <a href="badges-D-gamification-hub.html">
+      <div class="name">Badges D - Gamification Hub</div>
+      <div class="desc">Gamification-focused badge display</div>
+    </a>
+  </div>
+
+  <h2>Training Plan Builder</h2>
+  <div class="list">
+    <a href="builder-sections.html">
+      <div class="name">Builder - Sections</div>
+      <div class="desc">Section-based training plan builder</div>
+    </a>
+    <a href="builder-split-view.html">
+      <div class="name">Builder - Split View</div>
+      <div class="desc">Split panel training plan builder</div>
+    </a>
+    <a href="builder-visual-timeline.html">
+      <div class="name">Builder - Visual Timeline</div>
+      <div class="desc">Timeline-based visual builder</div>
+    </a>
+    <a href="training-wizard-mockups.html">
+      <div class="name">Training Wizard Mockups</div>
+      <div class="desc">Step-by-step training plan wizard</div>
+    </a>
+  </div>
+
+  <h2>Training Plans</h2>
+  <div class="list">
+    <a href="training-plan-A-split-panel.html">
+      <div class="name">Training Plan A - Split Panel</div>
+      <div class="desc">Split panel layout for training plans</div>
+    </a>
+    <a href="training-plan-B-timeline-focused.html">
+      <div class="name">Training Plan B - Timeline Focused</div>
+      <div class="desc">Timeline-centric training plan view</div>
+    </a>
+    <a href="training-plan-C-kanban-sections.html">
+      <div class="name">Training Plan C - Kanban Sections</div>
+      <div class="desc">Kanban-style section organization</div>
+    </a>
+    <a href="training-plan-D-combined.html">
+      <div class="name">Training Plan D - Combined</div>
+      <div class="desc">Combined approach with multiple views</div>
+    </a>
+  </div>
+
+  <h2>Evaluation Plans</h2>
+  <div class="list">
+    <a href="evaluation-plan-builder.html">
+      <div class="name">Evaluation Plan Builder</div>
+      <div class="desc">Builder for player evaluation plans</div>
+    </a>
+    <a href="plan-view-A-timeline-first.html">
+      <div class="name">Plan View A - Timeline First</div>
+      <div class="desc">Timeline-first evaluation plan view</div>
+    </a>
+    <a href="plan-view-B-coach-dashboard.html">
+      <div class="name">Plan View B - Coach Dashboard</div>
+      <div class="desc">Coach-centric dashboard view</div>
+    </a>
+    <a href="plan-view-C-vertical-flow.html">
+      <div class="name">Plan View C - Vertical Flow</div>
+      <div class="desc">Vertical flow evaluation plan</div>
+    </a>
+    <a href="plan-view-FINAL.html">
+      <div class="name">Plan View - Final</div>
+      <div class="desc">Final approved evaluation plan view</div>
+    </a>
+  </div>
+
+  <h2>Evaluation Session Flow</h2>
+  <div class="list">
+    <a href="01-setup-page.html">
+      <div class="name">01 - Setup Page</div>
+      <div class="desc">Evaluation session setup and configuration</div>
+    </a>
+    <a href="02-run-evaluator.html">
+      <div class="name">02 - Run Evaluator (Mobile)</div>
+      <div class="desc">Live evaluation scoring interface - mobile</div>
+    </a>
+    <a href="02b-run-evaluator-desktop.html">
+      <div class="name">02b - Run Evaluator (Desktop)</div>
+      <div class="desc">Live evaluation scoring interface - desktop</div>
+    </a>
+    <a href="03-run-coach-dashboard.html">
+      <div class="name">03 - Coach Dashboard</div>
+      <div class="desc">Real-time coach view during evaluation</div>
+    </a>
+    <a href="04-results-evaluation.html">
+      <div class="name">04 - Results (Mobile)</div>
+      <div class="desc">Evaluation results and scores - mobile</div>
+    </a>
+    <a href="04b-results-evaluation-desktop.html">
+      <div class="name">04b - Results (Desktop)</div>
+      <div class="desc">Evaluation results and scores - desktop</div>
+    </a>
+    <a href="05-results-trial.html">
+      <div class="name">05 - Trial Results (Mobile)</div>
+      <div class="desc">Trial/tryout results view - mobile</div>
+    </a>
+    <a href="05b-results-trial-desktop.html">
+      <div class="name">05b - Trial Results (Desktop)</div>
+      <div class="desc">Trial/tryout results view - desktop</div>
+    </a>
+  </div>
+
+  <h2>Events</h2>
+  <div class="list">
+    <a href="event-page-redesign.html">
+      <div class="name">Event Page Redesign</div>
+      <div class="desc">Redesigned event detail page</div>
+    </a>
+  </div>
+
+  <h2>Feedback</h2>
+  <div class="list">
+    <a href="feedback-actions.html">
+      <div class="name">Feedback - Actions</div>
+      <div class="desc">Actionable feedback interface</div>
+    </a>
+    <a href="feedback-cards.html">
+      <div class="name">Feedback - Cards</div>
+      <div class="desc">Card-based feedback layout</div>
+    </a>
+    <a href="feedback-insights.html">
+      <div class="name">Feedback - Insights</div>
+      <div class="desc">Feedback insights and analytics</div>
+    </a>
+    <a href="feedback-timeline.html">
+      <div class="name">Feedback - Timeline</div>
+      <div class="desc">Timeline-based feedback view</div>
+    </a>
+  </div>
+
+  <h2>Match Teams</h2>
+  <div class="list">
+    <a href="match-team-side-by-side.html">
+      <div class="name">Match Team Selection - Side by Side</div>
+      <div class="desc">VS layout with teams displayed side by side</div>
+    </a>
+    <a href="match-team-stacked.html">
+      <div class="name">Match Team Selection - Stacked</div>
+      <div class="desc">Vertical stacked card layout with inline team picker</div>
+    </a>
+  </div>
+</div>
+</body>
+</html>

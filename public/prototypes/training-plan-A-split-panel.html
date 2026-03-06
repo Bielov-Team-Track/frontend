@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Plan Builder — Prototype A: Split Panel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        base: '#121A1B',
+        subtle: '#1E292B',
+        surface: '#243335',
+        raised: '#2C383A',
+        overlay: '#344345',
+        border: '#2C383A',
+        'border-strong': '#3A4A4D',
+        muted: '#666666',
+        foreground: '#F5F5F5',
+        primary: '#FF7D00',
+        secondary: '#29757A',
+        accent: '#FF7D00',
+        success: '#4A7A45',
+        error: '#BE3F23',
+        info: '#2E5A88',
+        warning: '#D99100',
+        hover: '#2C383A',
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: Inter, system-ui, sans-serif; background: #121A1B; color: #F5F5F5; }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #3A4A4D; border-radius: 3px; }
+  .drag-ghost { opacity: 0.5; }
+  .drag-over { border-color: #FF7D00 !important; background: rgba(255,125,0,0.05) !important; }
+  .drop-indicator { height: 3px; background: #FF7D00; border-radius: 2px; margin: -2px 0; transition: opacity 0.15s; }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+  .animate-slide-in { animation: slideIn 0.3s ease-out; }
+  @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,125,0,0); } 50% { box-shadow: 0 0 12px 2px rgba(255,125,0,0.2); } }
+  .pulse-glow { animation: pulse-glow 2s infinite; }
+</style>
+</head>
+<body class="min-h-screen">
+<!-- App Shell -->
+<div class="max-w-[1400px] mx-auto p-6">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <a href="#" class="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-4">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Plans
+    </a>
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-foreground">Create Training Plan</h1>
+        <p class="text-sm text-muted mt-1">Drag drills from the library to build your session timeline</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="px-4 py-2 rounded-xl text-sm font-medium text-muted border border-border hover:border-border-strong hover:text-foreground transition-all">Cancel</button>
+        <button class="px-4 py-2 rounded-xl text-sm font-medium bg-primary text-white hover:brightness-110 transition-all flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save Template
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template Info (collapsible) -->
+  <div id="templateInfo" class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm p-5 mb-6">
+    <div class="flex items-center justify-between cursor-pointer" onclick="toggleTemplateInfo()">
+      <h2 class="text-base font-bold text-foreground">Template Details</h2>
+      <svg id="templateInfoChevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted transition-transform"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div id="templateInfoContent" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-xs font-medium text-muted mb-1.5">Name <span class="text-error">*</span></label>
+        <input type="text" placeholder="e.g., Pre-Game Warm-up" class="w-full px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all" value="Advanced Attacking Clinic" />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-muted mb-1.5">Description</label>
+        <input type="text" placeholder="What is this plan for?" class="w-full px-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all" value="High-intensity session focused on attacking skills" />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-muted mb-1.5">Visibility</label>
+        <div class="flex gap-2">
+          <button class="flex-1 px-3 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary border border-primary/30">Private</button>
+          <button class="flex-1 px-3 py-2 rounded-lg text-sm font-medium text-muted border border-border hover:border-border-strong transition-all">Public</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Split Layout -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT: Drill Library -->
+    <div class="lg:col-span-4 space-y-4">
+      <!-- Search & Filters -->
+      <div class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm p-4">
+        <div class="relative mb-3">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="drillSearch" placeholder="Search drills..." class="w-full pl-9 pr-3 py-2 rounded-lg bg-subtle/50 border border-border text-foreground text-sm placeholder:text-muted/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all" oninput="filterDrills()" />
+        </div>
+
+        <!-- Skill Filter Pills -->
+        <div class="flex flex-wrap gap-1.5" id="skillFilters"></div>
+      </div>
+
+      <!-- Drill List -->
+      <div class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm overflow-hidden flex flex-col" style="max-height: 600px;">
+        <div class="px-4 py-3 border-b border-border flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-foreground text-sm">Drill Library</h3>
+            <p class="text-xs text-muted mt-0.5" id="drillCount">12 drills</p>
+          </div>
+          <div class="flex gap-1">
+            <button class="p-1.5 rounded-lg text-muted hover:text-foreground hover:bg-hover transition-all" title="Grid view">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            </button>
+            <button class="p-1.5 rounded-lg text-foreground bg-hover transition-all" title="List view">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-thin" id="drillLibrary"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Timeline -->
+    <div class="lg:col-span-8 space-y-4">
+      <!-- Time Budget Bar -->
+      <div class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm p-5 relative overflow-hidden">
+        <div id="timeBudgetBar" class="absolute bottom-0 left-0 h-1 bg-accent transition-all duration-500" style="width: 0%"></div>
+
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
+          <div>
+            <h2 class="text-lg font-bold text-foreground">Session Timeline</h2>
+            <p class="text-xs text-muted mt-0.5">Drag to reorder &middot; Click to edit duration</p>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <!-- Duration Selector -->
+            <div class="flex items-center gap-2 bg-subtle/50 rounded-xl px-3 py-1.5 border border-border">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <select id="sessionDuration" class="bg-transparent text-foreground text-sm font-medium outline-none cursor-pointer" onchange="updateTimeBudget()">
+                <option value="60">60 min</option>
+                <option value="90" selected>90 min</option>
+                <option value="120">120 min</option>
+                <option value="150">150 min</option>
+              </select>
+            </div>
+
+            <div class="text-right">
+              <div id="timeDisplay" class="text-2xl font-bold text-foreground">0<span class="text-lg text-muted font-medium">/90m</span></div>
+              <div id="timeRemaining" class="text-xs font-bold uppercase tracking-wider text-muted">90m remaining</div>
+            </div>
+
+            <button id="clearAllBtn" class="hidden px-3 py-1.5 rounded-lg text-xs font-medium text-muted border border-border hover:text-error hover:border-error/30 transition-all" onclick="clearTimeline()">
+              Clear All
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Tabs -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1">
+        <div id="sectionTabs" class="flex items-center gap-2"></div>
+        <button class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-muted border border-dashed border-border hover:border-primary/50 hover:text-primary transition-all whitespace-nowrap" onclick="addSection()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Section
+        </button>
+      </div>
+
+      <!-- Timeline Area -->
+      <div id="timelineArea" class="min-h-[400px]">
+        <!-- Empty State -->
+        <div id="emptyState" class="rounded-2xl bg-surface/80 backdrop-blur-sm shadow-sm p-12 text-center">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-subtle flex items-center justify-center mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-muted"><path d="M14.5 4h-5L7 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-1">Build your training timeline</h3>
+          <p class="text-sm text-muted mb-6 max-w-sm mx-auto">Drag drills from the library on the left, or click the + button to add them to your session</p>
+          <div class="flex justify-center gap-3">
+            <button class="px-4 py-2 rounded-xl text-sm font-medium border border-primary/30 text-primary hover:bg-primary/10 transition-all flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Load Template
+            </button>
+          </div>
+        </div>
+
+        <!-- Timeline Content (hidden initially) -->
+        <div id="timelineContent" class="hidden">
+          <div class="relative pl-8" id="timelineList">
+            <!-- Timeline line -->
+            <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-border"></div>
+            <!-- Start node -->
+            <div class="absolute left-[5px] top-0 w-[13px] h-[13px] rounded-full bg-accent border-[3px] border-base z-10"></div>
+
+            <!-- Items inserted here by JS -->
+
+            <!-- End node -->
+            <div id="endNode" class="absolute left-[5px] bottom-0 w-[13px] h-[13px] rounded-full bg-muted/50 border-[3px] border-base z-10"></div>
+          </div>
+
+          <!-- Drop zone at end -->
+          <div id="dropZone" class="mt-4 p-6 rounded-xl border-2 border-dashed border-border text-center transition-all hover:border-primary/30">
+            <p class="text-sm text-muted">Drop drills here or
+              <button class="text-primary hover:underline" onclick="document.getElementById('drillSearch').focus()">browse library</button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Drill Detail Drawer (slides from right) -->
+<div id="drillDrawer" class="fixed inset-y-0 right-0 w-[420px] bg-overlay/95 backdrop-blur-xl shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+  <div class="h-full flex flex-col">
+    <div class="p-5 border-b border-border flex items-center justify-between">
+      <h3 class="font-bold text-foreground" id="drawerDrillName">Drill Name</h3>
+      <button onclick="closeDrawer()" class="p-2 rounded-lg hover:bg-hover text-muted hover:text-foreground transition-colors">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-5 space-y-4" id="drawerContent"></div>
+    <div class="p-4 border-t border-border">
+      <button class="w-full px-4 py-2.5 rounded-xl text-sm font-medium bg-primary text-white hover:brightness-110 transition-all flex items-center justify-center gap-2" onclick="addDrawerDrillToTimeline()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add to Timeline
+      </button>
+    </div>
+  </div>
+</div>
+<div id="drawerOverlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 z-40" onclick="closeDrawer()"></div>
+
+<!-- Edit Duration Popover -->
+<div id="durationPopover" class="fixed bg-raised/95 backdrop-blur-lg shadow-lg rounded-xl border border-border p-4 z-50 hidden" style="min-width: 220px;">
+  <label class="block text-xs font-medium text-muted mb-2">Duration (minutes)</label>
+  <div class="flex items-center gap-2">
+    <button class="w-8 h-8 rounded-lg bg-subtle border border-border text-foreground hover:bg-hover flex items-center justify-center" onclick="adjustPopoverDuration(-5)">-5</button>
+    <input type="number" id="popoverDuration" class="flex-1 px-3 py-1.5 rounded-lg bg-subtle/50 border border-border text-foreground text-sm text-center focus:border-primary/50 outline-none" min="1" />
+    <button class="w-8 h-8 rounded-lg bg-subtle border border-border text-foreground hover:bg-hover flex items-center justify-center" onclick="adjustPopoverDuration(5)">+5</button>
+  </div>
+  <div class="flex gap-2 mt-3">
+    <button class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium text-muted border border-border hover:text-foreground transition-all" onclick="closeDurationPopover()">Cancel</button>
+    <button class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-white hover:brightness-110 transition-all" onclick="saveDuration()">Save</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// MOCK DATA
+// ═══════════════════════════════════════════════════
+
+const CATEGORIES = ['Warmup','Technical','Tactical','Game','Conditioning','Cooldown'];
+const INTENSITIES = ['Low','Medium','High'];
+const SKILLS = ['Serving','Passing','Setting','Attacking','Blocking','Defense','Conditioning','Footwork'];
+
+const CATEGORY_COLORS = {
+  Warmup:'#29757A', Technical:'#2E5A88', Tactical:'#FF7D00', Game:'#FF7D00',
+  Conditioning:'#D99100', Cooldown:'#4A7A45'
+};
+const INTENSITY_COLORS = { Low:'#4A7A45', Medium:'#D99100', High:'#BE3F23' };
+
+const MOCK_DRILLS = [
+  { id:'d1', name:'Dynamic Stretching', duration:10, category:'Warmup', intensity:'Low', skills:['Conditioning','Footwork'], description:'Full-body dynamic stretch routine to prepare muscles and joints', instructions:['Arm circles','Leg swings','Hip rotations','Lunges with twist'] },
+  { id:'d2', name:'Pepper Drill', duration:8, category:'Warmup', intensity:'Low', skills:['Passing','Setting','Attacking'], description:'Partner passing, setting, and hitting warm-up drill' },
+  { id:'d3', name:'Serve Receive Lines', duration:15, category:'Technical', intensity:'Medium', skills:['Serving','Passing'], description:'Servers on one side, passers on the other. Focus on platform angle and footwork to target.' },
+  { id:'d4', name:'Setting Accuracy', duration:12, category:'Technical', intensity:'Medium', skills:['Setting'], description:'Setters work on consistent hand position and delivery to zones 2 and 4.' },
+  { id:'d5', name:'Attacking Approach', duration:15, category:'Technical', intensity:'High', skills:['Attacking','Footwork'], description:'Three-step approach drill with focus on timing, arm swing, and contact point.' },
+  { id:'d6', name:'Block & Recover', duration:12, category:'Technical', intensity:'High', skills:['Blocking','Defense','Footwork'], description:'Block at net then transition to defensive position. Focus on lateral movement.' },
+  { id:'d7', name:'6v6 Controlled', duration:20, category:'Tactical', intensity:'Medium', skills:['Serving','Passing','Setting','Attacking','Blocking','Defense'], description:'Full rotation game with specific tactical focus: serve receive patterns and quick attacks.' },
+  { id:'d8', name:'Transition Offense', duration:15, category:'Tactical', intensity:'High', skills:['Attacking','Setting','Defense'], description:'Dig → set → attack sequences from different defensive positions.' },
+  { id:'d9', name:'King of the Court', duration:20, category:'Game', intensity:'High', skills:['Serving','Passing','Setting','Attacking'], description:'Competitive 3v3 or 4v4 with rotation. Winners stay, losers rotate off.' },
+  { id:'d10', name:'Suicide Sprints', duration:8, category:'Conditioning', intensity:'High', skills:['Conditioning','Footwork'], description:'Court-length sprint intervals with specific volleyball movement patterns.' },
+  { id:'d11', name:'Cool Down Jog & Stretch', duration:10, category:'Cooldown', intensity:'Low', skills:['Conditioning'], description:'Light jog around court followed by static stretching for all major muscle groups.' },
+  { id:'d12', name:'Jump Serve Practice', duration:12, category:'Technical', intensity:'High', skills:['Serving'], description:'Individual jump serve practice with toss consistency and contact point focus.' },
+];
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+
+let timeline = [];
+let sections = [{ id: 'all', name: 'All Drills', order: 0 }];
+let activeSection = 'all';
+let selectedSkillFilters = new Set();
+let drawerDrill = null;
+let editingItemId = null;
+let dragSrcId = null;
+
+// ═══════════════════════════════════════════════════
+// SKILL FILTERS
+// ═══════════════════════════════════════════════════
+
+function renderSkillFilters() {
+  const container = document.getElementById('skillFilters');
+  container.innerHTML = SKILLS.map(skill => {
+    const active = selectedSkillFilters.has(skill);
+    return `<button onclick="toggleSkill('${skill}')"
+      class="px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+        active ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-subtle/50 text-muted border border-border hover:border-border-strong hover:text-foreground'
+      }">${skill}</button>`;
+  }).join('');
+}
+
+function toggleSkill(skill) {
+  if (selectedSkillFilters.has(skill)) selectedSkillFilters.delete(skill);
+  else selectedSkillFilters.add(skill);
+  renderSkillFilters();
+  renderDrillLibrary();
+}
+
+// ═══════════════════════════════════════════════════
+// DRILL LIBRARY
+// ═══════════════════════════════════════════════════
+
+function filterDrills() {
+  renderDrillLibrary();
+}
+
+function renderDrillLibrary() {
+  const search = document.getElementById('drillSearch').value.toLowerCase();
+  const container = document.getElementById('drillLibrary');
+
+  let drills = MOCK_DRILLS;
+  if (search) drills = drills.filter(d => d.name.toLowerCase().includes(search) || d.description.toLowerCase().includes(search));
+  if (selectedSkillFilters.size > 0) drills = drills.filter(d => d.skills.some(s => selectedSkillFilters.has(s)));
+
+  document.getElementById('drillCount').textContent = `${drills.length} drills`;
+
+  container.innerHTML = drills.map(drill => `
+    <div class="group flex items-center gap-3 p-3 rounded-xl bg-subtle/30 hover:bg-hover border border-transparent hover:border-border transition-all cursor-pointer"
+         draggable="true" ondragstart="onLibraryDragStart(event, '${drill.id}')" ondragend="onDragEnd(event)"
+         onclick="openDrawer('${drill.id}')">
+      <div class="flex-shrink-0 w-1 h-10 rounded-full" style="background: ${CATEGORY_COLORS[drill.category]}"></div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium text-foreground truncate">${drill.name}</span>
+        </div>
+        <div class="flex items-center gap-2 mt-0.5">
+          <span class="text-xs text-muted flex items-center gap-1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${drill.duration}m
+          </span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-medium" style="background: ${CATEGORY_COLORS[drill.category]}20; color: ${CATEGORY_COLORS[drill.category]}">${drill.category}</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-medium" style="background: ${INTENSITY_COLORS[drill.intensity]}20; color: ${INTENSITY_COLORS[drill.intensity]}">${drill.intensity}</span>
+        </div>
+      </div>
+      <button onclick="event.stopPropagation(); addDrillToTimeline('${drill.id}')"
+        class="flex-shrink-0 w-7 h-7 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" title="Add to timeline">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// TIMELINE
+// ═══════════════════════════════════════════════════
+
+function addDrillToTimeline(drillId) {
+  const drill = MOCK_DRILLS.find(d => d.id === drillId);
+  if (!drill) return;
+  const item = { ...drill, instanceId: 'ti-' + Date.now() + Math.random().toString(36).substr(2, 5), sectionId: activeSection };
+  timeline.push(item);
+  renderTimeline();
+  updateTimeBudget();
+}
+
+function removeDrillFromTimeline(instanceId) {
+  timeline = timeline.filter(t => t.instanceId !== instanceId);
+  renderTimeline();
+  updateTimeBudget();
+}
+
+function clearTimeline() {
+  timeline = [];
+  renderTimeline();
+  updateTimeBudget();
+}
+
+function formatTime(minutes) {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+}
+
+function renderTimeline() {
+  const empty = document.getElementById('emptyState');
+  const content = document.getElementById('timelineContent');
+  const clearBtn = document.getElementById('clearAllBtn');
+
+  if (timeline.length === 0) {
+    empty.classList.remove('hidden');
+    content.classList.add('hidden');
+    clearBtn.classList.add('hidden');
+    return;
+  }
+
+  empty.classList.add('hidden');
+  content.classList.remove('hidden');
+  clearBtn.classList.remove('hidden');
+
+  const list = document.getElementById('timelineList');
+  // Keep the line, start node, end node — clear items
+  const staticEls = list.querySelectorAll('[data-static]');
+  list.innerHTML = '';
+  // Re-add static elements
+  list.innerHTML = `
+    <div data-static class="absolute left-3 top-2 bottom-2 w-0.5 bg-border"></div>
+    <div data-static class="absolute left-[5px] top-0 w-[13px] h-[13px] rounded-full bg-accent border-[3px] border-base z-10"></div>
+  `;
+
+  let accTime = 0;
+  timeline.forEach((item, index) => {
+    const timeLabel = formatTime(accTime);
+    accTime += item.duration;
+
+    const el = document.createElement('div');
+    el.className = 'relative mb-3 animate-slide-in';
+    el.dataset.instanceId = item.instanceId;
+    el.draggable = true;
+    el.ondragstart = (e) => onTimelineDragStart(e, item.instanceId);
+    el.ondragover = (e) => onTimelineDragOver(e);
+    el.ondragenter = (e) => onTimelineDragEnter(e, item.instanceId);
+    el.ondragleave = (e) => onTimelineDragLeave(e);
+    el.ondrop = (e) => onTimelineDrop(e, item.instanceId);
+    el.ondragend = onDragEnd;
+
+    el.innerHTML = `
+      <!-- Node dot -->
+      <div class="absolute left-[-25px] top-5 w-[9px] h-[9px] rounded-full bg-muted/50 border-2 border-base z-10"></div>
+      <!-- Time label -->
+      <div class="absolute left-[-72px] top-4 text-[11px] font-mono text-muted w-10 text-right">${timeLabel}</div>
+
+      <div class="group ml-2 rounded-xl bg-surface/80 backdrop-blur-sm shadow-sm border border-border hover:border-accent/30 transition-all">
+        <div class="flex items-center gap-3 p-3.5">
+          <!-- Drag handle -->
+          <div class="flex-shrink-0 cursor-grab active:cursor-grabbing text-muted/40 hover:text-muted transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+          </div>
+
+          <!-- Category color bar -->
+          <div class="flex-shrink-0 w-1 h-10 rounded-full" style="background: ${CATEGORY_COLORS[item.category]}"></div>
+
+          <!-- Content -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <h4 class="font-semibold text-sm text-foreground truncate">${item.name}</h4>
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-medium" style="background: ${INTENSITY_COLORS[item.intensity]}20; color: ${INTENSITY_COLORS[item.intensity]}">${item.intensity}</span>
+            </div>
+            <div class="flex items-center gap-2 mt-1">
+              <button onclick="openDurationPopover(event, '${item.instanceId}')"
+                class="flex items-center gap-1 text-xs text-muted hover:text-primary transition-colors cursor-pointer" title="Click to edit duration">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                ${item.duration} min
+              </button>
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-medium" style="background: ${CATEGORY_COLORS[item.category]}20; color: ${CATEGORY_COLORS[item.category]}">${item.category}</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onclick="openDrawer('${item.id}')" class="p-1.5 rounded-lg text-muted hover:text-foreground hover:bg-hover transition-all" title="View details">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <button onclick="removeDrillFromTimeline('${item.instanceId}')" class="p-1.5 rounded-lg text-muted hover:text-error hover:bg-error/10 transition-all" title="Remove">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+
+  // End node
+  const totalTime = formatTime(accTime);
+  const endEl = document.createElement('div');
+  endEl.className = 'relative';
+  endEl.innerHTML = `
+    <div class="absolute left-[-25px] top-2 w-[13px] h-[13px] rounded-full bg-muted/50 border-[3px] border-base z-10"></div>
+    <div class="absolute left-[-72px] top-1 text-[11px] font-mono text-primary font-bold w-10 text-right">${totalTime}</div>
+    <div class="ml-2 text-xs text-muted py-2">End of session</div>
+  `;
+  list.appendChild(endEl);
+}
+
+// ═══════════════════════════════════════════════════
+// TIME BUDGET
+// ═══════════════════════════════════════════════════
+
+function updateTimeBudget() {
+  const sessionDur = parseInt(document.getElementById('sessionDuration').value);
+  const planned = timeline.reduce((acc, item) => acc + item.duration, 0);
+  const remaining = sessionDur - planned;
+  const pct = Math.min((planned / sessionDur) * 100, 100);
+  const isOver = remaining < 0;
+
+  document.getElementById('timeBudgetBar').style.width = pct + '%';
+  document.getElementById('timeBudgetBar').className = `absolute bottom-0 left-0 h-1 transition-all duration-500 ${isOver ? 'bg-error' : 'bg-accent'}`;
+  document.getElementById('timeDisplay').innerHTML = `${planned}<span class="text-lg text-muted font-medium">/${sessionDur}m</span>`;
+  document.getElementById('timeDisplay').className = `text-2xl font-bold ${isOver ? 'text-error' : 'text-foreground'}`;
+  document.getElementById('timeRemaining').textContent = isOver ? `${Math.abs(remaining)}m over` : `${remaining}m remaining`;
+  document.getElementById('timeRemaining').className = `text-xs font-bold uppercase tracking-wider ${isOver ? 'text-error' : 'text-muted'}`;
+}
+
+// ═══════════════════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════════════════
+
+function onLibraryDragStart(e, drillId) {
+  e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'library', drillId }));
+  e.dataTransfer.effectAllowed = 'copy';
+  e.target.classList.add('drag-ghost');
+  document.getElementById('dropZone').classList.add('border-primary/50', 'bg-primary/5');
+}
+
+function onTimelineDragStart(e, instanceId) {
+  dragSrcId = instanceId;
+  e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'timeline', instanceId }));
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => e.target.classList.add('drag-ghost'), 0);
+}
+
+function onTimelineDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function onTimelineDragEnter(e, instanceId) {
+  e.preventDefault();
+  if (dragSrcId === instanceId) return;
+  const el = e.currentTarget.querySelector('.rounded-xl');
+  if (el) el.classList.add('drag-over');
+}
+
+function onTimelineDragLeave(e) {
+  const el = e.currentTarget.querySelector('.rounded-xl');
+  if (el) el.classList.remove('drag-over');
+}
+
+function onTimelineDrop(e, targetInstanceId) {
+  e.preventDefault();
+  const el = e.currentTarget.querySelector('.rounded-xl');
+  if (el) el.classList.remove('drag-over');
+
+  const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+
+  if (data.type === 'library') {
+    // Insert from library at this position
+    const drill = MOCK_DRILLS.find(d => d.id === data.drillId);
+    if (!drill) return;
+    const newItem = { ...drill, instanceId: 'ti-' + Date.now() + Math.random().toString(36).substr(2, 5), sectionId: activeSection };
+    const idx = timeline.findIndex(t => t.instanceId === targetInstanceId);
+    timeline.splice(idx, 0, newItem);
+  } else if (data.type === 'timeline') {
+    // Reorder
+    if (data.instanceId === targetInstanceId) return;
+    const srcIdx = timeline.findIndex(t => t.instanceId === data.instanceId);
+    const tgtIdx = timeline.findIndex(t => t.instanceId === targetInstanceId);
+    const [moved] = timeline.splice(srcIdx, 1);
+    timeline.splice(tgtIdx, 0, moved);
+  }
+
+  renderTimeline();
+  updateTimeBudget();
+}
+
+function onDragEnd(e) {
+  e.target.classList.remove('drag-ghost');
+  document.getElementById('dropZone')?.classList.remove('border-primary/50', 'bg-primary/5');
+  dragSrcId = null;
+}
+
+// Handle drops on the end drop zone
+document.getElementById('dropZone')?.addEventListener('dragover', (e) => { e.preventDefault(); });
+document.getElementById('dropZone')?.addEventListener('drop', (e) => {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('border-primary/50', 'bg-primary/5');
+  const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+  if (data.type === 'library') {
+    addDrillToTimeline(data.drillId);
+  }
+});
+
+// ═══════════════════════════════════════════════════
+// DURATION POPOVER
+// ═══════════════════════════════════════════════════
+
+function openDurationPopover(e, instanceId) {
+  e.stopPropagation();
+  editingItemId = instanceId;
+  const item = timeline.find(t => t.instanceId === instanceId);
+  if (!item) return;
+
+  const popover = document.getElementById('durationPopover');
+  document.getElementById('popoverDuration').value = item.duration;
+
+  const rect = e.target.getBoundingClientRect();
+  popover.style.top = (rect.bottom + 8) + 'px';
+  popover.style.left = Math.max(8, rect.left - 60) + 'px';
+  popover.classList.remove('hidden');
+}
+
+function adjustPopoverDuration(delta) {
+  const input = document.getElementById('popoverDuration');
+  input.value = Math.max(1, parseInt(input.value) + delta);
+}
+
+function saveDuration() {
+  const item = timeline.find(t => t.instanceId === editingItemId);
+  if (item) {
+    item.duration = parseInt(document.getElementById('popoverDuration').value) || item.duration;
+  }
+  closeDurationPopover();
+  renderTimeline();
+  updateTimeBudget();
+}
+
+function closeDurationPopover() {
+  document.getElementById('durationPopover').classList.add('hidden');
+  editingItemId = null;
+}
+
+// Close popover on outside click
+document.addEventListener('click', (e) => {
+  const popover = document.getElementById('durationPopover');
+  if (!popover.classList.contains('hidden') && !popover.contains(e.target)) {
+    closeDurationPopover();
+  }
+});
+
+// ═══════════════════════════════════════════════════
+// DRILL DRAWER
+// ═══════════════════════════════════════════════════
+
+function openDrawer(drillId) {
+  drawerDrill = MOCK_DRILLS.find(d => d.id === drillId);
+  if (!drawerDrill) return;
+
+  document.getElementById('drawerDrillName').textContent = drawerDrill.name;
+  document.getElementById('drawerContent').innerHTML = `
+    <div class="flex flex-wrap gap-2">
+      <span class="px-2 py-1 rounded-lg text-xs font-medium" style="background: ${CATEGORY_COLORS[drawerDrill.category]}20; color: ${CATEGORY_COLORS[drawerDrill.category]}">${drawerDrill.category}</span>
+      <span class="px-2 py-1 rounded-lg text-xs font-medium" style="background: ${INTENSITY_COLORS[drawerDrill.intensity]}20; color: ${INTENSITY_COLORS[drawerDrill.intensity]}">${drawerDrill.intensity}</span>
+      <span class="px-2 py-1 rounded-lg text-xs font-medium bg-subtle text-muted flex items-center gap-1">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ${drawerDrill.duration} min
+      </span>
+    </div>
+    <p class="text-sm text-muted/80 leading-relaxed">${drawerDrill.description}</p>
+    <div>
+      <h4 class="text-xs font-bold text-muted uppercase tracking-wider mb-2">Skills</h4>
+      <div class="flex flex-wrap gap-1.5">
+        ${drawerDrill.skills.map(s => `<span class="px-2 py-0.5 rounded text-xs text-foreground bg-subtle border border-border">${s}</span>`).join('')}
+      </div>
+    </div>
+    ${drawerDrill.instructions ? `
+    <div>
+      <h4 class="text-xs font-bold text-muted uppercase tracking-wider mb-2">Instructions</h4>
+      <ol class="space-y-1.5 ml-4 list-decimal text-sm text-muted/80">
+        ${drawerDrill.instructions.map(i => `<li>${i}</li>`).join('')}
+      </ol>
+    </div>
+    ` : ''}
+  `;
+
+  document.getElementById('drillDrawer').classList.remove('translate-x-full');
+  document.getElementById('drawerOverlay').classList.remove('opacity-0', 'pointer-events-none');
+}
+
+function closeDrawer() {
+  document.getElementById('drillDrawer').classList.add('translate-x-full');
+  document.getElementById('drawerOverlay').classList.add('opacity-0', 'pointer-events-none');
+  drawerDrill = null;
+}
+
+function addDrawerDrillToTimeline() {
+  if (drawerDrill) {
+    addDrillToTimeline(drawerDrill.id);
+    closeDrawer();
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SECTIONS
+// ═══════════════════════════════════════════════════
+
+function renderSections() {
+  const container = document.getElementById('sectionTabs');
+  container.innerHTML = sections.map(s => {
+    const isActive = s.id === activeSection;
+    const count = s.id === 'all' ? timeline.length : timeline.filter(t => t.sectionId === s.id).length;
+    return `<button onclick="setActiveSection('${s.id}')"
+      class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+        isActive ? 'bg-primary/10 text-primary border border-primary/30' : 'text-muted border border-border hover:border-border-strong hover:text-foreground'
+      }">
+      ${s.name}
+      <span class="text-[10px] ${isActive ? 'text-primary/60' : 'text-muted/50'}">(${count})</span>
+    </button>`;
+  }).join('');
+}
+
+function setActiveSection(id) {
+  activeSection = id;
+  renderSections();
+}
+
+function addSection() {
+  const name = prompt('Section name:');
+  if (!name?.trim()) return;
+  const id = 'sec-' + Date.now();
+  sections.push({ id, name: name.trim(), order: sections.length });
+  activeSection = id;
+  renderSections();
+}
+
+// ═══════════════════════════════════════════════════
+// TEMPLATE INFO TOGGLE
+// ═══════════════════════════════════════════════════
+
+let templateInfoOpen = true;
+function toggleTemplateInfo() {
+  templateInfoOpen = !templateInfoOpen;
+  document.getElementById('templateInfoContent').classList.toggle('hidden', !templateInfoOpen);
+  document.getElementById('templateInfoChevron').style.transform = templateInfoOpen ? '' : 'rotate(-90deg)';
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+
+renderSkillFilters();
+renderDrillLibrary();
+renderSections();
+updateTimeBudget();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach Dashboard - Pre-Season Strength & Skills</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Base Colors */
+            --base: #121A1B;
+            --subtle: #1E292B;
+            --surface: #243335;
+            --raised: #2C383A;
+            --overlay: #344345;
+            --text-primary: #F5F5F5;
+            --text-secondary: #A0A0A0;
+            --text-muted: #666666;
+            --border: #344345;
+
+            /* Semantic Colors */
+            --orange: #FF7D00;
+            --teal: #29757A;
+            --green: #4A7A45;
+            --red: #BE3F23;
+            --blue: #2E5A88;
+            --gold: #D99100;
+
+            /* Category Colors (bright) */
+            --warmup: #3DBCC4;
+            --technical: #5B9BD5;
+            --tactical: #FF9533;
+            --game: #FFBC33;
+            --conditioning: #E85A3D;
+            --cooldown: #6ABF62;
+
+            /* Category Bar Colors (darker) */
+            --warmup-bar: #29757A;
+            --technical-bar: #2E5A88;
+            --tactical-bar: #FF7D00;
+            --game-bar: #D99100;
+            --conditioning-bar: #BE3F23;
+            --cooldown-bar: #4A7A45;
+
+            /* Intensity Colors */
+            --intensity-low: #4A7A45;
+            --intensity-medium: #D99100;
+            --intensity-high: #BE3F23;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--base);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 16px 20px;
+            background: rgba(36, 51, 53, 0.7);
+            backdrop-filter: blur(16px);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--raised);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--overlay);
+        }
+
+        .template-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .badges {
+            display: flex;
+            gap: 8px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-public {
+            background: rgba(74, 122, 69, 0.2);
+            color: var(--green);
+            border: 1px solid var(--green);
+        }
+
+        .badge-intermediate {
+            background: rgba(217, 145, 0, 0.2);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+        }
+
+        .meta {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .meta-separator {
+            margin: 0 8px;
+            color: var(--text-muted);
+        }
+
+        .header-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: var(--raised);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--overlay);
+        }
+
+        .btn-primary {
+            background: var(--orange);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #FF8C1A;
+        }
+
+        /* Two Column Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 55% 45%;
+            gap: 24px;
+        }
+
+        /* Left Column - Analytics */
+        .analytics-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(36, 51, 53, 0.7);
+            backdrop-filter: blur(16px);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        /* Session Timeline */
+        .timeline-container {
+            position: relative;
+            height: 80px;
+        }
+
+        .timeline-sections {
+            display: flex;
+            height: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            margin-top: 30px;
+        }
+
+        .timeline-segment {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-right: 1px solid var(--base);
+        }
+
+        .timeline-segment:last-child {
+            border-right: none;
+        }
+
+        .timeline-segment:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+
+        .timeline-segment.highlight {
+            box-shadow: 0 0 0 2px var(--orange);
+        }
+
+        .section-label {
+            position: absolute;
+            top: -24px;
+            left: 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .timeline-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Quick Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: var(--raised);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-unit {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-left: 4px;
+        }
+
+        /* Intensity Profile */
+        .intensity-bar {
+            display: flex;
+            height: 32px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .intensity-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .intensity-segment:hover {
+            filter: brightness(1.2);
+        }
+
+        /* Category Distribution */
+        .category-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .category-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .category-label {
+            width: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .category-bar-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-bar {
+            height: 24px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .category-bar:hover {
+            filter: brightness(1.2);
+        }
+
+        .category-info {
+            display: flex;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            min-width: 80px;
+        }
+
+        /* Skills Coverage */
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-pill {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .skill-pill.active {
+            background: rgba(255, 125, 0, 0.2);
+            color: var(--orange);
+            border: 1px solid var(--orange);
+        }
+
+        .skill-pill.inactive {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .skill-pill.active:hover {
+            background: rgba(255, 125, 0, 0.3);
+        }
+
+        .skill-minutes {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-left: 4px;
+        }
+
+        /* Right Column - Drill List */
+        .drills-column {
+            background: rgba(36, 51, 53, 0.7);
+            backdrop-filter: blur(16px);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            height: fit-content;
+            max-height: calc(100vh - 160px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drills-header {
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .drills-list {
+            overflow-y: auto;
+            padding: 12px 0;
+        }
+
+        .section-group {
+            margin-bottom: 12px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: sticky;
+            top: 0;
+            background: rgba(36, 51, 53, 0.95);
+            backdrop-filter: blur(16px);
+            z-index: 10;
+        }
+
+        .section-header:hover {
+            background: rgba(44, 56, 58, 0.95);
+        }
+
+        .section-border {
+            width: 4px;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .section-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .section-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .section-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .collapse-icon {
+            width: 16px;
+            height: 16px;
+            color: var(--text-secondary);
+            transition: transform 0.2s;
+        }
+
+        .collapse-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .drills {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drills.collapsed {
+            display: none;
+        }
+
+        .drill-row {
+            display: grid;
+            grid-template-columns: 40px 20px 1fr 60px 80px auto;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            border-left: 4px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .drill-row:hover {
+            background: rgba(44, 56, 58, 0.5);
+        }
+
+        .drill-row.highlighted {
+            background: rgba(255, 125, 0, 0.1);
+            border-left-color: var(--orange);
+        }
+
+        .drill-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .category-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .drill-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .duration-badge {
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: var(--raised);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .intensity-pill {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .intensity-low {
+            background: rgba(74, 122, 69, 0.2);
+            color: var(--intensity-low);
+        }
+
+        .intensity-medium {
+            background: rgba(217, 145, 0, 0.2);
+            color: var(--intensity-medium);
+        }
+
+        .intensity-high {
+            background: rgba(190, 63, 35, 0.2);
+            color: var(--intensity-high);
+        }
+
+        .skill-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .skill-tag {
+            font-size: 10px;
+            padding: 3px 6px;
+            background: var(--raised);
+            color: var(--text-secondary);
+            border-radius: 4px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 24px;
+            padding: 16px 20px;
+            background: rgba(36, 51, 53, 0.7);
+            backdrop-filter: blur(16px);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .footer-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Scrollbar */
+        .drills-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .drills-list::-webkit-scrollbar-track {
+            background: var(--raised);
+        }
+
+        .drills-list::-webkit-scrollbar-thumb {
+            background: var(--overlay);
+            border-radius: 3px;
+        }
+
+        .drills-list::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <button class="back-btn">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <h1 class="template-title">Pre-Season Strength & Skills</h1>
+                <div class="badges">
+                    <span class="badge badge-public">Public</span>
+                    <span class="badge badge-intermediate">Intermediate</span>
+                </div>
+                <span class="meta">
+                    90 min <span class="meta-separator">·</span> 12 drills <span class="meta-separator">·</span> 3 sections
+                </span>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-secondary">More</button>
+                <button class="btn btn-primary">Edit</button>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left Column - Analytics -->
+            <div class="analytics-column">
+                <!-- Session Timeline -->
+                <div class="card">
+                    <h2 class="card-title">Session Timeline</h2>
+                    <div class="timeline-container">
+                        <div class="timeline-sections" id="timeline"></div>
+                        <div class="timeline-scale">
+                            <span>0m</span>
+                            <span>15m</span>
+                            <span>30m</span>
+                            <span>45m</span>
+                            <span>60m</span>
+                            <span>75m</span>
+                            <span>90m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="card">
+                    <h2 class="card-title">Quick Stats</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Duration</div>
+                            <div class="stat-value">90<span class="stat-unit">min</span></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Drill Count</div>
+                            <div class="stat-value">12</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Sections</div>
+                            <div class="stat-value">3</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Avg Intensity</div>
+                            <div class="stat-value" style="font-size: 18px; color: var(--gold);">Medium</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Skills Covered</div>
+                            <div class="stat-value">10</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Est. Player Load</div>
+                            <div class="stat-value" style="font-size: 18px; color: var(--red);">High</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Intensity Profile -->
+                <div class="card">
+                    <h2 class="card-title">Intensity Profile</h2>
+                    <div class="intensity-bar">
+                        <div class="intensity-segment" style="width: 33.3%; background: var(--intensity-low);">Low 33%</div>
+                        <div class="intensity-segment" style="width: 38.9%; background: var(--intensity-medium);">Medium 39%</div>
+                        <div class="intensity-segment" style="width: 27.8%; background: var(--intensity-high);">High 28%</div>
+                    </div>
+                </div>
+
+                <!-- Category Distribution -->
+                <div class="card">
+                    <h2 class="card-title">Category Distribution</h2>
+                    <div class="category-bars">
+                        <div class="category-bar-row">
+                            <div class="category-label">Technical</div>
+                            <div class="category-bar-container">
+                                <div class="category-bar" style="width: 51%; background: var(--technical-bar);"></div>
+                                <div class="category-info">
+                                    <span>3 drills</span>
+                                    <span>28m</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="category-bar-row">
+                            <div class="category-label">Tactical</div>
+                            <div class="category-bar-container">
+                                <div class="category-bar" style="width: 40%; background: var(--tactical-bar);"></div>
+                                <div class="category-info">
+                                    <span>3 drills</span>
+                                    <span>22m</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="category-bar-row">
+                            <div class="category-label">Game</div>
+                            <div class="category-bar-container">
+                                <div class="category-bar" style="width: 36%; background: var(--game-bar);"></div>
+                                <div class="category-info">
+                                    <span>2 drills</span>
+                                    <span>20m</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="category-bar-row">
+                            <div class="category-label">Warmup</div>
+                            <div class="category-bar-container">
+                                <div class="category-bar" style="width: 27%; background: var(--warmup-bar);"></div>
+                                <div class="category-info">
+                                    <span>2 drills</span>
+                                    <span>15m</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="category-bar-row">
+                            <div class="category-label">Cooldown</div>
+                            <div class="category-bar-container">
+                                <div class="category-bar" style="width: 18%; background: var(--cooldown-bar);"></div>
+                                <div class="category-info">
+                                    <span>2 drills</span>
+                                    <span>10m</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Coverage -->
+                <div class="card">
+                    <h2 class="card-title">Skills Coverage</h2>
+                    <div class="skills-grid">
+                        <div class="skill-pill active">Passing <span class="skill-minutes">15m</span></div>
+                        <div class="skill-pill active">Setting <span class="skill-minutes">13m</span></div>
+                        <div class="skill-pill active">Serving <span class="skill-minutes">8m</span></div>
+                        <div class="skill-pill active">Attacking <span class="skill-minutes">8m</span></div>
+                        <div class="skill-pill active">Blocking <span class="skill-minutes">7m</span></div>
+                        <div class="skill-pill active">Defense <span class="skill-minutes">7m</span></div>
+                        <div class="skill-pill active">Positioning <span class="skill-minutes">17m</span></div>
+                        <div class="skill-pill active">Transition <span class="skill-minutes">7m</span></div>
+                        <div class="skill-pill active">Teamwork <span class="skill-minutes">20m</span></div>
+                        <div class="skill-pill active">Flexibility <span class="skill-minutes">13m</span></div>
+                        <div class="skill-pill inactive">Digging</div>
+                        <div class="skill-pill inactive">Footwork</div>
+                        <div class="skill-pill inactive">Communication</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Drill List -->
+            <div class="drills-column">
+                <div class="drills-header">
+                    <h2 class="card-title" style="margin: 0;">Drills & Structure</h2>
+                </div>
+                <div class="drills-list" id="drillsList"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-stat">
+                <svg class="footer-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                </svg>
+                <span>247 likes</span>
+            </div>
+            <div class="footer-stat">
+                <svg class="footer-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                </svg>
+                <span>89 bookmarks</span>
+            </div>
+            <div class="footer-stat">
+                <svg class="footer-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
+                </svg>
+                <span>34 comments</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structure
+        const sections = [
+            {
+                name: "Warmup",
+                duration: 20,
+                drillCount: 3,
+                color: "#29757A",
+                brightColor: "#3DBCC4",
+                drills: [
+                    { name: "Dynamic Stretching", category: "Warmup", categoryColor: "#3DBCC4", intensity: "Low", duration: 8, skills: ["Flexibility"] },
+                    { name: "Light Jogging with Ball", category: "Warmup", categoryColor: "#3DBCC4", intensity: "Low", duration: 7, skills: ["Ball Control"] },
+                    { name: "Pepper Drill", category: "Technical", categoryColor: "#5B9BD5", intensity: "Medium", duration: 5, skills: ["Passing", "Setting"] }
+                ]
+            },
+            {
+                name: "Core Skills",
+                duration: 45,
+                drillCount: 6,
+                color: "#2E5A88",
+                brightColor: "#5B9BD5",
+                drills: [
+                    { name: "Serve Receive Formation", category: "Technical", categoryColor: "#5B9BD5", intensity: "Medium", duration: 10, skills: ["Passing", "Positioning"] },
+                    { name: "Float Serve Practice", category: "Technical", categoryColor: "#5B9BD5", intensity: "High", duration: 8, skills: ["Serving"] },
+                    { name: "Quick Attack Combo", category: "Tactical", categoryColor: "#FF9533", intensity: "High", duration: 8, skills: ["Attacking", "Setting"] },
+                    { name: "Block-Transition Drill", category: "Tactical", categoryColor: "#FF9533", intensity: "High", duration: 7, skills: ["Blocking", "Transition"] },
+                    { name: "Defensive Rotation", category: "Tactical", categoryColor: "#FF9533", intensity: "Medium", duration: 7, skills: ["Defense", "Positioning"] },
+                    { name: "Free Ball Side-out", category: "Game", categoryColor: "#FFBC33", intensity: "Medium", duration: 5, skills: ["Teamwork"] }
+                ]
+            },
+            {
+                name: "Cooldown",
+                duration: 25,
+                drillCount: 3,
+                color: "#4A7A45",
+                brightColor: "#6ABF62",
+                drills: [
+                    { name: "6v6 Controlled Scrimmage", category: "Game", categoryColor: "#FFBC33", intensity: "Medium", duration: 15, skills: ["Teamwork", "Game Play"] },
+                    { name: "Static Stretching", category: "Cooldown", categoryColor: "#6ABF62", intensity: "Low", duration: 5, skills: ["Flexibility"] },
+                    { name: "Team Debrief", category: "Cooldown", categoryColor: "#6ABF62", intensity: "Low", duration: 5, skills: ["Communication"] }
+                ]
+            }
+        ];
+
+        // Render timeline
+        function renderTimeline() {
+            const timeline = document.getElementById('timeline');
+            const totalDuration = 90;
+            let currentTime = 0;
+            let drillIndex = 0;
+
+            sections.forEach((section, sectionIndex) => {
+                section.drills.forEach((drill, drillIndexInSection) => {
+                    const percentage = (drill.duration / totalDuration) * 100;
+                    const segment = document.createElement('div');
+                    segment.className = 'timeline-segment';
+                    segment.style.width = percentage + '%';
+                    segment.style.background = drill.categoryColor;
+                    segment.dataset.drillIndex = drillIndex;
+
+                    // Section label (only on first drill of section)
+                    if (drillIndexInSection === 0) {
+                        const label = document.createElement('div');
+                        label.className = 'section-label';
+                        label.textContent = section.name;
+                        label.style.color = section.brightColor;
+                        segment.appendChild(label);
+                    }
+
+                    // Hover interaction
+                    segment.addEventListener('mouseenter', () => {
+                        highlightDrill(drillIndex);
+                        segment.classList.add('highlight');
+                    });
+
+                    segment.addEventListener('mouseleave', () => {
+                        clearHighlights();
+                        segment.classList.remove('highlight');
+                    });
+
+                    timeline.appendChild(segment);
+                    drillIndex++;
+                });
+            });
+        }
+
+        // Render drills list
+        function renderDrillsList() {
+            const drillsList = document.getElementById('drillsList');
+            let cumulativeTime = 0;
+            let globalDrillIndex = 0;
+
+            sections.forEach((section, sectionIndex) => {
+                // Section group
+                const sectionGroup = document.createElement('div');
+                sectionGroup.className = 'section-group';
+
+                // Section header
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'section-header';
+                sectionHeader.innerHTML = `
+                    <div class="section-dot" style="background: ${section.brightColor};"></div>
+                    <div class="section-name">${section.name}</div>
+                    <div class="section-meta">${section.drillCount} drills · ${section.duration}m</div>
+                    <svg class="collapse-icon" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+
+                // Border
+                const border = document.createElement('div');
+                border.className = 'section-border';
+                border.style.background = section.color;
+                sectionHeader.appendChild(border);
+
+                // Drills container
+                const drillsContainer = document.createElement('div');
+                drillsContainer.className = 'drills';
+
+                // Collapse toggle
+                sectionHeader.addEventListener('click', () => {
+                    drillsContainer.classList.toggle('collapsed');
+                    sectionHeader.querySelector('.collapse-icon').classList.toggle('collapsed');
+                });
+
+                // Render drills
+                section.drills.forEach((drill) => {
+                    const drillRow = document.createElement('div');
+                    drillRow.className = 'drill-row';
+                    drillRow.dataset.drillIndex = globalDrillIndex;
+
+                    const intensityClass = drill.intensity.toLowerCase().replace(' ', '-');
+                    const skillsHtml = drill.skills.slice(0, 2).map(skill =>
+                        `<span class="skill-tag">${skill}</span>`
+                    ).join('');
+
+                    drillRow.innerHTML = `
+                        <div class="drill-time">${cumulativeTime}m</div>
+                        <div class="category-dot" style="background: ${drill.categoryColor};"></div>
+                        <div class="drill-name">${drill.name}</div>
+                        <div class="duration-badge">${drill.duration}m</div>
+                        <div class="intensity-pill intensity-${intensityClass}">${drill.intensity}</div>
+                        <div class="skill-tags">${skillsHtml}</div>
+                    `;
+
+                    // Hover interaction
+                    drillRow.addEventListener('mouseenter', () => {
+                        highlightDrill(globalDrillIndex);
+                        const timelineSegments = document.querySelectorAll('.timeline-segment');
+                        timelineSegments[globalDrillIndex].classList.add('highlight');
+                    });
+
+                    drillRow.addEventListener('mouseleave', () => {
+                        clearHighlights();
+                        const timelineSegments = document.querySelectorAll('.timeline-segment');
+                        timelineSegments[globalDrillIndex].classList.remove('highlight');
+                    });
+
+                    drillsContainer.appendChild(drillRow);
+                    cumulativeTime += drill.duration;
+                    globalDrillIndex++;
+                });
+
+                sectionGroup.appendChild(sectionHeader);
+                sectionGroup.appendChild(drillsContainer);
+                drillsList.appendChild(sectionGroup);
+            });
+        }
+
+        // Highlight drill
+        function highlightDrill(index) {
+            const drillRows = document.querySelectorAll('.drill-row');
+            drillRows[index].classList.add('highlighted');
+        }
+
+        // Clear highlights
+        function clearHighlights() {
+            const drillRows = document.querySelectorAll('.drill-row');
+            drillRows.forEach(row => row.classList.remove('highlighted'));
+        }
+
+        // Initialize
+        renderTimeline();
+        renderDrillsList();
+    </script>
+</body>
+</html>

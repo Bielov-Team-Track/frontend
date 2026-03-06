@@ -14,7 +14,8 @@ import {
 	UpdateClubMemberRequest,
 	updateRegistrationStatus,
 } from "@/lib/api/clubs";
-import { ClubMember, ClubMembersSortBy, ClubRegistration, ClubRole, RegistrationSortBy, RegistrationStatus } from "@/lib/models/Club";
+import { ClubMember, ClubMembersSortBy, ClubRegistration, RegistrationSortBy, RegistrationStatus } from "@/lib/models/Club";
+import { ClubPermissions } from "@/hooks/useClubPermissions";
 import { SortDirection } from "@/lib/models/filteringAndPagination";
 
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -62,27 +63,30 @@ function useInfiniteScroll(fetchNextPage: () => void, hasNextPage: boolean | und
 interface MembersTabProps {
 	members: ClubMember[];
 	clubId: string;
-	currentUserRole?: ClubRole;
 	onInvite: () => void;
+	permissions: ClubPermissions;
 }
 
 type SubTab = "members" | "registrations" | "waitlist" | "declined";
 
-export default function MembersTab({ members, clubId, currentUserRole, onInvite }: MembersTabProps) {
+export default function MembersTab({ members, clubId, onInvite, permissions }: MembersTabProps) {
 	const [activeSubTab, setActiveSubTab] = useState<SubTab>("members");
 
-	// Fetch registration status counts
+	// Fetch registration status counts (only for admins who can see registration tabs)
 	const { data: statusCounts } = useQuery({
 		queryKey: ["club-registrations-counts", clubId],
 		queryFn: () => getRegistrationStatusCounts(clubId),
+		enabled: permissions.canManageRegistrations,
 	});
 
-	// Build tabs for StatusTabs component
+	// Build tabs for StatusTabs component - registration tabs only for admins
 	const tabs = [
 		{ id: "members", label: "Members", count: members.length, icon: <Users size={16} /> },
-		{ id: "registrations", label: "Pending", count: statusCounts?.pending, icon: <UserPlus size={16} /> },
-		{ id: "waitlist", label: "Waitlist", count: statusCounts?.waitlist, icon: <UserCheck size={16} /> },
-		{ id: "declined", label: "Declined", count: statusCounts?.declined, icon: <UserMinus size={16} /> },
+		...(permissions.canManageRegistrations ? [
+			{ id: "registrations", label: "Pending", count: statusCounts?.pending, icon: <UserPlus size={16} /> },
+			{ id: "waitlist", label: "Waitlist", count: statusCounts?.waitlist, icon: <UserCheck size={16} /> },
+			{ id: "declined", label: "Declined", count: statusCounts?.declined, icon: <UserMinus size={16} /> },
+		] : []),
 	];
 
 	return (
@@ -90,32 +94,40 @@ export default function MembersTab({ members, clubId, currentUserRole, onInvite 
 			{/* Header Row: Title + Invite Button */}
 			<div className="flex items-center justify-between shrink-0">
 				<h2 className="text-lg font-semibold text-foreground">Members</h2>
-				<Button variant="outline" onClick={onInvite} leftIcon={<Plus size={16} />}>
-					Invite
-				</Button>
+				{permissions.canInviteMembers && (
+					<Button variant="outline" onClick={onInvite} leftIcon={<Plus size={16} />}>
+						Invite
+					</Button>
+				)}
 			</div>
 
-			{/* Status Tabs */}
-			<div className="shrink-0">
-				<StatusTabs tabs={tabs} activeTab={activeSubTab} onTabChange={(id) => setActiveSubTab(id as SubTab)} />
-			</div>
+			{/* Status Tabs - only shown for users who can manage registrations */}
+			{permissions.canManageRegistrations && (
+				<div className="shrink-0">
+					<StatusTabs tabs={tabs} activeTab={activeSubTab} onTabChange={(id) => setActiveSubTab(id as SubTab)} />
+				</div>
+			)}
 
 			{/* Main Content */}
 			<main className="flex-1 min-h-0" role="tabpanel" aria-label={`${activeSubTab} content`}>
-				<AnimatePresence mode="wait">
-					<motion.div
-						key={activeSubTab}
-						initial={{ opacity: 0, y: 10 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -10 }}
-						transition={{ duration: 0.15 }}
-						className="h-full">
-						{activeSubTab === "members" && <MembersList clubId={clubId} currentUserRole={currentUserRole} onInvite={onInvite} />}
-						{activeSubTab === "registrations" && <RegistrationsList clubId={clubId} status={RegistrationStatus.Pending} />}
-						{activeSubTab === "waitlist" && <RegistrationsList clubId={clubId} status={RegistrationStatus.Waitlist} />}
-						{activeSubTab === "declined" && <RegistrationsList clubId={clubId} status={RegistrationStatus.Declined} />}
-					</motion.div>
-				</AnimatePresence>
+				{permissions.canManageRegistrations ? (
+					<AnimatePresence mode="wait">
+						<motion.div
+							key={activeSubTab}
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ duration: 0.15 }}
+							className="h-full">
+							{activeSubTab === "members" && <MembersList clubId={clubId} onInvite={onInvite} permissions={permissions} />}
+							{activeSubTab === "registrations" && <RegistrationsList clubId={clubId} status={RegistrationStatus.Pending} />}
+							{activeSubTab === "waitlist" && <RegistrationsList clubId={clubId} status={RegistrationStatus.Waitlist} />}
+							{activeSubTab === "declined" && <RegistrationsList clubId={clubId} status={RegistrationStatus.Declined} />}
+						</motion.div>
+					</AnimatePresence>
+				) : (
+					<MembersList clubId={clubId} onInvite={onInvite} permissions={permissions} />
+				)}
 			</main>
 		</div>
 	);
@@ -165,7 +177,7 @@ function MemberRowSkeleton() {
 	);
 }
 
-function MembersList({ clubId, currentUserRole, onInvite }: Omit<MembersTabProps, "members">) {
+function MembersList({ clubId, onInvite, permissions }: Omit<MembersTabProps, "members">) {
 	const [editingMember, setEditingMember] = useState<ClubMember | null>(null);
 	const [removingMember, setRemovingMember] = useState<ClubMember | null>(null);
 	const [search, setSearch] = useState("");
@@ -297,7 +309,8 @@ function MembersList({ clubId, currentUserRole, onInvite }: Omit<MembersTabProps
 										key={member.userId}
 										member={member}
 										clubId={clubId}
-										currentUserRole={currentUserRole}
+										canEdit={permissions.canEditMembers}
+										canRemove={permissions.canEditMembers}
 										onEdit={() => setEditingMember(member)}
 										onRemove={() => setRemovingMember(member)}
 									/>

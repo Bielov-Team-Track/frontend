@@ -2,6 +2,9 @@ export { SessionOverviewBar } from "./SessionOverviewBar";
 export { default as DrillLibraryPanel } from "./DrillLibraryPanel";
 export { TimelineBuilderPanel } from "./TimelineBuilderPanel";
 export { KeyboardShortcutsOverlay } from "./KeyboardShortcutsOverlay";
+export { default as SessionTimelineSummary } from "./SessionTimelineSummary";
+export { default as DrillSectionsTimeline } from "./DrillSectionsTimeline";
+export { SideCard } from "./SideCard";
 
 // Shared color constants
 export {
@@ -11,6 +14,9 @@ export {
 	INTENSITY_PILL_COLORS,
 	CATEGORY_LABELS,
 	INTENSITY_LABELS,
+	SECTION_COLORS,
+	SKILL_COLOR_MAP,
+	getSkillBadgeColor,
 } from "./colors";
 
 // Re-export types

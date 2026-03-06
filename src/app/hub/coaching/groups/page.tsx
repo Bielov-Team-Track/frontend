@@ -1,3 +1,5 @@
+"use client";
+
 import { EmptyState } from "@/components";
 import { Users } from "lucide-react";
 

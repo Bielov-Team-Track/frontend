@@ -1,10 +1,22 @@
 "use client";
 
 import { Button } from "@/components";
-import { EmptyState } from "@/components/ui";
+import { Badge, EmptyState, Loader } from "@/components/ui";
 import { parseTrainingPlanSummary } from "@/lib/models/Event";
-import { useEventPlan, useCreateEventPlan, usePromoteToTemplate } from "@/hooks/useTemplates";
+import { useEventPlan, useCreateEventPlan, useDeleteEventPlan, usePromoteToTemplate } from "@/hooks/useTemplates";
+import { usePlanData } from "@/hooks/usePlanData";
 import { showErrorToast, showSuccessToast } from "@/lib/errors";
+import {
+	SessionTimelineSummary,
+	DrillSectionsTimeline,
+	SideCard,
+	getSkillBadgeColor,
+	CATEGORY_PILL_COLORS,
+	INTENSITY_PILL_COLORS,
+	CATEGORY_LABELS,
+	INTENSITY_LABELS,
+} from "@/components/features/training";
+import { TemplateCommentsSection } from "@/components/features/templates";
 import {
 	Clock,
 	ClipboardList,
@@ -15,6 +27,7 @@ import {
 	Play,
 	Save,
 	Plus,
+	Trash2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -31,6 +44,7 @@ export default function TrainingPlanPage() {
 	const [mode, setMode] = useState<PageMode>("overview");
 	const [showLoadTemplateModal, setShowLoadTemplateModal] = useState(false);
 	const [showPromoteConfirm, setShowPromoteConfirm] = useState(false);
+	const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 
 	// Check if the event already has a training plan
 	const hasPlan = !!event?.trainingPlanId;
@@ -39,13 +53,17 @@ export default function TrainingPlanPage() {
 		[event?.trainingPlanSummary]
 	);
 
-	// Fetch the full plan detail when a plan exists (for the run mode)
+	// Fetch the full plan detail when a plan exists
 	const { data: eventPlan, isLoading: isPlanLoading } = useEventPlan(eventId, {
 		enabled: hasPlan,
 	});
 
+	// Computed plan data for the rich view
+	const planData = usePlanData(eventPlan);
+
 	// Mutations
 	const createEventPlanMutation = useCreateEventPlan();
+	const deleteEventPlanMutation = useDeleteEventPlan();
 	const promoteToTemplateMutation = usePromoteToTemplate();
 
 	const eventDuration = useMemo(() => {
@@ -97,9 +115,24 @@ export default function TrainingPlanPage() {
 		}
 	};
 
+	// Remove the training plan entirely
+	const handleRemovePlan = async () => {
+		if (!event?.trainingPlanId) return;
+		try {
+			await deleteEventPlanMutation.mutateAsync({
+				planId: event.trainingPlanId,
+				eventId,
+			});
+			setShowRemoveConfirm(false);
+			showSuccessToast("Training plan removed");
+		} catch (error) {
+			showErrorToast(error, { fallback: "Failed to remove training plan" });
+		}
+	};
+
 	if (!event) return null;
 
-	// Run mode: use the lazy-loaded TrainingViewMode (imported dynamically to avoid loading when not needed)
+	// Run mode: use the lazy-loaded TrainingViewMode
 	if (mode === "run" && eventPlan) {
 		return (
 			<RunModeWrapper
@@ -129,6 +162,7 @@ export default function TrainingPlanPage() {
 					onCreatePlan={handleCreatePlan}
 					onLoadTemplate={() => setShowLoadTemplateModal(true)}
 					isCreating={createEventPlanMutation.isPending}
+					isAdmin={isAdmin}
 				/>
 			) : (
 				<PlanExistsState
@@ -139,8 +173,12 @@ export default function TrainingPlanPage() {
 					onEdit={handleEditPlan}
 					onRun={() => setMode("run")}
 					onSaveAsTemplate={() => setShowPromoteConfirm(true)}
+					onRemove={() => setShowRemoveConfirm(true)}
 					isPromoting={promoteToTemplateMutation.isPending}
 					canRun={!!eventPlan && (eventPlan.items?.length ?? 0) > 0}
+					planData={planData}
+					eventPlan={eventPlan}
+					trainingPlanId={event.trainingPlanId!}
 				/>
 			)}
 
@@ -150,6 +188,15 @@ export default function TrainingPlanPage() {
 					onConfirm={handlePromoteToTemplate}
 					onCancel={() => setShowPromoteConfirm(false)}
 					isLoading={promoteToTemplateMutation.isPending}
+				/>
+			)}
+
+			{/* Remove Plan Confirmation */}
+			{showRemoveConfirm && (
+				<RemovePlanConfirmDialog
+					onConfirm={handleRemovePlan}
+					onCancel={() => setShowRemoveConfirm(false)}
+					isLoading={deleteEventPlanMutation.isPending}
 				/>
 			)}
 
@@ -171,42 +218,50 @@ function NoPlanState({
 	onCreatePlan,
 	onLoadTemplate,
 	isCreating,
+	isAdmin,
 }: {
 	onCreatePlan: () => void;
 	onLoadTemplate: () => void;
 	isCreating: boolean;
+	isAdmin: boolean;
 }) {
 	return (
 		<div className="rounded-2xl bg-surface border border-border p-12">
 			<EmptyState
 				icon={ClipboardList}
 				title="No training plan yet"
-				description="Create a custom training plan or load one from your templates"
+				description={isAdmin
+					? "Create a custom training plan or load one from your templates"
+					: "The event organizer hasn't added a training plan yet"}
 			/>
-			<div className="flex flex-col sm:flex-row justify-center gap-3 mt-6">
-				<Button
-					color="primary"
-					leftIcon={<Plus size={16} />}
-					onClick={onCreatePlan}
-					disabled={isCreating}
-				>
-					Create Plan
-				</Button>
-				<Button
-					variant="outline"
-					color="primary"
-					leftIcon={<FileDown size={16} />}
-					onClick={onLoadTemplate}
-					disabled={isCreating}
-				>
-					Load from Template
-				</Button>
-			</div>
+			{isAdmin && (
+				<div className="flex flex-col sm:flex-row justify-center gap-3 mt-6">
+					<Button
+						color="primary"
+						leftIcon={<Plus size={16} />}
+						onClick={onCreatePlan}
+						disabled={isCreating}
+					>
+						Create Plan
+					</Button>
+					<Button
+						variant="outline"
+						color="primary"
+						leftIcon={<FileDown size={16} />}
+						onClick={onLoadTemplate}
+						disabled={isCreating}
+					>
+						Load from Template
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 }
 
 // ─── Plan Exists State ──────────────────────────────────────────────────────
+
+import type { PlanData } from "@/hooks/usePlanData";
 
 function PlanExistsState({
 	planSummary,
@@ -216,8 +271,12 @@ function PlanExistsState({
 	onEdit,
 	onRun,
 	onSaveAsTemplate,
+	onRemove,
 	isPromoting,
 	canRun,
+	planData,
+	eventPlan,
+	trainingPlanId,
 }: {
 	planSummary: { name: string; totalDuration: number; sectionCount: number; drillCount: number } | null;
 	eventDuration: number;
@@ -226,8 +285,12 @@ function PlanExistsState({
 	onEdit: () => void;
 	onRun: () => void;
 	onSaveAsTemplate: () => void;
+	onRemove: () => void;
 	isPromoting: boolean;
 	canRun: boolean;
+	planData: PlanData;
+	eventPlan: TrainingPlanDetail | undefined;
+	trainingPlanId: string;
 }) {
 	const name = planSummary?.name || "Training Plan";
 	const totalDuration = planSummary?.totalDuration || 0;
@@ -236,8 +299,8 @@ function PlanExistsState({
 	const remainingTime = eventDuration - totalDuration;
 
 	return (
-		<div className="space-y-4">
-			{/* Plan Summary Card */}
+		<div className="space-y-6">
+			{/* Plan Summary Card (renders immediately from planSummary) */}
 			<div className="rounded-2xl bg-surface border border-border overflow-hidden">
 				{/* Duration progress bar */}
 				{totalDuration > 0 && (
@@ -336,10 +399,111 @@ function PlanExistsState({
 									? "Saving..."
 									: "Save as Template"}
 							</Button>
+							<div className="flex-1" />
+							<Button
+								variant="destructive"
+								size="sm"
+								leftIcon={<Trash2 size={14} />}
+								onClick={onRemove}
+							>
+								Remove Plan
+							</Button>
 						</div>
 					)}
 				</div>
 			</div>
+
+			{/* Progressive-loaded rich view (waits for eventPlan) */}
+			{isPlanLoading ? (
+				<div className="flex items-center justify-center py-12">
+					<Loader size="lg" />
+				</div>
+			) : eventPlan ? (
+				<>
+					{/* Session Timeline */}
+					<SessionTimelineSummary
+						sections={planData.sections}
+						allItemsInOrder={planData.allItemsInOrder}
+						categoryDistribution={planData.categoryDistribution}
+						intensityDistribution={planData.intensityDistribution}
+						totalDuration={planData.totalDuration}
+					/>
+
+					{/* Drills + Side Panel */}
+					<div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 items-start">
+						<DrillSectionsTimeline
+							sections={planData.sections}
+							unassignedItems={planData.unassignedItems}
+						/>
+
+						{/* Side Panel */}
+						<div className="space-y-4 lg:sticky lg:top-6">
+							{planData.categoryDistribution.length > 0 && (
+								<SideCard title="Categories">
+									<div className="space-y-2.5">
+										{planData.categoryDistribution.map(([cat, dur]) => {
+											const label = CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS];
+											const color = CATEGORY_PILL_COLORS[cat as keyof typeof CATEGORY_PILL_COLORS];
+											if (!label || !color) return null;
+											const pct = planData.totalDuration > 0 ? (dur / planData.totalDuration) * 100 : 0;
+											return (
+												<div key={cat}>
+													<div className="flex justify-between text-xs mb-1">
+														<span style={{ color }}>{label}</span>
+														<span className="text-muted-foreground">{dur}m</span>
+													</div>
+													<div className="h-1.5 bg-card rounded-full overflow-hidden">
+														<div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+													</div>
+												</div>
+											);
+										})}
+									</div>
+								</SideCard>
+							)}
+
+							{planData.intensityDistribution.length > 0 && (
+								<SideCard title="Intensity">
+									<div className="space-y-2.5">
+										{planData.intensityDistribution.map(([int, dur]) => {
+											const label = INTENSITY_LABELS[int as keyof typeof INTENSITY_LABELS];
+											const color = INTENSITY_PILL_COLORS[int as keyof typeof INTENSITY_PILL_COLORS];
+											if (!label || !color) return null;
+											const pct = planData.totalDuration > 0 ? (dur / planData.totalDuration) * 100 : 0;
+											return (
+												<div key={int}>
+													<div className="flex justify-between text-xs mb-1">
+														<span style={{ color }}>{label}</span>
+														<span className="text-muted-foreground">{dur}m</span>
+													</div>
+													<div className="h-1.5 bg-card rounded-full overflow-hidden">
+														<div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+													</div>
+												</div>
+											);
+										})}
+									</div>
+								</SideCard>
+							)}
+
+							{planData.skills.length > 0 && (
+								<SideCard title="Skills Covered">
+									<div className="flex flex-wrap gap-1.5">
+										{planData.skills.map((skill) => (
+											<Badge key={skill} size="xs" color={getSkillBadgeColor(skill)} variant="soft">
+												{skill}
+											</Badge>
+										))}
+									</div>
+								</SideCard>
+							)}
+						</div>
+					</div>
+
+					{/* Comments */}
+					<TemplateCommentsSection templateId={trainingPlanId} />
+				</>
+			) : null}
 		</div>
 	);
 }
@@ -395,6 +559,56 @@ function PromoteConfirmDialog({
 	);
 }
 
+// ─── Remove Plan Confirmation Dialog ────────────────────────────────────────
+
+function RemovePlanConfirmDialog({
+	onConfirm,
+	onCancel,
+	isLoading,
+}: {
+	onConfirm: () => void;
+	onCancel: () => void;
+	isLoading: boolean;
+}) {
+	return (
+		<div className="fixed inset-0 z-50 flex items-center justify-center">
+			{/* Backdrop */}
+			<div
+				className="absolute inset-0 bg-black/60"
+				onClick={!isLoading ? onCancel : undefined}
+			/>
+
+			{/* Dialog */}
+			<div className="relative z-10 w-full max-w-md rounded-2xl bg-surface border border-border p-6 shadow-xl mx-4">
+				<h3 className="text-lg font-bold text-white mb-2">
+					Remove Training Plan
+				</h3>
+				<p className="text-sm text-muted mb-6">
+					This will permanently remove the training plan from this
+					event. All drills, sections, and changes will be lost. This
+					action cannot be undone.
+				</p>
+				<div className="flex gap-3 justify-end">
+					<Button
+						variant="outline"
+						onClick={onCancel}
+						disabled={isLoading}
+					>
+						Cancel
+					</Button>
+					<Button
+						variant="destructive"
+						onClick={onConfirm}
+						loading={isLoading}
+					>
+						{isLoading ? "Removing..." : "Remove Plan"}
+					</Button>
+				</div>
+			</div>
+		</div>
+	);
+}
+
 // ─── Run Mode Wrapper ───────────────────────────────────────────────────────
 // Maps plan items to timeline items for TrainingViewMode
 
@@ -405,9 +619,6 @@ function RunModeWrapper({
 	eventPlan: TrainingPlanDetail;
 	onExitToOverview: () => void;
 }) {
-	// Convert plan items to timeline items for TrainingViewMode
-	// The model Drill and features/drills Drill have compatible runtime shapes
-	// for the properties used by TrainingViewMode (name, duration, category, intensity, skills, description)
 	const timeline = useMemo((): TimelineItem[] => {
 		if (!eventPlan?.items) return [];
 		return eventPlan.items

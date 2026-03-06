@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Match Team Selection - Stacked</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #F5F5F5;
+    --surface: #FFFFFF;
+    --subtle: #EBEBEB;
+    --border: #D6DADD;
+    --border-strong: #C8CDD0;
+    --foreground: #1A1A1A;
+    --muted: #6B7280;
+    --accent: #FF7D00;
+    --teal: #29757A;
+    --success: #4A7A45;
+    --warning: #D99100;
+    --error: #BE3F23;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--foreground);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .step-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .section-header {
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+
+  .section-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .section-header p {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* Stacked team cards */
+  .team-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .team-card:hover {
+    border-color: var(--border-strong);
+  }
+
+  .team-card.selected {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 1px var(--teal);
+  }
+
+  .team-card-header {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--subtle);
+  }
+
+  .team-card-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+
+  .team-card-status {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 99px;
+  }
+
+  .status-empty { background: var(--subtle); color: var(--muted); }
+  .status-confirmed { background: rgba(74, 122, 69, 0.15); color: var(--success); }
+  .status-pending { background: rgba(217, 145, 0, 0.15); color: var(--warning); }
+
+  .team-card-body {
+    padding: 18px;
+  }
+
+  /* VS divider - horizontal */
+  .vs-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+  }
+
+  .vs-line-h {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .vs-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--foreground);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+  }
+
+  /* Empty state */
+  .empty-slot {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 4px 0;
+  }
+
+  .empty-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: var(--subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .empty-icon svg {
+    width: 22px;
+    height: 22px;
+    color: var(--muted);
+  }
+
+  .empty-content {
+    flex: 1;
+  }
+
+  .empty-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  /* Mode chips - horizontal */
+  .mode-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .mode-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  .mode-chip:hover {
+    background: var(--subtle);
+    border-color: var(--border-strong);
+  }
+
+  .mode-chip.active {
+    border-color: var(--accent);
+    background: rgba(255, 125, 0, 0.08);
+    color: var(--accent);
+  }
+
+  .mode-chip svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Selected team display */
+  .selected-team {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .team-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .team-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .team-info h4 {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .team-info p {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .team-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .icon-btn:hover {
+    background: var(--subtle);
+  }
+
+  .icon-btn svg {
+    width: 14px;
+    height: 14px;
+    color: var(--muted);
+  }
+
+  .icon-btn.danger:hover {
+    background: rgba(190, 63, 35, 0.08);
+    border-color: var(--error);
+  }
+
+  .icon-btn.danger:hover svg {
+    color: var(--error);
+  }
+
+  /* Expanded content for "Your Team" mode */
+  .team-list {
+    margin-top: 14px;
+    border-top: 1px solid var(--subtle);
+    padding-top: 14px;
+  }
+
+  .team-list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 4px;
+  }
+
+  .team-list-item:hover {
+    background: var(--subtle);
+  }
+
+  .team-list-item.selected-item {
+    background: rgba(41, 117, 122, 0.08);
+    border: 1px solid var(--teal);
+  }
+
+  .team-list-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .team-list-info h5 {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .team-list-info p {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .check-icon {
+    margin-left: auto;
+    color: var(--teal);
+  }
+
+  /* Variant label */
+  .variant-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    background: rgba(255, 125, 0, 0.08);
+    padding: 6px 14px;
+    border-radius: 99px;
+    margin-bottom: 20px;
+    display: inline-block;
+  }
+
+  .variant-wrapper {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .state-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .divider { height: 32px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="variant-wrapper">
+    <span class="variant-label">Variant B: Stacked Cards</span>
+  </div>
+
+  <div class="section-header">
+    <div class="step-label">Step 3 of 5</div>
+    <h2>Team Selection</h2>
+    <p>Select or invite teams for your match</p>
+  </div>
+
+  <!-- === EMPTY STATE === -->
+  <h3 class="state-label">Empty State</h3>
+
+  <!-- Home Team - Empty -->
+  <div class="team-card" style="margin-bottom: 0;">
+    <div class="team-card-header">
+      <span class="team-card-label">Home Team</span>
+      <span class="team-card-status status-empty">Empty</span>
+    </div>
+    <div class="team-card-body">
+      <div class="empty-slot">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="empty-content">
+          <div class="empty-text">Select a team</div>
+          <div class="mode-chips">
+            <button class="mode-chip active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              Your Team
+            </button>
+            <button class="mode-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              Invite
+            </button>
+            <button class="mode-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Manual
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Expanded: team picker -->
+      <div class="team-list">
+        <div class="team-list-item">
+          <div class="team-list-avatar" style="background: #FF6B6B;">BV</div>
+          <div class="team-list-info">
+            <h5>Beach Volleyers</h5>
+            <p>Sunset Beach Club</p>
+          </div>
+        </div>
+        <div class="team-list-item">
+          <div class="team-list-avatar" style="background: #4ECDC4;">IW</div>
+          <div class="team-list-info">
+            <h5>Indoor Warriors</h5>
+            <p>City Sports Club</p>
+          </div>
+        </div>
+        <div class="team-list-item">
+          <div class="team-list-avatar" style="background: #45B7D1;">SD</div>
+          <div class="team-list-info">
+            <h5>Sand Devils</h5>
+            <p>Sunset Beach Club</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VS Divider -->
+  <div class="vs-row">
+    <div class="vs-line-h"></div>
+    <div class="vs-badge">VS</div>
+    <div class="vs-line-h"></div>
+  </div>
+
+  <!-- Away Team - Empty (collapsed) -->
+  <div class="team-card">
+    <div class="team-card-header">
+      <span class="team-card-label">Away Team</span>
+      <span class="team-card-status status-empty">Empty</span>
+    </div>
+    <div class="team-card-body">
+      <div class="empty-slot">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="empty-content">
+          <div class="empty-text">Select a team</div>
+          <div class="mode-chips">
+            <button class="mode-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              Your Team
+            </button>
+            <button class="mode-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              Invite
+            </button>
+            <button class="mode-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              Manual
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- === FILLED STATE === -->
+  <h3 class="state-label">Filled State</h3>
+
+  <!-- Home Team - Confirmed -->
+  <div class="team-card selected" style="margin-bottom: 0;">
+    <div class="team-card-header">
+      <span class="team-card-label">Home Team</span>
+      <span class="team-card-status status-confirmed">Confirmed</span>
+    </div>
+    <div class="team-card-body">
+      <div class="selected-team">
+        <div class="team-avatar" style="background: #FF6B6B;">BV</div>
+        <div class="team-info">
+          <h4>Beach Volleyers</h4>
+          <p>Sunset Beach Club</p>
+        </div>
+        <div class="team-actions">
+          <button class="icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="icon-btn danger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VS Divider -->
+  <div class="vs-row">
+    <div class="vs-line-h"></div>
+    <div class="vs-badge">VS</div>
+    <div class="vs-line-h"></div>
+  </div>
+
+  <!-- Away Team - Pending invitation -->
+  <div class="team-card">
+    <div class="team-card-header">
+      <span class="team-card-label">Away Team</span>
+      <span class="team-card-status status-pending">Invited</span>
+    </div>
+    <div class="team-card-body">
+      <div class="selected-team">
+        <div class="team-avatar" style="background: #4ECDC4;">IW</div>
+        <div class="team-info">
+          <h4>Indoor Warriors</h4>
+          <p>City Sports Club</p>
+        </div>
+        <div class="team-actions">
+          <button class="icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="icon-btn danger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

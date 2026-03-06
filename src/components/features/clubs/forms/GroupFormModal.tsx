@@ -200,7 +200,7 @@ export default function GroupFormModal({ isOpen, group, clubId, onClose, onSubmi
 				<Select
 					label="Skill Level"
 					value={skillLevel}
-					onChange={(value) => setSkillLevel(value)}
+					onChange={(value) => setSkillLevel(value ?? "")}
 					options={SKILL_LEVEL_OPTIONS}
 				/>
 

@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training Plan Wizard - UI Mockups</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: '#1a1a1a',
+            raised: '#242424',
+            subtle: '#2a2a2a',
+            border: '#333',
+            'border-strong': '#444',
+            muted: '#888',
+            accent: '#FF7D00',
+            warmup: '#29757A',
+            technical: '#2E5A88',
+            tactical: '#FF7D00',
+            game: '#D99100',
+            conditioning: '#BE3F23',
+            cooldown: '#4A7A45',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #0f0f0f; }
+    .mockup-section {
+      border: 2px dashed #FF7D00;
+      position: relative;
+    }
+    .mockup-label {
+      position: absolute;
+      top: -12px;
+      left: 16px;
+      background: #FF7D00;
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .tooltip-arrow::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid #FF7D00;
+    }
+    .pulse-ring {
+      animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.5; }
+      100% { transform: scale(0.8); opacity: 1; }
+    }
+    .tab-active { border-bottom: 2px solid #FF7D00; color: #FF7D00; }
+    .gradient-shimmer {
+      background: linear-gradient(90deg, #2a2a2a 25%, #333 50%, #2a2a2a 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body class="text-white p-8">
+  <!-- Header -->
+  <div class="max-w-7xl mx-auto mb-8">
+    <h1 class="text-3xl font-bold text-accent mb-2">Training Plan Wizard - UI Mockups</h1>
+    <p class="text-muted">Interactive prototypes showing proposed improvements</p>
+
+    <!-- Navigation Tabs -->
+    <div class="flex gap-6 mt-6 border-b border-border pb-0">
+      <button onclick="showMockup('onboarding')" id="tab-onboarding" class="pb-3 px-1 text-sm font-medium tab-active">1. Onboarding</button>
+      <button onclick="showMockup('library')" id="tab-library" class="pb-3 px-1 text-sm font-medium text-muted hover:text-white">2. Drill Library</button>
+      <button onclick="showMockup('timeline')" id="tab-timeline" class="pb-3 px-1 text-sm font-medium text-muted hover:text-white">3. Timeline Builder</button>
+      <button onclick="showMockup('overview')" id="tab-overview" class="pb-3 px-1 text-sm font-medium text-muted hover:text-white">4. Session Overview</button>
+      <button onclick="showMockup('mobile')" id="tab-mobile" class="pb-3 px-1 text-sm font-medium text-muted hover:text-white">5. Mobile View</button>
+      <button onclick="showMockup('shortcuts')" id="tab-shortcuts" class="pb-3 px-1 text-sm font-medium text-muted hover:text-white">6. Keyboard Shortcuts</button>
+    </div>
+  </div>
+
+  <!-- MOCKUP 1: First-Time Onboarding -->
+  <div id="mockup-onboarding" class="max-w-7xl mx-auto">
+    <div class="bg-surface rounded-2xl p-6 mb-6">
+      <h2 class="text-xl font-bold mb-2">Mockup 1: First-Time User Onboarding</h2>
+      <p class="text-muted text-sm">Progressive tutorial that guides new coaches through their first session</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+      <!-- Empty State - Before -->
+      <div class="bg-surface rounded-2xl p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-bold text-red-400 bg-red-400/10 px-2 py-1 rounded">BEFORE</span>
+          <span class="text-sm text-muted">Current empty state</span>
+        </div>
+        <div class="bg-raised rounded-xl p-12 text-center border border-border">
+          <div class="w-16 h-16 rounded-2xl bg-subtle flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-clock text-muted text-2xl"></i>
+          </div>
+          <h3 class="font-bold mb-1">Build your training timeline</h3>
+          <p class="text-sm text-muted mb-6">Drag drills from the library or click + to add them to your session</p>
+          <button class="px-4 py-2 rounded-lg border border-border text-sm hover:bg-subtle">
+            <i class="fas fa-download mr-2"></i>Load Template
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State - After -->
+      <div class="bg-surface rounded-2xl p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded">AFTER</span>
+          <span class="text-sm text-muted">Guided onboarding experience</span>
+        </div>
+        <div class="mockup-section bg-raised rounded-xl p-8 text-center border border-accent/30">
+          <span class="mockup-label">New Design</span>
+
+          <!-- Welcome Header -->
+          <div class="mb-6">
+            <div class="w-20 h-20 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4 pulse-ring">
+              <i class="fas fa-volleyball text-accent text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Build Your First Training Plan</h3>
+            <p class="text-sm text-muted">Follow these 3 simple steps to create a reusable session template</p>
+          </div>
+
+          <!-- Steps -->
+          <div class="flex items-start gap-4 text-left mb-6">
+            <div class="flex-1 bg-accent/10 border border-accent/30 rounded-xl p-4">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="w-7 h-7 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center">1</span>
+                <span class="font-semibold text-accent">Add Drills</span>
+              </div>
+              <p class="text-xs text-muted">Browse the library and click drills to add them</p>
+            </div>
+            <div class="flex-1 bg-subtle rounded-xl p-4 opacity-60">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="w-7 h-7 rounded-full bg-border text-muted text-sm font-bold flex items-center justify-center">2</span>
+                <span class="font-semibold">Organize</span>
+              </div>
+              <p class="text-xs text-muted">Group drills into sections like warmup, skills, games</p>
+            </div>
+            <div class="flex-1 bg-subtle rounded-xl p-4 opacity-60">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="w-7 h-7 rounded-full bg-border text-muted text-sm font-bold flex items-center justify-center">3</span>
+                <span class="font-semibold">Save</span>
+              </div>
+              <p class="text-xs text-muted">Name your template and save for future use</p>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-center gap-3">
+            <button class="px-5 py-2.5 rounded-lg bg-accent text-white font-medium text-sm hover:bg-accent/90">
+              <i class="fas fa-play mr-2"></i>Start Building
+            </button>
+            <button class="px-4 py-2.5 rounded-lg border border-border text-sm text-muted hover:text-white hover:border-border-strong">
+              Browse Examples
+            </button>
+          </div>
+
+          <p class="text-xs text-muted mt-4">
+            <i class="fas fa-video mr-1"></i>
+            <a href="#" class="text-accent hover:underline">Watch 60-second tutorial</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tooltip Overlay Example -->
+    <div class="bg-surface rounded-2xl p-6 mt-6">
+      <h3 class="font-semibold mb-4">Interactive Tutorial Tooltips</h3>
+      <div class="relative bg-raised rounded-xl p-6 border border-border">
+        <div class="flex gap-6">
+          <!-- Fake Drill Library -->
+          <div class="w-72 bg-subtle rounded-xl p-4">
+            <div class="text-sm font-semibold mb-3">Drill Library</div>
+            <div class="space-y-2">
+              <div class="bg-raised rounded-lg p-3 border-2 border-accent relative">
+                <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-64 mockup-section">
+                  <span class="mockup-label">Tooltip</span>
+                  <div class="bg-accent text-white text-sm p-3 rounded-lg tooltip-arrow">
+                    <strong>Step 1:</strong> Click any drill to add it to your timeline
+                    <div class="flex gap-2 mt-2">
+                      <button class="text-xs bg-white/20 px-2 py-1 rounded">Skip Tutorial</button>
+                      <button class="text-xs bg-white px-2 py-1 rounded text-accent font-medium">Got it</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="w-1 h-8 rounded bg-warmup"></div>
+                  <div>
+                    <div class="font-medium text-sm">Pepper Drill</div>
+                    <div class="text-xs text-muted">15m · Warmup</div>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-raised rounded-lg p-3 opacity-50">
+                <div class="flex items-center gap-2">
+                  <div class="w-1 h-8 rounded bg-technical"></div>
+                  <div>
+                    <div class="font-medium text-sm">Setting Pairs</div>
+                    <div class="text-xs text-muted">10m · Technical</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Fake Timeline -->
+          <div class="flex-1 bg-subtle rounded-xl p-4">
+            <div class="text-sm font-semibold mb-3">Timeline</div>
+            <div class="border-2 border-dashed border-border rounded-lg p-8 text-center text-muted text-sm">
+              Drills will appear here
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOCKUP 2: Improved Drill Library -->
+  <div id="mockup-library" class="max-w-7xl mx-auto hidden">
+    <div class="bg-surface rounded-2xl p-6 mb-6">
+      <h2 class="text-xl font-bold mb-2">Mockup 2: Enhanced Drill Library</h2>
+      <p class="text-muted text-sm">Recent drills, favorites, improved filters, and grid/list toggle</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+      <!-- Before -->
+      <div class="bg-surface rounded-2xl p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-bold text-red-400 bg-red-400/10 px-2 py-1 rounded">BEFORE</span>
+        </div>
+        <div class="bg-raised rounded-xl overflow-hidden border border-border">
+          <div class="p-4 border-b border-border">
+            <input type="text" placeholder="Search drills..." class="w-full bg-subtle border border-border rounded-lg px-3 py-2 text-sm">
+            <button class="mt-2 text-xs text-muted flex items-center gap-1">
+              <i class="fas fa-chevron-down text-[10px]"></i> Filters
+            </button>
+          </div>
+          <div class="p-4 space-y-2 max-h-80 overflow-y-auto">
+            <div class="bg-subtle rounded-lg p-3">
+              <div class="font-medium text-sm">Pepper Drill</div>
+              <div class="flex gap-1 mt-1">
+                <span class="text-[10px] bg-warmup/20 text-warmup px-1.5 py-0.5 rounded">15m</span>
+                <span class="text-[10px] bg-warmup/20 text-warmup px-1.5 py-0.5 rounded">Warmup</span>
+              </div>
+            </div>
+            <div class="bg-subtle rounded-lg p-3">
+              <div class="font-medium text-sm">Setting Pairs</div>
+              <div class="flex gap-1 mt-1">
+                <span class="text-[10px] bg-technical/20 text-technical px-1.5 py-0.5 rounded">10m</span>
+                <span class="text-[10px] bg-technical/20 text-technical px-1.5 py-0.5 rounded">Technical</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- After -->
+      <div class="bg-surface rounded-2xl p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded">AFTER</span>
+        </div>
+        <div class="mockup-section bg-raised rounded-xl overflow-hidden border border-accent/30">
+          <span class="mockup-label">Enhanced</span>
+
+          <!-- Search + View Toggle -->
+          <div class="p-4 border-b border-border">
+            <div class="flex gap-2">
+              <div class="flex-1 relative">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm"></i>
+                <input type="text" placeholder="Search drills..." class="w-full bg-subtle border border-border rounded-lg pl-9 pr-3 py-2 text-sm">
+              </div>
+              <div class="flex bg-subtle rounded-lg p-1 border border-border">
+                <button class="px-2 py-1 rounded bg-accent/20 text-accent text-xs"><i class="fas fa-list"></i></button>
+                <button class="px-2 py-1 rounded text-muted text-xs hover:text-white"><i class="fas fa-grid-2"></i></button>
+              </div>
+            </div>
+
+            <!-- Quick Filters -->
+            <div class="flex items-center gap-2 mt-3">
+              <span class="text-[10px] text-muted uppercase tracking-wider">Quick:</span>
+              <button class="text-xs bg-warmup/20 text-warmup px-2 py-1 rounded-full border border-warmup/30 hover:bg-warmup/30">Warmup</button>
+              <button class="text-xs bg-subtle text-muted px-2 py-1 rounded-full border border-border hover:border-border-strong">High Intensity</button>
+              <button class="text-xs bg-subtle text-muted px-2 py-1 rounded-full border border-border hover:border-border-strong">≤10m</button>
+              <button class="text-xs text-accent hover:underline ml-auto">More Filters</button>
+            </div>
+          </div>
+
+          <!-- Recent + Favorites Section -->
+          <div class="p-4 border-b border-border bg-subtle/50">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-accent uppercase tracking-wider">
+                <i class="fas fa-clock mr-1"></i> Recently Added
+              </span>
+              <button class="text-[10px] text-muted hover:text-white">View All</button>
+            </div>
+            <div class="flex gap-2">
+              <button class="flex-1 bg-raised border border-border rounded-lg p-2 text-left hover:border-accent/50 group">
+                <div class="text-xs font-medium truncate">Pepper Drill</div>
+                <div class="text-[10px] text-muted">15m</div>
+                <i class="fas fa-plus text-accent opacity-0 group-hover:opacity-100 absolute right-2 top-1/2 -translate-y-1/2 text-xs"></i>
+              </button>
+              <button class="flex-1 bg-raised border border-border rounded-lg p-2 text-left hover:border-accent/50">
+                <div class="text-xs font-medium truncate">Setting Pairs</div>
+                <div class="text-[10px] text-muted">10m</div>
+              </button>
+              <button class="flex-1 bg-raised border border-border rounded-lg p-2 text-left hover:border-accent/50">
+                <div class="text-xs font-medium truncate">Block Jump</div>
+                <div class="text-[10px] text-muted">8m</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Drill List -->
+          <div class="p-4 space-y-2 max-h-60 overflow-y-auto">
+            <div class="bg-subtle rounded-lg p-3 border border-transparent hover:border-accent/30 cursor-pointer group relative">
+              <div class="flex items-start gap-3">
+                <div class="w-1 h-full rounded bg-warmup self-stretch"></div>
+                <div class="flex-1">
+                  <div class="flex items-center gap-2">
+                    <span class="font-medium text-sm">Pepper Drill</span>
+                    <i class="fas fa-star text-yellow-500 text-[10px]"></i>
+                  </div>
+                  <div class="flex flex-wrap gap-1 mt-1.5">
+                    <span class="text-[10px] bg-surface px-1.5 py-0.5 rounded flex items-center gap-1">
+                      <i class="fas fa-clock text-[8px]"></i> 15m
+                    </span>
+                    <span class="text-[10px] bg-warmup/20 text-warmup px-1.5 py-0.5 rounded">Warmup</span>
+                    <span class="text-[10px] bg-game/20 text-game px-1.5 py-0.5 rounded">Medium</span>
+                  </div>
+                  <!-- New: Equipment + Players -->
+                  <div class="flex items-center gap-2 mt-2 text-[10px] text-muted">
+                    <span><i class="fas fa-volleyball mr-1"></i>Ball</span>
+                    <span><i class="fas fa-users mr-1"></i>2-4 players</span>
+                  </div>
+                </div>
+                <button class="w-7 h-7 rounded-full bg-accent/20 text-accent opacity-0 group-hover:opacity-100 flex items-center justify-center">
+                  <i class="fas fa-plus text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOCKUP 3: Timeline Builder -->
+  <div id="mockup-timeline" class="max-w-7xl mx-auto hidden">
+    <div class="bg-surface rounded-2xl p-6 mb-6">
+      <h2 class="text-xl font-bold mb-2">Mockup 3: Improved Timeline Builder</h2>
+      <p class="text-muted text-sm">Quick duration adjustment, section templates, and better drag feedback</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+      <!-- Duration Editor - Before vs After -->
+      <div class="bg-surface rounded-2xl p-6">
+        <h3 class="font-semibold mb-4">Quick Duration Adjustment</h3>
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-bold text-red-400 bg-red-400/10 px-2 py-1 rounded">BEFORE</span>
+          <span class="text-sm text-muted">Click → Popover → Adjust → Save (4 clicks)</span>
+        </div>
+        <div class="bg-raised rounded-xl p-4 border border-border">
+          <div class="flex items-start gap-3">
+            <div class="w-1 h-16 rounded bg-warmup"></div>
+            <div class="flex-1">
+              <div class="font-medium">Pepper Drill</div>
+              <div class="flex items-center gap-2 mt-1 text-sm text-muted">
+                <i class="fas fa-clock text-xs"></i>
+                <span class="cursor-pointer hover:text-accent">15m</span>
+                <span class="text-muted/50">← Click to edit</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 mb-4 mt-6">
+          <span class="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded">AFTER</span>
+          <span class="text-sm text-muted">Inline +/- buttons (1 click each)</span>
+        </div>
+        <div class="mockup-section bg-raised rounded-xl p-4 border border-accent/30">
+          <span class="mockup-label">New</span>
+          <div class="flex items-start gap-3">
+            <div class="w-1 h-16 rounded bg-warmup"></div>
+            <div class="flex-1">
+              <div class="font-medium">Pepper Drill</div>
+              <div class="flex items-center gap-2 mt-2">
+                <div class="flex items-center bg-subtle rounded-lg border border-border">
+                  <button class="w-7 h-7 flex items-center justify-center text-muted hover:text-white hover:bg-border rounded-l-lg">
+                    <i class="fas fa-minus text-xs"></i>
+                  </button>
+                  <span class="px-3 font-mono text-sm">15m</span>
+                  <button class="w-7 h-7 flex items-center justify-center text-muted hover:text-white hover:bg-border rounded-r-lg">
+                    <i class="fas fa-plus text-xs"></i>
+                  </button>
+                </div>
+                <button class="text-xs text-muted hover:text-accent">
+                  <i class="fas fa-sticky-note mr-1"></i>Add notes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Templates -->
+      <div class="bg-surface rounded-2xl p-6">
+        <h3 class="font-semibold mb-4">Section Templates</h3>
+        <p class="text-sm text-muted mb-4">Pre-built blocks to accelerate session building</p>
+
+        <div class="mockup-section bg-raised rounded-xl p-4 border border-accent/30">
+          <span class="mockup-label">New Feature</span>
+
+          <div class="flex items-center gap-2 mb-4">
+            <button class="px-3 py-1.5 rounded-lg border border-dashed border-border text-sm text-muted hover:border-accent hover:text-accent">
+              <i class="fas fa-plus mr-1"></i>Add Section
+            </button>
+            <span class="text-muted text-xs">or use template:</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button class="bg-warmup/10 border border-warmup/30 rounded-lg p-3 text-left hover:bg-warmup/20 group">
+              <div class="flex items-center gap-2 mb-1">
+                <div class="w-3 h-3 rounded bg-warmup"></div>
+                <span class="font-medium text-sm text-warmup">Warmup Block</span>
+              </div>
+              <p class="text-[10px] text-muted">10-15min · 3 suggested drills</p>
+              <i class="fas fa-plus text-warmup opacity-0 group-hover:opacity-100 float-right text-xs mt-1"></i>
+            </button>
+
+            <button class="bg-technical/10 border border-technical/30 rounded-lg p-3 text-left hover:bg-technical/20 group">
+              <div class="flex items-center gap-2 mb-1">
+                <div class="w-3 h-3 rounded bg-technical"></div>
+                <span class="font-medium text-sm text-technical">Technical Skills</span>
+              </div>
+              <p class="text-[10px] text-muted">20-30min · 4 suggested drills</p>
+              <i class="fas fa-plus text-technical opacity-0 group-hover:opacity-100 float-right text-xs mt-1"></i>
+            </button>
+
+            <button class="bg-game/10 border border-game/30 rounded-lg p-3 text-left hover:bg-game/20 group">
+              <div class="flex items-center gap-2 mb-1">
+                <div class="w-3 h-3 rounded bg-game"></div>
+                <span class="font-medium text-sm text-game">Game Simulation</span>
+              </div>
+              <p class="text-[10px] text-muted">30-40min · 2 suggested drills</p>
+              <i class="fas fa-plus text-game opacity-0 group-hover:opacity-100 float-right text-xs mt-1"></i>
+            </button>
+
+            <button class="bg-cooldown/10 border border-cooldown/30 rounded-lg p-3 text-left hover:bg-cooldown/20 group">
+              <div class="flex items-center gap-2 mb-1">
+                <div class="w-3 h-3 rounded bg-cooldown"></div>
+                <span class="font-medium text-sm text-cooldown">Cooldown</span>
+              </div>
+              <p class="text-[10px] text-muted">10min · 2 suggested drills</p>
+              <i class="fas fa-plus text-cooldown opacity-0 group-hover:opacity-100 float-right text-xs mt-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drag Feedback -->
+    <div class="bg-surface rounded-2xl p-6 mt-6">
+      <h3 class="font-semibold mb-4">Improved Drag & Drop Feedback</h3>
+      <div class="grid grid-cols-3 gap-6">
+        <div>
+          <div class="text-xs text-muted mb-2 uppercase tracking-wider">Default State</div>
+          <div class="bg-raised rounded-xl p-4 border border-border">
+            <div class="flex items-center gap-2 bg-subtle rounded-lg p-3">
+              <i class="fas fa-grip-vertical text-muted"></i>
+              <span class="text-sm">Pepper Drill</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-muted mb-2 uppercase tracking-wider">Being Dragged</div>
+          <div class="mockup-section bg-raised rounded-xl p-4 border border-accent/30">
+            <span class="mockup-label">New</span>
+            <div class="flex items-center gap-2 bg-accent/20 border-2 border-accent border-dashed rounded-lg p-3 opacity-60">
+              <i class="fas fa-grip-vertical text-accent"></i>
+              <span class="text-sm text-accent">Pepper Drill</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-muted mb-2 uppercase tracking-wider">Drop Zone Active</div>
+          <div class="mockup-section bg-raised rounded-xl p-4 border border-accent/30">
+            <span class="mockup-label">New</span>
+            <div class="border-2 border-dashed border-accent/50 rounded-lg p-3 bg-accent/10 text-center text-accent text-sm">
+              <i class="fas fa-arrow-down mr-2"></i>Drop here
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOCKUP 4: Session Overview Bar -->
+  <div id="mockup-overview" class="max-w-7xl mx-auto hidden">
+    <div class="bg-surface rounded-2xl p-6 mb-6">
+      <h2 class="text-xl font-bold mb-2">Mockup 4: Enhanced Session Overview</h2>
+      <p class="text-muted text-sm">Better spacing, quick duration presets, and session balance indicators</p>
+    </div>
+
+    <!-- Before -->
+    <div class="bg-surface rounded-2xl p-6 mb-6">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-xs font-bold text-red-400 bg-red-400/10 px-2 py-1 rounded">BEFORE</span>
+        <span class="text-sm text-muted">Cramped spacing, no quick presets</span>
+      </div>
+      <div class="bg-raised rounded-2xl p-5 space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <h2 class="text-sm font-bold">Session Overview</h2>
+            <div class="flex bg-subtle/50 rounded-lg p-0.5 border border-border text-[10px]">
+              <button class="px-2 py-1 rounded bg-accent/15 text-accent">Categories</button>
+              <button class="px-2 py-1 rounded text-muted">Skills</button>
+              <button class="px-2 py-1 rounded text-muted">Intensity</button>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-xl font-bold">45</span>
+            <span class="text-sm text-muted"> / 90m</span>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+          <span class="text-xs px-2 py-0.5 rounded bg-warmup/15 text-warmup border border-warmup/30">Warmup · 15m</span>
+          <span class="text-xs px-2 py-0.5 rounded bg-technical/15 text-technical border border-technical/30">Technical · 20m</span>
+          <span class="text-xs px-2 py-0.5 rounded text-muted/30 border border-border/50">Tactical</span>
+        </div>
+        <div class="h-10 bg-subtle rounded-lg relative overflow-hidden">
+          <div class="absolute inset-y-1 left-0 w-1/6 rounded bg-warmup"></div>
+          <div class="absolute inset-y-1 left-[16.67%] w-[22%] rounded bg-technical"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- After -->
+    <div class="bg-surface rounded-2xl p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded">AFTER</span>
+        <span class="text-sm text-muted">Better spacing, quick presets, balance indicators</span>
+      </div>
+      <div class="mockup-section bg-raised rounded-2xl p-6 space-y-4">
+        <span class="mockup-label">Improved</span>
+
+        <!-- Header with Balance Score -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <h2 class="text-sm font-bold">Session Overview</h2>
+            <div class="flex bg-subtle/50 rounded-lg p-0.5 border border-border text-[10px]">
+              <button class="px-2.5 py-1.5 rounded bg-accent/15 text-accent font-medium">Categories</button>
+              <button class="px-2.5 py-1.5 rounded text-muted hover:text-white">Skills</button>
+              <button class="px-2.5 py-1.5 rounded text-muted hover:text-white">Intensity</button>
+              <button class="px-2.5 py-1.5 rounded text-muted hover:text-white border-l border-border ml-1">
+                <i class="fas fa-fire text-conditioning"></i> Load
+              </button>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <!-- Session Balance Badge -->
+            <div class="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-lg px-3 py-1.5">
+              <i class="fas fa-check-circle text-green-500 text-sm"></i>
+              <span class="text-xs font-medium text-green-500">Balanced Session</span>
+            </div>
+            <div class="text-right">
+              <span class="text-2xl font-bold">45</span>
+              <span class="text-sm text-muted"> / 90m</span>
+              <div class="text-xs text-green-500">45m remaining</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Pills with Better Spacing -->
+        <div class="flex flex-wrap gap-2">
+          <span class="text-xs px-2.5 py-1 rounded-lg bg-warmup/15 text-warmup border border-warmup/30 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-warmup"></span>
+            Warmup · 15m
+          </span>
+          <span class="text-xs px-2.5 py-1 rounded-lg bg-technical/15 text-technical border border-technical/30 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-technical"></span>
+            Technical · 20m
+          </span>
+          <span class="text-xs px-2.5 py-1 rounded-lg bg-game/15 text-game border border-game/30 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-game"></span>
+            Game · 10m
+          </span>
+          <span class="text-xs px-2.5 py-1 rounded-lg text-muted/40 border border-border/50 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-muted/30"></span>
+            Tactical
+          </span>
+          <span class="text-xs px-2.5 py-1 rounded-lg text-muted/40 border border-border/50 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-muted/30"></span>
+            Conditioning
+          </span>
+          <span class="text-xs px-2.5 py-1 rounded-lg text-muted/40 border border-border/50 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-muted/30"></span>
+            Cooldown
+          </span>
+        </div>
+
+        <!-- Timeline Bar -->
+        <div class="relative h-12 bg-subtle rounded-xl overflow-hidden">
+          <div class="absolute inset-y-1.5 left-1 w-[16%] rounded-lg bg-warmup flex items-center px-2">
+            <span class="text-[10px] text-white font-medium truncate">Warmup</span>
+          </div>
+          <div class="absolute inset-y-1.5 left-[17%] w-[22%] rounded-lg bg-technical flex items-center px-2">
+            <span class="text-[10px] text-white font-medium truncate">Technical</span>
+          </div>
+          <div class="absolute inset-y-1.5 left-[40%] w-[11%] rounded-lg bg-game flex items-center px-2">
+            <span class="text-[10px] text-white font-medium truncate">Game</span>
+          </div>
+          <!-- Time markers -->
+          <div class="absolute bottom-0 left-[33%] w-px h-3 bg-border"></div>
+          <div class="absolute bottom-0 left-[66%] w-px h-3 bg-border"></div>
+        </div>
+
+        <!-- Quick Duration Presets -->
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-muted">Target:</span>
+          <div class="flex gap-1">
+            <button class="px-3 py-1.5 rounded-lg border border-border text-xs text-muted hover:border-accent hover:text-accent">30m</button>
+            <button class="px-3 py-1.5 rounded-lg border border-border text-xs text-muted hover:border-accent hover:text-accent">60m</button>
+            <button class="px-3 py-1.5 rounded-lg border border-accent bg-accent/10 text-xs text-accent font-medium">90m</button>
+            <button class="px-3 py-1.5 rounded-lg border border-border text-xs text-muted hover:border-accent hover:text-accent">120m</button>
+            <button class="px-3 py-1.5 rounded-lg border border-border text-xs text-muted hover:border-accent hover:text-accent">150m</button>
+            <button class="px-3 py-1.5 rounded-lg border border-border text-xs text-muted hover:border-accent hover:text-accent">180m</button>
+          </div>
+          <div class="flex-1 mx-4">
+            <input type="range" min="30" max="180" value="90" class="w-full accent-accent">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOCKUP 5: Mobile View -->
+  <div id="mockup-mobile" class="max-w-7xl mx-auto hidden">
+    <div class="bg-surface rounded-2xl p-6 mb-6">
+      <h2 class="text-xl font-bold mb-2">Mockup 5: Mobile-Responsive Layout</h2>
+      <p class="text-muted text-sm">Stacked layout with bottom sheet filters and swipe actions</p>
+    </div>
+
+    <div class="flex gap-6 justify-center">
+      <!-- Mobile Frame -->
+      <div class="w-80">
+        <div class="bg-raised rounded-3xl p-2 border border-border">
+          <!-- Phone Notch -->
+          <div class="h-6 flex items-center justify-center">
+            <div class="w-20 h-5 bg-black rounded-full"></div>
+          </div>
+
+          <!-- Screen -->
+          <div class="mockup-section bg-surface rounded-2xl overflow-hidden h-[600px] relative">
+            <span class="mockup-label">Mobile</span>
+
+            <!-- Header -->
+            <div class="p-4 border-b border-border flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-arrow-left text-muted"></i>
+                <span class="font-semibold">New Training Plan</span>
+              </div>
+              <button class="px-3 py-1.5 rounded-lg bg-accent text-white text-sm font-medium">Save</button>
+            </div>
+
+            <!-- Collapsed Overview -->
+            <div class="p-3 bg-raised border-b border-border">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-muted uppercase">Session</span>
+                <span class="text-sm font-bold">45 / 90m</span>
+              </div>
+              <div class="h-2 bg-subtle rounded-full overflow-hidden">
+                <div class="h-full w-1/2 bg-gradient-to-r from-warmup via-technical to-game rounded-full"></div>
+              </div>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="flex border-b border-border">
+              <button class="flex-1 py-3 text-sm font-medium text-accent border-b-2 border-accent">Timeline</button>
+              <button class="flex-1 py-3 text-sm font-medium text-muted">Library</button>
+            </div>
+
+            <!-- Timeline Content -->
+            <div class="p-3 space-y-2 overflow-y-auto h-[350px]">
+              <!-- Drill Card - Swipeable -->
+              <div class="bg-raised rounded-xl p-3 border border-border relative">
+                <div class="absolute right-0 top-0 bottom-0 w-1 rounded-r-xl bg-warmup"></div>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="font-medium text-sm">Pepper Drill</div>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-xs text-muted">15m</span>
+                      <span class="text-[10px] bg-warmup/20 text-warmup px-1.5 py-0.5 rounded">Warmup</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button class="w-8 h-8 rounded-lg bg-subtle flex items-center justify-center">
+                      <i class="fas fa-minus text-xs text-muted"></i>
+                    </button>
+                    <span class="w-10 text-center font-mono">15m</span>
+                    <button class="w-8 h-8 rounded-lg bg-subtle flex items-center justify-center">
+                      <i class="fas fa-plus text-xs text-muted"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="text-[10px] text-muted mt-2">
+                  <i class="fas fa-arrow-left mr-1"></i>Swipe to delete
+                </div>
+              </div>
+
+              <div class="bg-raised rounded-xl p-3 border border-border relative">
+                <div class="absolute right-0 top-0 bottom-0 w-1 rounded-r-xl bg-technical"></div>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="font-medium text-sm">Setting Pairs</div>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-xs text-muted">10m</span>
+                      <span class="text-[10px] bg-technical/20 text-technical px-1.5 py-0.5 rounded">Technical</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button class="w-8 h-8 rounded-lg bg-subtle flex items-center justify-center">
+                      <i class="fas fa-minus text-xs text-muted"></i>
+                    </button>
+                    <span class="w-10 text-center font-mono">10m</span>
+                    <button class="w-8 h-8 rounded-lg bg-subtle flex items-center justify-center">
+                      <i class="fas fa-plus text-xs text-muted"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Add Drill Button -->
+              <button class="w-full py-4 border-2 border-dashed border-border rounded-xl text-muted text-sm hover:border-accent hover:text-accent">
+                <i class="fas fa-plus mr-2"></i>Add Drill
+              </button>
+            </div>
+
+            <!-- Bottom Sheet Indicator -->
+            <div class="absolute bottom-0 left-0 right-0 bg-raised border-t border-border p-3">
+              <div class="w-12 h-1 bg-border rounded-full mx-auto mb-2"></div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-muted">Drill Library</span>
+                <i class="fas fa-chevron-up text-muted"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="w-80">
+        <h3 class="font-semibold mb-4">Mobile UX Improvements</h3>
+        <div class="space-y-4">
+          <div class="bg-raised rounded-xl p-4 border border-border">
+            <div class="flex items-center gap-2 mb-2">
+              <i class="fas fa-layer-group text-accent"></i>
+              <span class="font-medium text-sm">Stacked Layout</span>
+            </div>
+            <p class="text-xs text-muted">Timeline and Library in separate tabs instead of side-by-side columns</p>
+          </div>
+
+          <div class="bg-raised rounded-xl p-4 border border-border">
+            <div class="flex items-center gap-2 mb-2">
+              <i class="fas fa-hand-pointer text-accent"></i>
+              <span class="font-medium text-sm">Touch-Friendly Controls</span>
+            </div>
+            <p class="text-xs text-muted">Large +/- buttons for duration, swipe-to-delete, bottom sheet for library</p>
+          </div>
+
+          <div class="bg-raised rounded-xl p-4 border border-border">
+            <div class="flex items-center gap-2 mb-2">
+              <i class="fas fa-compress-alt text-accent"></i>
+              <span class="font-medium text-sm">Collapsed Overview</span>
+            </div>
+            <p class="text-xs text-muted">Minimal progress bar instead of full session overview to save space</p>
+          </div>
+
+          <div class="bg-raised rounded-xl p-4 border border-border">
+            <div class="flex items-center gap-2 mb-2">
+              <i class="fas fa-window-maximize text-accent"></i>
+              <span class="font-medium text-sm">Bottom Sheet Library</span>
+            </div>
+            <p class="text-xs text-muted">Swipe up to reveal drill library, swipe down to dismiss</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOCKUP 6: Keyboard Shortcuts -->
+  <div id="mockup-shortcuts" class="max-w-7xl mx-auto hidden">
+    <div class="bg-surface rounded-2xl p-6 mb-6">
+      <h2 class="text-xl font-bold mb-2">Mockup 6: Keyboard Shortcuts & Accessibility</h2>
+      <p class="text-muted text-sm">Power user shortcuts and screen reader support</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+      <!-- Shortcuts Panel -->
+      <div class="bg-surface rounded-2xl p-6">
+        <h3 class="font-semibold mb-4">Keyboard Shortcuts Overlay</h3>
+        <p class="text-sm text-muted mb-4">Press <kbd class="px-2 py-0.5 bg-subtle rounded border border-border text-xs">?</kbd> to show</p>
+
+        <div class="mockup-section bg-raised rounded-xl p-6 border border-accent/30">
+          <span class="mockup-label">New</span>
+
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold">Keyboard Shortcuts</h4>
+            <button class="text-muted hover:text-white"><i class="fas fa-times"></i></button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <h5 class="text-xs font-bold text-accent uppercase tracking-wider mb-3">General</h5>
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-muted">Save template</span>
+                  <kbd class="px-2 py-0.5 bg-subtle rounded border border-border text-xs">Ctrl+S</kbd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-muted">Undo</span>
+                  <kbd class="px-2 py-0.5 bg-subtle rounded border border-border text-xs">Ctrl+Z</kbd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-muted">Redo</span>
+                  <kbd class="px-2 py-0.5 bg-subtle rounded border border-border text-xs">Ctrl+Y</kbd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-muted">Focus search</span>
+                  <kbd class="px-2 py-0.5 bg-subtle rounded border border-border text-xs">Ctrl+F</kbd>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h5 class="text-xs font-bold text-accent uppercase tracking-wider mb-3">Timeline</h5>
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-muted">Move drill up</span>
+                  <kbd class="px-2 py-0.5 bg-subtle rounded border border-border text-xs">↑</kbd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-muted">Move drill down</span>
+                  <kbd class="px-2 py-0.5 bg-subtle rounded border border-border text-xs">↓</kbd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-muted">Delete selected</span>
+                  <kbd class="px-2 py-0.5 bg-subtle rounded border border-border text-xs">Del</kbd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-muted">Edit duration</span>
+                  <kbd class="px-2 py-0.5 bg-subtle rounded border border-border text-xs">Enter</kbd>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accessibility Features -->
+      <div class="bg-surface rounded-2xl p-6">
+        <h3 class="font-semibold mb-4">Accessibility Improvements</h3>
+
+        <div class="space-y-4">
+          <div class="mockup-section bg-raised rounded-xl p-4 border border-accent/30">
+            <span class="mockup-label">ARIA Labels</span>
+            <div class="text-sm mb-2">Screen reader announces:</div>
+            <code class="text-xs bg-subtle p-2 rounded block text-green-400">
+              "Pepper Drill, position 1 of 5, 15 minutes, Warmup category, Medium intensity"
+            </code>
+          </div>
+
+          <div class="mockup-section bg-raised rounded-xl p-4 border border-accent/30">
+            <span class="mockup-label">Focus Indicators</span>
+            <div class="flex gap-3 mt-2">
+              <div class="bg-subtle rounded-lg p-3 ring-2 ring-accent ring-offset-2 ring-offset-raised">
+                <span class="text-sm">Focused Card</span>
+              </div>
+              <div class="bg-subtle rounded-lg p-3">
+                <span class="text-sm text-muted">Normal Card</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mockup-section bg-raised rounded-xl p-4 border border-accent/30">
+            <span class="mockup-label">Color + Pattern</span>
+            <div class="text-sm mb-2">Colorblind-safe intensity indicators:</div>
+            <div class="flex gap-2">
+              <div class="w-16 h-8 rounded bg-cooldown flex items-center justify-center">
+                <span class="text-white text-xs">Low</span>
+              </div>
+              <div class="w-16 h-8 rounded bg-game flex items-center justify-center" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)">
+                <span class="text-white text-xs">Med</span>
+              </div>
+              <div class="w-16 h-8 rounded bg-conditioning flex items-center justify-center" style="background-image: repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.2) 2px, rgba(0,0,0,0.2) 4px)">
+                <span class="text-white text-xs">High</span>
+              </div>
+            </div>
+            <p class="text-xs text-muted mt-2">Patterns differentiate levels even without color perception</p>
+          </div>
+
+          <div class="mockup-section bg-raised rounded-xl p-4 border border-accent/30">
+            <span class="mockup-label">Skip Links</span>
+            <div class="space-y-2">
+              <a href="#" class="text-accent text-sm hover:underline block">Skip to timeline →</a>
+              <a href="#" class="text-accent text-sm hover:underline block">Skip to drill library →</a>
+              <a href="#" class="text-accent text-sm hover:underline block">Skip to save button →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auto-Save Indicator -->
+    <div class="bg-surface rounded-2xl p-6 mt-6">
+      <h3 class="font-semibold mb-4">Auto-Save & Draft Status</h3>
+      <div class="mockup-section bg-raised rounded-xl p-4 border border-accent/30">
+        <span class="mockup-label">New</span>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <span class="font-bold text-lg">Pre-Game Warmup</span>
+            <span class="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full font-medium">Draft</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-xs text-muted">
+              <i class="fas fa-check-circle text-green-500 mr-1"></i>
+              Saved 5 seconds ago
+            </span>
+            <button class="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium">
+              Publish Template
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showMockup(id) {
+      // Hide all mockups
+      document.querySelectorAll('[id^="mockup-"]').forEach(el => el.classList.add('hidden'));
+      // Show selected
+      document.getElementById('mockup-' + id).classList.remove('hidden');
+      // Update tabs
+      document.querySelectorAll('[id^="tab-"]').forEach(el => {
+        el.classList.remove('tab-active');
+        el.classList.add('text-muted');
+      });
+      document.getElementById('tab-' + id).classList.add('tab-active');
+      document.getElementById('tab-' + id).classList.remove('text-muted');
+    }
+  </script>
+</body>
+</html>

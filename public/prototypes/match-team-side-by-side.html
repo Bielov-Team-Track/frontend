@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Match Team Selection - Side by Side</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #F5F5F5;
+    --surface: #FFFFFF;
+    --subtle: #EBEBEB;
+    --border: #D6DADD;
+    --border-strong: #C8CDD0;
+    --foreground: #1A1A1A;
+    --muted: #6B7280;
+    --accent: #FF7D00;
+    --accent-hover: #E67100;
+    --teal: #29757A;
+    --success: #4A7A45;
+    --warning: #D99100;
+    --error: #BE3F23;
+    --info: #2E5A88;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--foreground);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 640px;
+  }
+
+  .step-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .section-header {
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+
+  .section-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 4px;
+  }
+
+  .section-header p {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* VS Layout */
+  .match-layout {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .team-card {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .team-card:hover {
+    border-color: var(--border-strong);
+  }
+
+  .team-card.selected {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 1px var(--teal);
+  }
+
+  .team-card-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--subtle);
+  }
+
+  .team-card-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+
+  .team-card-status {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 99px;
+  }
+
+  .status-empty {
+    background: var(--subtle);
+    color: var(--muted);
+  }
+
+  .status-confirmed {
+    background: rgba(74, 122, 69, 0.15);
+    color: var(--success);
+  }
+
+  .status-pending {
+    background: rgba(217, 145, 0, 0.15);
+    color: var(--warning);
+  }
+
+  .team-card-body {
+    padding: 16px;
+  }
+
+  /* Empty state */
+  .empty-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 8px;
+  }
+
+  .empty-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .empty-icon svg {
+    width: 22px;
+    height: 22px;
+    color: var(--muted);
+  }
+
+  .empty-text {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* Mode buttons */
+  .mode-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .mode-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--foreground);
+    text-align: left;
+  }
+
+  .mode-btn:hover {
+    background: var(--subtle);
+    border-color: var(--border-strong);
+  }
+
+  .mode-btn.active {
+    border-color: var(--accent);
+    background: rgba(255, 125, 0, 0.06);
+  }
+
+  .mode-btn-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .mode-btn-icon svg {
+    width: 14px;
+    height: 14px;
+    color: var(--muted);
+  }
+
+  .mode-btn.active .mode-btn-icon {
+    background: rgba(255, 125, 0, 0.15);
+  }
+
+  .mode-btn.active .mode-btn-icon svg {
+    color: var(--accent);
+  }
+
+  .mode-btn-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mode-btn-label {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .mode-btn-desc {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* VS divider */
+  .vs-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 4px;
+  }
+
+  .vs-line {
+    width: 1px;
+    flex: 1;
+    min-height: 20px;
+    background: var(--border);
+  }
+
+  .vs-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--foreground);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+
+  /* Selected team display */
+  .selected-team {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 0 12px;
+  }
+
+  .team-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .team-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .team-info p {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .change-btn {
+    margin-top: 8px;
+    width: 100%;
+    padding: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--subtle);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .change-btn:hover {
+    background: var(--border);
+  }
+
+  /* Variant label */
+  .variant-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    background: rgba(255, 125, 0, 0.08);
+    padding: 6px 14px;
+    border-radius: 99px;
+    margin-bottom: 20px;
+    display: inline-block;
+  }
+
+  .variant-wrapper {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="variant-wrapper">
+    <span class="variant-label">Variant A: Side-by-Side</span>
+  </div>
+
+  <div class="section-header">
+    <div class="step-label">Step 3 of 5</div>
+    <h2>Team Selection</h2>
+    <p>Select or invite teams for your match</p>
+  </div>
+
+  <!-- Empty state -->
+  <h3 style="font-size:13px; font-weight:600; color:var(--muted); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.04em;">Empty State</h3>
+  <div class="match-layout">
+    <!-- Home Team - Empty -->
+    <div class="team-card">
+      <div class="team-card-header">
+        <span class="team-card-label">Home</span>
+        <span class="team-card-status status-empty">Empty</span>
+      </div>
+      <div class="team-card-body">
+        <div class="empty-slot">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <span class="empty-text">No team selected</span>
+          <div class="mode-buttons">
+            <button class="mode-btn">
+              <div class="mode-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+              <div class="mode-btn-text">
+                <span class="mode-btn-label">Your Team</span>
+                <span class="mode-btn-desc">Pick from your clubs</span>
+              </div>
+            </button>
+            <button class="mode-btn">
+              <div class="mode-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div>
+              <div class="mode-btn-text">
+                <span class="mode-btn-label">Invite Team</span>
+                <span class="mode-btn-desc">Search &amp; invite</span>
+              </div>
+            </button>
+            <button class="mode-btn">
+              <div class="mode-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <div class="mode-btn-text">
+                <span class="mode-btn-label">Manual Entry</span>
+                <span class="mode-btn-desc">Add external team</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VS -->
+    <div class="vs-divider">
+      <div class="vs-line"></div>
+      <div class="vs-badge">VS</div>
+      <div class="vs-line"></div>
+    </div>
+
+    <!-- Away Team - Empty -->
+    <div class="team-card">
+      <div class="team-card-header">
+        <span class="team-card-label">Away</span>
+        <span class="team-card-status status-empty">Empty</span>
+      </div>
+      <div class="team-card-body">
+        <div class="empty-slot">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <span class="empty-text">No team selected</span>
+          <div class="mode-buttons">
+            <button class="mode-btn">
+              <div class="mode-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+              <div class="mode-btn-text">
+                <span class="mode-btn-label">Your Team</span>
+                <span class="mode-btn-desc">Pick from your clubs</span>
+              </div>
+            </button>
+            <button class="mode-btn">
+              <div class="mode-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div>
+              <div class="mode-btn-text">
+                <span class="mode-btn-label">Invite Team</span>
+                <span class="mode-btn-desc">Search &amp; invite</span>
+              </div>
+            </button>
+            <button class="mode-btn">
+              <div class="mode-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <div class="mode-btn-text">
+                <span class="mode-btn-label">Manual Entry</span>
+                <span class="mode-btn-desc">Add external team</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filled state -->
+  <h3 style="font-size:13px; font-weight:600; color:var(--muted); margin-bottom:12px; margin-top:32px; text-transform:uppercase; letter-spacing:0.04em;">Filled State</h3>
+  <div class="match-layout">
+    <!-- Home Team - Selected -->
+    <div class="team-card selected">
+      <div class="team-card-header">
+        <span class="team-card-label">Home</span>
+        <span class="team-card-status status-confirmed">Confirmed</span>
+      </div>
+      <div class="team-card-body">
+        <div class="selected-team">
+          <div class="team-avatar" style="background: #FF6B6B;">BV</div>
+          <div class="team-info">
+            <h4>Beach Volleyers</h4>
+            <p>Sunset Beach Club</p>
+          </div>
+        </div>
+        <button class="change-btn">Change Team</button>
+      </div>
+    </div>
+
+    <!-- VS -->
+    <div class="vs-divider">
+      <div class="vs-line"></div>
+      <div class="vs-badge">VS</div>
+      <div class="vs-line"></div>
+    </div>
+
+    <!-- Away Team - Pending -->
+    <div class="team-card">
+      <div class="team-card-header">
+        <span class="team-card-label">Away</span>
+        <span class="team-card-status status-pending">Invited</span>
+      </div>
+      <div class="team-card-body">
+        <div class="selected-team">
+          <div class="team-avatar" style="background: #4ECDC4;">IW</div>
+          <div class="team-info">
+            <h4>Indoor Warriors</h4>
+            <p>City Sports Club</p>
+          </div>
+        </div>
+        <button class="change-btn">Change Team</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
