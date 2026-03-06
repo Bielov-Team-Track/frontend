@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [main, development]
   pull_request:
-    branches: [main]
+    branches: [main, development]
 
 # Restrict default permissions - each job declares only what it needs
 permissions: {}
@@ -19,12 +19,42 @@ jobs:
     permissions:
       contents: read
 
-  # Build and push image (main branch only)
-  build-push:
+  # Build and push image (development branch) — staging env vars baked in
+  build-staging:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/development'
+    uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
+    with:
+      push-docker-image: true
+      environment: staging
+    permissions:
+      contents: read
+      packages: write
+
+  # Deploy to staging server
+  deploy-staging:
+    needs: build-staging
+    uses: Bielov-Team-Track/devops/.github/workflows/deploy-service.yml@main
+    with:
+      service-name: frontend
+      environment: staging
+    secrets: inherit
+
+  # Build and push image (main branch) — production env vars baked in
+  build-production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
     with:
       push-docker-image: true
+      environment: production
     permissions:
       contents: read
       packages: write
+
+  # Deploy to production server
+  deploy-production:
+    needs: build-production
+    uses: Bielov-Team-Track/devops/.github/workflows/deploy-service.yml@main
+    with:
+      service-name: frontend
+      environment: production
+    secrets: inherit
