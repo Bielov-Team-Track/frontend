@@ -297,11 +297,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, issueUrl });
     }
 
-    return NextResponse.json({
-      success: true,
-      issueUrl: null,
-      warning: "Feedback received but could not be recorded",
-    });
+    return NextResponse.json(
+      { success: false, error: "Failed to create feedback issue. Please try again later." },
+      { status: 502 }
+    );
   } catch (error) {
     console.error("Feedback error:", error);
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
