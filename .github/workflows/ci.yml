@@ -33,14 +33,22 @@ jobs:
   # Deploy to staging server
   deploy-staging:
     needs: build-staging
+    if: github.ref == 'refs/heads/development' && github.event_name == 'push'
     uses: Bielov-Team-Track/devops/.github/workflows/deploy-service.yml@main
     permissions:
       contents: read
+      actions: read
     with:
       service-name: frontend
       environment: staging
       health-check-path: /api/health
-    secrets: inherit
+    secrets:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_FINGERPRINT: ${{ secrets.SSH_FINGERPRINT }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
   # Build and push image (main branch) — production env vars baked in
   build-production:
@@ -56,11 +64,19 @@ jobs:
   # Deploy to production server
   deploy-production:
     needs: build-production
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     uses: Bielov-Team-Track/devops/.github/workflows/deploy-service.yml@main
     permissions:
       contents: read
+      actions: read
     with:
       service-name: frontend
       environment: production
       health-check-path: /api/health
-    secrets: inherit
+    secrets:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_FINGERPRINT: ${{ secrets.SSH_FINGERPRINT }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
