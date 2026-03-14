@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Download, RefreshCw, ImageOff } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { getOgImageUrl } from '@/lib/share/share-data';
+import { showErrorToast } from '@/lib/errors';
 import type { ShareableEntity } from './types';
 
 interface ShareImagePreviewProps {
@@ -14,8 +15,9 @@ interface ShareImagePreviewProps {
 
 export function ShareImagePreview({ entity, templateId }: ShareImagePreviewProps) {
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
+  const [retryCount, setRetryCount] = useState(0);
 
-  const previewUrl = getOgImageUrl(entity, { preview: true, templateId });
+  const previewUrl = getOgImageUrl(entity, { preview: true, templateId }) + (retryCount > 0 ? `&_t=${retryCount}` : '');
 
   // Reset loading state when preview URL changes (e.g., template switch)
   useEffect(() => {
@@ -25,14 +27,19 @@ export function ShareImagePreview({ entity, templateId }: ShareImagePreviewProps
   const downloadStoryUrl = getOgImageUrl(entity, { width: 1080, height: 1920, templateId });
 
   const handleDownload = async (url: string, filename: string) => {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = blobUrl;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(blobUrl);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Download failed');
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      showErrorToast(new Error('Download failed'), { fallback: 'Could not download image' });
+    }
   };
 
   return (
@@ -49,7 +56,7 @@ export function ShareImagePreview({ entity, templateId }: ShareImagePreviewProps
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setStatus('loading')}
+              onClick={() => { setRetryCount(c => c + 1); setStatus('loading'); }}
             >
               <RefreshCw className="mr-1.5 size-3.5" />
               Retry

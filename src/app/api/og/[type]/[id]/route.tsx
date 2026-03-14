@@ -4,6 +4,7 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import { getFonts } from '../../lib/fonts';
 import { parseTemplateConfig, DEFAULT_TEMPLATE } from '../../lib/template-config';
+import { isUrlSafe } from '../../lib/url-validator';
 import { MatchResultTemplate } from '../../templates/MatchResultTemplate';
 import { EventTemplate } from '../../templates/EventTemplate';
 import { ClubTemplate } from '../../templates/ClubTemplate';
@@ -24,6 +25,12 @@ export async function GET(
   // Validate type
   if (!VALID_TYPES.includes(type as OgType)) {
     return new Response('Invalid type', { status: 400 });
+  }
+
+  // Validate id as UUID (prevent path traversal / injection)
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!UUID_REGEX.test(id)) {
+    return new Response('Invalid entity ID', { status: 400 });
   }
 
   // Parse query params
@@ -49,7 +56,17 @@ export async function GET(
     // Access control for private entities (HMAC sig) — deferred to follow-up plan
     // Template config fetching from clubs-service — deferred to TemplatePicker integration
 
-    const config = DEFAULT_TEMPLATE; // Uses Spike default; club templates wired after CRUD integration
+    let config = DEFAULT_TEMPLATE; // Uses Spike default; club templates wired after CRUD integration
+
+    // Validate URLs in template config (SSRF prevention - defense in depth)
+    // When club templates are wired in, validate here:
+    // if (config.background?.imageUrl && !isUrlSafe(config.background.imageUrl)) {
+    //   config = { ...config, background: { ...config.background, imageUrl: undefined } };
+    // }
+    // if (config.logo?.url && !isUrlSafe(config.logo.url)) {
+    //   config = { ...config, logo: undefined };
+    // }
+    void isUrlSafe; // referenced above for SSRF validation when templates are connected
     const fonts = await getFonts();
 
     // Select template component based on type
