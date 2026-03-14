@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { AuthResponse, login as apiLogin, logout as apiLogout, refreshToken as apiRefreshToken, getCurrentUserProfile } from "@/lib/api/auth";
 import { getCookie, setCookie, deleteCookie } from "@/lib/cookies";
 import { UserProfile } from "@/lib/models/User";
@@ -233,6 +234,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 		initializeAuth();
 	}, [refreshAuth, clearTokens]);
+
+	// Sync Sentry user context
+	useEffect(() => {
+		if (userProfile) {
+			Sentry.setUser({ id: userProfile.id, email: userProfile.email });
+		} else {
+			Sentry.setUser(null);
+		}
+	}, [userProfile]);
 
 	// Cleanup timer on unmount
 	useEffect(() => {

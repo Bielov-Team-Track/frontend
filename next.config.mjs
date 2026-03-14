@@ -1,4 +1,5 @@
 import bundleAnalyzer from "@next/bundle-analyzer";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const withBundleAnalyzer = bundleAnalyzer({
 	enabled: process.env.ANALYZE === "true",
@@ -95,4 +96,20 @@ const nextConfig = {
 	},
 };
 
-export default withBundleAnalyzer(nextConfig);
+export default withSentryConfig(withBundleAnalyzer(nextConfig), {
+	org: process.env.SENTRY_ORG,
+	project: process.env.SENTRY_PROJECT,
+
+	// Upload source maps for readable stack traces
+	authToken: process.env.SENTRY_AUTH_TOKEN,
+
+	// Route Sentry requests through Next.js to avoid ad-blockers
+	tunnelRoute: "/monitoring",
+
+	// Only print logs in CI
+	silent: !process.env.CI,
+
+	// Disable source map upload when no auth token (local dev)
+	disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+	disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+});

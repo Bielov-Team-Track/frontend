@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { toast } from 'sonner';
 import { ApiError } from './ApiError';
 import { ErrorCodes } from './types';
@@ -31,6 +32,14 @@ export function showErrorToast(
   // Don't show toast for auth errors (handled by redirect)
   if (apiError.code === ErrorCodes.UNAUTHORIZED || apiError.code === ErrorCodes.TOKEN_EXPIRED) {
     return apiError;
+  }
+
+  // Report server errors and unknown errors to Sentry
+  if (apiError.status >= 500 || apiError.code === 'UNKNOWN_ERROR' || apiError.code === 'NETWORK_ERROR') {
+    Sentry.captureException(apiError.originalError ?? apiError, {
+      tags: { errorCode: apiError.code },
+      extra: { status: apiError.status, detail: apiError.detail },
+    });
   }
 
   const message = options.message ?? apiError.getUserMessage() ?? options.fallback ?? 'An error occurred';
