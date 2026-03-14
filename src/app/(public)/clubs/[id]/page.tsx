@@ -2,6 +2,7 @@
 
 import { Avatar, Button } from "@/components";
 import { Link } from "@/components/ui";
+import { ShareButton } from "@/components/features/share";
 import { getClub, getClubMembers, getTeamsByClub } from "@/lib/api/clubs";
 import { useQuery } from "@tanstack/react-query";
 import { Calendar, Heart, ImageIcon, ImageOff, Loader2, MapPin, MessageCircle, MoreHorizontal, Share2, Shield, Trophy, Users } from "lucide-react";
@@ -139,6 +140,17 @@ export default function ClubPage() {
 								<MessageCircle size={18} />
 								Message
 							</Button>
+							<ShareButton
+								entity={{
+									type: 'club',
+									id: club.id,
+									data: {
+										title: club.name,
+										url: `/clubs/${club.id}`,
+										imageUrl: club.logoUrl,
+									},
+								}}
+							/>
 						</div>
 					</div>
 				</div>

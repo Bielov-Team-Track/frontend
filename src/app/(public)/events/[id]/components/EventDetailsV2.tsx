@@ -4,13 +4,14 @@ import CommentsSection from "@/components/features/comments/components/CommentsS
 import { EventPaymentCard } from "@/components/features/events";
 import { Map } from "@/components/features/locations";
 import { TeamsList } from "@/components/features/teams";
+import { ShareButton } from "@/components/features/share";
 import { Event } from "@/lib/models/Event";
 import { Unit } from "@/lib/models/EventPaymentConfig";
 import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { Team } from "@/lib/models/Team";
 import { UserProfile } from "@/lib/models/User";
 import { getDuration, getFormattedDateWithDay, getFormattedTime } from "@/lib/utils/date";
-import { AlertTriangle, Clock, MapPin, Share2, Users } from "lucide-react";
+import { AlertTriangle, Clock, MapPin, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import EventPageButtons from "./EventPageButtons";
@@ -94,9 +95,16 @@ export default function EventDetailsV2({ event, user, isAdmin, teams, userPartic
 								<EventPageButtons event={event} participantIds={participantIds} />
 							</div>
 						)}
-						<button className="btn btn-square btn-ghost bg-surface hover:bg-hover border border-border text-foreground">
-							<Share2 size={18} />
-						</button>
+						<ShareButton
+							entity={{
+								type: 'event',
+								id: event.id,
+								data: {
+									title: event.name,
+									url: `/events/${event.id}`,
+								},
+							}}
+						/>
 					</div>
 				</div>
 			</div>

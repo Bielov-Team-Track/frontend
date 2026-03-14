@@ -1,20 +1,27 @@
 "use client";
 
 import { cancelEvent } from "@/lib/api/events";
+import { ShareMenuItem } from "@/components/features/share";
+import type { ShareableEntity } from "@/components/features/share";
 
 export default function EventMenuClient({
 	eventId,
+	eventName,
 	eventUrl,
 	isAdmin,
 }: {
 	eventId: string;
+	eventName: string;
 	eventUrl: string;
 	isAdmin: boolean;
 }) {
-	const copyUrl = async () => {
-		try {
-			await navigator.clipboard.writeText(eventUrl);
-		} catch (_) {}
+	const entity: ShareableEntity = {
+		type: 'event',
+		id: eventId,
+		data: {
+			title: eventName,
+			url: `/events/${eventId}`,
+		},
 	};
 
 	const onCancel = async () => {
@@ -25,9 +32,7 @@ export default function EventMenuClient({
 
 	return (
 		<>
-			<li>
-				<a onClick={copyUrl}>Copy URL</a>
-			</li>
+			<ShareMenuItem entity={entity} />
 			{isAdmin && (
 				<li>
 					<a onClick={onCancel}>Cancel</a>
