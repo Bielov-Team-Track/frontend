@@ -1,4 +1,3 @@
-import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 import { generateOgSignature } from '../lib/signing';
 

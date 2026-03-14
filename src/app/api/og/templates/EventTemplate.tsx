@@ -1,5 +1,4 @@
 // frontend/src/app/api/og/templates/EventTemplate.tsx
-import 'server-only';
 import type { TemplateConfig } from '../lib/template-config';
 import { BaseTemplate } from './BaseTemplate';
 

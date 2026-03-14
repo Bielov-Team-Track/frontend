@@ -1,4 +1,3 @@
-import 'server-only';
 import { createHmac } from 'crypto';
 
 const OG_SIGNING_SECRET = process.env.OG_SIGNING_SECRET || 'dev-og-signing-secret-change-in-production';

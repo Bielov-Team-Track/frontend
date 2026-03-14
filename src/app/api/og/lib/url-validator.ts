@@ -1,5 +1,4 @@
 // frontend/src/app/api/og/lib/url-validator.ts
-import 'server-only';
 
 const ALLOWED_DOMAINS = [
   process.env.NEXT_PUBLIC_S3_DOMAIN,       // e.g., "cdn.spike.app"

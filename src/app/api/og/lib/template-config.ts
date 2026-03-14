@@ -1,5 +1,4 @@
 // frontend/src/app/api/og/lib/template-config.ts
-import 'server-only';
 
 export type LayoutPreset = 'centered-score' | 'banner-hero' | 'stats-card' | 'achievement';
 export type LogoPosition = 'top-left' | 'top-center' | 'top-right';

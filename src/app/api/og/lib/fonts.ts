@@ -1,22 +1,27 @@
 // frontend/src/app/api/og/lib/fonts.ts
-import 'server-only';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 
-// Font ArrayBuffers loaded once at module scope, reused across all requests.
-const fontsDir = join(process.cwd(), 'public', 'fonts');
-
-const interBoldPromise = readFile(join(fontsDir, 'Inter-Bold.ttf'));
-const interRegularPromise = readFile(join(fontsDir, 'Inter-Regular.ttf'));
+let cachedFonts: { name: string; data: ArrayBuffer; weight: 700 | 400 }[] | null = null;
 
 export async function getFonts() {
-  const [interBold, interRegular] = await Promise.all([
-    interBoldPromise,
-    interRegularPromise,
+  if (cachedFonts) return cachedFonts;
+
+  // Use fetch to load font files from the public directory
+  // This works in both Turbopack and Webpack contexts
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const [boldRes, regularRes] = await Promise.all([
+    fetch(`${baseUrl}/fonts/Inter-Bold.ttf`),
+    fetch(`${baseUrl}/fonts/Inter-Regular.ttf`),
   ]);
 
-  return [
-    { name: 'Inter', data: interBold, weight: 700 as const },
-    { name: 'Inter', data: interRegular, weight: 400 as const },
+  const [boldData, regularData] = await Promise.all([
+    boldRes.arrayBuffer(),
+    regularRes.arrayBuffer(),
+  ]);
+
+  cachedFonts = [
+    { name: 'Inter', data: boldData, weight: 700 },
+    { name: 'Inter', data: regularData, weight: 400 },
   ];
+
+  return cachedFonts;
 }

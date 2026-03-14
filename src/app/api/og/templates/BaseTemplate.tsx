@@ -1,5 +1,4 @@
 // frontend/src/app/api/og/templates/BaseTemplate.tsx
-import 'server-only';
 import type { TemplateConfig } from '../lib/template-config';
 
 interface BaseTemplateProps {
