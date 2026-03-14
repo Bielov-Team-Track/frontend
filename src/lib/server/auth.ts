@@ -79,7 +79,8 @@ export const getFullUserProfile = async () => {
 		const profile = await profileRes.json();
 		const playerProfile = playerRes?.ok ? await playerRes.json() : undefined;
 		const coachProfile = coachRes?.ok ? await coachRes.json() : undefined;
-		const historyEntries = historyRes?.ok ? await historyRes.json() : [];
+		const historyData = historyRes?.ok ? await historyRes.json() : { items: [] };
+		const historyEntries = historyData.items ?? [];
 
 		return {
 			...profile,
