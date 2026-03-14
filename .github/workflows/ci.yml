@@ -16,6 +16,7 @@ jobs:
       contents: read
     with:
       push-docker-image: false
+    secrets: inherit
 
   build-production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
