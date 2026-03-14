@@ -25,34 +25,31 @@ export function getShareData(entity: ShareableEntity): ShareData {
       return { title, text: `${title} — evaluation results`, url };
     case 'award':
       return { title, text: title, url };
+    case 'page':
+      return { title, text: entity.data.description ?? title, url };
     default:
       return { title, text: title, url };
   }
 }
 
+/**
+ * Get the OG image URL for an entity.
+ * Uses the page's own Next.js opengraph-image route (served at {pagePath}/opengraph-image).
+ * This means the preview in the share modal matches exactly what messengers will show.
+ */
 export function getOgImageUrl(
   entity: ShareableEntity,
   options?: {
     templateId?: string;
-    width?: number;
-    height?: number;
     preview?: boolean;
     sig?: string;
     exp?: string;
     configHash?: string;
   }
 ): string {
-  const params = new URLSearchParams();
-  if (options?.templateId) params.set('templateId', options.templateId);
-  if (options?.width) params.set('width', String(options.width));
-  if (options?.height) params.set('height', String(options.height));
-  if (options?.preview) params.set('preview', 'true');
-  if (options?.sig) params.set('sig', options.sig);
-  if (options?.exp) params.set('exp', options.exp);
-  if (options?.configHash) params.set('v', options.configHash);
-
-  const query = params.toString();
-  return `/api/og/${entity.type}/${entity.id}${query ? `?${query}` : ''}`;
+  // The page's OG image is at {pageUrl}/opengraph-image
+  const pagePath = entity.data.url; // e.g. /events/abc123 or /sign-up
+  return `${pagePath}/opengraph-image`;
 }
 
 /**

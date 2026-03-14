@@ -17,24 +17,23 @@ export function ShareImagePreview({ entity, templateId }: ShareImagePreviewProps
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [retryCount, setRetryCount] = useState(0);
 
-  const previewUrl = getOgImageUrl(entity, { preview: true, templateId }) + (retryCount > 0 ? `&_t=${retryCount}` : '');
+  const ogUrl = getOgImageUrl(entity, { templateId });
+  const previewUrl = retryCount > 0 ? `${ogUrl}?_t=${retryCount}` : ogUrl;
 
-  // Reset loading state when preview URL changes (e.g., template switch)
+  // Reset loading state when preview URL changes
   useEffect(() => {
     setStatus('loading');
   }, [previewUrl]);
-  const downloadOgUrl = getOgImageUrl(entity, { width: 1200, height: 630, templateId });
-  const downloadStoryUrl = getOgImageUrl(entity, { width: 1080, height: 1920, templateId });
 
-  const handleDownload = async (url: string, filename: string) => {
+  const handleDownload = async () => {
     try {
-      const response = await fetch(url);
+      const response = await fetch(ogUrl);
       if (!response.ok) throw new Error('Download failed');
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = blobUrl;
-      a.download = filename;
+      a.download = `${entity.data.title || 'share'}.png`;
       a.click();
       URL.revokeObjectURL(blobUrl);
     } catch {
@@ -65,7 +64,7 @@ export function ShareImagePreview({ entity, templateId }: ShareImagePreviewProps
         )}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          key={previewUrl} // Re-mount on URL change to reset loading state
+          key={previewUrl}
           src={previewUrl}
           alt={`Share preview for ${entity.data.title}`}
           className={`size-full object-cover transition-opacity ${status === 'loaded' ? 'opacity-100' : 'opacity-0'}`}
@@ -74,31 +73,16 @@ export function ShareImagePreview({ entity, templateId }: ShareImagePreviewProps
         />
       </div>
 
-      {/* Download buttons */}
-      <div className="flex gap-2">
-        <Button
-          variant="default"
-          size="sm"
-          className="flex-1"
-          onClick={() =>
-            handleDownload(downloadOgUrl, `${entity.type}-${entity.id}.png`)
-          }
-        >
-          <Download className="mr-1.5 size-3.5" />
-          Save Image
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1"
-          onClick={() =>
-            handleDownload(downloadStoryUrl, `${entity.type}-${entity.id}-story.png`)
-          }
-        >
-          <Download className="mr-1.5 size-3.5" />
-          Save for Stories (9:16)
-        </Button>
-      </div>
+      {/* Download button */}
+      <Button
+        variant="default"
+        size="sm"
+        className="w-full"
+        onClick={handleDownload}
+      >
+        <Download className="mr-1.5 size-3.5" />
+        Save Image
+      </Button>
     </div>
   );
 }
