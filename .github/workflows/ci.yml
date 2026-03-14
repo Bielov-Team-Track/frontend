@@ -37,6 +37,7 @@ jobs:
     with:
       service-name: frontend
       environment: staging
+      health-check-path: /api/health
     secrets: inherit
 
   # Build and push image (main branch) — production env vars baked in
@@ -57,4 +58,5 @@ jobs:
     with:
       service-name: frontend
       environment: production
+      health-check-path: /api/health
     secrets: inherit
