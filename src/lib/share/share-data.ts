@@ -42,6 +42,8 @@ export function getOgImageUrl(
   _options?: {
     templateId?: string;
     preview?: boolean;
+    sig?: string;
+    exp?: string;
   }
 ): string {
   // Try reading the og:image from the current page's meta tags (client-side only)
