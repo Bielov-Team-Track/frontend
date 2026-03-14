@@ -39,7 +39,7 @@ export default async function proxy(request: NextRequest) {
 
 	// Allow social media crawlers through so they can read og:image meta tags
 	const userAgent = request.headers.get('user-agent') || '';
-	const isCrawler = /TelegramBot|WhatsApp|facebookexternalhit|Twitterbot|LinkedInBot|Slackbot|Discordbot|vkShare/i.test(userAgent);
+	const isCrawler = /TelegramBot|WhatsApp|facebookexternalhit|Twitterbot|LinkedInBot|Slackbot|Discordbot/i.test(userAgent);
 	if (isCrawler) {
 		return NextResponse.next();
 	}
