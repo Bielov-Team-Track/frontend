@@ -3,6 +3,7 @@
 
 import { Share2 } from 'lucide-react';
 import { Button } from '@/components/ui';
+import { DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { ShareableEntity } from './types';
 import { useShare } from '@/hooks/useShare';
 import { getShareData } from '@/lib/share/share-data';
@@ -47,21 +48,25 @@ export function ShareButton({
 
   return (
     <>
-      <Button
-        variant={variant}
-        size={size}
-        className={className}
-        onClick={handleClick}
-      >
-        <Share2 className="size-3.5" />
-        {children ?? 'Share'}
-      </Button>
-
       <ShareDropdown
         shareData={shareData}
         open={dropdownOpen}
         onOpenChange={setDropdownOpen}
-      />
+      >
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant={variant}
+              size={size}
+              className={className}
+              onClick={handleClick}
+            >
+              <Share2 className="size-3.5" />
+              {children ?? 'Share'}
+            </Button>
+          }
+        />
+      </ShareDropdown>
 
       <ShareModal
         entity={entity}

@@ -47,10 +47,12 @@ export function ShareTargetGrid({
       const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
       if (isMobile) {
         window.location.href = `instagram-stories://share?url=${enc(shareData.url)}`;
-        // If deep link fails (app not installed), fall back to copy
+        // Only copy if the deep link failed (page didn't lose focus = app not installed)
         setTimeout(async () => {
-          const success = await copyToClipboard(shareData.url);
-          if (success) showSuccessToast('Link copied! Open Instagram to paste.');
+          if (!document.hidden) {
+            const success = await copyToClipboard(shareData.url);
+            if (success) showSuccessToast('Link copied! Open Instagram to paste.');
+          }
         }, 1500);
       } else {
         // Desktop: copy link and instruct

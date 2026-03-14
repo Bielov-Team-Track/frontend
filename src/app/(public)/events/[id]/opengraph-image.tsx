@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { getFonts } from '@/app/api/og/lib/fonts';
 import { DEFAULT_TEMPLATE } from '@/app/api/og/lib/template-config';
+import { EventTemplate } from '@/app/api/og/templates/EventTemplate';
 
 export const runtime = 'nodejs';
 export const size = { width: 1200, height: 630 };
@@ -12,39 +13,29 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const { id } = await params;
   const fonts = await getFonts();
 
-  let title = 'Volleyball Event';
+  let eventData = { name: 'Volleyball Event' } as Record<string, unknown>;
   try {
     const res = await fetch(`${INTERNAL_API_URL}/events/v1/events/${id}`, {
       next: { revalidate: 3600 },
     });
     if (res.ok) {
-      const data = await res.json();
-      title = data.name || data.title || title;
+      eventData = await res.json();
     }
-  } catch { /* use default title */ }
-
-  const config = DEFAULT_TEMPLATE;
+  } catch { /* use defaults */ }
 
   return new ImageResponse(
     (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 1200,
-          height: 630,
-          backgroundImage: `linear-gradient(135deg, ${config.colors.secondary}, ${config.background.to || '#0f3460'})`,
-          color: config.colors.text,
-          fontFamily: 'Inter',
-          fontSize: 48,
-          fontWeight: 700,
-          padding: 96,
-          textAlign: 'center',
+      <EventTemplate
+        data={{
+          name: String(eventData.name || eventData.title || 'Volleyball Event'),
+          date: eventData.date as string | undefined,
+          venue: eventData.venue as string | undefined,
+          surface: eventData.surface as string | undefined,
         }}
-      >
-        {title}
-      </div>
+        config={DEFAULT_TEMPLATE}
+        width={size.width}
+        height={size.height}
+      />
     ),
     {
       ...size,
