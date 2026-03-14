@@ -14,21 +14,21 @@ jobs:
   build-and-test:
     if: github.event_name == 'pull_request'
     uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
-    with:
-      push-docker-image: false
     permissions:
       contents: read
+    with:
+      push-docker-image: false
 
   # Build and push image (development branch) — staging env vars baked in
   build-staging:
     if: github.event_name == 'push' && github.ref == 'refs/heads/development'
     uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
-    with:
-      push-docker-image: true
-      environment: staging
     permissions:
       contents: read
       packages: write
+    with:
+      push-docker-image: true
+      environment: staging
 
   # Deploy to staging server
   deploy-staging:
@@ -46,12 +46,12 @@ jobs:
   build-production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
-    with:
-      push-docker-image: true
-      environment: production
     permissions:
       contents: read
       packages: write
+    with:
+      push-docker-image: true
+      environment: production
 
   # Deploy to production server
   deploy-production:
