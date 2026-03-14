@@ -33,7 +33,14 @@ export default async function proxy(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	// Allow OG image and API routes through without auth (crawlers/bots need access)
-	if (pathname.endsWith('/opengraph-image') || pathname.startsWith('/api/og/')) {
+	if (pathname.endsWith('/opengraph-image') || pathname.includes('/opengraph-image') || pathname.startsWith('/api/og/')) {
+		return NextResponse.next();
+	}
+
+	// Allow social media crawlers through so they can read og:image meta tags
+	const userAgent = request.headers.get('user-agent') || '';
+	const isCrawler = /TelegramBot|WhatsApp|facebookexternalhit|Twitterbot|LinkedInBot|Slackbot|Discordbot|vkShare/i.test(userAgent);
+	if (isCrawler) {
 		return NextResponse.next();
 	}
 
