@@ -12,6 +12,8 @@ const PUBLIC_ROUTES = [
 	"/terms-of-service",
 	"/error",
 	"/clubs",
+	"/events",
+	"/profiles",
 ];
 
 const AUTH_ROUTES = ["/login", "/sign-up", "/forgot-password", "/reset-password"];
@@ -29,6 +31,11 @@ const PROFILE_SETUP_ROUTES = ["/complete-profile-setup"];
  */
 export default async function proxy(request: NextRequest) {
 	const { pathname } = request.nextUrl;
+
+	// Allow OG image and API routes through without auth (crawlers/bots need access)
+	if (pathname.endsWith('/opengraph-image') || pathname.startsWith('/api/og/')) {
+		return NextResponse.next();
+	}
 
 	// Check if route is public (no auth required)
 	const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));

@@ -34,21 +34,38 @@ export function getShareData(entity: ShareableEntity): ShareData {
 
 /**
  * Get the OG image URL for an entity.
- * Uses the page's own Next.js opengraph-image route (served at {pagePath}/opengraph-image).
- * This means the preview in the share modal matches exactly what messengers will show.
+ * Reads the current page's og:image meta tag if available (includes Next.js hash suffix).
+ * Falls back to constructing the path manually.
  */
 export function getOgImageUrl(
   entity: ShareableEntity,
-  options?: {
+  _options?: {
     templateId?: string;
     preview?: boolean;
-    sig?: string;
-    exp?: string;
-    configHash?: string;
   }
 ): string {
-  // The page's OG image is at {pageUrl}/opengraph-image
-  const pagePath = entity.data.url; // e.g. /events/abc123 or /sign-up
+  // Try reading the og:image from the current page's meta tags (client-side only)
+  if (typeof document !== 'undefined') {
+    const ogMeta = document.querySelector('meta[property="og:image"]');
+    if (ogMeta) {
+      const content = ogMeta.getAttribute('content');
+      if (content) {
+        // Convert absolute URL to relative path for same-origin fetch
+        try {
+          const url = new URL(content, window.location.origin);
+          if (url.origin === window.location.origin) {
+            return url.pathname + url.search;
+          }
+          return content;
+        } catch {
+          return content;
+        }
+      }
+    }
+  }
+
+  // Fallback: construct the path (may not include Next.js hash suffix)
+  const pagePath = entity.data.url;
   return `${pagePath}/opengraph-image`;
 }
 
