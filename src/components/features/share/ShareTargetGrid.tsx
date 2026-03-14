@@ -82,7 +82,7 @@ export function ShareTargetGrid({
           <button
             key={target.id}
             onClick={() => handleClick(target)}
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-muted transition-colors"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-foreground/5 transition-colors"
           >
             <span
               className="flex size-8 items-center justify-center rounded-lg text-white"
@@ -103,7 +103,7 @@ export function ShareTargetGrid({
         <button
           key={target.id}
           onClick={() => handleClick(target)}
-          className="flex flex-col items-center gap-1.5 rounded-lg p-2 hover:bg-muted transition-colors"
+          className="flex flex-col items-center gap-1.5 rounded-lg p-2 hover:bg-foreground/5 transition-colors"
         >
           <span
             className="flex size-10 items-center justify-center rounded-full text-white"

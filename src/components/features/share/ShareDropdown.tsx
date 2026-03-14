@@ -52,7 +52,7 @@ export function ShareDropdown({ shareData, open, onOpenChange, children }: Share
                 e.stopPropagation();
                 setExpanded(true);
               }}
-              className="flex w-full items-center justify-center gap-1.5 rounded-md py-1.5 text-xs text-muted-foreground hover:bg-muted transition-colors"
+              className="flex w-full items-center justify-center gap-1.5 rounded-md py-1.5 text-xs text-muted-foreground hover:bg-foreground/5 transition-colors"
             >
               <MoreHorizontal className="size-3.5" />
               <span>More options</span>
