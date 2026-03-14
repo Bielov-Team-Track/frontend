@@ -9,7 +9,8 @@ import { Unit } from "@/lib/models/EventPaymentConfig";
 import { EventParticipant, ParticipationStatus } from "@/lib/models/EventParticipant";
 import { Team } from "@/lib/models/Team";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, ClipboardList, CreditCard, Edit, MessageCircle, MoreHorizontal, Settings, Share2, Trash2, Users, XCircle } from "lucide-react";
+import { ArrowLeft, Calendar, ClipboardList, CreditCard, Edit, MessageCircle, MoreHorizontal, Settings, Trash2, Users, XCircle } from "lucide-react";
+import { ShareButton } from "@/components/features/share";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -222,28 +223,39 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 					<div className="flex-1">
 						<h1 className="text-2xl font-bold text-white" data-testid="event-detail-name">{event.name}</h1>
 					</div>
-					{/* Overflow Menu for ALL users */}
-					<div className="relative">
-						<Button variant="ghost" color="neutral" className="p-2" onClick={() => setShowAdminMenu(!showAdminMenu)} data-testid="event-overflow-menu">
-							<MoreHorizontal size={18} />
+					{/* Header Actions */}
+					<div className="flex items-center gap-1">
+						<ShareButton
+							entity={{
+								type: 'event',
+								id: eventId,
+								data: {
+									title: event.name,
+									url: `/events/${eventId}`,
+								},
+							}}
+							variant="ghost"
+							size="icon-sm"
+						/>
+						<Button
+							variant="ghost"
+							color="neutral"
+							className="p-2"
+							onClick={handleMessageOrganizers}
+							data-testid="event-message-button"
+						>
+							<MessageCircle size={18} />
 						</Button>
-						{showAdminMenu && (
-							<>
-								<div className="fixed inset-0 z-40" onClick={() => setShowAdminMenu(false)} />
-								<div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-raised border border-border shadow-xl z-50 py-1">
-									{/* Actions for all users */}
-									<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3">
-										<Share2 size={16} className="text-muted" />
-										Share
-									</button>
-									<button className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3">
-										<MessageCircle size={16} className="text-muted" />
-										Message Hosts
-									</button>
-									{/* Admin-only actions */}
-									{isAdmin && (
-										<>
-											<div className="border-t border-border my-1" />
+						{/* Admin overflow menu */}
+						{isAdmin && (
+							<div className="relative">
+								<Button variant="ghost" color="neutral" className="p-2" onClick={() => setShowAdminMenu(!showAdminMenu)} data-testid="event-overflow-menu">
+									<MoreHorizontal size={18} />
+								</Button>
+								{showAdminMenu && (
+									<>
+										<div className="fixed inset-0 z-40" onClick={() => setShowAdminMenu(false)} />
+										<div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-raised border border-border shadow-xl z-50 py-1">
 											<Link
 												href={`/hub/events/${eventId}/settings`}
 												className="w-full px-4 py-2.5 text-left text-sm text-white hover:bg-surface flex items-center gap-3"
@@ -264,10 +276,10 @@ export default function EventPrototypeLayout({ children }: { children: React.Rea
 												<Trash2 size={16} />
 												Delete Event
 											</button>
-										</>
-									)}
-								</div>
-							</>
+										</div>
+									</>
+								)}
+							</div>
 						)}
 					</div>
 				</div>

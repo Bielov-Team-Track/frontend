@@ -61,8 +61,8 @@ export function ShareButton({
               className={className}
               onClick={handleClick}
             >
-              <Share2 className="size-3.5" />
-              {children ?? 'Share'}
+              <Share2 className={size?.toString().startsWith('icon') ? 'size-4' : 'size-3.5'} />
+              {size?.toString().startsWith('icon') ? null : (children ?? 'Share')}
             </Button>
           }
         />
