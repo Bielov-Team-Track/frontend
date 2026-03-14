@@ -16,6 +16,22 @@ type EventPageParams = {
 
 const INTERNAL_API_URL = process.env.INTERNAL_API_URL || "http://localhost:8000";
 
+// Pre-generate params for recent events so Next.js knows valid IDs upfront.
+// No `revalidate` here because the page reads user auth state (getUserProfile,
+// getMyParticipation) which makes it inherently dynamic per-request.
+export async function generateStaticParams() {
+	try {
+		const res = await fetch(`${INTERNAL_API_URL}/events/v1/events?pageSize=200`);
+		if (res.ok) {
+			const data = await res.json();
+			return (data.items || []).map((e: { id: string }) => ({ id: e.id }));
+		}
+	} catch {
+		/* non-fatal */
+	}
+	return [];
+}
+
 export async function generateMetadata({ params }: EventPageParams): Promise<Metadata> {
 	const { id } = await params;
 
