@@ -45,9 +45,9 @@ export function ShareImagePreview({ entity, templateId }: ShareImagePreviewProps
   return (
     <div className="space-y-3">
       {/* Image preview */}
-      <div className="relative aspect-[1200/630] overflow-hidden rounded-lg bg-muted">
+      <div className="relative aspect-[1200/630] overflow-hidden rounded-lg bg-foreground/5">
         {status === 'loading' && (
-          <div className="absolute inset-0 animate-pulse bg-muted" />
+          <div className="absolute inset-0 animate-pulse bg-foreground/5" />
         )}
         {status === 'error' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
