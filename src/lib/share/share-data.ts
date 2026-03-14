@@ -24,7 +24,6 @@ export function getShareData(entity: ShareableEntity): ShareData {
     case 'evaluation':
       return { title, text: `${title} — evaluation results`, url };
     case 'award':
-      return { title, text: title, url };
     case 'page':
       return { title, text: entity.data.description ?? title, url };
     default:
