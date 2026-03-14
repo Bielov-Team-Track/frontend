@@ -1,6 +1,6 @@
 export type ShareableEntityType =
   | 'match' | 'event' | 'club' | 'evaluation' | 'award'
-  | 'post' | 'profile' | 'venue';
+  | 'post' | 'profile' | 'venue' | 'page';
 
 export interface ShareableEntity {
   type: ShareableEntityType;
