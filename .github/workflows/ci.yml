@@ -6,51 +6,9 @@ on:
   pull_request:
     branches: [main, development]
 
-# Restrict default permissions - each job declares only what it needs
 permissions: {}
 
 jobs:
-  # Build and test only (PRs) - read-only permissions
-  build-and-test:
-    if: github.event_name == 'pull_request'
-    uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
-    permissions:
-      contents: read
-    with:
-      push-docker-image: false
-
-  # Build and push image (development branch) — staging env vars baked in
-  build-staging:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/development'
-    uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
-    permissions:
-      contents: read
-      packages: write
-    with:
-      push-docker-image: true
-      environment: staging
-
-  # Deploy to staging server
-  deploy-staging:
-    needs: build-staging
-    if: github.ref == 'refs/heads/development' && github.event_name == 'push'
-    uses: Bielov-Team-Track/devops/.github/workflows/deploy-service.yml@main
-    permissions:
-      contents: read
-      actions: read
-    with:
-      service-name: frontend
-      environment: staging
-      health-check-path: /api/health
-    secrets:
-      SSH_HOST: ${{ secrets.SSH_HOST }}
-      SSH_USER: ${{ secrets.SSH_USER }}
-      SSH_KEY: ${{ secrets.SSH_KEY }}
-      SSH_FINGERPRINT: ${{ secrets.SSH_FINGERPRINT }}
-      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-
-  # Build and push image (main branch) — production env vars baked in
   build-production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
@@ -60,23 +18,3 @@ jobs:
     with:
       push-docker-image: true
       environment: production
-
-  # Deploy to production server
-  deploy-production:
-    needs: build-production
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    uses: Bielov-Team-Track/devops/.github/workflows/deploy-service.yml@main
-    permissions:
-      contents: read
-      actions: read
-    with:
-      service-name: frontend
-      environment: production
-      health-check-path: /api/health
-    secrets:
-      SSH_HOST: ${{ secrets.SSH_HOST }}
-      SSH_USER: ${{ secrets.SSH_USER }}
-      SSH_KEY: ${{ secrets.SSH_KEY }}
-      SSH_FINGERPRINT: ${{ secrets.SSH_FINGERPRINT }}
-      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
