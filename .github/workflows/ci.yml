@@ -9,6 +9,17 @@ on:
 permissions: {}
 
 jobs:
+  # Build and test only (PRs)
+  build-and-test:
+    if: github.event_name == 'pull_request'
+    uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
+    permissions:
+      contents: read
+      packages: write
+    with:
+      push-docker-image: false
+    secrets: inherit
+
   build-production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: Bielov-Team-Track/devops/.github/workflows/build-frontend.yml@main
