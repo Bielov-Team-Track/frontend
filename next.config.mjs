@@ -11,7 +11,7 @@ const nextConfig = {
 		remotePatterns: [
 			{
 				protocol: "https",
-				hostname: process.env.NEXT_PUBLIC_S3_HOSTNAME || "volleyer.s3.eu-west-2.amazonaws.com",
+				hostname: process.env.NEXT_PUBLIC_S3_HOSTNAME || "volleyspike.s3.eu-west-2.amazonaws.com",
 			},
 			{
 				protocol: "https",
