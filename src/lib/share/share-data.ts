@@ -50,13 +50,11 @@ export function getOgImageUrl(
     if (ogMeta) {
       const content = ogMeta.getAttribute('content');
       if (content) {
-        // Convert absolute URL to relative path for same-origin fetch
+        // Always extract pathname + search to avoid CORS issues
+        // (meta tag may have localhost origin while page is served via tunnel)
         try {
           const url = new URL(content, window.location.origin);
-          if (url.origin === window.location.origin) {
-            return url.pathname + url.search;
-          }
-          return content;
+          return url.pathname + url.search;
         } catch {
           return content;
         }
