@@ -231,9 +231,28 @@ export const generateMetadata = async ({
 	}
 
 	const fullName = [profile.userProfile?.name, profile.userProfile?.surname].filter(Boolean).join(" ") || "User";
+	const position = profile.playerProfile?.preferredPosition != null
+		? getVolleyballPositionLabel(profile.playerProfile.preferredPosition)
+		: null;
+	const description = position
+		? `${fullName} - ${position} on Spike`
+		: `View ${fullName}'s volleyball profile on Spike`;
 
 	return {
 		title: `${fullName} - Profile`,
-		description: `View ${fullName}'s volleyball profile and achievements`,
+		description,
+		openGraph: {
+			title: `${fullName} - Volleyball Player`,
+			description,
+			type: "website" as const,
+		},
+		twitter: {
+			card: "summary_large_image" as const,
+			title: fullName,
+			description,
+		},
+		alternates: {
+			canonical: `/profiles/${id}`,
+		},
 	};
 };
