@@ -28,8 +28,8 @@ export default function PrivacyPolicyPage() {
 							<ul className="list-disc pl-6 mt-4 space-y-2">
 								<li>
 									Visit our website at{" "}
-									<a href="https://www.volleyer.app" className="link link-primary" target="_blank" rel="noopener noreferrer">
-										https://www.volleyer.app
+									<a href="https://www.volleyspike.app" className="link link-primary" target="_blank" rel="noopener noreferrer">
+										https://www.volleyspike.app
 									</a>{" "}
 									or any website of ours that links to this Privacy Notice
 								</li>
@@ -483,8 +483,8 @@ export default function PrivacyPolicyPage() {
 									</p>
 									<p>
 										<strong>Website:</strong>{" "}
-										<a href="https://www.volleyer.app" className="link link-primary" target="_blank" rel="noopener noreferrer">
-											www.volleyer.app
+										<a href="https://www.volleyspike.app" className="link link-primary" target="_blank" rel="noopener noreferrer">
+											www.volleyspike.app
 										</a>
 									</p>
 								</div>

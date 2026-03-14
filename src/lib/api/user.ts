@@ -250,11 +250,13 @@ export async function updateProfileImage(image: Blob): Promise<{ imageUrl: strin
 	const presignedUrl = response.data;
 
 	// Step 2: Upload directly to S3 using presigned URL
+	// Cache-Control must match the value signed into the presigned URL by the backend
 	const uploadResponse = await fetch(presignedUrl, {
 		method: "PUT",
 		body: compressed,
 		headers: {
 			"Content-Type": fileType,
+			"Cache-Control": "public, max-age=300, s-maxage=86400",
 		},
 	});
 

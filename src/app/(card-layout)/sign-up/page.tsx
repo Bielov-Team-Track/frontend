@@ -178,6 +178,7 @@ function SignUpPage() {
 							options={countryOptions}
 							leftIcon={<Globe size={16} />}
 							error={errors.countryCode?.message}
+							helperText="Select the country where you'll be using the app"
 							required
 							fullWidth
 							onChange={(value) => {

@@ -24,8 +24,8 @@ export default function TermsOfServicePage() {
 							<p className="text-lg mb-4">
 								We are <strong>Spike</strong> (&quot;Company,&quot; &quot;we,&quot; &quot;us,&quot; &quot;our&quot;). We operate the Spike
 								volleyball community platform at{" "}
-								<a href="https://www.volleyer.app" className="link link-primary" target="_blank" rel="noopener noreferrer">
-									www.volleyer.app
+								<a href="https://www.volleyspike.app" className="link link-primary" target="_blank" rel="noopener noreferrer">
+									www.volleyspike.app
 								</a>
 								, as well as any other related products and services that refer or link to these legal terms (the &quot;Legal Terms&quot;)
 								(collectively, the &quot;Services&quot;).
@@ -408,8 +408,8 @@ export default function TermsOfServicePage() {
 									</p>
 									<p>
 										<strong>Website:</strong>{" "}
-										<a href="https://www.volleyer.app" className="link link-primary" target="_blank" rel="noopener noreferrer">
-											www.volleyer.app
+										<a href="https://www.volleyspike.app" className="link link-primary" target="_blank" rel="noopener noreferrer">
+											www.volleyspike.app
 										</a>
 									</p>
 								</div>
