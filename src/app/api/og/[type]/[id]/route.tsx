@@ -5,11 +5,14 @@ import { NextRequest } from 'next/server';
 import { getFonts } from '../../lib/fonts';
 import { parseTemplateConfig, DEFAULT_TEMPLATE } from '../../lib/template-config';
 import { isUrlSafe } from '../../lib/url-validator';
+import { validateOgSignature } from '../../lib/signing';
 import { MatchResultTemplate } from '../../templates/MatchResultTemplate';
 import { EventTemplate } from '../../templates/EventTemplate';
 import { ClubTemplate } from '../../templates/ClubTemplate';
 import { EvaluationTemplate } from '../../templates/EvaluationTemplate';
 import { AwardTemplate } from '../../templates/AwardTemplate';
+
+const PRIVATE_ENTITY_TYPES = ['evaluation', 'award'];
 
 const INTERNAL_API_URL = process.env.INTERNAL_API_URL || 'http://localhost:8000';
 
@@ -39,6 +42,8 @@ export async function GET(
   const height = Number(searchParams.get('height')) || 630;
   const preview = searchParams.get('preview') === 'true';
   const templateId = searchParams.get('templateId');
+  const sig = searchParams.get('sig');
+  const exp = searchParams.get('exp');
 
   // Clamp dimensions
   const w = Math.min(Math.max(width, 200), 1920);
@@ -53,7 +58,25 @@ export async function GET(
       return new Response('Entity not found', { status: 404 });
     }
 
-    // Access control for private entities (HMAC sig) — deferred to follow-up plan
+    // Access control for private entities — validate HMAC signature
+    const requiresSig = PRIVATE_ENTITY_TYPES.includes(type) || entityData.isPublic === false;
+    if (requiresSig) {
+      if (!sig || !exp || !validateOgSignature(type, id, sig, exp)) {
+        const fonts = await getFonts();
+        return new ImageResponse(renderPlaceholder(finalW, finalH), {
+          width: finalW,
+          height: finalH,
+          fonts: fonts.map((f) => ({
+            name: f.name,
+            data: f.data,
+            weight: f.weight,
+            style: 'normal' as const,
+          })),
+          headers: { 'Cache-Control': 'private, no-store' },
+        });
+      }
+    }
+
     // Template config fetching from clubs-service — deferred to TemplatePicker integration
 
     let config = DEFAULT_TEMPLATE; // Uses Spike default; club templates wired after CRUD integration
@@ -93,6 +116,26 @@ export async function GET(
     console.error('OG image generation error:', err);
     return new Response('Image generation failed', { status: 500 });
   }
+}
+
+function renderPlaceholder(width: number, height: number) {
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width,
+      height,
+      backgroundImage: 'linear-gradient(135deg, #1a1a2e, #0f3460)',
+      color: '#ffffff',
+      fontFamily: 'Inter',
+      gap: 16,
+    }}>
+      <span style={{ fontSize: Math.round(width * 0.06), fontWeight: 800, color: '#FF7D00' }}>Spike</span>
+      <span style={{ fontSize: Math.round(width * 0.025), opacity: 0.5 }}>Content not available</span>
+    </div>
+  );
 }
 
 async function fetchEntityData(type: OgType, id: string) {

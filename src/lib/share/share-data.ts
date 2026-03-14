@@ -1,6 +1,8 @@
 import type { ShareableEntity, ShareData } from '@/components/features/share/types';
 import { buildShareUrl } from './share-utils';
 
+const PRIVATE_ENTITY_TYPES = ['evaluation', 'award'];
+
 /**
  * Build share data (title, text, url) for a given entity.
  *
@@ -36,6 +38,7 @@ export function getOgImageUrl(
     height?: number;
     preview?: boolean;
     sig?: string;
+    exp?: string;
     configHash?: string;
   }
 ): string {
@@ -45,8 +48,39 @@ export function getOgImageUrl(
   if (options?.height) params.set('height', String(options.height));
   if (options?.preview) params.set('preview', 'true');
   if (options?.sig) params.set('sig', options.sig);
+  if (options?.exp) params.set('exp', options.exp);
   if (options?.configHash) params.set('v', options.configHash);
 
   const query = params.toString();
   return `/api/og/${entity.type}/${entity.id}${query ? `?${query}` : ''}`;
+}
+
+/**
+ * Get a signed OG image URL for private entities.
+ * Calls the server-side signing endpoint to get HMAC signature.
+ * For public entities, returns the unsigned URL.
+ */
+export async function getSignedOgImageUrl(
+  entity: ShareableEntity,
+  options?: Parameters<typeof getOgImageUrl>[1]
+): Promise<string> {
+  if (!PRIVATE_ENTITY_TYPES.includes(entity.type)) {
+    return getOgImageUrl(entity, options);
+  }
+
+  try {
+    const response = await fetch('/api/og/sign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: entity.type, id: entity.id }),
+    });
+    if (response.ok) {
+      const { sig, exp } = await response.json();
+      return getOgImageUrl(entity, { ...options, sig, exp: String(exp) });
+    }
+  } catch {
+    // Fall through to unsigned URL
+  }
+
+  return getOgImageUrl(entity, options);
 }

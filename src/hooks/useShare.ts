@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import type { ShareableEntity } from '@/components/features/share/types';
 import { isRichEntity } from '@/components/features/share/types';
-import { getShareData, getOgImageUrl } from '@/lib/share/share-data';
+import { getShareData, getSignedOgImageUrl } from '@/lib/share/share-data';
 import {
   isNativeShareSupported,
   isFileShareSupported,
@@ -50,7 +50,7 @@ export function useShare({ entity }: UseShareOptions): UseShareReturn {
     if (nativeShareSupported) {
       try {
         if (isRichEntity(entity.type) && isFileShareSupported()) {
-          const imageUrl = getOgImageUrl(entity, { preview: true });
+          const imageUrl = await getSignedOgImageUrl(entity, { preview: true });
           const file = await fetchImageAsFile(imageUrl, `${entity.type}-${entity.id}.png`);
           const shared = await nativeShare({ ...shareData, files: [file] });
           if (shared) return null;
