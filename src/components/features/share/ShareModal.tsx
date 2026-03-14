@@ -37,7 +37,7 @@ export function ShareModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!sm:max-w-md !max-w-[calc(100%-2rem)] !gap-0 !p-0 !rounded-2xl overflow-hidden max-h-[85vh] flex flex-col">
+      <DialogContent className="!max-w-[calc(100%-2rem)] sm:!max-w-md !gap-0 !p-0 !rounded-2xl overflow-hidden max-h-[85vh] flex flex-col">
         <DialogHeader className="border-b px-5 py-4 shrink-0">
           <DialogTitle>Share</DialogTitle>
         </DialogHeader>
