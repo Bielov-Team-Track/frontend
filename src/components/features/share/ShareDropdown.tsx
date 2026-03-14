@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuSeparator,
+  DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { ShareData } from './types';
 import { ShareTargetGrid } from './ShareTargetGrid';
@@ -14,12 +14,13 @@ interface ShareDropdownProps {
   shareData: ShareData;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  children: React.ReactNode; // Trigger element (the ShareButton)
+  children: React.ReactNode; // Trigger element (rendered as the menu trigger)
 }
 
 /**
  * Compact share popover anchored to the trigger button.
  * Shows top share targets with "More options" to expand.
+ * Children are rendered as the dropdown trigger.
  */
 export function ShareDropdown({ shareData, open, onOpenChange, children }: ShareDropdownProps) {
   const [expanded, setExpanded] = useState(false);
@@ -33,7 +34,7 @@ export function ShareDropdown({ shareData, open, onOpenChange, children }: Share
         if (!o) setExpanded(false);
       }}
     >
-      {children}
+      <DropdownMenuTrigger render={children as React.ReactElement} />
       <DropdownMenuContent align="end" side="bottom" className="w-64 p-2">
         <p className="mb-2 px-1.5 text-xs font-medium text-muted-foreground">Share</p>
         <ShareTargetGrid

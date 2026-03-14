@@ -3,8 +3,8 @@
 
 import { Share2 } from 'lucide-react';
 import { Button } from '@/components/ui';
-import { DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { ShareableEntity } from './types';
+import { isRichEntity } from './types';
 import { useShare } from '@/hooks/useShare';
 import { getShareData } from '@/lib/share/share-data';
 import { ShareDropdown } from './ShareDropdown';
@@ -37,6 +37,7 @@ export function ShareButton({
   } = useShare({ entity });
 
   const shareData = getShareData(entity);
+  const isIconSize = size?.toString().startsWith('icon');
 
   const handleClick = async () => {
     if (action === 'copy') {
@@ -46,27 +47,48 @@ export function ShareButton({
     }
   };
 
+  // For simple entities: wrap button in DropdownMenu so it anchors properly
+  // For rich entities or copy mode: just a plain button (modal/toast, no dropdown)
+  if (!isRichEntity(entity.type) && action === 'share') {
+    return (
+      <>
+        <ShareDropdown
+          shareData={shareData}
+          open={dropdownOpen}
+          onOpenChange={setDropdownOpen}
+        >
+          <Button
+            variant={variant}
+            size={size}
+            className={className}
+          >
+            <Share2 className={isIconSize ? 'size-4' : 'size-3.5'} />
+            {isIconSize ? null : (children ?? 'Share')}
+          </Button>
+        </ShareDropdown>
+
+        <ShareModal
+          entity={entity}
+          shareData={shareData}
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+        />
+      </>
+    );
+  }
+
+  // Rich entities or copy mode: plain button, no dropdown wrapper
   return (
     <>
-      <ShareDropdown
-        shareData={shareData}
-        open={dropdownOpen}
-        onOpenChange={setDropdownOpen}
+      <Button
+        variant={variant}
+        size={size}
+        className={className}
+        onClick={handleClick}
       >
-        <DropdownMenuTrigger
-          render={
-            <Button
-              variant={variant}
-              size={size}
-              className={className}
-              onClick={handleClick}
-            >
-              <Share2 className={size?.toString().startsWith('icon') ? 'size-4' : 'size-3.5'} />
-              {size?.toString().startsWith('icon') ? null : (children ?? 'Share')}
-            </Button>
-          }
-        />
-      </ShareDropdown>
+        <Share2 className={isIconSize ? 'size-4' : 'size-3.5'} />
+        {isIconSize ? null : (children ?? 'Share')}
+      </Button>
 
       <ShareModal
         entity={entity}
