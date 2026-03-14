@@ -22,9 +22,6 @@ export function FeedbackButton() {
 
 	const { getDiagnostics } = useDiagnostics();
 
-	// Check if beta mode is enabled
-	const isBetaMode = process.env.NEXT_PUBLIC_BETA_MODE === "true";
-
 	// Capture using html2canvas-pro (supports lab/oklch colors)
 	const captureWithHtml2Canvas = useCallback(async (): Promise<string | null> => {
 		try {
@@ -132,8 +129,6 @@ export function FeedbackButton() {
 
 	// Keyboard shortcuts: Ctrl/Cmd+Shift+F for text only, Ctrl/Cmd+Shift+S for screenshot
 	useEffect(() => {
-		if (!isBetaMode) return;
-
 		const handleKeyDown = (e: KeyboardEvent) => {
 			// Don't trigger if user is typing in an input/textarea
 			const target = e.target as HTMLElement;
@@ -171,7 +166,7 @@ export function FeedbackButton() {
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [isBetaMode, getDiagnostics, handleWithScreenshot, handleFullScreen]);
+	}, [getDiagnostics, handleWithScreenshot, handleFullScreen]);
 
 	const handleRegionSelected = useCallback((region: Region, croppedDataUrl: string) => {
 		setSelectedRegion(region);
@@ -189,11 +184,6 @@ export function FeedbackButton() {
 	const handleModalClose = useCallback(() => {
 		handleCancel();
 	}, [handleCancel]);
-
-	// Don't render if not in beta mode
-	if (!isBetaMode) {
-		return null;
-	}
 
 	return (
 		<>
