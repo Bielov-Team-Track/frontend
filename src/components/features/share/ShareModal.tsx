@@ -3,9 +3,9 @@
 
 import { Link, Copy } from 'lucide-react';
 import {
-  Dialog, DialogPortal, DialogOverlay, DialogContent,
-  DialogHeader, DialogTitle, Button,
-} from '@/components/ui';
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui';
 import type { ShareableEntity, ShareData } from './types';
 import { ShareTargetGrid } from './ShareTargetGrid';
 import { ShareImagePreview } from './ShareImagePreview';
@@ -37,14 +37,12 @@ export function ShareModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPortal>
-        <DialogOverlay />
-        <DialogContent className="!max-w-md !rounded-2xl !p-0">
-          <DialogHeader className="border-b px-5 py-4">
-            <DialogTitle>Share</DialogTitle>
-          </DialogHeader>
+      <DialogContent className="!max-w-md !rounded-2xl !p-0">
+        <DialogHeader className="border-b px-5 py-4">
+          <DialogTitle>Share</DialogTitle>
+        </DialogHeader>
 
-          <div className="space-y-4 p-5">
+        <div className="space-y-4 p-5">
             {/* Generated image preview + download */}
             <ShareImagePreview entity={entity} templateId={templateId} />
 
@@ -70,7 +68,6 @@ export function ShareModal({
             </div>
           </div>
         </DialogContent>
-      </DialogPortal>
     </Dialog>
   );
 }
