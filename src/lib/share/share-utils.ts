@@ -1,4 +1,4 @@
-const APP_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://spike.app';
+const APP_BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.volleyspike.app';
 
 export function buildShareUrl(relativePath: string): string {
   return `${APP_BASE_URL}${relativePath}`;
