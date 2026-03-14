@@ -28,6 +28,7 @@ jobs:
     with:
       push-docker-image: true
       environment: staging
+    secrets: inherit
 
   # Deploy to staging server
   deploy-staging:
@@ -40,7 +41,11 @@ jobs:
       service-name: frontend
       environment: staging
       health-check-path: /api/health
-    secrets: inherit
+    secrets:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_FINGERPRINT: ${{ secrets.SSH_FINGERPRINT }}
 
   # Build and push image (main branch) — production env vars baked in
   build-production:
@@ -52,6 +57,7 @@ jobs:
     with:
       push-docker-image: true
       environment: production
+    secrets: inherit
 
   # Deploy to production server
   deploy-production:
@@ -64,4 +70,8 @@ jobs:
       service-name: frontend
       environment: production
       health-check-path: /api/health
-    secrets: inherit
+    secrets:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_FINGERPRINT: ${{ secrets.SSH_FINGERPRINT }}
