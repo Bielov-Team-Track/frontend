@@ -4,7 +4,12 @@ Sentry.init({
 	dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 	environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "production",
 
-	tracesSampleRate: 0.2,
+	// Tracing now handled by OpenTelemetry → Grafana Tempo
+	tracesSampleRate: 0,
+
+	// Prevent Sentry from registering its own OTel instrumentation,
+	// which would conflict with @vercel/otel. Available in Sentry SDK v8+.
+	skipOpenTelemetrySetup: true,
 
 	enabled: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
 });

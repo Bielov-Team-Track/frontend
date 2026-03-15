@@ -4,8 +4,8 @@ Sentry.init({
 	dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 	environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "production",
 
-	// Performance monitoring — sample 20% of transactions
-	tracesSampleRate: 0.2,
+	// Tracing now handled by OpenTelemetry → Grafana Tempo
+	tracesSampleRate: 0,
 
 	// Session replay — capture 5% of sessions, 100% on error
 	replaysSessionSampleRate: 0.05,
@@ -16,7 +16,6 @@ Sentry.init({
 			maskAllText: false,
 			blockAllMedia: false,
 		}),
-		Sentry.browserTracingIntegration(),
 	],
 
 	// Don't send errors without a DSN configured
